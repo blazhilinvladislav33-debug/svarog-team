@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVAROG | Admin Dashboard</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Конфігурація вашого проєкту Firebase Svarog-Team
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+            authDomain: "svarog-team.firebaseapp.com",
+            projectId: "svarog-team",
+            storageBucket: "svarog-team.firebasestorage.app",
+            messagingSenderId: "311449325528",
+            appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
+            measurementId: "G-56T1VN72PF"
+        };
+        // Ініціалізація хмари
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -41,7 +60,6 @@
         .superadmin-toggle-link { font-size: 0.8rem; color: #ffffff; opacity: 0.3; text-decoration: none; cursor: pointer; transition: opacity 0.2s ease; }
         .superadmin-toggle-link:hover { opacity: 0.8; color: #00ffcc; }
 
-        /* ВКЛАДКИ */
         .tabs-header { display: flex; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         .tab-button { flex: 1; min-width: 90px; padding: 10px 5px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; text-align: center; position: relative; display: flex; justify-content: center; align-items: center; gap: 5px; }
         .tab-button.active { color: #121212; background: #ffffff; }
@@ -60,7 +78,6 @@
         .delete-admin-btn { background: none; border: 1px solid #ff4a4a; color: #ff4a4a; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; cursor: pointer; position: absolute; right: 15px; top: 13px; }
         .edit-news-btn { background: none; border: 1px solid #00ffcc; color: #00ffcc; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; cursor: pointer; position: absolute; right: 105px; top: 13px; }
 
-        /* ЧАТ МАКЕТ */
         .chat-admin-layout { display: flex; gap: 20px; height: 480px; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; border: 1px solid rgba(255,255,255,0.05); }
         .chat-sessions-list { width: 240px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 10px; flex-shrink: 0; }
         .session-item { padding: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; cursor: pointer; border: 1px solid transparent; font-size: 0.85rem; }
@@ -81,7 +98,6 @@
         .admin-bubble.admin { background: rgba(0, 255, 204, 0.15); align-self: flex-end; border: 1px solid rgba(0, 255, 204, 0.3); border-bottom-right-radius: 2px; }
         .admin-bubble img { max-width: 100%; max-height: 150px; border-radius: 4px; margin-top: 5px; cursor: pointer; display: block; }
 
-        /* ОНОВЛЕНА ЗОНА ВВОДУ В АДМІНЦІ (КРУГЛІ ЕЛЕМЕНТИ ТА SVG) */
         .admin-input-area { padding: 12px 0 0 0; display: none; gap: 8px; border-top: 1px solid rgba(255,255,255,0.1); background: transparent; align-items: center; }
         .admin-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 19px; color: #ffffff; outline: none; font-size: 0.9rem; }
         
@@ -89,25 +105,8 @@
         .clip-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
         .clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.7); }
         
-        .admin-send-btn { 
-            width: 38px; 
-            height: 38px; 
-            background: #00ffcc; 
-            border: none; 
-            color: #121212; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-            padding: 0;
-        }
-        .admin-send-btn:hover { 
-            transform: scale(1.05);
-            box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
-        }
+        .admin-send-btn { width: 38px; height: 38px; background: #00ffcc; border: none; color: #121212; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0; padding: 0; }
+        .admin-send-btn:hover { transform: scale(1.05); box-shadow: 0 0 12px rgba(0, 255, 204, 0.4); }
         .admin-send-btn svg { width: 18px; height: 18px; fill: #121212; margin-left: 2px; }
 
         .export-btn { display: inline-block; width: auto; padding: 6px 15px; font-size: 0.85rem; border: 1px solid #00ffcc; color: #00ffcc; border-radius: 4px; background: transparent; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
@@ -141,8 +140,6 @@
         .menu-toggle.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
         .back-to-list-btn { display: none; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: bold; margin-right: 8px; }
-
-        /* Чекбокс перемикач */
         .switch-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
         .switch-wrapper input { cursor: pointer; width: 16px; height: 16px; accent-color: #00ffcc; }
 
@@ -318,6 +315,13 @@
             <div id="admin-management-tab" class="tab-content">
                 <div class="superadmin-grid">
                     <div class="admin-creator-form">
+                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Управління безпекою</h3>
+                        <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.15);">
+                            <h4 style="font-size: 0.9rem; color: #aaa; margin-bottom: 10px;">Зміна пароля системи (admin)</h4>
+                            <div class="form-group"><input type="password" id="change-system-pass" class="form-input" placeholder="Новий системний пароль"></div>
+                            <button class="btn" onclick="execChangeAdminPassword()" style="border-color:#ffaa00; color:#ffaa00; padding:8px; font-size:0.9rem;">Оновити пароль</button>
+                        </div>
+
                         <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Створити адміністратора</h3>
                         <form id="create-admin-form" onsubmit="createNewAdminAccount(event)">
                             <div class="form-group"><input type="text" id="new-admin-lastname" class="form-input" placeholder="Прізвище" required autocomplete="off"></div>
@@ -342,12 +346,13 @@
 
     <script>
         let currentSelectedChatId = null;
-        let updateInterval = null;
         let isConfirmingStatus = false;
         let currentTab = 'active-chats-tab';
         let isSuperadminSession = false;
         let isSuperadminLoginMode = false;
         let newsPhotoBase64 = "";
+        let globalChatsData = {}; // Локальний хмарний зліпок чатів
+        let unsubscribeChats = null; // Відписка від стріму бази даних
 
         const menuButton = document.getElementById('menu-button');
         const navMenu = document.getElementById('nav-menu');
@@ -375,7 +380,8 @@
             }
         }
 
-        function handleLogin(event) {
+        // Хмарна авторизація
+        async function handleLogin(event) {
             event.preventDefault();
             const userInp = document.getElementById('username').value.trim();
             const passInp = document.getElementById('password').value.trim();
@@ -386,12 +392,38 @@
                     document.getElementById('superadmin-only-tab-btn').style.display = 'block'; enterDashboard();
                 } else { document.getElementById('error-block').style.display = 'block'; }
             } else {
-                let createdAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
-                const matchedAdmin = createdAdmins.find(a => a.user === userInp && a.pass === passInp);
-                if ((userInp === 'admin' && passInp === 'admin123') || matchedAdmin) {
-                    isSuperadminSession = false;
-                    document.getElementById('superadmin-only-tab-btn').style.display = 'none'; enterDashboard();
-                } else { document.getElementById('error-block').style.display = 'block'; }
+                // Отримання пароля для 'admin' з Firebase
+                try {
+                    const authDoc = await db.collection("config").doc("auth").get();
+                    let systemPassword = "admin123"; // Заводський дефолт
+                    if (authDoc.exists && authDoc.data().password) {
+                        systemPassword = authDoc.data().password;
+                    }
+
+                    let createdAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
+                    const matchedAdmin = createdAdmins.find(a => a.user === userInp && a.pass === passInp);
+
+                    if ((userInp === 'admin' && passInp === systemPassword) || matchedAdmin) {
+                        isSuperadminSession = false;
+                        document.getElementById('superadmin-only-tab-btn').style.display = 'none'; enterDashboard();
+                    } else { document.getElementById('error-block').style.display = 'block'; }
+                } catch(e) {
+                    console.error(e);
+                    document.getElementById('error-block').style.display = 'block';
+                }
+            }
+        }
+
+        // Зміна пароля з інтерфейсу вкладки "Адміни"
+        async function execChangeAdminPassword() {
+            const newPass = document.getElementById('change-system-pass').value.trim();
+            if (!newPass) { alert("Введіть новий пароль!"); return; }
+            try {
+                await db.collection("config").doc("auth").set({ password: newPass }, { merge: true });
+                document.getElementById('change-system-pass').value = "";
+                alert("✓ Системний пароль для облікового запису 'admin' успішно змінено у Firebase!");
+            } catch(e) {
+                alert("Помилка доступу до бази: " + e.message);
             }
         }
 
@@ -399,9 +431,25 @@
             document.getElementById('login-card').style.display = 'none';
             const dashboard = document.getElementById('admin-dashboard');
             dashboard.style.display = 'block'; dashboard.classList.add('dashboard-mode');
-            initBadges(); loadAdminData();
-            updateInterval = setInterval(loadAdminData, 2000);
+            
+            // Запуск прослуховування хмарної бази даних Firebase Firestore у реальному часі
+            initFirebaseRealtimeStreams();
+            
+            initBadges();
             document.getElementById('news-date-field').valueAsDate = new Date();
+        }
+
+        // Стрім даних без перезавантаження сторінки
+        function initFirebaseRealtimeStreams() {
+            unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
+                globalChatsData = {};
+                snapshot.forEach(doc => {
+                    globalChatsData[doc.id] = doc.data();
+                });
+                renderAllDynamicData(); // Оновлюємо інтерфейс щоразу як прийшло повідомлення
+            }, error => {
+                console.error("Помилка стріму бази: ", error);
+            });
         }
 
         function previewNewsPhoto(input) {
@@ -601,32 +649,29 @@
             document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active'); button.classList.add('active');
 
-            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
             let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
             let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
 
-            if(tabId === 'active-chats-tab') localStorage.setItem('viewed_chats', Object.keys(allChats).filter(id => allChats[id].status === 'active').length);
+            if(tabId === 'active-chats-tab') localStorage.setItem('viewed_chats', Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length);
             if(tabId === 'feedback-tab') localStorage.setItem('viewed_feedback', fbMsgs.length);
             if(tabId === 'volunteer-tab') localStorage.setItem('viewed_volunteers', volMsgs.length);
             if(tabId === 'link-management-tab') showCurrentLinkInField();
-            loadAdminData();
+            renderAllDynamicData();
         }
 
         function initBadges() {
-            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
             let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
             let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
-            if(!localStorage.getItem('viewed_chats')) localStorage.setItem('viewed_chats', Object.keys(allChats).filter(id => allChats[id].status === 'active').length);
+            if(!localStorage.getItem('viewed_chats')) localStorage.setItem('viewed_chats', Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length);
             if(!localStorage.getItem('viewed_feedback')) localStorage.setItem('viewed_feedback', fbMsgs.length);
             if(!localStorage.getItem('viewed_volunteers')) localStorage.setItem('viewed_volunteers', volMsgs.length);
         }
 
         function updateBadgesLogic() {
-            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
             let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
             let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
 
-            let activeChatsCount = Object.keys(allChats).filter(id => allChats[id].status === 'active').length;
+            let activeChatsCount = Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length;
             let newChats = activeChatsCount - (parseInt(localStorage.getItem('viewed_chats')) || 0);
             let newFeedback = fbMsgs.length - (parseInt(localStorage.getItem('viewed_feedback')) || 0);
             let newVolunteers = volMsgs.length - (parseInt(localStorage.getItem('viewed_volunteers')) || 0);
@@ -640,19 +685,20 @@
 
         function showBadgeElement(id, count) { const el = document.getElementById(id); if(count > 0) { el.innerText = count; el.style.display = 'flex'; } else { el.style.display = 'none'; } }
 
-        function loadAdminData() {
+        // Єдина функція малювання інтерфейсу на базі зліпку з Firebase Firestore
+        function renderAllDynamicData() {
             if (isConfirmingStatus) return;
             updateBadgesLogic();
 
-            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
             const sessionsBox = document.getElementById('active-sessions-box'); const savedScrollTop = sessionsBox.scrollTop; sessionsBox.innerHTML = "";
             let activeCount = 0;
-            Object.keys(allChats).forEach(id => {
-                if (allChats[id].status === 'active') {
+            
+            Object.keys(globalChatsData).forEach(id => {
+                if (globalChatsData[id].status === 'active') {
                     activeCount++; const item = document.createElement('div');
                     item.className = `session-item ${currentSelectedChatId === id ? 'selected' : ''}`;
-                    let statusLabel = allChats[id].adminStatus === 'success' ? 'Успішно' : allChats[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
-                    item.innerHTML = `<div><strong>ID: ${id.substr(8)}</strong> <span class="badge ${allChats[id].adminStatus}">${statusLabel}</span></div>`;
+                    let statusLabel = globalChatsData[id].adminStatus === 'success' ? 'Успішно' : globalChatsData[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
+                    item.innerHTML = `<div><strong>ID: ${id.substr(0,8)}</strong> <span class="badge ${globalChatsData[id].adminStatus}">${statusLabel}</span></div>`;
                     item.onclick = () => selectChatSession(id); sessionsBox.appendChild(item);
                 }
             });
@@ -663,9 +709,9 @@
             const inputBlock = document.getElementById('global-admin-input-block');
             const workspaceWrapper = document.getElementById('chat-workspace-block');
 
-            if (currentSelectedChatId && allChats[currentSelectedChatId]) {
+            if (currentSelectedChatId && globalChatsData[currentSelectedChatId]) {
                 inputBlock.style.display = 'flex'; sessionsBox.classList.add('hide-on-mobile'); workspaceWrapper.classList.add('show-on-mobile');
-                renderWorkspaceContent(allChats[currentSelectedChatId], workspaceContent);
+                renderWorkspaceContent(globalChatsData[currentSelectedChatId], workspaceContent);
             } else {
                 inputBlock.style.display = 'none'; sessionsBox.classList.remove('hide-on-mobile'); workspaceWrapper.classList.remove('show-on-mobile');
                 workspaceContent.innerHTML = `<div style="text-align:center; margin:auto; color:#666;" data-lang="ua">Оберіть чат зі списку</div>`;
@@ -681,19 +727,19 @@
             if(volMsgs.length === 0) volBox.innerHTML = `<div class="no-msg">Бланків немає</div>`;
             volMsgs.forEach(vol => {
                 let imgHtml = vol.image ? `<img src="${vol.image}" class="attached-img-preview" onclick="openFullImage('${vol.image}')">` : '';
-                volBox.innerHTML += `<div class='msg-item'><div class='meta-line'>📋 ${vol.name} | 🏛️ ${vol.org} (${vol.time})</div><div class='msg-text' style='margin-bottom:5px;'>📞 <strong>Тел:</strong> ${vol.phone} | 💬 <strong>WhatsApp:</strong> ${vol.whatsapp}</div><div class='msg-text' style='color:#bbb;'>✉️ <strong>Повідомлення:</strong> ${vol.message}</div>${imgHtml}</div>`;
+                box.innerHTML += `<div class='msg-item'><div class='meta-line'>📋 ${vol.name} | 🏛️ ${vol.org} (${vol.time})</div><div class='msg-text' style='margin-bottom:5px;'>📞 <strong>Тел:</strong> ${vol.phone} | 💬 <strong>WhatsApp:</strong> ${vol.whatsapp}</div><div class='msg-text' style='color:#bbb;'>✉️ <strong>Повідомлення:</strong> ${vol.message}</div>${imgHtml}</div>`;
             });
 
             if (isSuperadminSession) { renderAdminAccountsList(); }
 
             const archiveBox = document.getElementById('box-for-archive'); archiveBox.innerHTML = "";
             let archiveCount = 0;
-            Object.keys(allChats).forEach(id => {
-                if (allChats[id].status === 'closed') {
+            Object.keys(globalChatsData).forEach(id => {
+                if (globalChatsData[id].status === 'closed') {
                     archiveCount++;
-                    let statusLabel = allChats[id].adminStatus === 'success' ? 'Успішно' : allChats[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
-                    let chatHtml = `<div class='msg-item'><div class='meta-line'>📦 Архів: ${id.substr(8)} | <span class="badge ${allChats[id].adminStatus}">${statusLabel}</span></div><div style='display:flex; flex-direction:column; gap:5px; margin-top:10px;'>`;
-                    allChats[id].messages.forEach(m => {
+                    let statusLabel = globalChatsData[id].adminStatus === 'success' ? 'Успішно' : globalChatsData[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
+                    let chatHtml = `<div class='msg-item'><div class='meta-line'>📦 Архів: ${id.substr(0,8)} | <span class="badge ${globalChatsData[id].adminStatus}">${statusLabel}</span></div><div style='display:flex; flex-direction:column; gap:5px; margin-top:10px;'>`;
+                    globalChatsData[id].messages.forEach(m => {
                         let contentHtml = m.type === 'image' ? `<img src="${m.text}" onclick="openFullImage('${m.text}')" style="max-height:100px;">` : m.text;
                         chatHtml += `<div style='font-size:0.85rem; color:${m.sender === 'admin' ? '#00ffcc' : '#bbb'}'><strong>${m.sender}:</strong> ${contentHtml}</div>`;
                     });
@@ -714,7 +760,7 @@
             if (currentAdmins.some(a => a.user === user) || user === 'admin' || user === 'superadmin') { alert("Логін зайнятий!"); return; }
             currentAdmins.push({ lastName, firstName, phone, user, pass, id: 'admin_' + Date.now() });
             localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins));
-            document.getElementById('create-admin-form').reset(); loadAdminData();
+            document.getElementById('create-admin-form').reset(); renderAllDynamicData();
         }
 
         function renderAdminAccountsList() {
@@ -726,14 +772,18 @@
             });
         }
 
-        function deleteAdminAccount(adminId) { if (confirm("Видалити?")) { let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins = currentAdmins.filter(a => a.id !== adminId); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); loadAdminData(); } }
+        function deleteAdminAccount(adminId) { if (confirm("Видалити?")) { let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins = currentAdmins.filter(a => a.id !== adminId); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); renderAllDynamicData(); } }
         function openFullImage(base64Data) { const newWindow = window.open(); newWindow.document.write(`<body style="margin:0; background:#121212; display:flex; justify-content:center; align-items:center; min-height:100vh;"><img src="${base64Data}" style="max-width:100%; max-height:100vh; object-fit:contain;"></body>`); }
-        function selectChatSession(id) { currentSelectedChatId = id; loadAdminData(); }
-        function backToSessionsList() { currentSelectedChatId = null; loadAdminData(); }
+        function selectChatSession(id) { currentSelectedChatId = id; renderAllDynamicData(); }
+        function backToSessionsList() { currentSelectedChatId = null; renderAllDynamicData(); }
 
         function renderWorkspaceContent(chatObj, targetElement) {
             const flowBox = targetElement.querySelector('#admin-msg-flow'); const wasAtBottom = flowBox ? (flowBox.scrollHeight - flowBox.scrollTop <= flowBox.clientHeight + 50) : true;
-            targetElement.innerHTML = `<div class="workspace-header"><button class="back-to-list-btn" onclick="backToSessionsList()">←</button><span>ID: ${chatObj.id.substr(8)}</span><select class="status-select ${chatObj.adminStatus}" onchange="confirmAndChangeStatus('${chatObj.id}', this.value, '${chatObj.adminStatus}')"><option value="processing">В обробці</option><option value="success">Успішно</option><option value="unresolved">Не вирішено</option></select><button onclick="closeChatSession('${chatObj.id}')" style="background:none; border:1px solid #ff4a4a; color:#ff4a4a; padding:4px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.75rem;">X</button></div><div class="admin-messages-box" id="admin-msg-flow"></div>`;
+            targetElement.innerHTML = `<div class="workspace-header"><button class="back-to-list-btn" onclick="backToSessionsList()">←</button><span>ID: ${chatObj.id.substr(0,8)}</span><select class="status-select ${chatObj.adminStatus}" onchange="confirmAndChangeStatus('${chatObj.id}', this.value, '${chatObj.adminStatus}')"><option value="processing">В обробці</option><option value="success">Успішно</option><option value="unresolved">Не вирішено</option></select><button onclick="closeChatSession('${chatObj.id}')" style="background:none; border:1px solid #ff4a4a; color:#ff4a4a; padding:4px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.75rem;">X</button></div><div class="admin-messages-box" id="admin-msg-flow"></div>`;
+            
+            const selectEl = targetElement.querySelector('.status-select');
+            if(selectEl) selectEl.value = chatObj.adminStatus;
+
             const flow = targetElement.querySelector('#admin-msg-flow');
             chatObj.messages.forEach(m => {
                 const b = document.createElement('div'); b.className = `admin-bubble ${m.sender}`;
@@ -742,22 +792,28 @@
             if (wasAtBottom) { flow.scrollTop = flow.scrollHeight; }
         }
 
-        function sendAdminReply() {
+        // Хмарна відправка тексту в Firebase
+        async function sendAdminReply() {
             if (!currentSelectedChatId) return;
             const input = document.getElementById('admin-reply-input'); const text = input.value.trim(); if(!text) return;
-            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-            if(allChats[currentSelectedChatId]) {
-                allChats[currentSelectedChatId].messages.push({ sender: 'admin', text: text, type: 'text', time: Date.now() });
-                localStorage.setItem('liveChatSystem', JSON.stringify(allChats)); input.value = ""; loadAdminData();
-            }
+            try {
+                await db.collection("chats").doc(currentSelectedChatId).update({
+                    messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'admin', text: text, type: 'text', time: Date.now() })
+                });
+                input.value = "";
+            } catch(e) { console.error("Помилка відправки:", e); }
         }
 
+        // Хмарна відправка фото в Firebase
         function sendAdminChatPhoto(input) {
             if (!currentSelectedChatId || !input.files || !input.files[0]) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-                if(allChats[currentSelectedChatId]) { allChats[currentSelectedChatId].messages.push({ sender: 'admin', text: e.target.result, type: 'image', time: Date.now() }); localStorage.setItem('liveChatSystem', JSON.stringify(allChats)); loadAdminData(); }
+            reader.onload = async function(e) {
+                try {
+                    await db.collection("chats").doc(currentSelectedChatId).update({
+                        messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'admin', text: e.target.result, type: 'image', time: Date.now() })
+                    });
+                } catch(err) { console.error(err); }
             }; reader.readAsDataURL(input.files[0]); input.value = "";
         }
 
@@ -772,22 +828,37 @@
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.setAttribute("href", URL.createObjectURL(blob)); link.setAttribute("download", `${fileName}.csv`); link.click();
         }
 
-        function confirmAndChangeStatus(id, newStatus, oldStatus) {
+        // Хмарна зміна статусу обробки чату
+        async function confirmAndChangeStatus(id, newStatus, oldStatus) {
             isConfirmingStatus = true;
             if (confirm(`Змінити статус чату?`)) {
-                let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {}; if (allChats[id]) { allChats[id].adminStatus = newStatus; localStorage.setItem('liveChatSystem', JSON.stringify(allChats)); }
+                try {
+                    await db.collection("chats").doc(id).update({ adminStatus: newStatus });
+                } catch(e) { console.error(e); }
             }
-            isConfirmingStatus = false; loadAdminData();
+            isConfirmingStatus = false; renderAllDynamicData();
         }
 
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'admin-reply-input') sendAdminReply(); });
-        function closeChatSession(id) { if (confirm('Закрити чат?')) { let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {}; if (allChats[id]) { allChats[id].status = 'closed'; localStorage.setItem('liveChatSystem', JSON.stringify(allChats)); } currentSelectedChatId = null; loadAdminData(); } }
+        
+        // Хмарне архівування чату
+        async function closeChatSession(id) { 
+            if (confirm('Закрити та перемістити цей чат в архів?')) { 
+                try {
+                    await db.collection("chats").doc(id).update({ status: 'closed' });
+                    currentSelectedChatId = null; 
+                    renderAllDynamicData();
+                } catch(e) { console.error(e); }
+            } 
+        }
         
         function handleLogout() {
-            clearInterval(updateInterval); isSuperadminSession = false; toggleSuperadminMode(false);
+            if(unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; } // Закриваємо з'єднання
+            isSuperadminSession = false; toggleSuperadminMode(false);
             const dashboard = document.getElementById('admin-dashboard'); dashboard.style.display = 'none'; dashboard.classList.remove('dashboard-mode');
             document.getElementById('username').value = ""; document.getElementById('password').value = ""; document.getElementById('login-card').style.display = 'block';
         }
+        
         window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); });
     </script>
 </body>
