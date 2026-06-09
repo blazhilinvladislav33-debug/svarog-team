@@ -308,14 +308,23 @@
             <div id="admin-management-tab" class="tab-content">
                 <div class="superadmin-grid">
                     <div class="admin-creator-form">
-                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Управління безпекою</h3>
-                        <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.15);">
-                            <h4 style="font-size: 0.9rem; color: #aaa; margin-bottom: 10px;">Зміна пароля системи (admin)</h4>
-                            <div class="form-group"><input type="password" id="change-system-pass" class="form-input" placeholder="Новий системний пароль"></div>
-                            <button class="btn" onclick="execChangeAdminPassword()" style="border-color:#ffaa00; color:#ffaa00; padding:8px; font-size:0.9rem;">Оновити пароль</button>
+                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Управління безпекою системи</h3>
+                        
+                        <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.15);">
+                            <h4 style="font-size: 0.9rem; color: #aaa; margin-bottom: 10px;">Зміна доступу звичайного Admin</h4>
+                            <div class="form-group"><input type="text" id="change-admin-user" class="form-input" placeholder="Новий логін Admin"></div>
+                            <div class="form-group"><input type="password" id="change-admin-pass" class="form-input" placeholder="Новий пароль Admin"></div>
+                            <button class="btn" onclick="updateSystemCredentials('admin')" style="border-color:#ffaa00; color:#ffaa00; padding:8px; font-size:0.9rem;">Оновити Admin</button>
                         </div>
 
-                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Створити адміністратора</h3>
+                        <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.15);">
+                            <h4 style="font-size: 0.9rem; color: #aaa; margin-bottom: 10px;">Зміна доступу Головного Superadmin</h4>
+                            <div class="form-group"><input type="text" id="change-superadmin-user" class="form-input" placeholder="Новий логін Superadmin"></div>
+                            <div class="form-group"><input type="password" id="change-superadmin-pass" class="form-input" placeholder="Новий пароль Superadmin"></div>
+                            <button class="btn" onclick="updateSystemCredentials('superadmin')" style="border-color:#00ffcc; color:#00ffcc; padding:8px; font-size:0.9rem;">Оновити Superadmin</button>
+                        </div>
+
+                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Створити додаткового адміна</h3>
                         <form id="create-admin-form" onsubmit="createNewAdminAccount(event)">
                             <div class="form-group"><input type="text" id="new-admin-lastname" class="form-input" placeholder="Прізвище" required autocomplete="off"></div>
                             <div class="form-group"><input type="text" id="new-admin-firstname" class="form-input" placeholder="Ім'я" required autocomplete="off"></div>
@@ -389,88 +398,151 @@
             const userInp = document.getElementById('username').value.trim();
             const passInp = document.getElementById('password').value.trim();
 
-            if (isSuperadminLoginMode) {
-                if (userInp === 'superadmin' && passInp === 'super123') {
-                    isSuperadminSession = true;
-                    document.getElementById('superadmin-only-tab-btn').style.display = 'block'; enterDashboard();
-                } else { document.getElementById('error-block').style.display = 'block'; }
-            } else {
-                try {
-                    const authDoc = await db.collection("config").doc("auth").get();
-                    let systemPassword = "admin123";
-                    if (authDoc.exists && authDoc.data().password) {
-                        systemPassword = authDoc.data().password;
-                    }
+            try {
+                const authDoc = await db.collection("config").doc("auth").get();
+                let creds = {
+                    admin_user: "admin",
+                    admin_pass: "admin123",
+                    superadmin_user: "superadmin",
+                    superadmin_pass: "super123"
+                };
+                
+                if (authDoc.exists) {
+                    const d = authDoc.data();
+                    if(d.admin_user) creds.admin_user = d.admin_user;
+                    if(d.admin_pass) creds.admin_pass = d.admin_pass;
+                    if(d.password) creds.admin_pass = d.password; // зворотна сумісність
+                    if(d.superadmin_user) creds.superadmin_user = d.superadmin_user;
+                    if(d.superadmin_pass) creds.superadmin_pass = d.superadmin_pass;
+                }
 
+                if (isSuperadminLoginMode) {
+                    if (userInp === creds.superadmin_user && passInp === creds.superadmin_pass) {
+                        isSuperadminSession = true;
+                        document.getElementById('superadmin-only-tab-btn').style.display = 'block'; enterDashboard();
+                    } else { document.getElementById('error-block').style.display = 'block'; }
+                } else {
                     let createdAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
                     const matchedAdmin = createdAdmins.find(a => a.user === userInp && a.pass === passInp);
 
-                    if ((userInp === 'admin' && passInp === systemPassword) || matchedAdmin) {
+                    if ((userInp === creds.admin_user && passInp === creds.admin_pass) || matchedAdmin) {
                         isSuperadminSession = false;
                         document.getElementById('superadmin-only-tab-btn').style.display = 'none'; enterDashboard();
                     } else { document.getElementById('error-block').style.display = 'block'; }
-                } catch(e) {
-                    console.error(e);
-                    document.getElementById('error-block').style.display = 'block';
                 }
+            } catch(e) {
+                console.error(e);
+                document.getElementById('error-block').style.display = 'block';
             }
         }
 
-        // Зміна пароля системи
-        async function execChangeAdminPassword() {
-            const newPass = document.getElementById('change-system-pass').value.trim();
-            if (!newPass) { alert("Введіть новий пароль!"); return; }
+        // Зміна доступу системних користувачів (Admin та Superadmin)
+        async function updateSystemCredentials(role) {
+            const userField = document.getElementById(`change-${role}-user`).value.trim();
+            const passField = document.getElementById(`change-${role}-pass`).value.trim();
+
+            if (!userField && !passField) { alert("Заповніть хоча б одне поле для зміни!"); return; }
+
             try {
-                await db.collection("config").doc("auth").set({ password: newPass }, { merge: true });
-                document.getElementById('change-system-pass').value = "";
-                alert("✓ Системний пароль успішно змінено у Firebase!");
-            } catch(e) { alert("Помилка: " + e.message); }
+                let updateData = {};
+                if (role === 'admin') {
+                    if (userField) updateData.admin_user = userField;
+                    if (passField) updateData.admin_pass = passField;
+                } else {
+                    if (userField) updateData.superadmin_user = userField;
+                    if (passField) updateData.superadmin_pass = passField;
+                }
+
+                await db.collection("config").doc("auth").set(updateData, { merge: true });
+                document.getElementById(`change-${role}-user`).value = "";
+                document.getElementById(`change-${role}-pass`).value = "";
+                alert(`✓ Доступи для ${role} успішно оновлено у Firebase!`);
+            } catch(e) { alert("Помилка оновлення: " + e.message); }
         }
 
         function enterDashboard() {
             document.getElementById('login-card').style.display = 'none';
             const dashboard = document.getElementById('admin-dashboard');
             dashboard.style.display = 'block'; dashboard.classList.add('dashboard-mode');
-            
-            // Запуск прослуховування всіх хмарних потоків
             initFirebaseRealtimeStreams();
-            
             initBadges();
             document.getElementById('news-date-field').valueAsDate = new Date();
         }
 
         // Повний стрім усіх даних з хмари Firebase в реальному часі
         function initFirebaseRealtimeStreams() {
-            // 1. Стрім чатів
             unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
                 globalChatsData = {};
                 snapshot.forEach(doc => { globalChatsData[doc.id] = doc.data(); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
-            // 2. Стрім заявок (Forms / Feedback)
             unsubscribeFeedback = db.collection("feedback").onSnapshot(snapshot => {
                 globalFeedbackData = [];
                 snapshot.forEach(doc => { globalFeedbackData.push({ id: doc.id, ...doc.data() }); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
-            // 3. Стрім бланкових волонтерів
             unsubscribeVolunteers = db.collection("volunteers").onSnapshot(snapshot => {
                 globalVolunteersData = [];
                 snapshot.forEach(doc => { globalVolunteersData.push({ id: doc.id, ...doc.data() }); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
-            // 4. Стрім налаштувань соцмереж
             unsubscribeSocials = db.collection("config").doc("socials").onSnapshot(doc => {
-                if (doc.exists && doc.data().list) {
-                    globalSocialNetworks = doc.data().list;
-                } else {
-                    globalSocialNetworks = [];
-                }
+                globalSocialNetworks = (doc.exists && doc.data().list) ? doc.data().list : [];
                 renderAdminSocialList();
             }, e => console.error(e));
+        }
+
+        // --- ЛОГІКА АДМІНІСТРУВАННЯ АНОНІМНОГО ЧАТУ ---
+        async function sendAdminReply() {
+            const input = document.getElementById('admin-reply-input');
+            const text = input.value.trim();
+            if (!text || !currentSelectedChatId) return;
+
+            const msgObject = { sender: 'admin', text: text, type: 'text', time: Date.now() };
+            input.value = "";
+
+            try {
+                await db.collection("chats").doc(currentSelectedChatId).update({
+                    messages: firebase.firestore.FieldValue.arrayUnion(msgObject),
+                    lastUpdate: Date.now()
+                });
+            } catch(e) { console.error("Помилка відповіді адміна: ", e); }
+        }
+
+        function sendAdminChatPhoto(input) {
+            if (!input.files || !input.files[0] || !currentSelectedChatId) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const msgObject = { sender: 'admin', text: e.target.result, type: 'image', time: Date.now() };
+                try {
+                    await db.collection("chats").doc(currentSelectedChatId).update({
+                        messages: firebase.firestore.FieldValue.arrayUnion(msgObject),
+                        lastUpdate: Date.now()
+                    });
+                } catch(err) { console.error("Помилка фото адміна: ", err); }
+            };
+            reader.readAsDataURL(input.files[0]);
+            input.value = "";
+        }
+
+        async function confirmAndChangeStatus(id, newStatus, oldStatus) {
+            isConfirmingStatus = true;
+            try {
+                await db.collection("chats").doc(id).update({ adminStatus: newStatus });
+            } catch(e) { console.error(e); }
+            finally { isConfirmingStatus = false; renderAllDynamicData(); }
+        }
+
+        async function closeChatSession(id) {
+            if (confirm("Завершити цей сеанс чату та перенести його в архів?")) {
+                try {
+                    await db.collection("chats").doc(id).update({ status: 'closed' });
+                    if (currentSelectedChatId === id) currentSelectedChatId = null;
+                } catch(e) { console.error("Помилка закриття сесії:", e); }
+            }
         }
 
         function previewNewsPhoto(input) {
@@ -634,7 +706,6 @@
             localStorage.setItem('siteDonationLink', newUrl); showCurrentLinkInField(); inputField.value = ""; alert("✓ Банку успішно оновлено!");
         }
 
-        // Додавання соціальної мережі безпосередньо у Firebase хмару
         async function addNewSocialNetwork() {
             const nameField = document.getElementById('soc-name'); const urlField = document.getElementById('soc-url'); const colorField = document.getElementById('soc-color');
             const name = nameField.value.trim(); const url = urlField.value.trim(); const color = colorField.value;
@@ -644,10 +715,9 @@
             try {
                 await db.collection("config").doc("socials").set({ list: updatedList });
                 nameField.value = ""; urlField.value = "";
-            } catch(e) { console.error("Помилка запису мережі в хмару:", e); }
+            } catch(e) { console.error("Помилка соцмережі:", e); }
         }
 
-        // Відображення соціальних мереж із хмарного масиву
         function renderAdminSocialList() {
             const box = document.getElementById('box-for-social-list'); box.innerHTML = "";
             if(globalSocialNetworks.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:5px;">Мереж немає</div>`; return; }
@@ -661,13 +731,10 @@
             });
         }
 
-        // Видалення соціальної мережі з хмари Firebase
         async function deleteSocialNetwork(id) {
             if(confirm("Видалити цю соцмережу?")) {
                 let updatedList = globalSocialNetworks.filter(net => net.id !== id);
-                try {
-                    await db.collection("config").doc("socials").set({ list: updatedList });
-                } catch(e) { console.error(e); }
+                try { await db.collection("config").doc("socials").set({ list: updatedList }); } catch(e) { console.error(e); }
             }
         }
 
@@ -705,12 +772,11 @@
 
         function showBadgeElement(id, count) { const el = document.getElementById(id); if(count > 0) { el.innerText = count; el.style.display = 'flex'; } else { el.style.display = 'none'; } }
 
-        // Відображення даних з хмари у відповідних табах
         function renderAllDynamicData() {
             if (isConfirmingStatus) return;
             updateBadgesLogic();
 
-            // Малювання чатів
+            // ЧАТИ
             const sessionsBox = document.getElementById('active-sessions-box'); const savedScrollTop = sessionsBox.scrollTop; sessionsBox.innerHTML = "";
             let activeCount = 0;
             
@@ -738,7 +804,7 @@
                 workspaceContent.innerHTML = `<div style="text-align:center; margin:auto; color:#666;" data-lang="ua">Оберіть чат зі списку</div>`;
             }
 
-            // Малювання заявок зворотного зв'язку з хмари Firebase
+            // ЗАЯВКИ FEEDBACK
             const fbBox = document.getElementById('box-for-feedback'); fbBox.innerHTML = "";
             if(globalFeedbackData.length === 0) fbBox.innerHTML = `<div class="no-msg">Заявок немає</div>`;
             globalFeedbackData.slice().reverse().forEach(fb => { 
@@ -750,7 +816,7 @@
                     </div>`; 
             });
 
-            // Малювання бланків волонтерів з хмари Firebase
+            // ВОЛОНТЕРИ
             const volBox = document.getElementById('box-for-volunteers'); volBox.innerHTML = "";
             if(globalVolunteersData.length === 0) volBox.innerHTML = `<div class="no-msg">Бланків немає</div>`;
             globalVolunteersData.slice().reverse().forEach(vol => {
@@ -767,7 +833,7 @@
 
             if (isSuperadminSession) { renderAdminAccountsList(); }
 
-            // Архів чатів
+            // АРХІВ ЧАТІВ
             const archiveBox = document.getElementById('box-for-archive'); archiveBox.innerHTML = "";
             let archiveCount = 0;
             Object.keys(globalChatsData).forEach(id => {
@@ -785,20 +851,9 @@
             if(archiveCount === 0) archiveBox.innerHTML = `<div class="no-msg">Архів порожній</div>`;
         }
 
-        // Функції видалення заявок та волонтерів безпосередньо з хмари Firebase
-        async function deleteFeedbackItem(id) {
-            if(confirm("Видалити цю заявку безповоротно з хмари?")) {
-                try { await db.collection("feedback").doc(id).delete(); } catch(e) { console.error(e); }
-            }
-        }
+        async function deleteFeedbackItem(id) { if(confirm("Видалити цю заявку?")) { try { await db.collection("feedback").doc(id).delete(); } catch(e) { console.error(e); } } }
+        async function deleteVolunteerItem(id) { if(confirm("Видалити цей бланк волонтера?")) { try { await db.collection("volunteers").doc(id).delete(); } catch(e) { console.error(e); } } }
 
-        async function deleteVolunteerItem(id) {
-            if(confirm("Видалити цей бланк волонтера безповоротно з хмари?")) {
-                try { await db.collection("volunteers").doc(id).delete(); } catch(e) { console.error(e); }
-            }
-        }
-
-        // Локальний менеджмент додаткових адмін-профілів
         function createNewAdminAccount(event) {
             event.preventDefault();
             const lastName = document.getElementById('new-admin-lastname').value.trim();
@@ -822,7 +877,7 @@
             });
         }
 
-        function deleteAdminAccount(adminId) { if (confirm("Видалити профиль?")) { let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins = currentAdmins.filter(a => a.id !== adminId); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); renderAllDynamicData(); } }
+        function deleteAdminAccount(adminId) { if (confirm("Видалити профіль?")) { let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins = currentAdmins.filter(a => a.id !== adminId); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); renderAllDynamicData(); } }
         function openFullImage(base64Data) { const newWindow = window.open(); newWindow.document.write(`<body style="margin:0; background:#121212; display:flex; justify-content:center; align-items:center; min-height:100vh;"><img src="${base64Data}" style="max-width:100%; max-height:100vh; object-fit:contain;"></body>`); }
         function selectChatSession(id) { currentSelectedChatId = id; renderAllDynamicData(); }
         function backToSessionsList() { currentSelectedChatId = null; renderAllDynamicData(); }
@@ -842,19 +897,15 @@
             if (wasAtBottom) { flow.scrollTop = flow.scrollHeight; }
         }
 
-        // Функція експорту хмарних даних у CSV (Excel)
         function exportToCSV(storageKey, fileName) {
-            let rawData = [];
+            let rawData = (storageKey === 'siteFeedbackData') ? globalFeedbackData : globalVolunteersData;
+            if(rawData.length === 0) { alert("Немає даних для експорту!"); return; }
             let csvContent = "\uFEFF";
             
             if(storageKey === 'siteFeedbackData') {
-                rawData = globalFeedbackData;
-                if(rawData.length === 0) { alert("Немає даних для експорту!"); return; }
                 csvContent += "Дата,Ім'я,Контакт,Повідомлення\n"; 
                 rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.contact}","${item.message}"\n`; });
-            } else if(storageKey === 'siteVolunteerData') {
-                rawData = globalVolunteersData;
-                if(rawData.length === 0) { alert("Немає даних для експорту!"); return; }
+            } else {
                 csvContent += "Дата,Прізвище Ім'я,Фонд,Телефон,WhatsApp,Повідомлення\n"; 
                 rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.org}","${item.phone}","${item.whatsapp}","${item.message}"\n`; });
             }
@@ -867,7 +918,6 @@
         }
 
         function handleLogout() {
-            // Закриваємо потоки при виході
             if(unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; }
             if(unsubscribeFeedback) { unsubscribeFeedback(); unsubscribeFeedback = null; }
             if(unsubscribeVolunteers) { unsubscribeVolunteers(); unsubscribeVolunteers = null; }
@@ -878,6 +928,10 @@
             document.getElementById('username').value = ""; document.getElementById('password').value = ""; document.getElementById('login-card').style.display = 'block';
         }
         
+        document.addEventListener('keydown', function(e) { 
+            if (e.key === 'Enter' && document.activeElement.id === 'admin-reply-input') sendAdminReply(); 
+        });
+
         window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); });
     </script>
 </body>
