@@ -132,13 +132,6 @@
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
 
-        .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .menu-toggle:hover { transform: scale(1.05); background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); }
-        .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
-        .menu-toggle.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-        .menu-toggle.open .bar:nth-child(2) { opacity: 0; transform: translateX(-10px); }
-        .menu-toggle.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
         .back-to-list-btn { display: none; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: bold; margin-right: 8px; }
         .switch-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
         .switch-wrapper input { cursor: pointer; width: 16px; height: 16px; accent-color: #00ffcc; }
@@ -446,7 +439,7 @@
             document.getElementById('news-date-field').valueAsDate = new Date();
         }
 
-        // ОНОВЛЕНО: Повний стрім усіх даних з хмари Firebase в реальному часі
+        // Повний стрім усіх даних з хмари Firebase в реальному часі
         function initFirebaseRealtimeStreams() {
             // 1. Стрім чатів
             unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
@@ -456,14 +449,14 @@
             }, e => console.error(e));
 
             // 2. Стрім заявок (Forms / Feedback)
-            unsubscribeFeedback = db.collection("feedback").orderBy("timestamp", "asc").onSnapshot(snapshot => {
+            unsubscribeFeedback = db.collection("feedback").onSnapshot(snapshot => {
                 globalFeedbackData = [];
                 snapshot.forEach(doc => { globalFeedbackData.push({ id: doc.id, ...doc.data() }); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
             // 3. Стрім бланкових волонтерів
-            unsubscribeVolunteers = db.collection("volunteers").orderBy("timestamp", "asc").onSnapshot(snapshot => {
+            unsubscribeVolunteers = db.collection("volunteers").onSnapshot(snapshot => {
                 globalVolunteersData = [];
                 snapshot.forEach(doc => { globalVolunteersData.push({ id: doc.id, ...doc.data() }); });
                 renderAllDynamicData();
@@ -641,7 +634,7 @@
             localStorage.setItem('siteDonationLink', newUrl); showCurrentLinkInField(); inputField.value = ""; alert("✓ Банку успішно оновлено!");
         }
 
-        // ОНОВЛЕНО: Додавання соціальної мережі безпосередньо у Firebase хмару
+        // Додавання соціальної мережі безпосередньо у Firebase хмару
         async function addNewSocialNetwork() {
             const nameField = document.getElementById('soc-name'); const urlField = document.getElementById('soc-url'); const colorField = document.getElementById('soc-color');
             const name = nameField.value.trim(); const url = urlField.value.trim(); const color = colorField.value;
@@ -654,7 +647,7 @@
             } catch(e) { console.error("Помилка запису мережі в хмару:", e); }
         }
 
-        // ОНОВЛЕНО: Відображення соціальних мереж із хмарного масиву
+        // Відображення соціальних мереж із хмарного масиву
         function renderAdminSocialList() {
             const box = document.getElementById('box-for-social-list'); box.innerHTML = "";
             if(globalSocialNetworks.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:5px;">Мереж немає</div>`; return; }
@@ -668,7 +661,7 @@
             });
         }
 
-        // ОНОВЛЕНО: Видалення соціальної мережі з хмари Firebase
+        // Видалення соціальної мережі з хмари Firebase
         async function deleteSocialNetwork(id) {
             if(confirm("Видалити цю соцмережу?")) {
                 let updatedList = globalSocialNetworks.filter(net => net.id !== id);
@@ -712,7 +705,7 @@
 
         function showBadgeElement(id, count) { const el = document.getElementById(id); if(count > 0) { el.innerText = count; el.style.display = 'flex'; } else { el.style.display = 'none'; } }
 
-        // ОНОВЛЕНО: Відображення даних з хмари у відповідних табах
+        // Відображення даних з хмари у відповідних табах
         function renderAllDynamicData() {
             if (isConfirmingStatus) return;
             updateBadgesLogic();
@@ -792,7 +785,7 @@
             if(archiveCount === 0) archiveBox.innerHTML = `<div class="no-msg">Архів порожній</div>`;
         }
 
-        // ОНОВЛЕНО: Функції видалення заявок та волонтерів безпосередньо з хмари Firebase
+        // Функції видалення заявок та волонтерів безпосередньо з хмари Firebase
         async function deleteFeedbackItem(id) {
             if(confirm("Видалити цю заявку безповоротно з хмари?")) {
                 try { await db.collection("feedback").doc(id).delete(); } catch(e) { console.error(e); }
