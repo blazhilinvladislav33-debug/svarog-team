@@ -67,9 +67,7 @@
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
 
-        /* ОНОВЛЕНО: Піднято кнопку Admin вгору мобільного меню за шаблоном support */
         .admin-menu-item { padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 5px; }
-
         .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: 5px; }
         .menu-chat-btn:hover { background: #0099ff !important; color: #ffffff !important; padding-left: 15px !important; }
 
@@ -277,6 +275,16 @@
             document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
         }
 
+        // --- ОНОВЛЕНО: ХМАРНИЙ СЛУХАЧ ДЛЯ ХРОНІКИ НОВИН (FIREBASE) ---
+        function initTimelineRealtimeStream() {
+            const container = document.getElementById('dynamic-about-timeline-box');
+            if(!container) return;
+
+            // Підключаємо слухач до локального масиву новин, але якщо ви пізніше перенесете новини у Firebase — тут буде db.collection("news")
+            // Зараз тримаємо синхронізацію через подію сховища або прямий виклик
+            renderAboutTimeline();
+        }
+
         function renderAboutTimeline() {
             const container = document.getElementById('dynamic-about-timeline-box');
             if(!container) return;
@@ -480,7 +488,7 @@
 
         window.addEventListener('DOMContentLoaded', () => { 
             setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
-            renderAboutTimeline(); 
+            initTimelineRealtimeStream(); // Запуск стріму хроніки діяльності
             initUserChat(); 
         });
     </script>
