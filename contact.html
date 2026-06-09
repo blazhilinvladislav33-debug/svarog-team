@@ -25,19 +25,26 @@
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { width: 100%; min-height: 100%; height: 100%; }
+        html, body { width: 100%; min-height: 100%; } /* ВИПРАВЛЕНО: Прибрано жорстку висоту 100% */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             position: relative; overflow-x: hidden;
-            background-image: url('bg1.jpg');
-            background-attachment: fixed;
+            --bg-image: url('bg1.jpg'); /* ОНОВЛЕНО: CSS-змінна для слайд-шоу */
+        }
+        
+        /* ВИПРАВЛЕНО: Тепер цей блок тримає і міняє фон, і затемнює його на всіх пристроях */
+        body::before { 
+            content: ""; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), var(--bg-image);
             background-position: center; 
             background-repeat: no-repeat; 
             background-size: cover;
-            transition: background-image 1s ease-in-out;
+            z-index: -1; 
         }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: -1; }
         
         /* НАВІГАЦІЯ */
         .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
@@ -119,7 +126,7 @@
         
         [data-lang="en"] { display: none; }
         @media (max-width: 768px) { 
-            body { background-attachment: scroll; } 
+            /* ВИПРАВЛЕНО: Видалено конфліктне правило фону для мобільних */
             .nav-links { width: 280px; } 
             .main-content { padding: 12px; margin-top: 75px; }
             .container { padding: 30px 20px; }
@@ -210,10 +217,13 @@
     </div>
 
     <script>
-        // Зміна фонів
+        // ВИПРАВЛЕНО: Слайд-шоу тепер оновлює CSS-змінну для стабільності на телефонах
         const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
         let bgIndex = 0;
-        setInterval(() => { bgIndex = (bgIndex + 1) % images.length; document.body.style.backgroundImage = `url('${images[bgIndex]}')`; }, 3000);
+        setInterval(() => { 
+            bgIndex = (bgIndex + 1) % images.length; 
+            document.body.style.setProperty('--bg-image', `url('${images[bgIndex]}')`); 
+        }, 3000);
 
         // Бургер меню лістенер
         const menuButton = document.getElementById('menu-button');
