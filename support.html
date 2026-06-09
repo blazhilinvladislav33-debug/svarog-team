@@ -31,15 +31,18 @@
             transition: background-image 1s ease-in-out;
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: -1; }
+        
+        /* НАВІГАЦІЯ */
         .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
         .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .left-side { display: flex; align-items: center; gap: 20px; }
-        .lang-switcher { display: flex; gap: 4px; background: rgba(0, 0, 0, 0.3); padding: 2px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .lang-btn { background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; font-weight: bold; padding: 4px 8px; cursor: pointer; border-radius: 3px; transition: all 0.3s ease; }
-        .lang-btn.active { color: #121212; background-color: #ffffff; }
         
         .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: 0.3s; }
         .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
+        .menu-toggle.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .menu-toggle.open .bar:nth-child(2) { opacity: 0; transform: translateX(-10px); }
+        .menu-toggle.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        
         .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-img { height: 40px; }
         .logo-main { font-size: 1.1rem; font-weight: 900; color: #ffffff; }
@@ -48,10 +51,12 @@
         .nav-links { list-style: none; display: flex; flex-direction: column; width: 260px; background-color: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); position: fixed; top: 65px; left: -280px; height: calc(100vh - 65px); padding: 30px 20px; gap: 10px; transition: 0.4s; }
         .nav-links.active { left: 0; }
         .nav-links a { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 1.1rem; padding: 12px 15px; border-radius: 6px; }
-        .nav-links a.current-page { color: #ffffff; border-left: 4px solid #ffffff; }
+        .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
+        
         .admin-menu-item { padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 5px; }
-        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; font-weight: bold !important; text-align: center; }
+        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; margin-top: 5px; }
 
+        /* КОНТЕНТ */
         .main-content { margin-top: 100px; padding: 20px; display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; }
         .container { padding: 40px 30px; border-radius: 12px; background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.82) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); max-width: 550px; width: 100%; text-align: center; }
         .btn { display: block; padding: 12px; background: transparent; border: 2px solid #00ffcc; color: #00ffcc; border-radius: 4px; margin-top: 15px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; text-decoration: none; }
@@ -59,7 +64,10 @@
         .volunteer-form { margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: left; }
         input, textarea { padding: 12px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.15); width: 100%; border-radius: 4px; margin-bottom: 12px; }
 
-        .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); border-radius: 20px; z-index: 2000; flex-direction: column; overflow: hidden; }
+        .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
+
+        /* ЧАТ МОДАЛКА */
+        .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); z-index: 2000; flex-direction: column; overflow: hidden; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         .chat-bubble { padding: 8px 12px; border-radius: 8px; max-width: 80%; }
@@ -78,7 +86,7 @@
             <div class="left-side">
                 <button class="menu-toggle" id="menu-button"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
                 <a href="index.html" class="logo-container">
-                    <img src="logo.png" alt="SVAROG" class="logo-img">
+                    <img src="logo.png" alt="SVAROG TEAM" class="logo-img">
                     <div class="logo-text-group">
                         <span class="logo-main">SVAROG TEAM</span>
                         <span class="logo-sub">35 POLK NGU</span>
@@ -114,6 +122,10 @@
             </div>
         </div>
     </div>
+
+    <footer class="footer">
+        <span>SVAROG TEAM © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
+    </footer>
 
     <div class="user-chat-modal" id="user-chat-window">
         <div class="chat-header"><span>Чат</span><span style="cursor:pointer" onclick="document.getElementById('user-chat-window').style.display='none'">×</span></div>
