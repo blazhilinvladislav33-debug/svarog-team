@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVAROG | Support Us</title>
+    <title>Підтримка | SVAROG TEAM</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script>
+        // Конфігурація вашого проєкту Firebase Svarog-Team
         const firebaseConfig = {
             apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
             authDomain: "svarog-team.firebaseapp.com",
@@ -17,6 +18,7 @@
             appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
             measurementId: "G-56T1VN72PF"
         };
+        // Ініціалізація хмари
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
@@ -27,11 +29,9 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             position: relative; overflow-x: hidden;
-            background-image: url('bg1.jpg'); /* ВИПРАВЛЕНО: Стартовий фон тепер bg1.jpg */
+            background-image: url('bg1.jpg'); /* ОПТИМІЗАЦІЯ: Миттєве завантаження першого фону */
             background-attachment: fixed;
-            background-position: center; 
-            background-repeat: no-repeat; 
-            background-size: cover;
+            background-position: center; background-repeat: no-repeat; background-size: cover;
             transition: background-image 1s ease-in-out;
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: -1; }
@@ -40,43 +40,61 @@
         .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         
         .left-side { display: flex; align-items: center; gap: 20px; }
+        
+        .lang-switcher { display: flex; gap: 4px; background: rgba(0, 0, 0, 0.3); padding: 2px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .lang-btn { background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; font-weight: bold; padding: 4px 8px; cursor: pointer; border-radius: 3px; transition: all 0.3s ease; }
+        .lang-btn:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.1); }
+        .lang-btn.active { color: #121212; background-color: #ffffff; box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2); }
+        
         .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
         .menu-toggle:hover { transform: scale(1.05); background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); }
         .menu-toggle.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
         .menu-toggle.open .bar:nth-child(2) { opacity: 0; transform: translateX(-10px); }
         .menu-toggle.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
+        
         .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-text-group { display: flex; flex-direction: column; line-height: 1.1; }
         .logo-main { font-size: 1.1rem; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; }
         .logo-sub { font-size: 0.7rem; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 1px; }
         .logo-img { height: 40px; width: auto; display: block; }
-
-        .lang-switcher { display: flex; gap: 4px; background: rgba(0, 0, 0, 0.3); padding: 2px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .lang-btn { background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; font-weight: bold; padding: 4px 8px; cursor: pointer; border-radius: 3px; transition: all 0.3s ease; }
-        .lang-btn:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.1); }
-        .lang-btn.active { color: #121212; background-color: #ffffff; box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2); }
         
-        .nav-links { list-style: none; display: flex; flex-direction: column; width: 260px; background-color: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); position: fixed; top: 65px; left: -280px; height: calc(100vh - 65px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); gap: 10px; box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5); transition: left 0.4s cubic-bezier(0.075, 0.82, 0.165, 1); }
+        .nav-links { list-style: none; display: flex; flex-direction: column; width: 260px; background-color: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); position: fixed; top: 65px; left: -280px; height: calc(100vh - 65px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5); transition: left 0.4s cubic-bezier(0.075, 0.82, 0.165, 1); }
         .nav-links.active { left: 0; }
+        .nav-links li { margin-bottom: 10px; }
+        
+        /* ОНОВЛЕНО: Піднято кнопки Admin та Чат вгору мобільного меню */
+        .nav-links li.admin-menu-item { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); }
+
         .nav-links a { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 1.1rem; font-weight: 500; display: block; padding: 12px 15px; border-radius: 6px; transition: all 0.2s ease; }
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
-
-        /* ОНОВЛЕНО: Стиль для кнопки Admin без автоматичного відступу донизу */
-        .admin-menu-item { padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 5px; }
-
-        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: 5px; }
+        
+        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); }
         .menu-chat-btn:hover { background: #0099ff !important; color: #ffffff !important; padding-left: 15px !important; }
 
-        .main-content { margin-top: 80px; display: flex; justify-content: center; align-items: center; flex-grow: 1; width: 100%; padding: 20px; }
-        .container { text-align: center; padding: 40px 30px; border-radius: 12px; background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.82) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35); max-width: 550px; width: 100%; }
-        h1 { color: #ffffff; margin-bottom: 15px; font-size: 2rem; }
-        p { color: #e0e0e0; font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; }
+        .main-content { margin-top: 80px; padding: 20px; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .page-title-box { text-align: center; max-width: 600px; margin-bottom: 20px; }
+        .page-title-box h1 { font-size: 2rem; color: #ffffff; margin-bottom: 10px; }
+        .page-title-box p { color: #ccc; font-size: 1.05rem; }
+        .container { text-align: center; padding: 40px 30px; background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.82) 100%); border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 24px 60px rgba(0,0,0,0.35); max-width: 550px; width: 100%; }
         
-        .btn { display: inline-block; padding: 12px 30px; background-color: transparent; color: #00ffcc; text-decoration: none; border: 2px solid #00ffcc; border-radius: 4px; font-weight: bold; font-size: 1rem; transition: all 0.3s ease; cursor: pointer; }
-        .btn:hover { background-color: #00ffcc; color: #121212; box-shadow: 0 0 15px rgba(0, 255, 204, 0.4); }
+        .btn { display: block; padding: 12px; background: rgba(255,255,255,0.05); color: #00ffcc; border: 2px solid #00ffcc; border-radius: 4px; margin-top: 10px; cursor: pointer; width: 100%; font-weight: bold; transition: all 0.3s ease; text-decoration: none; }
+        .btn:hover { background: #00ffcc; color: #121212; box-shadow: 0 0 15px rgba(0, 255, 204, 0.4); }
+        .btn.disabled { opacity: 0.5; cursor: not-allowed; border-color: #444; color: #aaa; }
+        .btn.disabled:hover { background: transparent; color: #aaa; box-shadow: none; }
+
+        .donation-qr-card { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 12px; }
+        .donation-qr-card img { width: 180px; height: 180px; border-radius: 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); padding: 10px; }
+        .donation-qr-description { color: #ccc; font-size: 0.95rem; text-align: center; max-width: 340px; }
+        .donation-qr-warning { color: #ffb74d; font-size: 0.9rem; text-align: center; margin-top: -4px; }
+        .volunteer-form { display: flex; flex-direction: column; gap: 12px; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+        .volunteer-form textarea { min-height: 110px; resize: vertical; }
+        .file-input-wrapper { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+        .file-input-label { color: #aaa; font-size: 0.85rem; padding-left: 2px; }
+        .file-input { color: #fff; padding: 5px 0; }
+        input, textarea { padding: 12px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.15); width: 100%; border-radius: 4px; outline: none; }
+        input:focus, textarea:focus { border-color: #00ffcc; }
 
         .footer {
             width: 100%;
@@ -90,6 +108,7 @@
             backdrop-filter: blur(8px);
         }
 
+        /* ЗАКРУГЛЕНЕ ВІКНО ЧАТУ (20px) */
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
@@ -100,24 +119,12 @@
         .chat-bubble.system { background: rgba(255, 74, 74, 0.1); border: 1px solid rgba(255, 74, 74, 0.2); align-self: center; text-align: center; font-size: 0.8rem; max-width: 95%; color: #ff4a4a; border-radius: 6px; }
         
         .chat-input-area { padding: 12px; display: flex; gap: 8px; background: rgba(0,0,0,0.25); align-items: center; }
-        .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
+        .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
         .chat-input-area input:focus { border-color: rgba(0, 153, 255, 0.6); }
         
         .chat-send-btn { 
-            width: 38px; 
-            height: 38px; 
-            background: #0099ff; 
-            border: none; 
-            color: #ffffff; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            transition: all 0.2s ease; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            box-shadow: 0 0 10px rgba(0, 153, 255, 0.2);
-            flex-shrink: 0;
-            padding: 0;
+            width: 38px; height: 38px; background: #0099ff; border: none; color: #ffffff; border-radius: 50%; cursor: pointer; 
+            transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(0, 153, 255, 0.2); flex-shrink: 0; padding: 0;
         }
         .chat-send-btn:hover { background: #007acc; box-shadow: 0 0 15px rgba(0, 153, 255, 0.5); transform: scale(1.05); }
         .chat-send-btn:active { transform: scale(0.95); }
@@ -129,17 +136,15 @@
 
         [data-lang="en"] { display: none; }
 
-        /* ОНОВЛЕНО: КРИТИЧНІ СТИЛІ ДЛЯ ОПТИМІЗАЦІЇ ПІД МОБІЛЬНІ ТЕЛЕФОНИ */
+        /* ОНОВЛЕНО: ОПТИМІЗАЦІЯ ДЛЯ СИНХРОННОГО ФОНУ ТА ЕЛЕМЕНТІВ НА ТЕЛЕФОНІ */
         @media (max-width: 768px) { 
             .nav-links { width: 280px; } 
             .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
-            
-            /* Мобільна оптимізація контенту */
+            body { background-attachment: scroll; }
             .main-content { padding: 12px; margin-top: 75px; }
-            .container { padding: 30px 20px; width: 100%; }
-            h1 { font-size: 1.5rem; margin-bottom: 12px; }
-            p { font-size: 0.95rem; margin-bottom: 20px; }
-            .btn { width: 100%; padding: 12px 15px; font-size: 0.95rem; }
+            .container { padding: 30px 15px; width: 100%; }
+            .page-title-box h1 { font-size: 1.6rem; }
+            .donation-qr-card img { width: 160px; height: 160px; }
         }
     </style>
 </head>
@@ -156,18 +161,18 @@
                     </div>
                 </a>
             </div>
+            
             <div class="lang-switcher">
-                <button class="lang-btn active" onclick="setLanguage('ua')">UA</button>
-                <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+                <button class="lang-btn active" id="lang-ua-btn" onclick="setLanguage('ua')">UA</button>
+                <button class="lang-btn" id="lang-en-btn" onclick="setLanguage('en')">EN</button>
             </div>
+            
             <ul class="nav-links" id="nav-menu">
                 <li><a href="index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
-                <li><a href="support.html" class="current-page"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
+                <li><a href="support.html" class="current-page"><span data-lang="ua">Підтримка</span><span data-lang="en">Support</span></a></li>
                 <li><a href="about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
-                <li class="admin-menu-item">
-                    <a href="admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
-                </li>
+                <li class="admin-menu-item"><a href="admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a></li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -175,15 +180,34 @@
 
     <div class="main-content">
         <div class="container">
-            <div data-lang="ua">
-                <h1>ПІДТРИМКА ПІДРОЗДІЛУ</h1>
-                <p>Ваша допомога — це міцний фундамент для виконання наших бойових завдань та наближення спільної перемоги. Кожен внесок є важливим.</p>
-                <button class="btn" onclick="redirectToDonation()">Підтримати (Монобанка)</button>
+            <div class="page-title-box">
+                <h1><span data-lang="ua">Підтримка</span><span data-lang="en">Support</span></h1>
+                <p><span data-lang="ua">Ваша допомога є критично важливою.</span><span data-lang="en">Your help is critically important.</span></p>
             </div>
-            <div data-lang="en">
-                <h1>SUPPORT OUR UNIT</h1>
-                <p>Your support is a solid foundation for the execution of our combat missions and bringing our shared victory closer. Every contribution matters.</p>
-                <button class="btn" onclick="redirectToDonation()">Support via Monobank</button>
+            <a id="donation-button" class="btn" href="#" target="_blank" rel="noopener" onclick="openDonationLink(event)">
+                <span data-lang="ua">Підтримати на Банку</span><span data-lang="en">Donate via Bank</span>
+            </a>
+            <div id="donation-qr-card" class="donation-qr-card">
+                <img id="donation-qr-image" src="" alt="QR code" />
+                <p id="donation-qr-description" class="donation-qr-description">
+                    <span data-lang="ua">Скануйте QR-код або натисніть кнопку для переказу.</span>
+                    <span data-lang="en">Scan the QR code or click the button to donate.</span>
+                </p>
+                <p id="donation-qr-warning" class="donation-qr-warning"></p>
+            </div>
+            <div id="volunteer-form" class="volunteer-form">
+                <h2 style="color:#ffffff; margin-bottom:15px;" data-lang="ua">Бланк волонтера</h2>
+                <h2 style="color:#ffffff; margin-bottom:15px;" data-lang="en">Volunteer Form</h2>
+                <div class="form-group" style="margin-bottom:12px;"><input type="text" id="v-fullname" placeholder="Full name" data-placeholder-ua="Прізвище ім'я" data-placeholder-en="Full name"></div>
+                <div class="form-group" style="margin-bottom:12px;"><input type="text" id="v-org" placeholder="Organization" data-placeholder-ua="Назва організації" data-placeholder-en="Organization name"></div>
+                <div class="form-group" style="margin-bottom:12px;"><input type="tel" id="v-phone" placeholder="Phone" data-placeholder-ua="Номер телефону" data-placeholder-en="Contact phone"></div>
+                <div class="form-group" style="margin-bottom:12px;"><input type="tel" id="v-whatsapp" placeholder="WhatsApp" data-placeholder-ua="WhatsApp" data-placeholder-en="WhatsApp"></div>
+                <div class="form-group" style="margin-bottom:12px;"><textarea id="v-message" placeholder="Message" data-placeholder-ua="Текст повідомлення" data-placeholder-en="Message"></textarea></div>
+                <div class="file-input-wrapper">
+                    <label for="v-photo" class="file-input-label"><span data-lang="ua">Прикріпити фото документу / посвідчення:</span><span data-lang="en">Attach photo:</span></label>
+                    <input type="file" id="v-photo" class="file-input" accept="image/*">
+                </div>
+                <button class="btn" onclick="sendVolunteerData()" style="margin-top:15px; border-color:#00ffcc; color:#00ffcc;"><span data-lang="ua">Відправити бланк</span><span data-lang="en">Send Form</span></button>
             </div>
         </div>
     </div>
@@ -216,6 +240,7 @@
     </div>
 
     <script>
+        /* АВТОМАТИЧНИЙ ЦИКЛ ЗМІНИ ФОНУ */
         const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
         let currentIndex = 0;
         setInterval(() => {
@@ -229,20 +254,61 @@
             menuButton.addEventListener('click', (e) => { e.stopPropagation(); navMenu.classList.toggle('active'); menuButton.classList.toggle('open'); });
             document.addEventListener('click', (e) => { if (!navMenu.contains(e.target) && !menuButton.contains(e.target)) { navMenu.classList.remove('active'); menuButton.classList.remove('open'); } });
         }
-        
+
         function setLanguage(lang) {
             localStorage.setItem('selectedLang', lang);
             document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
             document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
-            document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
+            
+            document.getElementById('lang-ua-btn').classList.toggle('active', lang === 'ua');
+            document.getElementById('lang-en-btn').classList.toggle('active', lang === 'en');
+            
+            document.querySelectorAll('[data-placeholder-ua]').forEach(el => {
+                el.placeholder = lang === 'ua' ? el.dataset.placeholderUa : el.dataset.placeholderEn;
+            });
+            refreshDonationLinkBlock();
         }
 
-        function redirectToDonation() {
-            const savedLink = localStorage.getItem('siteDonationLink') || "https://send.monobank.ua/...";
-            window.open(savedLink, '_blank');
+        function openDonationLink(e) {
+            const btn = e.currentTarget;
+            const url = btn.dataset.url || '';
+            if (!url) {
+                e.preventDefault();
+                alert(localStorage.getItem('selectedLang') === 'en' ? 'Donation link is not configured.' : 'Посилання для Банки не встановлено.');
+            }
         }
 
-        // --- ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE ---
+        function refreshDonationLinkBlock() {
+            const donationLink = localStorage.getItem('siteDonationLink') || '';
+            const donationButton = document.getElementById('donation-button');
+            const qrImage = document.getElementById('donation-qr-image');
+            const warningText = document.getElementById('donation-qr-warning');
+            const description = document.getElementById('donation-qr-description');
+
+            if (!donationLink) {
+                donationButton.href = '#';
+                donationButton.dataset.url = '';
+                donationButton.classList.add('disabled');
+                donationButton.setAttribute('aria-disabled', 'true');
+                qrImage.style.display = 'none';
+                qrImage.src = '';
+                warningText.innerText = localStorage.getItem('selectedLang') === 'en' ? 'Admin has not set the donation link yet.' : 'Адмін ще не задав посилання для Банки.';
+                description.style.display = 'none';
+            } else {
+                donationButton.href = donationLink;
+                donationButton.dataset.url = donationLink;
+                donationButton.classList.remove('disabled');
+                donationButton.removeAttribute('aria-disabled');
+                const qrSrc = `https://api.qrserver.com/v1/create-qr-code?size=200x200&data=${encodeURIComponent(donationLink)}`;
+                qrImage.style.display = 'block';
+                qrImage.src = qrSrc;
+                qrImage.alt = localStorage.getItem('selectedLang') === 'en' ? 'Donation QR code' : 'QR-код для Банки';
+                warningText.innerText = '';
+                description.style.display = 'block';
+            }
+        }
+
+        // --- ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE ДЛЯ SUPPORT ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
@@ -256,8 +322,8 @@
 
         function openUserChat(e) {
             e.preventDefault();
-            if(navMenu) navMenu.classList.remove('active');
-            if(menuButton) menuButton.classList.remove('open');
+            if (navMenu) navMenu.classList.remove('active');
+            if (menuButton) menuButton.classList.remove('open');
             document.getElementById('user-chat-window').style.display = 'flex';
             renderUserChat();
         }
@@ -269,7 +335,7 @@
                 let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' };
                 renderUserChat(myChat);
             }, err => {
-                console.error("Помилка хмари: ", err);
+                console.error("Помилка хмари чату: ", err);
             });
         }
 
@@ -297,10 +363,10 @@
             myChat.messages.forEach(msg => {
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${msg.sender}`;
-                if(msg.type === 'image') {
+                if (msg.type === 'image') {
                     bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src=\'${msg.text}\'>')">`;
-                } else { 
-                    bubble.innerText = msg.text; 
+                } else {
+                    bubble.innerText = msg.text;
                 }
                 messagesBox.appendChild(bubble);
             });
@@ -314,8 +380,8 @@
                 if (!localStorage.getItem('clearChatTime_' + userChatSessionId)) {
                     localStorage.setItem('clearChatTime_' + userChatSessionId, Date.now() + 5 * 60 * 1000);
                 }
-            } else { 
-                inputBlock.style.display = 'flex'; 
+            } else {
+                inputBlock.style.display = 'flex';
             }
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }
@@ -352,8 +418,70 @@
             input.value = "";
         }
 
-        document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
-        window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); initUserChat(); });
+        // --- ЛОГІКА ВІДПРАВКИ ДАНИХ ВОЛОНТЕРА (МЕНЕДЖМЕНТ ЧЕРЕЗ LOCALSTORAGE) ---
+        function sendVolunteerData() {
+            const fullname = document.getElementById('v-fullname').value.trim();
+            const org = document.getElementById('v-org').value.trim();
+            const phone = document.getElementById('v-phone').value.trim();
+            const whatsapp = document.getElementById('v-whatsapp').value.trim();
+            const message = document.getElementById('v-message').value.trim();
+            const photoInput = document.getElementById('v-photo');
+            const lang = localStorage.getItem('selectedLang') || 'ua';
+
+            if (!fullname || !org || !phone || !whatsapp || !message) {
+                alert(lang === 'en' ? 'Please fill all volunteer fields.' : 'Заповніть усі поля волонтера.');
+                return;
+            }
+
+            const volunteer = {
+                id: 'vol_' + Date.now(),
+                name: fullname,
+                org: org,
+                phone: phone,
+                whatsapp: whatsapp,
+                message: message,
+                image: null,
+                time: new Date().toLocaleString(),
+            };
+
+            const saveVolunteer = () => {
+                const stored = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
+                stored.push(volunteer);
+                localStorage.setItem('siteVolunteerData', JSON.stringify(stored));
+                document.getElementById('v-fullname').value = '';
+                document.getElementById('v-org').value = '';
+                document.getElementById('v-phone').value = '';
+                document.getElementById('v-whatsapp').value = '';
+                document.getElementById('v-message').value = '';
+                photoInput.value = '';
+                alert(lang === 'en' ? 'Volunteer request sent successfully.' : 'Заявка волонтера надіслана успішно.');
+            };
+
+            if (photoInput.files && photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    volunteer.image = e.target.result;
+                    saveVolunteer();
+                };
+                reader.readAsDataURL(photoInput.files[0]);
+            } else {
+                saveVolunteer();
+            }
+        }
+
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'siteDonationLink') refreshDonationLinkBlock();
+        });
+
+        document.addEventListener('keydown', function(e) { 
+            if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); 
+        });
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
+            refreshDonationLinkBlock();
+            initUserChat(); 
+        });
     </script>
 </body>
 </html>
