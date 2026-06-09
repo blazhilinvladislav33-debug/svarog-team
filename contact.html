@@ -1,9 +1,28 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVAROG TEAM | Зв'язок з нами</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Конфігурація вашого проєкту Firebase Svarog-Team
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+            authDomain: "svarog-team.firebaseapp.com",
+            projectId: "svarog-team",
+            storageBucket: "svarog-team.firebasestorage.app",
+            messagingSenderId: "311449325528",
+            appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
+            measurementId: "G-56T1VN72PF"
+        };
+        // Ініціалізація хмари
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { width: 100%; min-height: 100%; height: 100%; }
@@ -44,11 +63,13 @@
         .nav-links { list-style: none; display: flex; flex-direction: column; width: 260px; background-color: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); position: fixed; top: 65px; left: -280px; height: calc(100vh - 65px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); gap: 10px; box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5); transition: left 0.4s cubic-bezier(0.075, 0.82, 0.165, 1); }
         .nav-links.active { left: 0; }
         .nav-links li { display: flex; }
-        .nav-links a { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 1.1rem; font-weight: 500; display: block; padding: 12px 15px; border-radius: 6px; transition: all 0.2s ease; }
+        .nav-links a { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 1.1rem; font-weight: 500; display: block; padding: 12px 15px; border-radius: 6px; transition: all 0.2s ease; width: 100%; }
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
 
-        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: auto !important; width: 100%; }
+        /* ВИПРАВЛЕНО: Кнопки приведені до структури index/support (прибрано margin-top auto) */
+        .nav-links li.admin-menu-item { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: 5px; width: 100%; }
         .menu-chat-btn:hover { background: #0099ff !important; color: #ffffff !important; padding-left: 15px !important; }
 
         /* КОНТЕНТ */
@@ -58,31 +79,22 @@
         .page-title-box p { color: #ccc; font-size: 1.05rem; }
         .container { padding: 40px 30px; border-radius: 12px; background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.82) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 24px 60px rgba(0,0,0,0.35); max-width: 550px; width: 100%; text-align: center; }
         .form-group { margin-bottom: 15px; text-align: left; }
-        .form-input, .form-textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; border-radius: 4px; outline: none; }
+        .form-input, .form-textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 4px; outline: none; }
         .form-input:focus, .form-textarea:focus { border-color: #0099ff; }
         .form-textarea { min-height: 110px; resize: vertical; font-family: inherit; }
         
         .btn { width: 100%; padding: 12px; background: transparent; border: 1px solid #fff; color: #fff; cursor: pointer; margin-top: 10px; font-weight: bold; border-radius: 4px; transition: all 0.2s; }
         .btn:hover { background: #fff; color: #121212; }
         
-        .social-box { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
-        .social-btn { padding: 10px 20px; border: 1px solid #fff; color: #fff; text-decoration: none; border-radius: 4px; font-weight: 500; transition: all 0.2s; }
-        .social-btn:hover { filter: brightness(1.2); background: rgba(255,255,255,0.05); }
+        /* СТИЛІЗАЦІЯ ДИНАМІЧНИХ СОЦМЕРЕЖ */
+        .social-box { display: flex; gap: 12px; margin-top: 25px; flex-direction: column; width: 100%; max-width: 550px; }
+        .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 1.05rem; color: #ffffff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
+        .social-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); filter: brightness(1.2); }
         
         /* ФУТЕР */
-        .footer {
-            width: 100%;
-            padding: 20px 12px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.55);
-            font-size: 0.82rem;
-            margin-top: auto;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(10, 10, 10, 0.65);
-            backdrop-filter: blur(8px);
-        }
+        .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
 
-        /* ОНОВЛЕНЕ ЗАОКРУГЛЕНЕ ВІКНА ЧАТУ (20px) */
+        /* ЗАКРУГЛЕНЕ ВІКНО ЧАТУ */
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
@@ -97,34 +109,23 @@
         .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
         .chat-input-area input:focus { border-color: rgba(0, 153, 255, 0.6); }
         
-        /* КРУГЛА КНОПКА З SVG-ЛІТАЧКОМ */
-        .chat-send-btn { 
-            width: 38px; 
-            height: 38px; 
-            background: #0099ff; 
-            border: none; 
-            color: #ffffff; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            transition: all 0.2s ease; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            box-shadow: 0 0 10px rgba(0, 153, 255, 0.2);
-            flex-shrink: 0;
-            padding: 0;
-        }
+        .chat-send-btn { width: 38px; height: 38px; background: #0099ff; border: none; color: #ffffff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(0, 153, 255, 0.2); flex-shrink: 0; padding: 0; }
         .chat-send-btn:hover { background: #007acc; box-shadow: 0 0 15px rgba(0, 153, 255, 0.5); transform: scale(1.05); }
         .chat-send-btn:active { transform: scale(0.95); }
         .chat-send-btn svg { width: 18px; height: 18px; fill: #ffffff; margin-left: 2px; }
 
-        /* КНОПКА СКРІПКИ З SVG */
         .user-clip-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s, border-color 0.2s; padding: 0; }
         .user-clip-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
         .user-clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.75); }
         
         [data-lang="en"] { display: none; }
-        @media (max-width: 768px) { .nav-links { width: 280px; } .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } }
+        @media (max-width: 768px) { 
+            .nav-links { width: 280px; } 
+            body { background-attachment: scroll; }
+            .main-content { padding: 12px; margin-top: 75px; }
+            .container { padding: 30px 15px; width: 100%; }
+            .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
+        }
     </style>
 </head>
 <body>
@@ -149,7 +150,7 @@
                 <li><a href="support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
                 <li><a href="about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="contact.html" class="current-page"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
-                <li style="margin-top: auto; padding-top: 15px;"><a href="admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'"><span data-lang="ua">Адмін</span><span data-lang="en">Admin</span></a></li>
+                <li class="admin-menu-item"><a href="admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'"><span data-lang="ua">Адмін</span><span data-lang="en">Admin</span></a></li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -170,6 +171,7 @@
                 <button type="submit" class="btn"><span data-lang="ua">Надіслати</span><span data-lang="en">Send</span></button>
             </form>
         </div>
+        
         <div class="social-box" id="dynamic-user-social-container"></div>
     </div>
 
@@ -229,27 +231,36 @@
             document.title = lang === 'ua' ? "SVAROG TEAM | Зв'язок з нами" : 'SVAROG TEAM | Contact Us';
         }
 
-        /* ПОВНІСТЮ СИНХРОНІЗОВАНА РОБОЧА ЛОГІКА ЧАТУ */
+        // --- ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE ДЛЯ CONTACT ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
-        let lastMessagesLength = -1; 
-        let lastChatStatus = '';
+        let unsubscribeUserChat = null;
 
         function initUserChat() {
             if (!userChatSessionId) {
                 userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('userChatSessionId', userChatSessionId);
             }
-            setInterval(renderUserChat, 2000);
+            startRealtimeChatListener();
         }
 
         function openUserChat(e) { e.preventDefault(); if(navMenu) navMenu.classList.remove('active'); if(menuButton) menuButton.classList.remove('open'); document.getElementById('user-chat-window').style.display = 'flex'; renderUserChat(); }
         
-        function renderUserChat() {
+        function startRealtimeChatListener() {
+            if (unsubscribeUserChat) unsubscribeUserChat();
+
+            unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(doc => {
+                let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' };
+                renderUserChat(myChat);
+            }, err => {
+                console.error("Помилка хмари чату: ", err);
+            });
+        }
+
+        function renderUserChat(myChatData) {
             const messagesBox = document.getElementById('user-chat-messages');
             const inputBlock = document.getElementById('user-chat-input-block');
             const lang = localStorage.getItem('selectedLang') || 'ua';
-            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-            let myChat = allChats[userChatSessionId] || { messages: [], status: 'active' };
+            let myChat = myChatData || { messages: [], status: 'active' };
 
             if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
                 const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
@@ -260,16 +271,10 @@
                     localStorage.setItem('userChatSessionId', userChatSessionId);
                     messagesBox.innerHTML = "";
                     inputBlock.style.display = 'flex';
-                    lastMessagesLength = -1;
-                    lastChatStatus = '';
+                    startRealtimeChatListener();
                     return;
                 }
             }
-
-            if (myChat.messages.length === lastMessagesLength && myChat.status === lastChatStatus) return;
-            
-            lastMessagesLength = myChat.messages.length;
-            lastChatStatus = myChat.status;
 
             messagesBox.innerHTML = "";
             myChat.messages.forEach(msg => {
@@ -298,41 +303,70 @@
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }
 
-        function sendUserChatMessage() {
+        async function sendUserChatMessage() {
             const input = document.getElementById('user-chat-input');
             const text = input.value.trim();
             if(!text) return;
-            let chats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-            if(!chats[userChatSessionId]) chats[userChatSessionId] = { id: userChatSessionId, messages: [], status: 'active', adminStatus: 'processing', lastUpdate: Date.now() };
-            chats[userChatSessionId].messages.push({ sender: 'user', text: text, type: 'text', time: Date.now() });
-            chats[userChatSessionId].lastUpdate = Date.now();
-            localStorage.setItem('liveChatSystem', JSON.stringify(chats));
+
+            const msgObject = { sender: 'user', text: text, type: 'text', time: Date.now() };
             input.value = "";
-            renderUserChat();
+
+            try {
+                await db.collection("chats").doc(userChatSessionId).set({
+                    id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
+                    messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
+                }, { merge: true });
+            } catch(e) { console.error("Помилка відправки повідомлення: ", e); }
         }
 
         function sendUserChatPhoto(input) {
             if (!input.files || !input.files[0]) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                let chats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-                if(!chats[userChatSessionId]) chats[userChatSessionId] = { id: userChatSessionId, messages: [], status: 'active', adminStatus: 'processing', lastUpdate: Date.now() };
-                chats[userChatSessionId].messages.push({ sender: 'user', text: e.target.result, type: 'image', time: Date.now() });
-                chats[userChatSessionId].lastUpdate = Date.now();
-                localStorage.setItem('liveChatSystem', JSON.stringify(chats));
-                renderUserChat();
+            reader.onload = async function(e) {
+                const msgObject = { sender: 'user', text: e.target.result, type: 'image', time: Date.now() };
+                try {
+                    await db.collection("chats").doc(userChatSessionId).set({
+                        id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
+                        messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
+                    }, { merge: true });
+                } catch(err) { console.error("Помилка відправки фото: ", err); }
             };
             reader.readAsDataURL(input.files[0]);
             input.value = '';
         }
 
+        // --- ОНОВЛЕНО: ХМАРНИЙ СЛУХАЧ ДЛЯ КЕРУВАННЯ СОЦМЕРЕЖАМИ З АДМІНКИ ---
         function renderSocial() {
             const container = document.getElementById('dynamic-user-social-container');
-            const nets = JSON.parse(localStorage.getItem('siteDynamicSocialNetworks')) || [
-                {name: 'Telegram', url: '#', color: '#0088cc'},
-                {name: 'TikTok', url: '#', color: '#fe2c55'}
-            ];
-            container.innerHTML = nets.map(n => `<a href="${n.url}" target="_blank" class="social-btn" style="border-color:${n.color}; color:#fff;">${n.name}</a>`).join('');
+            if (!container) return;
+
+            // Створюємо стрім у реальному часі до локального сховища або напряму відображаємо зміни
+            db.collection("config").doc("socials").onSnapshot(doc => {
+                // Якщо в базі немає налаштованих мереж, використовуємо дефолтні
+                let networks = [];
+                if (doc.exists && doc.data().list) {
+                    networks = doc.data().list;
+                } else {
+                    networks = JSON.parse(localStorage.getItem('siteDynamicSocialNetworks')) || [
+                        {name: 'Telegram', url: '#', color: '#0088cc'},
+                        {name: 'TikTok', url: '#', color: '#fe2c55'}
+                    ];
+                }
+                
+                if (networks.length === 0) {
+                    const currentLang = localStorage.getItem('selectedLang') || 'ua';
+                    container.innerHTML = `<p style="color:#666; font-style:italic;">${currentLang === 'en' ? 'Social links are being updated...' : 'Посилання наразі оновлюються...'}</p>`;
+                    return;
+                }
+
+                container.innerHTML = networks.map(n => `
+                    <a href="${n.url}" target="_blank" rel="noopener" class="social-btn" style="border-color:${n.color}; box-shadow: 0 0 10px ${n.color}33;">
+                        <span style="color: ${n.color}; margin-right: 8px;">●</span>${n.name}
+                    </a>
+                `).join('');
+            }, err => {
+                console.error("Помилка отримання соцмереж з Firebase: ", err);
+            });
         }
 
         function sendFeedback(e) { 
@@ -361,8 +395,8 @@
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
         
         window.addEventListener('DOMContentLoaded', () => { 
-            renderSocial(); 
             setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
+            renderSocial(); // Запускає хмарне відслідковування посилань
             initUserChat();
         });
     </script>
