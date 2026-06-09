@@ -90,7 +90,7 @@
         <div class="navbar-container">
             <div class="left-side">
                 <button class="menu-toggle" id="menu-button"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-                <a href="index.html" class="logo-container">
+                <a href="https://svarogteam.com/index.html" class="logo-container">
                     <img src="logo.png" alt="SVAROG TEAM" class="logo-img">
                     <div class="logo-text-group">
                         <span class="logo-main">SVAROG TEAM</span>
@@ -99,11 +99,11 @@
                 </a>
             </div>
             <ul class="nav-links" id="nav-menu">
-                <li><a href="index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
-                <li><a href="support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
-                <li><a href="about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
-                <li><a href="contact.html" class="current-page"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
-                <li class="admin-menu-item"><a href="admin.html">Admin</a></li>
+                <li><a href="https://svarogteam.com/index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
+                <li><a href="https://svarogteam.com/support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
+                <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
+                <li><a href="https://svarogteam.com/contact.html" class="current-page"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li class="admin-menu-item"><a href="https://svarogteam.com/admin.html">Admin</a></li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)">💬 Анонімний чат</a></li>
             </ul>
         </div>
@@ -132,6 +132,14 @@
     </div>
 
     <script>
+        // Меню бургер лістенер
+        const menuButton = document.getElementById('menu-button');
+        const navMenu = document.getElementById('nav-menu');
+        if(menuButton && navMenu) {
+            menuButton.addEventListener('click', (e) => { e.stopPropagation(); navMenu.classList.toggle('active'); menuButton.classList.toggle('open'); });
+            document.addEventListener('click', (e) => { if (!navMenu.contains(e.target) && !menuButton.contains(e.target)) { navMenu.classList.remove('active'); menuButton.classList.remove('open'); } });
+        }
+
         // Ініціалізація та хмарна логіка
         let userChatSessionId = localStorage.getItem('userChatSessionId') || 'session_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('userChatSessionId', userChatSessionId);
