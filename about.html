@@ -74,7 +74,8 @@
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
 
-        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: auto; }
+        /* ВИПРАВЛЕНО: Кнопка чату піднята до списку без margin-top: auto */
+        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: 5px; }
         .menu-chat-btn:hover { background: #0099ff !important; color: #ffffff !important; padding-left: 15px !important; }
 
         /* ГОЛОВНИЙ КОНТЕНТ */
@@ -228,9 +229,6 @@
                 <li><a href="https://svarogteam.com/support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
                 <li><a href="https://svarogteam.com/about.html" class="current-page"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
-                <li style="margin-top: auto; padding-top: 15px;">
-                    <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
-                </li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -302,12 +300,12 @@
             document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
         }
 
-        /* ОНОВЛЕНО: ЖИВЕ РЕНДЕРЕННЯ ТАЙМЛАЙНУ З FIREBASE CLOUD */
+        /* ОНОВЛЕНО: ЖИВЕ РЕНДЕРЕННЯ ТАЙМЛАЙНУ З FIREBASE CLOUD ТА СОРТУВАННЯМ СПОЧАТКУ НОВІ */
         function initTimelineRealtimeStream() {
             const container = document.getElementById('dynamic-about-timeline-box');
             if(!container) return;
 
-            // Підключаємо живий слухач до колекції новин у Firebase Firestore
+            // Підключаємо живий слухач до колекції новин у Firebase Firestore із сортуванням за спаданням
             db.collection("news").orderBy("date", "desc").onSnapshot(snapshot => {
                 let dataset = [];
                 snapshot.forEach(doc => {
@@ -316,8 +314,9 @@
                 renderAboutTimeline(dataset);
             }, err => {
                 console.error("Помилка хмари новин: ", err);
-                // Локальний резервний варіант на випадок збою мережі
+                // Резервний варіант сортування локальних новин
                 let localDataset = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
+                localDataset.sort((a, b) => new Date(b.date) - new Date(a.date));
                 renderAboutTimeline(localDataset);
             });
         }
