@@ -8,7 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script>
-        // Конфігурація вашого проєкту Firebase Svarog-Team
+        // Конфігурація проєкту Firebase Svarog-Team
         const firebaseConfig = {
             apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
             authDomain: "svarog-team.firebaseapp.com",
@@ -165,7 +165,7 @@
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         [data-lang="en"] { display: none; }
 
-        /* ОНОВЛЕНО: ОПТИМІЗАЦІЯ ДЛЯ ТЕЛЕФОНІВ ТА СИНХРОНІЗАЦІЇ ФОНУ */
+        /* ОПТИМІЗАЦІЯ ДЛЯ ТЕЛЕФОНІВ ТА СИНХРОНІЗАЦІЇ ФОНУ */
         @media (max-width: 768px) { 
             .nav-links { width: 280px; } 
             .page-title-box h1 { font-size: 1.6rem; }
@@ -188,7 +188,7 @@
         <div class="navbar-container">
             <div class="left-side">
                 <button class="menu-toggle" id="menu-button"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-                <a href="index.html" class="logo-container">
+                <a href="https://svarogteam.com/index.html" class="logo-container">
                     <img src="logo.png" alt="SVAROG TEAM" class="logo-img">
                     <div class="logo-text-group">
                         <span class="logo-main">SVAROG TEAM</span>
@@ -207,7 +207,7 @@
                 <li><a href="https://svarogteam.com/contact.html">Зв'язок з нами</a></li>
                 <li><a href="https://svarogteam.com/admin.html">Admin</a></li>
                 <li class="admin-menu-item">
-                    <a href="admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
+                    <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
                 </li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
@@ -276,13 +276,10 @@
             document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
         }
 
-        // --- ОНОВЛЕНО: ХМАРНИЙ СЛУХАЧ ДЛЯ ХРОНІКИ НОВИН (FIREBASE) ---
+        // --- ХМАРНИЙ СЛУХАЧ ДЛЯ ХРОНІКИ НОВИН (FIREBASE) ---
         function initTimelineRealtimeStream() {
             const container = document.getElementById('dynamic-about-timeline-box');
             if(!container) return;
-
-            // Підключаємо слухач до локального масиву новин, але якщо ви пізніше перенесете новини у Firebase — тут буде db.collection("news")
-            // Зараз тримаємо синхронізацію через подію сховища або прямий виклик
             renderAboutTimeline();
         }
 
@@ -489,7 +486,7 @@
 
         window.addEventListener('DOMContentLoaded', () => { 
             setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
-            initTimelineRealtimeStream(); // Запуск стріму хроніки діяльності
+            initTimelineRealtimeStream();
             initUserChat(); 
         });
     </script>
