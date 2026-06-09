@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVAROG TEAM</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Конфігурація вашого проєкту Firebase Svarog-Team
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+            authDomain: "svarog-team.firebaseapp.com",
+            projectId: "svarog-team",
+            storageBucket: "svarog-team.firebasestorage.app",
+            messagingSenderId: "311449325528",
+            appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
+            measurementId: "G-56T1VN72PF"
+        };
+        // Ініціалізація хмари
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -70,7 +89,6 @@
             backdrop-filter: blur(8px);
         }
 
-        /* ЗАКРУГЛЕНЕ ВІКНО ЧАТУ (20px) */
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
@@ -80,12 +98,10 @@
         .chat-bubble img { max-width: 100%; max-height: 140px; border-radius: 4px; display: block; cursor: pointer; margin-top: 3px; }
         .chat-bubble.system { background: rgba(255, 74, 74, 0.1); border: 1px solid rgba(255, 74, 74, 0.2); align-self: center; text-align: center; font-size: 0.8rem; max-width: 95%; color: #ff4a4a; border-radius: 6px; }
         
-        /* ОНОВЛЕНА ЗОНА ВВОДУ */
         .chat-input-area { padding: 12px; display: flex; gap: 8px; background: rgba(0,0,0,0.25); align-items: center; }
         .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
         .chat-input-area input:focus { border-color: rgba(0, 153, 255, 0.6); }
         
-        /* КРУГЛА КНОПКА З ЛІТАЧКОМ */
         .chat-send-btn { 
             width: 38px; 
             height: 38px; 
@@ -106,7 +122,6 @@
         .chat-send-btn:active { transform: scale(0.95); }
         .chat-send-btn svg { width: 18px; height: 18px; fill: #ffffff; margin-left: 2px; }
 
-        /* КНОПКА СКРІПКИ З SVG */
         .user-clip-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s, border-color 0.2s; padding: 0; }
         .user-clip-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
         .user-clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.75); }
@@ -212,16 +227,20 @@
             document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
             document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
         }
-        window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); initUserChat(); });
 
+        // --- ЛОГІКА ХМАРНОГО ЧАТУ (FIREBASE + LOCALSTORAGE ДЛЯ СЕСІЙ) ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
+        let unsubscribeUserChat = null; // Слухач змін конкретної розмови
+
         function initUserChat() {
             if (!userChatSessionId) {
                 userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('userChatSessionId', userChatSessionId);
             }
-            setInterval(renderUserChat, 2000);
+            // Запускаємо прослуховування нашого хмарного документа
+            startRealtimeChatListener();
         }
+
         function openUserChat(e) {
             e.preventDefault();
             if(navMenu) navMenu.classList.remove('active');
@@ -230,16 +249,27 @@
             renderUserChat();
         }
 
-        let lastMessagesLength = -1; 
-        let lastChatStatus = '';
+        // Перевірка та підключення до стріму Firebase
+        function startRealtimeChatListener() {
+            if (unsubscribeUserChat) unsubscribeUserChat();
 
-        function renderUserChat() {
+            unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(doc => {
+                let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' };
+                renderUserChat(myChat);
+            }, err => {
+                console.error("Помилка отримання чату з хмари: ", err);
+            });
+        }
+
+        function renderUserChat(myChatData) {
             const messagesBox = document.getElementById('user-chat-messages');
             const inputBlock = document.getElementById('user-chat-input-block');
             const lang = localStorage.getItem('selectedLang') || 'ua';
-            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-            let myChat = allChats[userChatSessionId] || { messages: [], status: 'active' };
 
+            // Якщо даних з хмари немає, беремо пусту заготовку
+            let myChat = myChatData || { messages: [], status: 'active' };
+
+            // Логіка очищення локальної історії (залишаючи в адмінці)
             if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
                 const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
                 if (Date.now() > clearTime) {
@@ -249,16 +279,10 @@
                     localStorage.setItem('userChatSessionId', userChatSessionId);
                     messagesBox.innerHTML = "";
                     inputBlock.style.display = 'flex';
-                    lastMessagesLength = -1;
-                    lastChatStatus = '';
+                    startRealtimeChatListener(); // Перепідключаємось до нової сесії
                     return;
                 }
             }
-
-            if (myChat.messages.length === lastMessagesLength && myChat.status === lastChatStatus) return;
-            
-            lastMessagesLength = myChat.messages.length;
-            lastChatStatus = myChat.status;
 
             messagesBox.innerHTML = "";
             myChat.messages.forEach(msg => {
@@ -288,38 +312,52 @@
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }
 
-        function sendUserChatMessage() {
+        // Хмарне збереження повідомлення користувача
+        async function sendUserChatMessage() {
             const input = document.getElementById('user-chat-input');
             const text = input.value.trim();
             if (!text) return;
-            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-            if (!allChats[userChatSessionId]) { 
-                allChats[userChatSessionId] = { id: userChatSessionId, messages: [], status: 'active', adminStatus: 'processing', lastUpdate: Date.now() }; 
-            }
-            allChats[userChatSessionId].messages.push({ sender: 'user', text: text, type: 'text', time: Date.now() });
-            allChats[userChatSessionId].lastUpdate = Date.now();
-            localStorage.setItem('liveChatSystem', JSON.stringify(allChats));
+
+            const msgObject = { sender: 'user', text: text, type: 'text', time: Date.now() };
             input.value = "";
-            renderUserChat();
+
+            try {
+                await db.collection("chats").doc(userChatSessionId).set({
+                    id: userChatSessionId,
+                    status: 'active',
+                    adminStatus: 'processing',
+                    lastUpdate: Date.now(),
+                    messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
+                }, { merge: true });
+            } catch(e) {
+                console.error("Помилка хмарного запису: ", e);
+            }
         }
 
+        // Хмарне збереження фотографії користувача
         function sendUserChatPhoto(input) {
             if (!input.files || !input.files[0]) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-                if (!allChats[userChatSessionId]) { 
-                    allChats[userChatSessionId] = { id: userChatSessionId, messages: [], status: 'active', adminStatus: 'processing', lastUpdate: Date.now() }; 
+            reader.onload = async function(e) {
+                const msgObject = { sender: 'user', text: e.target.result, type: 'image', time: Date.now() };
+                try {
+                    await db.collection("chats").doc(userChatSessionId).set({
+                        id: userChatSessionId,
+                        status: 'active',
+                        adminStatus: 'processing',
+                        lastUpdate: Date.now(),
+                        messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
+                    }, { merge: true });
+                } catch(err) {
+                    console.error("Помилка завантаження фото в хмару: ", err);
                 }
-                allChats[userChatSessionId].messages.push({ sender: 'user', text: e.target.result, type: 'image', time: Date.now() });
-                allChats[userChatSessionId].lastUpdate = Date.now();
-                localStorage.setItem('liveChatSystem', JSON.stringify(allChats));
-                renderUserChat();
             };
             reader.readAsDataURL(input.files[0]);
             input.value = "";
         }
+
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
+        window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); initUserChat(); });
     </script>
 </body>
 </html>
