@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Підтримка | SVAROG TEAM</title>
+    <title>SVAROG TEAM | Зв'язок з нами</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -23,6 +23,7 @@
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; min-height: 100%; height: 100%; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
@@ -30,18 +31,14 @@
             background-position: center; background-repeat: no-repeat; background-size: cover;
             transition: background-image 1s ease-in-out;
         }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: -1; }
+        body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.65); z-index: -1; }
         
         /* НАВІГАЦІЯ */
         .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
         .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .left-side { display: flex; align-items: center; gap: 20px; }
-        
         .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: 0.3s; }
         .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
-        .menu-toggle.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-        .menu-toggle.open .bar:nth-child(2) { opacity: 0; transform: translateX(-10px); }
-        .menu-toggle.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
         
         .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-img { height: 40px; }
@@ -51,22 +48,20 @@
         .nav-links { list-style: none; display: flex; flex-direction: column; width: 260px; background-color: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); position: fixed; top: 65px; left: -280px; height: calc(100vh - 65px); padding: 30px 20px; gap: 10px; transition: 0.4s; }
         .nav-links.active { left: 0; }
         .nav-links a { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 1.1rem; padding: 12px 15px; border-radius: 6px; }
-        .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
-        
+        .nav-links a.current-page { color: #ffffff; border-left: 4px solid #ffffff; background-color: rgba(255, 255, 255, 0.12); }
         .admin-menu-item { padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 5px; }
-        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; margin-top: 5px; }
+        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; font-weight: bold !important; text-align: center; }
 
-        /* КОНТЕНТ */
         .main-content { margin-top: 100px; padding: 20px; display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; }
         .container { padding: 40px 30px; border-radius: 12px; background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.82) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); max-width: 550px; width: 100%; text-align: center; }
-        .btn { display: block; padding: 12px; background: transparent; border: 2px solid #00ffcc; color: #00ffcc; border-radius: 4px; margin-top: 15px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; text-decoration: none; }
+        .btn { display: block; padding: 12px; background: transparent; border: 2px solid #00ffcc; color: #00ffcc; border-radius: 4px; margin-top: 15px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; }
         .btn:hover { background: #00ffcc; color: #121212; }
-        .volunteer-form { margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: left; }
         input, textarea { padding: 12px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.15); width: 100%; border-radius: 4px; margin-bottom: 12px; }
+        
+        .social-box { display: flex; gap: 12px; margin-top: 25px; flex-direction: column; width: 100%; max-width: 550px; }
+        .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; border-radius: 6px; text-decoration: none; font-weight: bold; color: #fff; border: 1px solid; transition: 0.3s; }
 
-        .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
-
-        /* ЧАТ МОДАЛКА */
+        /* ЧАТ */
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); z-index: 2000; flex-direction: column; overflow: hidden; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
@@ -86,7 +81,7 @@
             <div class="left-side">
                 <button class="menu-toggle" id="menu-button"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
                 <a href="index.html" class="logo-container">
-                    <img src="logo.png" alt="SVAROG TEAM" class="logo-img">
+                    <img src="logo.png" alt="SVAROG" class="logo-img">
                     <div class="logo-text-group">
                         <span class="logo-main">SVAROG TEAM</span>
                         <span class="logo-sub">35 POLK NGU</span>
@@ -95,9 +90,9 @@
             </div>
             <ul class="nav-links" id="nav-menu">
                 <li><a href="index.html">Головна</a></li>
-                <li><a href="support.html" class="current-page">Підтримка</a></li>
+                <li><a href="support.html">Підтримка</a></li>
                 <li><a href="about.html">Про нас</a></li>
-                <li><a href="contact.html">Зв'язок з нами</a></li>
+                <li><a href="contact.html" class="current-page">Зв'язок з нами</a></li>
                 <li class="admin-menu-item"><a href="admin.html">Admin</a></li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)">💬 Анонімний чат</a></li>
             </ul>
@@ -106,26 +101,16 @@
 
     <div class="main-content">
         <div class="container">
-            <h1>ПІДТРИМКА ПІДРОЗДІЛУ</h1>
-            <a id="donation-button" class="btn" href="#" target="_blank">Підтримати на Банку</a>
-            <div class="donation-qr-card"><img id="donation-qr-image" src="" alt="QR"></div>
-            
-            <div class="volunteer-form">
-                <h2>Бланк волонтера</h2>
-                <input type="text" id="v-fullname" placeholder="Прізвище Ім'я">
-                <input type="text" id="v-org" placeholder="Назва організації">
-                <input type="tel" id="v-phone" placeholder="Телефон">
-                <input type="tel" id="v-whatsapp" placeholder="WhatsApp">
-                <textarea id="v-message" placeholder="Повідомлення"></textarea>
-                <input type="file" id="v-photo" accept="image/*">
-                <button class="btn" onclick="sendVolunteerData()">Відправити бланк</button>
-            </div>
+            <h1>Зв'язок з нами</h1>
+            <form id="feedback-form" onsubmit="sendFeedback(event)">
+                <input type="text" id="fb-name" placeholder="Ім'я" required>
+                <input type="text" id="fb-contact" placeholder="Контакт" required>
+                <textarea id="fb-message" placeholder="Повідомлення" required></textarea>
+                <button type="submit" class="btn">Надіслати</button>
+            </form>
         </div>
+        <div class="social-box" id="dynamic-user-social-container"></div>
     </div>
-
-    <footer class="footer">
-        <span>SVAROG TEAM © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
-    </footer>
 
     <div class="user-chat-modal" id="user-chat-window">
         <div class="chat-header"><span>Чат</span><span style="cursor:pointer" onclick="document.getElementById('user-chat-window').style.display='none'">×</span></div>
@@ -142,6 +127,7 @@
         let userChatSessionId = localStorage.getItem('userChatSessionId') || 'session_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('userChatSessionId', userChatSessionId);
 
+        // Firebase: Слухач чату
         db.collection("chats").doc(userChatSessionId).onSnapshot(doc => {
             const messagesBox = document.getElementById('user-chat-messages');
             messagesBox.innerHTML = "";
@@ -156,6 +142,7 @@
             }
         });
 
+        // Firebase: Відправка повідомлень
         async function sendUserChatMessage() {
             const input = document.getElementById('user-chat-input');
             if(!input.value.trim()) return;
@@ -165,36 +152,25 @@
             input.value = "";
         }
 
-        async function sendVolunteerData() {
-            const photoInput = document.getElementById('v-photo');
-            const data = {
-                name: document.getElementById('v-fullname').value,
-                org: document.getElementById('v-org').value,
-                phone: document.getElementById('v-phone').value,
-                whatsapp: document.getElementById('v-whatsapp').value,
-                message: document.getElementById('v-message').value,
+        // Firebase: Відправка заявки (Feedback)
+        async function sendFeedback(e) {
+            e.preventDefault();
+            await db.collection("feedback").add({
+                name: document.getElementById('fb-name').value,
+                contact: document.getElementById('fb-contact').value,
+                message: document.getElementById('fb-message').value,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 time: new Date().toLocaleString()
-            };
-            if (photoInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    data.image = e.target.result;
-                    await db.collection("volunteers").add(data);
-                    alert("Заявка відправлена!");
-                };
-                reader.readAsDataURL(photoInput.files[0]);
-            } else {
-                await db.collection("volunteers").add(data);
-                alert("Заявка відправлена!");
-            }
+            });
+            alert("Повідомлення надіслано!");
+            document.getElementById('feedback-form').reset();
         }
 
-        db.collection("config").doc("donation").onSnapshot(doc => {
-            if(doc.exists) {
-                document.getElementById('donation-button').href = doc.data().url;
-                document.getElementById('donation-qr-image').src = `https://api.qrserver.com/v1/create-qr-code?size=200x200&data=${encodeURIComponent(doc.data().url)}`;
-            }
+        // Firebase: Соцмережі
+        db.collection("config").doc("socials").onSnapshot(doc => {
+            const box = document.getElementById('dynamic-user-social-container');
+            const nets = doc.exists ? doc.data().list : [];
+            box.innerHTML = nets.map(n => `<a href="${n.url}" class="social-btn" style="border-color:${n.color}">${n.name}</a>`).join('');
         });
 
         function openUserChat(e) { e.preventDefault(); document.getElementById('user-chat-window').style.display = 'flex'; }
