@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script>
+        // Конфігурація вашого проєкту Firebase Svarog-Team
         const firebaseConfig = {
             apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
             authDomain: "svarog-team.firebaseapp.com",
@@ -65,41 +66,40 @@
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
 
-        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: auto !important; width: 100%; }
+        .admin-menu-item { padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 5px; }
+        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: 5px; width: 100%; }
         .menu-chat-btn:hover { background: #0099ff !important; color: #ffffff !important; padding-left: 15px !important; }
 
         /* КОНТЕНТ */
-        .main-content { margin-top: 100px; padding: 20px; display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; }
-        .page-title-box { text-align: center; max-width: 600px; margin-bottom: 20px; }
+        .main-content { margin-top: 100px; padding: 20px; display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; gap: 30px; }
+        .page-title-box { text-align: center; max-width: 600px; margin-bottom: 5px; }
         .page-title-box h1 { font-size: 2rem; color: #ffffff; margin-bottom: 10px; }
         .page-title-box p { color: #ccc; font-size: 1.05rem; }
+        
         .container { padding: 40px 30px; border-radius: 12px; background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.82) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 24px 60px rgba(0,0,0,0.35); max-width: 550px; width: 100%; text-align: center; }
         .form-group { margin-bottom: 15px; text-align: left; }
-        .form-input, .form-textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; border-radius: 4px; outline: none; }
-        .form-input:focus, .form-textarea:focus { border-color: #0099ff; }
+        .form-input, .form-textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; border-radius: 4px; outline: none; font-size: 1rem; }
+        .form-input:focus, .form-textarea:focus { border-color: #00ffcc; box-shadow: 0 0 8px rgba(0, 255, 204, 0.2); }
         .form-textarea { min-height: 110px; resize: vertical; font-family: inherit; }
         
-        .btn { width: 100%; padding: 12px; background: transparent; border: 1px solid #fff; color: #fff; cursor: pointer; margin-top: 10px; font-weight: bold; border-radius: 4px; transition: all 0.2s; }
+        .btn { width: 100%; padding: 12px; background: transparent; border: 1px solid #fff; color: #fff; cursor: pointer; margin-top: 10px; font-weight: bold; border-radius: 4px; transition: all 0.2s; font-size: 1rem; }
         .btn:hover { background: #fff; color: #121212; }
         
-        .social-box { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+        /* ДИНАМІЧНИЙ БЛОК QR КОДУ */
+        .qr-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.1); }
+        .qr-image { width: 180px; height: 180px; background: #fff; border-radius: 6px; padding: 6px; box-shadow: 0 0 20px rgba(0, 255, 204, 0.15); }
+        .donation-action-btn { border-color: #00ffcc !important; color: #00ffcc !important; }
+        .donation-action-btn:hover { background: #00ffcc !important; color: #121212 !important; box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); }
+
+        .social-box { display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 550px; }
         .social-btn { padding: 10px 20px; border: 1px solid #fff; color: #fff; text-decoration: none; border-radius: 4px; font-weight: 500; transition: all 0.2s; }
         .social-btn:hover { filter: brightness(1.2); background: rgba(255,255,255,0.05); }
-        
-        /* ФУТЕР */
-        .footer {
-            width: 100%;
-            padding: 20px 12px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.55);
-            font-size: 0.82rem;
-            margin-top: auto;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(10, 10, 10, 0.65);
-            backdrop-filter: blur(8px);
-        }
+        .attached-preview { max-width: 100%; max-height: 150px; border-radius: 6px; margin-top: 10px; display: none; border: 1px dashed rgba(255,255,255,0.3); object-fit: contain; }
 
-        /* ОКРУГЛЕНЕ ВІКНА ЧАТУ */
+        /* ФУТЕР */
+        .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
+
+        /* ЧАТ */
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
@@ -109,39 +109,27 @@
         .chat-bubble img { max-width: 100%; max-height: 140px; border-radius: 4px; display: block; cursor: pointer; margin-top: 3px; }
         .chat-bubble.system { background: rgba(255, 74, 74, 0.1); border: 1px solid rgba(255, 74, 74, 0.2); align-self: center; text-align: center; font-size: 0.8rem; max-width: 95%; color: #ff4a4a; border-radius: 6px; }
         
-        /* ЗОНА ВВОДУ */
         .chat-input-area { padding: 12px; display: flex; gap: 8px; background: rgba(0,0,0,0.25); align-items: center; }
         .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
         .chat-input-area input:focus { border-color: rgba(0, 153, 255, 0.6); }
         
-        /* КНОПКА НАДСИЛАННЯ З SVG */
-        .chat-send-btn { 
-            width: 38px; 
-            height: 38px; 
-            background: #0099ff; 
-            border: none; 
-            color: #ffffff; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            transition: all 0.2s ease; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            box-shadow: 0 0 10px rgba(0, 153, 255, 0.2);
-            flex-shrink: 0;
-            padding: 0;
-        }
+        .chat-send-btn { width: 38px; height: 38px; background: #0099ff; border: none; color: #ffffff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(0, 153, 255, 0.2); flex-shrink: 0; padding: 0; }
         .chat-send-btn:hover { background: #007acc; box-shadow: 0 0 15px rgba(0, 153, 255, 0.5); transform: scale(1.05); }
         .chat-send-btn:active { transform: scale(0.95); }
         .chat-send-btn svg { width: 18px; height: 18px; fill: #ffffff; margin-left: 2px; }
 
-        /* КНОПКА СКРІПКИ З SVG */
         .user-clip-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s, border-color 0.2s; padding: 0; }
         .user-clip-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
         .user-clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.75); }
         
         [data-lang="en"] { display: none; }
-        @media (max-width: 768px) { .nav-links { width: 280px; } .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } }
+        @media (max-width: 768px) { 
+            body { background-attachment: scroll; }
+            .nav-links { width: 280px; } 
+            .main-content { padding: 12px; margin-top: 75px; }
+            .container { padding: 30px 20px; }
+            .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
+        }
     </style>
 </head>
 <body>
@@ -166,7 +154,9 @@
                 <li><a href="https://svarogteam.com/support.html" class="current-page"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
                 <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
-                <li style="margin-top: auto; padding-top: 15px;"><a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'"><span data-lang="ua">Адмін</span><span data-lang="en">Admin</span></a></li>
+                <li style="margin-top: auto; padding-top: 15px;">
+                    <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'"><span data-lang="ua">Адмін</span><span data-lang="en">Admin</span></a>
+                </li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -175,18 +165,55 @@
     <div class="main-content">
         <div class="container">
             <div class="page-title-box">
-                <h1 data-lang="ua">Підтримка</h1>
-                <h1 data-lang="en">Support us</h1>
-                <p data-lang="ua">Залиште повідомлення або скористайтеся посиланнями нижче для підтримки команди SVAROG TEAM.</p>
-                <p data-lang="en">Leave a message or use the links below to support the SVAROG TEAM.</p>
+                <h1 data-lang="ua">Фінансова підтримка</h1>
+                <h1 data-lang="en">Financial Support</h1>
+                <p data-lang="ua">Скануйте QR-код або скористайтеся кнопкою переходу, щоб підтримати офіційний збір підрозділу.</p>
+                <p data-lang="en">Scan the QR code or use the action button to support our unit's official fundraiser.</p>
             </div>
-            <form id="feedback-form" onsubmit="sendFeedback(event)">
-                <div class="form-group"><input type="text" id="fb-name" class="form-input" data-placeholder-ua="Ім'я" data-placeholder-en="Name" placeholder="Ім'я" required></div>
-                <div class="form-group"><input type="text" id="fb-contact" class="form-input" data-placeholder-ua="Контакт" data-placeholder-en="Contact" placeholder="Контакт" required></div>
-                <div class="form-group"><textarea id="fb-message" class="form-textarea" data-placeholder-ua="Повідомлення" data-placeholder-en="Message" placeholder="Повідомлення" required></textarea></div>
-                <button type="submit" class="btn"><span data-lang="ua">Надіслати</span><span data-lang="en">Send</span></button>
+            
+            <div class="qr-zone">
+                <img id="donation-qr" class="qr-image" src="" alt="Fundraiser QR">
+                <a id="donation-btn" href="#" target="_blank" class="btn donation-action-btn">
+                    <span data-lang="ua">Перейти до Банки</span>
+                    <span data-lang="en">Go to Fundraiser</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="page-title-box">
+                <h2 data-lang="ua" style="font-size:1.6rem; margin-bottom:8px;">Анкета волонтера</h2>
+                <h2 data-lang="en" style="font-size:1.6rem; margin-bottom:8px;">Volunteer Application</h2>
+                <p data-lang="ua">Заповніть форму — ваша заявка миттєво з'явиться в адмін-панелі для зворотного зв'язку.</p>
+                <p data-lang="en">Fill out the form — your application will instantly appear in the admin panel for feedback.</p>
+            </div>
+            
+            <form id="volunteer-form" onsubmit="sendVolunteerForm(event)">
+                <div class="form-group">
+                    <input type="text" id="vol-name" class="form-input" data-placeholder-ua="Прізвище та Ім'я" data-placeholder-en="Full Name" placeholder="Прізвище та Ім'я" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="vol-org" class="form-input" data-placeholder-ua="Назва Організації / Фонду" data-placeholder-en="Organization / Foundation Name" placeholder="Назва Організації / Фонду" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="vol-phone" class="form-input" data-placeholder-ua="Номер телефону" data-placeholder-en="Phone Number" placeholder="Номер телефону" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="vol-whatsapp" class="form-input" data-placeholder-ua="Контактний WhatsApp або Telegram" data-placeholder-en="Contact WhatsApp or Telegram" placeholder="Контактний WhatsApp або Telegram" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <textarea id="vol-message" class="form-textarea" data-placeholder-ua="Чим саме можете допомогти підрозділу?" data-placeholder-en="How exactly can you help the unit?" placeholder="Повідомлення" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;" data-lang="ua">Прикріпити офіційний бланк / фото документа (необов'язково):</label>
+                    <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;" data-lang="en">Attach official form / document photo (optional):</label>
+                    <input type="file" id="vol-file" accept="image/*" class="form-input" onchange="previewVolunteerPhoto(this)">
+                    <img id="vol-preview-element" class="attached-preview" src="">
+                </div>
+                <button type="submit" class="btn"><span data-lang="ua">Надіслати анкету</span><span data-lang="en">Submit Application</span></button>
             </form>
         </div>
+
         <div class="social-box" id="dynamic-user-social-container"></div>
     </div>
 
@@ -228,10 +255,7 @@
             menuButton.addEventListener('click', (e) => { e.stopPropagation(); navMenu.classList.toggle('active'); menuButton.classList.toggle('open'); });
             document.addEventListener('click', (e) => { if (!navMenu.contains(e.target) && !menuButton.contains(e.target)) { navMenu.classList.remove('active'); menuButton.classList.remove('open'); } });
             navMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    navMenu.classList.remove('active');
-                    menuButton.classList.remove('open');
-                });
+                link.addEventListener('click', () => { navMenu.classList.remove('active'); menuButton.classList.remove('open'); });
             });
         }
 
@@ -246,27 +270,106 @@
             document.title = lang === 'ua' ? "SVAROG TEAM | Підтримка" : 'SVAROG TEAM | Support';
         }
 
-        /* РОБОЧА ЛОГІКА ЧАТУ */
+        // --- ЛОГІКА ДИНАМІЧНОГО ЗЧИТУВАННЯ БАНКИ ТА QR-КОДУ ---
+        function initDonationLinkAndQR() {
+            const currentLink = localStorage.getItem('siteDonationLink') || "https://send.monobank.ua/jar/default";
+            
+            // Налаштовуємо посилання на кнопці дії
+            document.getElementById('donation-btn').href = currentLink;
+            
+            // Формуємо динамічний QR код за допомогою надійного відкритого сервісу
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(currentLink)}`;
+            document.getElementById('donation-qr').src = qrApiUrl;
+        }
+
+        // --- ЛОГІКА ВОЛОНТЕРСЬКОЇ АНКЕТИ (FIREBASE) ---
+        let volunteerImgBase64 = "";
+
+        function previewVolunteerPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    volunteerImgBase64 = e.target.result;
+                    const previewImg = document.getElementById('vol-preview-element');
+                    previewImg.src = volunteerImgBase64; previewImg.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function sendVolunteerForm(e) { 
+            e.preventDefault(); 
+            const name = document.getElementById('vol-name').value.trim();
+            const org = document.getElementById('vol-org').value.trim();
+            const phone = document.getElementById('vol-phone').value.trim();
+            const whatsapp = document.getElementById('vol-whatsapp').value.trim();
+            const message = document.getElementById('vol-message').value.trim();
+            const lang = localStorage.getItem('selectedLang') || 'ua';
+
+            try {
+                // Відправляємо дані прямо в Firebase, колекція "volunteers"
+                await db.collection("volunteers").add({
+                    name: name,
+                    org: org,
+                    phone: phone,
+                    whatsapp: whatsapp,
+                    message: message,
+                    image: volunteerImgBase64 || null,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    time: new Date().toLocaleString('uk-UA')
+                });
+
+                alert(lang === 'ua' ? 'Анкету успішно надіслано в адмін-панель!' : 'Application successfully sent to the admin panel!'); 
+                document.getElementById('volunteer-form').reset();
+                document.getElementById('vol-preview-element').style.display = 'none';
+                volunteerImgBase64 = "";
+            } catch (err) {
+                console.error("Помилка відправки анкети: ", err);
+                alert(lang === 'ua' ? 'Помилка хмари: ' + err.message : 'Cloud error: ' + err.message);
+            }
+        }
+
+        // Стрім кнопок соцмереж з хмари
+        db.collection("config").doc("socials").onSnapshot(doc => {
+            const container = document.getElementById('dynamic-user-social-container');
+            if(!container) return;
+            const nets = doc.exists ? doc.data().list : [];
+            container.innerHTML = nets.map(n => `<a href="${n.url}" target="_blank" class="social-btn" style="border-color:${n.color}; color:#fff; text-align:center;">${n.name}</a>`).join('');
+        });
+
+        // --- ЖИВА СИНХРОНІЗАЦІЯ АНОНІМНОГО ЧАТУ (FIREBASE REALTIME) ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
-        let lastMessagesLength = -1; 
-        let lastChatStatus = '';
+        let unsubscribeUserChat = null;
 
         function initUserChat() {
             if (!userChatSessionId) {
                 userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('userChatSessionId', userChatSessionId);
             }
-            setInterval(renderUserChat, 2000);
+            startRealtimeChatListener();
         }
 
-        function openUserChat(e) { e.preventDefault(); if(navMenu) navMenu.classList.remove('active'); if(menuButton) menuButton.classList.remove('open'); document.getElementById('user-chat-window').style.display = 'flex'; renderUserChat(); }
-        
-        function renderUserChat() {
+        function openUserChat(e) {
+            e.preventDefault();
+            if(navMenu) navMenu.classList.remove('active');
+            if(menuButton) menuButton.classList.remove('open');
+            document.getElementById('user-chat-window').style.display = 'flex';
+            renderUserChat();
+        }
+
+        function startRealtimeChatListener() {
+            if (unsubscribeUserChat) unsubscribeUserChat();
+            unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(doc => {
+                let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' };
+                renderUserChat(myChat);
+            }, err => { console.error("Помилка чату: ", err); });
+        }
+
+        function renderUserChat(myChatData) {
             const messagesBox = document.getElementById('user-chat-messages');
             const inputBlock = document.getElementById('user-chat-input-block');
             const lang = localStorage.getItem('selectedLang') || 'ua';
-            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-            let myChat = allChats[userChatSessionId] || { messages: [], status: 'active' };
+            let myChat = myChatData || { messages: [], status: 'active' };
 
             if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
                 const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
@@ -277,16 +380,10 @@
                     localStorage.setItem('userChatSessionId', userChatSessionId);
                     messagesBox.innerHTML = "";
                     inputBlock.style.display = 'flex';
-                    lastMessagesLength = -1;
-                    lastChatStatus = '';
+                    startRealtimeChatListener();
                     return;
                 }
             }
-
-            if (myChat.messages.length === lastMessagesLength && myChat.status === lastChatStatus) return;
-            
-            lastMessagesLength = myChat.messages.length;
-            lastChatStatus = myChat.status;
 
             messagesBox.innerHTML = "";
             myChat.messages.forEach(msg => {
@@ -315,72 +412,43 @@
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }
 
-        function sendUserChatMessage() {
+        async function sendUserChatMessage() {
             const input = document.getElementById('user-chat-input');
             const text = input.value.trim();
-            if(!text) return;
-            let chats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-            if(!chats[userChatSessionId]) chats[userChatSessionId] = { id: userChatSessionId, messages: [], status: 'active', adminStatus: 'processing', lastUpdate: Date.now() };
-            chats[userChatSessionId].messages.push({ sender: 'user', text: text, type: 'text', time: Date.now() });
-            chats[userChatSessionId].lastUpdate = Date.now();
-            localStorage.setItem('liveChatSystem', JSON.stringify(chats));
+            if (!text) return;
+
+            const msgObject = { sender: 'user', text: text, type: 'text', time: Date.now() };
             input.value = "";
-            renderUserChat();
+            try {
+                await db.collection("chats").doc(userChatSessionId).set({
+                    id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
+                    messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
+                }, { merge: true });
+            } catch(e) { console.error(e); }
         }
 
         function sendUserChatPhoto(input) {
             if (!input.files || !input.files[0]) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                let chats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
-                if(!chats[userChatSessionId]) chats[userChatSessionId] = { id: userChatSessionId, messages: [], status: 'active', adminStatus: 'processing', lastUpdate: Date.now() };
-                chats[userChatSessionId].messages.push({ sender: 'user', text: e.target.result, type: 'image', time: Date.now() });
-                chats[userChatSessionId].lastUpdate = Date.now();
-                localStorage.setItem('liveChatSystem', JSON.stringify(chats));
-                renderUserChat();
+            reader.onload = async function(e) {
+                const msgObject = { sender: 'user', text: e.target.result, type: 'image', time: Date.now() };
+                try {
+                    await db.collection("chats").doc(userChatSessionId).set({
+                        id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
+                        messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
+                    }, { merge: true });
+                } catch(err) { console.error(err); }
             };
             reader.readAsDataURL(input.files[0]);
-            input.value = '';
-        }
-
-        function renderSocial() {
-            const container = document.getElementById('dynamic-user-social-container');
-            const nets = JSON.parse(localStorage.getItem('siteDynamicSocialNetworks')) || [
-                {name: 'Telegram', url: '#', color: '#0088cc'},
-                {name: 'TikTok', url: '#', color: '#fe2c55'}
-            ];
-            container.innerHTML = nets.map(n => `<a href="${n.url}" target="_blank" class="social-btn" style="border-color:${n.color}; color:#fff;">${n.name}</a>`).join('');
-        }
-
-        function sendFeedback(e) { 
-            e.preventDefault(); 
-            const name = document.getElementById('fb-name').value.trim();
-            const contact = document.getElementById('fb-contact').value.trim();
-            const message = document.getElementById('fb-message').value.trim();
-            const lang = localStorage.getItem('selectedLang') || 'ua';
-
-            let storedFeedback = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
-            storedFeedback.push({
-                name: name,
-                contact: contact,
-                message: message,
-                time: new Date().toLocaleString('uk-UA')
-            });
-            localStorage.setItem('siteFeedbackData', JSON.stringify(storedFeedback));
-
-            document.getElementById('fb-name').value = "";
-            document.getElementById('fb-contact').value = "";
-            document.getElementById('fb-message').value = "";
-
-            alert(lang === 'ua' ? 'Повідомлення надіслано в адмін-панель!' : 'Message sent to admin panel!'); 
+            input.value = "";
         }
 
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
         
         window.addEventListener('DOMContentLoaded', () => { 
-            renderSocial(); 
+            initDonationLinkAndQR();
             setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
-            initUserChat();
+            initUserChat(); 
         });
     </script>
 </body>
