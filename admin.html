@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVAROG | Admin Dashboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            position: relative; overflow-x: hidden;
+            background-image: url('background.jpg'); background-attachment: fixed;
+            background-position: center; background-repeat: no-repeat; background-size: cover;
+        }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: -1; }
+        .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
+        .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        .left-side { display: flex; align-items: center; gap: 20px; }
+        .logo { color: #ffffff; text-decoration: none; font-weight: 900; letter-spacing: 1px; font-size: 1.1rem; }
+        .lang-switcher { display: flex; gap: 4px; background: rgba(0, 0, 0, 0.3); padding: 2px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .lang-btn { background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; font-weight: bold; padding: 4px 8px; cursor: pointer; border-radius: 3px; transition: all 0.3s ease; }
+        .lang-btn:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.1); }
+        .lang-btn.active { color: #121212; background-color: #ffffff; box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2); }
+
+        .main-content { margin-top: 80px; display: flex; justify-content: center; align-items: center; flex-grow: 1; width: 100%; padding: 15px; }
+        .container { padding: 30px 20px; border-radius: 12px; background: rgba(30, 30, 30, 0.65); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); max-width: 400px; width: 100%; transition: all 0.3s ease; }
+        .container.dashboard-mode { max-width: 1100px; }
+        
+        h1 { color: #ffffff; margin-bottom: 20px; font-size: 1.6rem; text-align: center; }
+        .form-group { width: 100%; margin-bottom: 15px; text-align: left; }
+        .form-input { width: 100%; padding: 12px 16px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; color: #ffffff; font-size: 1rem; outline: none; }
+        .form-input:focus { border-color: #ffffff; box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
+        textarea.form-input { min-height: 120px; resize: vertical; font-family: inherit; }
+
+        .btn { display: inline-block; width: 100%; padding: 12px; background-color: transparent; color: #ffffff; border: 2px solid #ffffff; border-radius: 4px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; text-align: center; text-decoration: none; }
+        .btn:hover { background-color: #ffffff; color: #121212; }
+        .error-msg { color: #ff4a4a; font-size: 0.9rem; margin-top: 15px; display: none; text-align: center; font-weight: bold; }
+
+        .superadmin-link-wrapper { text-align: center; margin-top: 15px; }
+        .superadmin-toggle-link { font-size: 0.8rem; color: #ffffff; opacity: 0.3; text-decoration: none; cursor: pointer; transition: opacity 0.2s ease; }
+        .superadmin-toggle-link:hover { opacity: 0.8; color: #00ffcc; }
+
+        /* ВКЛАДКИ */
+        .tabs-header { display: flex; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-button { flex: 1; min-width: 90px; padding: 10px 5px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; text-align: center; position: relative; display: flex; justify-content: center; align-items: center; gap: 5px; }
+        .tab-button.active { color: #121212; background: #ffffff; }
+        .tab-badge { display: none; background: #ff4a4a; color: #ffffff; font-size: 0.75rem; font-weight: bold; min-width: 18px; height: 18px; border-radius: 5px; padding: 0 4px; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.2); }
+
+        .tab-content { display: none; text-align: left; }
+        .tab-content.active { display: block; }
+
+        .superadmin-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px; }
+        .admin-creator-form { flex: 1; min-width: 300px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .admin-accounts-list { flex: 1.2; min-width: 320px; max-height: 550px; overflow-y: auto; }
+
+        .admin-user-card { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 15px; margin-bottom: 12px; position: relative; }
+        .admin-card-title { font-weight: bold; color: #00ffcc; font-size: 1rem; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px; margin-bottom: 8px; }
+        .admin-card-info { font-size: 0.9rem; color: #e0e0e0; margin-bottom: 4px; }
+        .delete-admin-btn { background: none; border: 1px solid #ff4a4a; color: #ff4a4a; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; cursor: pointer; position: absolute; right: 15px; top: 13px; }
+        .edit-news-btn { background: none; border: 1px solid #00ffcc; color: #00ffcc; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; cursor: pointer; position: absolute; right: 105px; top: 13px; }
+
+        /* ЧАТ МАКЕТ */
+        .chat-admin-layout { display: flex; gap: 20px; height: 480px; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .chat-sessions-list { width: 240px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 10px; flex-shrink: 0; }
+        .session-item { padding: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; cursor: pointer; border: 1px solid transparent; font-size: 0.85rem; }
+        .session-item.selected { border-color: #00ffcc; background: rgba(0, 255, 204, 0.05); }
+        
+        .chat-workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        #chat-messages-and-header { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .workspace-header { padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; height: 45px; gap: 8px; flex-wrap: wrap; }
+        
+        .status-select { background: #1a1a1a; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 5px 8px; border-radius: 4px; font-size: 0.8rem; outline: none; cursor: pointer; }
+        .status-select.processing { border-color: #ffaa00; color: #ffaa00; }
+        .status-select.success { border-color: #00ffcc; color: #00ffcc; }
+        .status-select.unresolved { border-color: #ff4a4a; color: #ff4a4a; }
+
+        .admin-messages-box { flex: 1; padding: 15px 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; min-height: 200px; }
+        .admin-bubble { padding: 8px 12px; border-radius: 8px; max-width: 85%; font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; }
+        .admin-bubble.user { background: rgba(255,255,255,0.1); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .admin-bubble.admin { background: rgba(0, 255, 204, 0.15); align-self: flex-end; border: 1px solid rgba(0, 255, 204, 0.3); border-bottom-right-radius: 2px; }
+        .admin-bubble img { max-width: 100%; max-height: 150px; border-radius: 4px; margin-top: 5px; cursor: pointer; display: block; }
+
+        /* ОНОВЛЕНА ЗОНА ВВОДУ В АДМІНЦІ (КРУГЛІ ЕЛЕМЕНТИ ТА SVG) */
+        .admin-input-area { padding: 12px 0 0 0; display: none; gap: 8px; border-top: 1px solid rgba(255,255,255,0.1); background: transparent; align-items: center; }
+        .admin-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 19px; color: #ffffff; outline: none; font-size: 0.9rem; }
+        
+        .clip-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s, border-color 0.2s; padding: 0; }
+        .clip-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
+        .clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.7); }
+        
+        .admin-send-btn { 
+            width: 38px; 
+            height: 38px; 
+            background: #00ffcc; 
+            border: none; 
+            color: #121212; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            padding: 0;
+        }
+        .admin-send-btn:hover { 
+            transform: scale(1.05);
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
+        }
+        .admin-send-btn svg { width: 18px; height: 18px; fill: #121212; margin-left: 2px; }
+
+        .export-btn { display: inline-block; width: auto; padding: 6px 15px; font-size: 0.85rem; border: 1px solid #00ffcc; color: #00ffcc; border-radius: 4px; background: transparent; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .export-btn:hover { background: #00ffcc; color: #121212; }
+
+        .msg-list { width: 100%; max-height: 380px; overflow-y: auto; padding-right: 5px; margin-top: 10px; }
+        .msg-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 12px; margin-bottom: 12px; }
+        .meta-line { font-weight: bold; color: #00ffcc; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 6px; font-size: 0.85rem; }
+        .msg-text { font-size: 0.95rem; color: #e0e0e0; line-height: 1.4; word-wrap: break-word; }
+        .no-msg { text-align: center; color: #666; font-style: italic; margin-top: 40px; width: 100%; font-size: 0.9rem; }
+
+        .attached-img-preview { margin-top: 10px; max-width: 120px; max-height: 80px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; display: block; }
+        .news-img-preview { max-width: 100%; max-height: 120px; border-radius: 6px; margin-top: 8px; display: none; border: 1px dashed rgba(255,255,255,0.3); object-fit: contain; }
+
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 5px; }
+        .badge.processing { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
+        .badge.success { background: rgba(0, 255, 204, 0.2); color: #00ffcc; }
+        .badge.unresolved { background: rgba(255, 74, 74, 0.2); color: #ff4a4a; }
+
+        .nav-links { list-style: none; display: flex; flex-direction: column; width: 260px; background-color: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); position: fixed; top: 65px; left: -280px; height: calc(100vh - 65px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); gap: 10px; box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5); transition: left 0.4s cubic-bezier(0.075, 0.82, 0.165, 1); }
+        .nav-links.active { left: 0; }
+        .nav-links a { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 1.1rem; font-weight: 500; display: block; padding: 12px 15px; border-radius: 6px; transition: all 0.2s ease; }
+        .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
+        .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
+
+        .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .menu-toggle:hover { transform: scale(1.05); background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); }
+        .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
+        .menu-toggle.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .menu-toggle.open .bar:nth-child(2) { opacity: 0; transform: translateX(-10px); }
+        .menu-toggle.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .back-to-list-btn { display: none; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: bold; margin-right: 8px; }
+
+        /* Чекбокс перемикач */
+        .switch-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
+        .switch-wrapper input { cursor: pointer; width: 16px; height: 16px; accent-color: #00ffcc; }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 10px; }
+            .container { padding: 25px 15px; }
+            h1 { font-size: 1.4rem; }
+            .tabs-header { gap: 4px; padding-bottom: 10px; }
+            .tab-button { min-width: 65px; padding: 8px 2px; font-size: 0.65rem; }
+            .chat-admin-layout { position: relative; height: 430px; }
+            .chat-sessions-list { width: 100%; border-right: none; padding-right: 0; }
+            .chat-sessions-list.hide-on-mobile { display: none; }
+            .chat-workspace { display: none; width: 100%; }
+            .chat-workspace.show-on-mobile { display: flex; }
+            .back-to-list-btn { display: inline-block; }
+            .workspace-header { font-size: 0.85rem; }
+            .status-select { padding: 4px 6px; font-size: 0.75rem; }
+            .admin-bubble { max-width: 90%; font-size: 0.85rem; }
+            .superadmin-grid { flex-direction: column; }
+            .edit-news-btn { right: 85px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="left-side">
+                <button class="menu-toggle" id="menu-button"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+                <a href="index.html" class="logo">SVAROG SUPPORT</a>
+            </div>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="setLanguage('ua')">UA</button>
+                <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+            </div>
+            <ul class="nav-links" id="nav-menu">
+                <li><a href="index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
+                <li><a href="support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
+                <li><a href="about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
+                <li><a href="contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li style="margin-top: auto; padding-top: 15px;">
+                    <a href="admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container" id="login-card">
+            <h1 id="login-title-text" data-lang="ua">Вхід в панель</h1>
+            <h1 id="login-title-text-en" data-lang="en">Admin Login</h1>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group"><input type="text" id="username" class="form-input" placeholder="Логін / Username" required autocomplete="off"></div>
+                <div class="form-group"><input type="password" id="password" class="form-input" placeholder="Пароль / Password" required></div>
+                <button type="submit" class="btn"><span data-lang="ua">Увійти</span><span data-lang="en">Login</span></button>
+                <div class="superadmin-link-wrapper">
+                    <a class="superadmin-toggle-link" id="superadmin-mode-btn" onclick="toggleSuperadminMode(true)">Головний admin / Superadmin</a>
+                </div>
+                <div class="error-msg" id="error-block">Невірні дані / Invalid credentials</div>
+            </form>
+        </div>
+
+        <div class="container" id="admin-dashboard" style="display: none;">
+            <div class="tabs-header">
+                <button class="tab-button active" onclick="switchTab('active-chats-tab', this)"><span data-lang="ua">💬 Чати</span><span data-lang="en">💬 Chats</span><div class="tab-badge" id="badge-chats">0</div></button>
+                <button class="tab-button" onclick="switchTab('feedback-tab', this)"><span data-lang="ua">📂 Заявки</span><span data-lang="en">📂 Forms</span><div class="tab-badge" id="badge-feedback">0</div></button>
+                <button class="tab-button" onclick="switchTab('volunteer-tab', this)"><span data-lang="ua">📋 Волонтери</span><span data-lang="en">📋 Volunteers</span><div class="tab-badge" id="badge-volunteers">0</div></button>
+                <button class="tab-button" onclick="switchTab('link-management-tab', this)"><span data-lang="ua">🔗 Контент</span><span data-lang="en">🔗 Content</span></button>
+                <button class="tab-button" id="superadmin-only-tab-btn" onclick="switchTab('admin-management-tab', this)" style="display:none; color:#00ffcc; border-color:rgba(0,255,204,0.2);"><span data-lang="ua">⚙️ Адміни</span><span data-lang="en">⚙️ Managers</span></button>
+                <button class="tab-button" onclick="switchTab('archive-tab', this)"><span data-lang="ua">📦 Архів</span><span data-lang="en">📦 Archive</span></button>
+            </div>
+
+            <div id="active-chats-tab" class="tab-content active">
+                <div class="chat-admin-layout">
+                    <div class="chat-sessions-list" id="active-sessions-box"></div>
+                    <div class="chat-workspace" id="chat-workspace-block">
+                        <div id="chat-messages-and-header" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                            <div style="text-align:center; margin:auto; color:#666;" data-lang="ua">Оберіть чат зі списку</div>
+                        </div>
+                        <div class="admin-input-area" id="global-admin-input-block">
+                            <button class="clip-btn" onclick="document.getElementById('admin-chat-file').click()">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-3.31 2.69-6 6-6s6 2.69 6 6v12c0 4.42-3.58 8-8 8s-8-3.58-8-8V6h2v11c0 3.31 2.69 6 6 6s6-2.69 6-6V5c0-2.21-1.79-4-4-4s-4 1.79-4 4v12.5c0 1.1.9 2 2 2s2-.9 2-2V6h2z"/>
+                                </svg>
+                            </button>
+                            <input type="file" id="admin-chat-file" accept="image/*" style="display:none;" onchange="sendAdminChatPhoto(this)">
+                            <input type="text" id="admin-reply-input" placeholder="Відповідь...">
+                            <button class="admin-send-btn" onclick="sendAdminReply()">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-tab" class="tab-content">
+                <button class="export-btn" onclick="exportToCSV('siteFeedbackData', 'Feedback_Requests')">📊 Експорт в Excel</button>
+                <div class="msg-list" id="box-for-feedback"></div>
+            </div>
+
+            <div id="volunteer-tab" class="tab-content">
+                <button class="export-btn" onclick="exportToCSV('siteVolunteerData', 'Volunteer_Forms')">📊 Експорт в Excel</button>
+                <div class="msg-list" id="box-for-volunteers"></div>
+            </div>
+
+            <div id="link-management-tab" class="tab-content">
+                <div class="superadmin-grid">
+                    <div class="admin-creator-form" style="flex: 1.3; min-width: 320px;">
+                        <h3 id="news-form-title" style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">📰 Публікація новини</h3>
+                        <input type="hidden" id="edit-news-id" value="">
+                        <div class="form-group">
+                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Фото новини:</label>
+                            <input type="file" id="news-photo-file" accept="image/*" class="form-input" onchange="previewNewsPhoto(this)">
+                            <img id="news-preview-element" class="news-img-preview" src="">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="news-title-field" class="form-input" placeholder="Заголовок новини" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <textarea id="news-body-field" class="form-input" placeholder="Повний текст новини (розкритий текст)..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Дата публікації:</label>
+                            <input type="date" id="news-date-field" class="form-input">
+                        </div>
+                        <div class="switch-wrapper" onclick="toggleNewsButtonFields()">
+                            <input type="checkbox" id="news-has-btn-checkbox">
+                            <label style="font-size:0.9rem; color:#bbb; cursor:pointer;">Додати кнопку дії (посилання)</label>
+                        </div>
+                        <div id="news-button-config-box" style="display: none; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div class="form-group">
+                                <input type="text" id="news-btn-text-field" class="form-input" placeholder="Текст на кнопці (напр: Читати в TG)">
+                            </div>
+                            <div class="form-group">
+                                <input type="url" id="news-btn-url-field" class="form-input" placeholder="Посилання (https://...)">
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button id="news-submit-btn" class="btn" onclick="publishNewsItem()" style="border-color:#00ffcc; color:#00ffcc; flex:2;">Опублікувати новину</button>
+                            <button id="news-cancel-edit-btn" class="btn" onclick="cancelNewsEditing()" style="border-color:#ff4a4a; color:#ff4a4a; display:none; flex:1;">Скасувати</button>
+                        </div>
+                    </div>
+
+                    <div style="flex: 1; display:flex; flex-direction:column; gap:20px;">
+                        <div class="admin-creator-form">
+                            <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Посилання збору (Банка)</h3>
+                            <div class="form-group"><input type="text" id="current-saved-link-input" class="form-input" readonly style="color:#00ffcc; opacity:0.7;"></div>
+                            <div class="form-group"><input type="url" id="new-donation-link-field" class="form-input" placeholder="https://send.monobank.ua/..."></div>
+                            <button class="btn" onclick="updateDonationLink()" style="border-color:#00ffcc; color:#00ffcc;">Оновити Банку</button>
+                        </div>
+                        <div class="admin-creator-form">
+                            <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Додати соціальну мережу</h3>
+                            <div class="form-group"><input type="text" id="soc-name" class="form-input" placeholder="Назва" autocomplete="off"></div>
+                            <div class="form-group"><input type="url" id="soc-url" class="form-input" placeholder="Посилання" autocomplete="off"></div>
+                            <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                                <label style="font-size:0.9rem; color:#bbb;">Колір кнопки:</label>
+                                <input type="color" id="soc-color" value="#00ffcc" style="background:none; border:none; width:40px; height:35px; cursor:pointer;">
+                            </div>
+                            <button class="btn" onclick="addNewSocialNetwork()" style="border-color:#00ffcc; color:#00ffcc;">Зберегти мережу</button>
+                        </div>
+                    </div>
+
+                    <div class="admin-accounts-list" style="width:100%; max-height:none;">
+                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:#fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:5px;" data-lang="ua">Хроніка опублікованих новин:</h3>
+                        <div id="box-for-published-news"></div>
+                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:#fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:5px; margin-top:30px;" data-lang="ua">Активні посилання соцмереж:</h3>
+                        <div id="box-for-social-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-management-tab" class="tab-content">
+                <div class="superadmin-grid">
+                    <div class="admin-creator-form">
+                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Створити адміністратора</h3>
+                        <form id="create-admin-form" onsubmit="createNewAdminAccount(event)">
+                            <div class="form-group"><input type="text" id="new-admin-lastname" class="form-input" placeholder="Прізвище" required autocomplete="off"></div>
+                            <div class="form-group"><input type="text" id="new-admin-firstname" class="form-input" placeholder="Ім'я" required autocomplete="off"></div>
+                            <div class="form-group"><input type="tel" id="new-admin-phone" class="form-input" placeholder="Номер телефону" required autocomplete="off"></div>
+                            <div class="form-group"><input type="text" id="new-admin-user" class="form-input" placeholder="Логін для входу" required autocomplete="off"></div>
+                            <div class="form-group"><input type="password" id="new-admin-pass" class="form-input" placeholder="Пароль" required></div>
+                            <button type="submit" class="btn" style="border-color:#00ffcc; color:#00ffcc; padding:10px;">Зберегти адміна</button>
+                        </form>
+                    </div>
+                    <div class="admin-accounts-list" id="box-for-admin-accounts"></div>
+                </div>
+            </div>
+
+            <div id="archive-tab" class="tab-content">
+                <div class="msg-list" id="box-for-archive"></div>
+            </div>
+
+            <button class="btn" onclick="handleLogout()" style="margin-top:20px; border-color:rgba(255,255,255,0.2); padding:10px;">Вийти / Logout</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSelectedChatId = null;
+        let updateInterval = null;
+        let isConfirmingStatus = false;
+        let currentTab = 'active-chats-tab';
+        let isSuperadminSession = false;
+        let isSuperadminLoginMode = false;
+        let newsPhotoBase64 = "";
+
+        const menuButton = document.getElementById('menu-button');
+        const navMenu = document.getElementById('nav-menu');
+        if(menuButton && navMenu) {
+            menuButton.addEventListener('click', (e) => { e.stopPropagation(); navMenu.classList.toggle('active'); menuButton.classList.toggle('open'); });
+            document.addEventListener('click', (e) => { if (!navMenu.contains(e.target) && !menuButton.contains(e.target)) { navMenu.classList.remove('active'); menuButton.classList.remove('open'); } });
+        }
+
+        function setLanguage(lang) {
+            localStorage.setItem('selectedLang', lang);
+            document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
+            document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.innerText.toLowerCase() === lang));
+        }
+
+        function toggleSuperadminMode(activate) {
+            isSuperadminLoginMode = activate;
+            const titleUa = document.getElementById('login-title-text');
+            const toggleBtn = document.getElementById('superadmin-mode-btn');
+            document.getElementById('error-block').style.display = 'none';
+            if(activate) {
+                titleUa.innerText = "Головна адмін панель"; toggleBtn.innerText = "← Звичайний адмін"; toggleBtn.setAttribute('onclick', 'toggleSuperadminMode(false)');
+            } else {
+                titleUa.innerText = "Вхід в панель"; toggleBtn.innerText = "Головний адмін / Superadmin"; toggleBtn.setAttribute('onclick', 'toggleSuperadminMode(true)');
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const userInp = document.getElementById('username').value.trim();
+            const passInp = document.getElementById('password').value.trim();
+
+            if (isSuperadminLoginMode) {
+                if (userInp === 'superadmin' && passInp === 'super123') {
+                    isSuperadminSession = true;
+                    document.getElementById('superadmin-only-tab-btn').style.display = 'block'; enterDashboard();
+                } else { document.getElementById('error-block').style.display = 'block'; }
+            } else {
+                let createdAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
+                const matchedAdmin = createdAdmins.find(a => a.user === userInp && a.pass === passInp);
+                if ((userInp === 'admin' && passInp === 'admin123') || matchedAdmin) {
+                    isSuperadminSession = false;
+                    document.getElementById('superadmin-only-tab-btn').style.display = 'none'; enterDashboard();
+                } else { document.getElementById('error-block').style.display = 'block'; }
+            }
+        }
+
+        function enterDashboard() {
+            document.getElementById('login-card').style.display = 'none';
+            const dashboard = document.getElementById('admin-dashboard');
+            dashboard.style.display = 'block'; dashboard.classList.add('dashboard-mode');
+            initBadges(); loadAdminData();
+            updateInterval = setInterval(loadAdminData, 2000);
+            document.getElementById('news-date-field').valueAsDate = new Date();
+        }
+
+        function previewNewsPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    newsPhotoBase64 = e.target.result;
+                    const previewImg = document.getElementById('news-preview-element');
+                    previewImg.src = newsPhotoBase64; previewImg.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function toggleNewsButtonFields() {
+            const checked = document.getElementById('news-has-btn-checkbox').checked;
+            document.getElementById('news-button-config-box').style.display = checked ? 'block' : 'none';
+        }
+
+        function publishNewsItem() {
+            const title = document.getElementById('news-title-field').value.trim();
+            const body = document.getElementById('news-body-field').value.trim();
+            const dateVal = document.getElementById('news-date-field').value;
+            const hasBtn = document.getElementById('news-has-btn-checkbox').checked;
+            const editId = document.getElementById('edit-news-id').value;
+            
+            if(!title || !body || !dateVal) { alert("Заповніть заголовок, текст та дату новини!"); return; }
+
+            let btnText = ""; let btnUrl = "";
+            if(hasBtn) {
+                btnText = document.getElementById('news-btn-text-field').value.trim();
+                btnUrl = document.getElementById('news-btn-url-field').value.trim();
+                if(!btnText || !btnUrl) { alert("Заповніть налаштування кнопки дії або вимкніть її!"); return; }
+            }
+
+            let newsList = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
+            
+            if(editId) {
+                const index = newsList.findIndex(n => n.id === editId);
+                if(index !== -1) {
+                    newsList[index].title = title;
+                    newsList[index].body = body;
+                    newsList[index].date = dateVal;
+                    if(newsPhotoBase64) newsList[index].image = newsPhotoBase64;
+                    newsList[index].hasButton = hasBtn;
+                    newsList[index].btnText = btnText;
+                    newsList[index].btnUrl = btnUrl;
+                    alert("✓ Зміни збережено!");
+                }
+            } else {
+                const newPost = {
+                    id: 'news_' + Date.now(),
+                    title: title,
+                    body: body,
+                    date: dateVal,
+                    image: newsPhotoBase64 || null,
+                    hasButton: hasBtn,
+                    btnText: btnText,
+                    btnUrl: btnUrl
+                };
+                newsList.unshift(newPost);
+                alert("✓ Новину успішно опубліковано!");
+            }
+
+            localStorage.setItem('sitePublishedNewsChronicle', JSON.stringify(newsList));
+            cancelNewsEditing();
+            renderAdminNewsChronicle();
+        }
+
+        function startEditNews(id) {
+            let newsList = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
+            const news = newsList.find(n => n.id === id);
+            if(!news) return;
+
+            document.getElementById('edit-news-id').value = news.id;
+            document.getElementById('news-title-field').value = news.title;
+            document.getElementById('news-body-field').value = news.body;
+            document.getElementById('news-date-field').value = news.date;
+            
+            if(news.image) {
+                newsPhotoBase64 = news.image;
+                const previewImg = document.getElementById('news-preview-element');
+                previewImg.src = news.image; previewImg.style.display = 'block';
+            } else {
+                document.getElementById('news-preview-element').style.display = 'none';
+                newsPhotoBase64 = "";
+            }
+
+            document.getElementById('news-has-btn-checkbox').checked = news.hasButton;
+            if(news.hasButton) {
+                document.getElementById('news-button-config-box').style.display = 'block';
+                document.getElementById('news-btn-text-field').value = news.btnText || "";
+                document.getElementById('news-btn-url-field').value = news.btnUrl || "";
+            } else {
+                document.getElementById('news-button-config-box').style.display = 'none';
+            }
+
+            document.getElementById('news-form-title').innerText = "📝 Редагування новини";
+            document.getElementById('news-submit-btn').innerText = "Зберегти зміни";
+            document.getElementById('news-cancel-edit-btn').style.display = 'inline-block';
+            document.getElementById('link-management-tab').scrollTop = 0;
+        }
+
+        function cancelNewsEditing() {
+            document.getElementById('edit-news-id').value = "";
+            document.getElementById('news-title-field').value = "";
+            document.getElementById('news-body-field').value = "";
+            document.getElementById('news-photo-file').value = "";
+            document.getElementById('news-preview-element').style.display = 'none';
+            document.getElementById('news-has-btn-checkbox').checked = false;
+            document.getElementById('news-button-config-box').style.display = 'none';
+            document.getElementById('news-btn-text-field').value = "";
+            document.getElementById('news-btn-url-field').value = "";
+            newsPhotoBase64 = "";
+
+            document.getElementById('news-form-title').innerText = "📰 Публікація новини";
+            document.getElementById('news-submit-btn').innerText = "Опублікувати новину";
+            document.getElementById('news-cancel-edit-btn').style.display = 'none';
+            document.getElementById('news-date-field').valueAsDate = new Date();
+        }
+
+        function renderAdminNewsChronicle() {
+            const box = document.getElementById('box-for-published-news'); box.innerHTML = "";
+            let newsList = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
+            if(newsList.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:10px;">Немає опублікованих новин</div>`; return; }
+
+            newsList.forEach(news => {
+                let imgHtml = news.image ? `<img src="${news.image}" style="max-height:60px; border-radius:4px; margin-top:5px; display:block;">` : '';
+                let btnHtml = news.hasButton ? `<span style="background:rgba(0,255,204,0.1); color:#00ffcc; font-size:0.75rem; padding:2px 6px; border-radius:4px; margin-top:5px; display:inline-block;">Кнопка: ${news.btnText}</span>` : '';
+                
+                box.innerHTML += `
+                    <div class="admin-user-card" style="padding: 12px 15px;">
+                        <div style="font-size:0.8rem; color:#00ffcc; font-weight:bold;">📅 ${news.date}</div>
+                        <div style="font-weight:bold; margin:4px 0; font-size:1rem; padding-right:180px;">${news.title}</div>
+                        <div style="font-size:0.85rem; color:#ccc; max-height:45px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${news.body}</div>
+                        ${imgHtml} ${btnHtml}
+                        <button class="edit-news-btn" onclick="startEditNews('${news.id}')">Редагувати</button>
+                        <button class="delete-admin-btn" style="top:13px; border-color:#ff4a4a; color:#ff4a4a;" onclick="deleteNewsItem('${news.id}')">Видалити</button>
+                    </div>`;
+            });
+        }
+
+        function deleteNewsItem(id) {
+            if(confirm("Видалити цю новину безповоротно?")) {
+                let newsList = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
+                newsList = newsList.filter(n => n.id !== id);
+                localStorage.setItem('sitePublishedNewsChronicle', JSON.stringify(newsList));
+                if(document.getElementById('edit-news-id').value === id) cancelNewsEditing();
+                renderAdminNewsChronicle();
+            }
+        }
+
+        function showCurrentLinkInField() {
+            const currentLink = localStorage.getItem('siteDonationLink') || "https://send.monobank.ua/...";
+            document.getElementById('current-saved-link-input').value = currentLink;
+            renderAdminSocialList(); renderAdminNewsChronicle();
+        }
+
+        function updateDonationLink() {
+            const inputField = document.getElementById('new-donation-link-field'); const newUrl = inputField.value.trim(); if(!newUrl) return;
+            localStorage.setItem('siteDonationLink', newUrl); showCurrentLinkInField(); inputField.value = ""; alert("✓ Банку успішно оновлено!");
+        }
+
+        function addNewSocialNetwork() {
+            const nameField = document.getElementById('soc-name'); const urlField = document.getElementById('soc-url'); const colorField = document.getElementById('soc-color');
+            const name = nameField.value.trim(); const url = urlField.value.trim(); const color = colorField.value;
+            if(!name || !url) { alert("Заповніть назву та посилання!"); return; }
+            let networks = JSON.parse(localStorage.getItem('siteDynamicSocialNetworks')) || [];
+            networks.push({ id: 'soc_' + Date.now(), name, url, color }); localStorage.setItem('siteDynamicSocialNetworks', JSON.stringify(networks));
+            nameField.value = ""; urlField.value = ""; renderAdminSocialList();
+        }
+
+        function renderAdminSocialList() {
+            const box = document.getElementById('box-for-social-list'); box.innerHTML = "";
+            let networks = JSON.parse(localStorage.getItem('siteDynamicSocialNetworks')) || [];
+            networks.forEach(net => {
+                box.innerHTML += `
+                    <div class="admin-user-card" style="border-left: 4px solid ${net.color}; padding: 10px 15px;">
+                        <span style="font-weight:bold; color:${net.color};">${net.name}</span>
+                        <div style="font-size:0.8rem; color:#aaa; margin-top:4px; word-break:break-all;">${net.url}</div>
+                        <button class="delete-admin-btn" style="top:8px;" onclick="deleteSocialNetwork('${net.id}')">Видалити</button>
+                    </div>`;
+            });
+        }
+
+        function deleteSocialNetwork(id) {
+            if(confirm("Видалити цю соцмережу?")) {
+                let networks = JSON.parse(localStorage.getItem('siteDynamicSocialNetworks')) || [];
+                networks = networks.filter(net => net.id !== id); localStorage.setItem('siteDynamicSocialNetworks', JSON.stringify(networks));
+                renderAdminSocialList();
+            }
+        }
+
+        function switchTab(tabId, button) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active'); button.classList.add('active');
+
+            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
+            let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
+            let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
+
+            if(tabId === 'active-chats-tab') localStorage.setItem('viewed_chats', Object.keys(allChats).filter(id => allChats[id].status === 'active').length);
+            if(tabId === 'feedback-tab') localStorage.setItem('viewed_feedback', fbMsgs.length);
+            if(tabId === 'volunteer-tab') localStorage.setItem('viewed_volunteers', volMsgs.length);
+            if(tabId === 'link-management-tab') showCurrentLinkInField();
+            loadAdminData();
+        }
+
+        function initBadges() {
+            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
+            let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
+            let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
+            if(!localStorage.getItem('viewed_chats')) localStorage.setItem('viewed_chats', Object.keys(allChats).filter(id => allChats[id].status === 'active').length);
+            if(!localStorage.getItem('viewed_feedback')) localStorage.setItem('viewed_feedback', fbMsgs.length);
+            if(!localStorage.getItem('viewed_volunteers')) localStorage.setItem('viewed_volunteers', volMsgs.length);
+        }
+
+        function updateBadgesLogic() {
+            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
+            let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
+            let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
+
+            let activeChatsCount = Object.keys(allChats).filter(id => allChats[id].status === 'active').length;
+            let newChats = activeChatsCount - (parseInt(localStorage.getItem('viewed_chats')) || 0);
+            let newFeedback = fbMsgs.length - (parseInt(localStorage.getItem('viewed_feedback')) || 0);
+            let newVolunteers = volMsgs.length - (parseInt(localStorage.getItem('viewed_volunteers')) || 0);
+
+            if(currentTab === 'active-chats-tab') { newChats = 0; localStorage.setItem('viewed_chats', activeChatsCount); }
+            if(currentTab === 'feedback-tab') { newFeedback = 0; localStorage.setItem('viewed_feedback', fbMsgs.length); }
+            if(currentTab === 'volunteer-tab') { newVolunteers = 0; localStorage.setItem('viewed_volunteers', volMsgs.length); }
+
+            showBadgeElement('badge-chats', newChats); showBadgeElement('badge-feedback', newFeedback); showBadgeElement('badge-volunteers', newVolunteers);
+        }
+
+        function showBadgeElement(id, count) { const el = document.getElementById(id); if(count > 0) { el.innerText = count; el.style.display = 'flex'; } else { el.style.display = 'none'; } }
+
+        function loadAdminData() {
+            if (isConfirmingStatus) return;
+            updateBadgesLogic();
+
+            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
+            const sessionsBox = document.getElementById('active-sessions-box'); const savedScrollTop = sessionsBox.scrollTop; sessionsBox.innerHTML = "";
+            let activeCount = 0;
+            Object.keys(allChats).forEach(id => {
+                if (allChats[id].status === 'active') {
+                    activeCount++; const item = document.createElement('div');
+                    item.className = `session-item ${currentSelectedChatId === id ? 'selected' : ''}`;
+                    let statusLabel = allChats[id].adminStatus === 'success' ? 'Успішно' : allChats[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
+                    item.innerHTML = `<div><strong>ID: ${id.substr(8)}</strong> <span class="badge ${allChats[id].adminStatus}">${statusLabel}</span></div>`;
+                    item.onclick = () => selectChatSession(id); sessionsBox.appendChild(item);
+                }
+            });
+            if(activeCount === 0) sessionsBox.innerHTML = `<div class="no-msg">Активних чатів немає</div>`;
+            sessionsBox.scrollTop = savedScrollTop;
+
+            const workspaceContent = document.getElementById('chat-messages-and-header');
+            const inputBlock = document.getElementById('global-admin-input-block');
+            const workspaceWrapper = document.getElementById('chat-workspace-block');
+
+            if (currentSelectedChatId && allChats[currentSelectedChatId]) {
+                inputBlock.style.display = 'flex'; sessionsBox.classList.add('hide-on-mobile'); workspaceWrapper.classList.add('show-on-mobile');
+                renderWorkspaceContent(allChats[currentSelectedChatId], workspaceContent);
+            } else {
+                inputBlock.style.display = 'none'; sessionsBox.classList.remove('hide-on-mobile'); workspaceWrapper.classList.remove('show-on-mobile');
+                workspaceContent.innerHTML = `<div style="text-align:center; margin:auto; color:#666;" data-lang="ua">Оберіть чат зі списку</div>`;
+            }
+
+            const fbBox = document.getElementById('box-for-feedback'); fbBox.innerHTML = "";
+            let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
+            if(fbMsgs.length === 0) fbBox.innerHTML = `<div class="no-msg">Заявок немає</div>`;
+            fbMsgs.slice().reverse().forEach(fb => { fbBox.innerHTML += `<div class='msg-item'><div class='meta-line'>👤 ${fb.name} | 📱 ${fb.contact} (${fb.time})</div><div class='msg-text'>${fb.message}</div></div>`; });
+
+            const volBox = document.getElementById('box-for-volunteers'); volBox.innerHTML = "";
+            let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
+            if(volMsgs.length === 0) volBox.innerHTML = `<div class="no-msg">Бланків немає</div>`;
+            volMsgs.forEach(vol => {
+                let imgHtml = vol.image ? `<img src="${vol.image}" class="attached-img-preview" onclick="openFullImage('${vol.image}')">` : '';
+                volBox.innerHTML += `<div class='msg-item'><div class='meta-line'>📋 ${vol.name} | 🏛️ ${vol.org} (${vol.time})</div><div class='msg-text' style='margin-bottom:5px;'>📞 <strong>Тел:</strong> ${vol.phone} | 💬 <strong>WhatsApp:</strong> ${vol.whatsapp}</div><div class='msg-text' style='color:#bbb;'>✉️ <strong>Повідомлення:</strong> ${vol.message}</div>${imgHtml}</div>`;
+            });
+
+            if (isSuperadminSession) { renderAdminAccountsList(); }
+
+            const archiveBox = document.getElementById('box-for-archive'); archiveBox.innerHTML = "";
+            let archiveCount = 0;
+            Object.keys(allChats).forEach(id => {
+                if (allChats[id].status === 'closed') {
+                    archiveCount++;
+                    let statusLabel = allChats[id].adminStatus === 'success' ? 'Успішно' : allChats[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
+                    let chatHtml = `<div class='msg-item'><div class='meta-line'>📦 Архів: ${id.substr(8)} | <span class="badge ${allChats[id].adminStatus}">${statusLabel}</span></div><div style='display:flex; flex-direction:column; gap:5px; margin-top:10px;'>`;
+                    allChats[id].messages.forEach(m => {
+                        let contentHtml = m.type === 'image' ? `<img src="${m.text}" onclick="openFullImage('${m.text}')" style="max-height:100px;">` : m.text;
+                        chatHtml += `<div style='font-size:0.85rem; color:${m.sender === 'admin' ? '#00ffcc' : '#bbb'}'><strong>${m.sender}:</strong> ${contentHtml}</div>`;
+                    });
+                    chatHtml += `</div></div>`; archiveBox.innerHTML += chatHtml;
+                }
+            });
+            if(archiveCount === 0) archiveBox.innerHTML = `<div class="no-msg">Архів порожній</div>`;
+        }
+
+        function createNewAdminAccount(event) {
+            event.preventDefault();
+            const lastName = document.getElementById('new-admin-lastname').value.trim();
+            const firstName = document.getElementById('new-admin-firstname').value.trim();
+            const phone = document.getElementById('new-admin-phone').value.trim();
+            const user = document.getElementById('new-admin-user').value.trim();
+            const pass = document.getElementById('new-admin-pass').value.trim();
+            let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
+            if (currentAdmins.some(a => a.user === user) || user === 'admin' || user === 'superadmin') { alert("Логін зайнятий!"); return; }
+            currentAdmins.push({ lastName, firstName, phone, user, pass, id: 'admin_' + Date.now() });
+            localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins));
+            document.getElementById('create-admin-form').reset(); loadAdminData();
+        }
+
+        function renderAdminAccountsList() {
+            const listBox = document.getElementById('box-for-admin-accounts'); listBox.innerHTML = "";
+            let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
+            if(currentAdmins.length === 0) { listBox.innerHTML = `<div class="no-msg">Немає адмінів</div>`; return; }
+            currentAdmins.forEach(admin => {
+                listBox.innerHTML += `<div class="admin-user-card"><div class="admin-card-title">👤 ${admin.lastName} ${admin.firstName}</div><div class="admin-card-info">🔑 Login: ${admin.user}</div><button class="delete-admin-btn" onclick="deleteAdminAccount('${admin.id}')">Видалити</button></div>`;
+            });
+        }
+
+        function deleteAdminAccount(adminId) { if (confirm("Видалити?")) { let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins = currentAdmins.filter(a => a.id !== adminId); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); loadAdminData(); } }
+        function openFullImage(base64Data) { const newWindow = window.open(); newWindow.document.write(`<body style="margin:0; background:#121212; display:flex; justify-content:center; align-items:center; min-height:100vh;"><img src="${base64Data}" style="max-width:100%; max-height:100vh; object-fit:contain;"></body>`); }
+        function selectChatSession(id) { currentSelectedChatId = id; loadAdminData(); }
+        function backToSessionsList() { currentSelectedChatId = null; loadAdminData(); }
+
+        function renderWorkspaceContent(chatObj, targetElement) {
+            const flowBox = targetElement.querySelector('#admin-msg-flow'); const wasAtBottom = flowBox ? (flowBox.scrollHeight - flowBox.scrollTop <= flowBox.clientHeight + 50) : true;
+            targetElement.innerHTML = `<div class="workspace-header"><button class="back-to-list-btn" onclick="backToSessionsList()">←</button><span>ID: ${chatObj.id.substr(8)}</span><select class="status-select ${chatObj.adminStatus}" onchange="confirmAndChangeStatus('${chatObj.id}', this.value, '${chatObj.adminStatus}')"><option value="processing">В обробці</option><option value="success">Успішно</option><option value="unresolved">Не вирішено</option></select><button onclick="closeChatSession('${chatObj.id}')" style="background:none; border:1px solid #ff4a4a; color:#ff4a4a; padding:4px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.75rem;">X</button></div><div class="admin-messages-box" id="admin-msg-flow"></div>`;
+            const flow = targetElement.querySelector('#admin-msg-flow');
+            chatObj.messages.forEach(m => {
+                const b = document.createElement('div'); b.className = `admin-bubble ${m.sender}`;
+                if(m.type === 'image') { b.innerHTML = `<img src="${m.text}" onclick="openFullImage('${m.text}')">`; } else { b.innerText = m.text; } flow.appendChild(b);
+            });
+            if (wasAtBottom) { flow.scrollTop = flow.scrollHeight; }
+        }
+
+        function sendAdminReply() {
+            if (!currentSelectedChatId) return;
+            const input = document.getElementById('admin-reply-input'); const text = input.value.trim(); if(!text) return;
+            let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
+            if(allChats[currentSelectedChatId]) {
+                allChats[currentSelectedChatId].messages.push({ sender: 'admin', text: text, type: 'text', time: Date.now() });
+                localStorage.setItem('liveChatSystem', JSON.stringify(allChats)); input.value = ""; loadAdminData();
+            }
+        }
+
+        function sendAdminChatPhoto(input) {
+            if (!currentSelectedChatId || !input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {};
+                if(allChats[currentSelectedChatId]) { allChats[currentSelectedChatId].messages.push({ sender: 'admin', text: e.target.result, type: 'image', time: Date.now() }); localStorage.setItem('liveChatSystem', JSON.stringify(allChats)); loadAdminData(); }
+            }; reader.readAsDataURL(input.files[0]); input.value = "";
+        }
+
+        function exportToCSV(storageKey, fileName) {
+            const rawData = JSON.parse(localStorage.getItem(storageKey)) || []; if(rawData.length === 0) { alert("Немає даних!"); return; }
+            let csvContent = "\uFEFF";
+            if(storageKey === 'siteFeedbackData') {
+                csvContent += "Дата,Ім'я,Контакт,Повідомлення\n"; rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.contact}","${item.message}"\n`; });
+            } else if(storageKey === 'siteVolunteerData') {
+                csvContent += "Дата,Прізвище Ім'я,Фонд,Телефон,WhatsApp,Повідомлення\n"; rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.org}","${item.phone}","${item.whatsapp}","${item.message}"\n`; });
+            }
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.setAttribute("href", URL.createObjectURL(blob)); link.setAttribute("download", `${fileName}.csv`); link.click();
+        }
+
+        function confirmAndChangeStatus(id, newStatus, oldStatus) {
+            isConfirmingStatus = true;
+            if (confirm(`Змінити статус чату?`)) {
+                let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {}; if (allChats[id]) { allChats[id].adminStatus = newStatus; localStorage.setItem('liveChatSystem', JSON.stringify(allChats)); }
+            }
+            isConfirmingStatus = false; loadAdminData();
+        }
+
+        document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'admin-reply-input') sendAdminReply(); });
+        function closeChatSession(id) { if (confirm('Закрити чат?')) { let allChats = JSON.parse(localStorage.getItem('liveChatSystem')) || {}; if (allChats[id]) { allChats[id].status = 'closed'; localStorage.setItem('liveChatSystem', JSON.stringify(allChats)); } currentSelectedChatId = null; loadAdminData(); } }
+        
+        function handleLogout() {
+            clearInterval(updateInterval); isSuperadminSession = false; toggleSuperadminMode(false);
+            const dashboard = document.getElementById('admin-dashboard'); dashboard.style.display = 'none'; dashboard.classList.remove('dashboard-mode');
+            document.getElementById('username').value = ""; document.getElementById('password').value = ""; document.getElementById('login-card').style.display = 'block';
+        }
+        window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); });
+    </script>
+</body>
+</html>
