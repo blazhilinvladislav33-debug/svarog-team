@@ -24,18 +24,26 @@
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; min-height: 100%; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             position: relative; overflow-x: hidden;
-            background-image: url('bg1.jpg'); 
-            background-attachment: fixed;
+            --bg-image: url('bg1.jpg'); /* ОНОВЛЕНО: CSS-змінна для слайд-шоу */
+        }
+        
+        /* ВИПРАВЛЕНО: Фіксований псевдоелемент надійно тримає та затемнює рухомий фон на телефонах */
+        body::before { 
+            content: ""; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), var(--bg-image);
             background-position: center; 
             background-repeat: no-repeat; 
             background-size: cover;
-            transition: background-image 1s ease-in-out;
+            z-index: -1; 
         }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: -1; }
         
         /* ШАПКА */
         .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
@@ -66,7 +74,7 @@
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
 
-        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: 5px; }
+        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: auto; }
         .menu-chat-btn:hover { background: #0099ff !important; color: #ffffff !important; padding-left: 15px !important; }
 
         /* ГОЛОВНИЙ КОНТЕНТ */
@@ -220,6 +228,9 @@
                 <li><a href="https://svarogteam.com/support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
                 <li><a href="https://svarogteam.com/about.html" class="current-page"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li style="margin-top: auto; padding-top: 15px;">
+                    <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
+                </li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -266,12 +277,12 @@
     </div>
 
     <script>
-        /* ЦИКЛІЧНА ЗМІНА ФОНУ */
+        /* ВИПРАВЛЕНО: Слайд-шоу тепер міняє CSS-змінну для стабільності на телефонах */
         const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
         let currentIndex = 0;
         setInterval(() => {
             currentIndex = (currentIndex + 1) % images.length;
-            document.body.style.backgroundImage = `url('${images[currentIndex]}')`;
+            document.body.style.setProperty('--bg-image', `url('${images[currentIndex]}')`);
         }, 3000);
 
         const menuButton = document.getElementById('menu-button');
@@ -291,16 +302,34 @@
             document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
         }
 
-        /* ІНТЕГРОВАНЕ СИНХРОНІЗОВАНЕ РЕНДЕРЕННЯ ТАЙМЛАЙНУ З АДМІН-ПАНЕЛІ */
-        function renderAboutTimeline() {
+        /* ОНОВЛЕНО: ЖИВЕ РЕНДЕРЕННЯ ТАЙМЛАЙНУ З FIREBASE CLOUD */
+        function initTimelineRealtimeStream() {
+            const container = document.getElementById('dynamic-about-timeline-box');
+            if(!container) return;
+
+            // Підключаємо живий слухач до колекції новин у Firebase Firestore
+            db.collection("news").orderBy("date", "desc").onSnapshot(snapshot => {
+                let dataset = [];
+                snapshot.forEach(doc => {
+                    dataset.push({ id: doc.id, ...doc.data() });
+                });
+                renderAboutTimeline(dataset);
+            }, err => {
+                console.error("Помилка хмари новин: ", err);
+                // Локальний резервний варіант на випадок збою мережі
+                let localDataset = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
+                renderAboutTimeline(localDataset);
+            });
+        }
+
+        function renderAboutTimeline(dataset) {
             const container = document.getElementById('dynamic-about-timeline-box');
             if(!container) return;
             container.innerHTML = "";
 
             const currentLang = localStorage.getItem('selectedLang') || 'ua';
-            let dataset = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
 
-            if(dataset.length === 0) {
+            if(!dataset || dataset.length === 0) {
                 container.innerHTML = `
                     <div style="text-align:center; color:#aaa; font-style:italic; padding: 40px 10px; background: rgba(0,0,0,0.2); border-radius:10px; border: 1px dashed rgba(255,255,255,0.1);">
                         ${currentLang === 'en' ? 'No news chronicle updates yet...' : 'Хроніка новин наразі порожня...'}
@@ -353,13 +382,13 @@
             initScrollAnimation();
         }
 
-        /* ЛОГІКА СКРОЛ-АНІМАЦІЇ */
+        /* ВИПРАВЛЕНО: Розширено межі спрацьовування анімації для телефонів */
         function initScrollAnimation() {
             const items = document.querySelectorAll('.timeline-item');
             const observerOptions = {
                 root: null,
-                threshold: 0.15,
-                rootMargin: "0px 0px -50px 0px"
+                threshold: 0.01, // Спрацьовує миттєво при появі 1% об'єкта
+                rootMargin: "80px 0px 80px 0px" // Заздалегідь активує прозорість при скролі
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
@@ -385,8 +414,6 @@
         // --- ЖИВА СИНХРОНІЗАЦІЯ АНОНІМНОГО ЧАТУ (FIREBASE REALTIME) ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
-        let lastMessagesLength = -1; 
-        let lastChatStatus = '';
 
         function initUserChat() { 
             if (!userChatSessionId) { 
@@ -427,7 +454,6 @@
                     localStorage.setItem('userChatSessionId', userChatSessionId); 
                     messagesBox.innerHTML = ""; 
                     inputBlock.style.display = 'flex'; 
-                    lastMessagesLength = -1; lastChatStatus = '';
                     startRealtimeChatListener();
                     return; 
                 }
@@ -492,7 +518,7 @@
         
         window.addEventListener('DOMContentLoaded', () => { 
             setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
-            renderAboutTimeline(); 
+            initTimelineRealtimeStream(); 
             initUserChat(); 
         });
     </script>
