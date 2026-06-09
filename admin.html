@@ -29,7 +29,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             position: relative; overflow-x: hidden;
-            background-image: url('background.jpg'); background-attachment: fixed;
+            background-image: url('bg1.jpg'); background-attachment: fixed;
             background-position: center; background-repeat: no-repeat; background-size: cover;
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: -1; }
@@ -352,7 +352,17 @@
         let isSuperadminLoginMode = false;
         let newsPhotoBase64 = "";
         let globalChatsData = {}; // Локальний хмарний зліпок чатів
-        let unsubscribeChats = null; // Відписка від стріму бази даних
+        
+        // Хмарні масиви даних
+        let globalFeedbackData = [];
+        let globalVolunteersData = [];
+        let globalSocialNetworks = [];
+
+        // Змінні для відписки від Firebase streams
+        let unsubscribeChats = null;
+        let unsubscribeFeedback = null;
+        let unsubscribeVolunteers = null;
+        let unsubscribeSocials = null;
 
         const menuButton = document.getElementById('menu-button');
         const navMenu = document.getElementById('nav-menu');
@@ -374,7 +384,7 @@
             const toggleBtn = document.getElementById('superadmin-mode-btn');
             document.getElementById('error-block').style.display = 'none';
             if(activate) {
-                titleUa.innerText = "Головна адмін панель"; toggleBtn.innerText = "← Звичайний адмін"; toggleBtn.setAttribute('onclick', 'toggleSuperadminMode(false)');
+                titleUa.innerText = "Головна адмін панель"; toggleBtn.innerText = "← Звичайний admin"; toggleBtn.setAttribute('onclick', 'toggleSuperadminMode(false)');
             } else {
                 titleUa.innerText = "Вхід в панель"; toggleBtn.innerText = "Головний адмін / Superadmin"; toggleBtn.setAttribute('onclick', 'toggleSuperadminMode(true)');
             }
@@ -392,10 +402,9 @@
                     document.getElementById('superadmin-only-tab-btn').style.display = 'block'; enterDashboard();
                 } else { document.getElementById('error-block').style.display = 'block'; }
             } else {
-                // Отримання пароля для 'admin' з Firebase
                 try {
                     const authDoc = await db.collection("config").doc("auth").get();
-                    let systemPassword = "admin123"; // Заводський дефолт
+                    let systemPassword = "admin123";
                     if (authDoc.exists && authDoc.data().password) {
                         systemPassword = authDoc.data().password;
                     }
@@ -414,17 +423,15 @@
             }
         }
 
-        // Зміна пароля з інтерфейсу вкладки "Адміни"
+        // Зміна пароля системи
         async function execChangeAdminPassword() {
             const newPass = document.getElementById('change-system-pass').value.trim();
             if (!newPass) { alert("Введіть новий пароль!"); return; }
             try {
                 await db.collection("config").doc("auth").set({ password: newPass }, { merge: true });
                 document.getElementById('change-system-pass').value = "";
-                alert("✓ Системний пароль для облікового запису 'admin' успішно змінено у Firebase!");
-            } catch(e) {
-                alert("Помилка доступу до бази: " + e.message);
-            }
+                alert("✓ Системний пароль успішно змінено у Firebase!");
+            } catch(e) { alert("Помилка: " + e.message); }
         }
 
         function enterDashboard() {
@@ -432,24 +439,45 @@
             const dashboard = document.getElementById('admin-dashboard');
             dashboard.style.display = 'block'; dashboard.classList.add('dashboard-mode');
             
-            // Запуск прослуховування хмарної бази даних Firebase Firestore у реальному часі
+            // Запуск прослуховування всіх хмарних потоків
             initFirebaseRealtimeStreams();
             
             initBadges();
             document.getElementById('news-date-field').valueAsDate = new Date();
         }
 
-        // Стрім даних без перезавантаження сторінки
+        // ОНОВЛЕНО: Повний стрім усіх даних з хмари Firebase в реальному часі
         function initFirebaseRealtimeStreams() {
+            // 1. Стрім чатів
             unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
                 globalChatsData = {};
-                snapshot.forEach(doc => {
-                    globalChatsData[doc.id] = doc.data();
-                });
-                renderAllDynamicData(); // Оновлюємо інтерфейс щоразу як прийшло повідомлення
-            }, error => {
-                console.error("Помилка стріму бази: ", error);
-            });
+                snapshot.forEach(doc => { globalChatsData[doc.id] = doc.data(); });
+                renderAllDynamicData();
+            }, e => console.error(e));
+
+            // 2. Стрім заявок (Forms / Feedback)
+            unsubscribeFeedback = db.collection("feedback").orderBy("timestamp", "asc").onSnapshot(snapshot => {
+                globalFeedbackData = [];
+                snapshot.forEach(doc => { globalFeedbackData.push({ id: doc.id, ...doc.data() }); });
+                renderAllDynamicData();
+            }, e => console.error(e));
+
+            // 3. Стрім бланкових волонтерів
+            unsubscribeVolunteers = db.collection("volunteers").orderBy("timestamp", "asc").onSnapshot(snapshot => {
+                globalVolunteersData = [];
+                snapshot.forEach(doc => { globalVolunteersData.push({ id: doc.id, ...doc.data() }); });
+                renderAllDynamicData();
+            }, e => console.error(e));
+
+            // 4. Стрім налаштувань соцмереж
+            unsubscribeSocials = db.collection("config").doc("socials").onSnapshot(doc => {
+                if (doc.exists && doc.data().list) {
+                    globalSocialNetworks = doc.data().list;
+                } else {
+                    globalSocialNetworks = [];
+                }
+                renderAdminSocialList();
+            }, e => console.error(e));
         }
 
         function previewNewsPhoto(input) {
@@ -605,7 +633,7 @@
         function showCurrentLinkInField() {
             const currentLink = localStorage.getItem('siteDonationLink') || "https://send.monobank.ua/...";
             document.getElementById('current-saved-link-input').value = currentLink;
-            renderAdminSocialList(); renderAdminNewsChronicle();
+            renderAdminNewsChronicle();
         }
 
         function updateDonationLink() {
@@ -613,19 +641,24 @@
             localStorage.setItem('siteDonationLink', newUrl); showCurrentLinkInField(); inputField.value = ""; alert("✓ Банку успішно оновлено!");
         }
 
-        function addNewSocialNetwork() {
+        // ОНОВЛЕНО: Додавання соціальної мережі безпосередньо у Firebase хмару
+        async function addNewSocialNetwork() {
             const nameField = document.getElementById('soc-name'); const urlField = document.getElementById('soc-url'); const colorField = document.getElementById('soc-color');
             const name = nameField.value.trim(); const url = urlField.value.trim(); const color = colorField.value;
             if(!name || !url) { alert("Заповніть назву та посилання!"); return; }
-            let networks = JSON.parse(localStorage.getItem('siteDynamicSocialNetworks')) || [];
-            networks.push({ id: 'soc_' + Date.now(), name, url, color }); localStorage.setItem('siteDynamicSocialNetworks', JSON.stringify(networks));
-            nameField.value = ""; urlField.value = ""; renderAdminSocialList();
+            
+            let updatedList = [...globalSocialNetworks, { id: 'soc_' + Date.now(), name, url, color }];
+            try {
+                await db.collection("config").doc("socials").set({ list: updatedList });
+                nameField.value = ""; urlField.value = "";
+            } catch(e) { console.error("Помилка запису мережі в хмару:", e); }
         }
 
+        // ОНОВЛЕНО: Відображення соціальних мереж із хмарного масиву
         function renderAdminSocialList() {
             const box = document.getElementById('box-for-social-list'); box.innerHTML = "";
-            let networks = JSON.parse(localStorage.getItem('siteDynamicSocialNetworks')) || [];
-            networks.forEach(net => {
+            if(globalSocialNetworks.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:5px;">Мереж немає</div>`; return; }
+            globalSocialNetworks.forEach(net => {
                 box.innerHTML += `
                     <div class="admin-user-card" style="border-left: 4px solid ${net.color}; padding: 10px 15px;">
                         <span style="font-weight:bold; color:${net.color};">${net.name}</span>
@@ -635,11 +668,13 @@
             });
         }
 
-        function deleteSocialNetwork(id) {
+        // ОНОВЛЕНО: Видалення соціальної мережі з хмари Firebase
+        async function deleteSocialNetwork(id) {
             if(confirm("Видалити цю соцмережу?")) {
-                let networks = JSON.parse(localStorage.getItem('siteDynamicSocialNetworks')) || [];
-                networks = networks.filter(net => net.id !== id); localStorage.setItem('siteDynamicSocialNetworks', JSON.stringify(networks));
-                renderAdminSocialList();
+                let updatedList = globalSocialNetworks.filter(net => net.id !== id);
+                try {
+                    await db.collection("config").doc("socials").set({ list: updatedList });
+                } catch(e) { console.error(e); }
             }
         }
 
@@ -649,47 +684,40 @@
             document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active'); button.classList.add('active');
 
-            let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
-            let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
-
             if(tabId === 'active-chats-tab') localStorage.setItem('viewed_chats', Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length);
-            if(tabId === 'feedback-tab') localStorage.setItem('viewed_feedback', fbMsgs.length);
-            if(tabId === 'volunteer-tab') localStorage.setItem('viewed_volunteers', volMsgs.length);
+            if(tabId === 'feedback-tab') localStorage.setItem('viewed_feedback', globalFeedbackData.length);
+            if(tabId === 'volunteer-tab') localStorage.setItem('viewed_volunteers', globalVolunteersData.length);
             if(tabId === 'link-management-tab') showCurrentLinkInField();
             renderAllDynamicData();
         }
 
         function initBadges() {
-            let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
-            let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
             if(!localStorage.getItem('viewed_chats')) localStorage.setItem('viewed_chats', Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length);
-            if(!localStorage.getItem('viewed_feedback')) localStorage.setItem('viewed_feedback', fbMsgs.length);
-            if(!localStorage.getItem('viewed_volunteers')) localStorage.setItem('viewed_volunteers', volMsgs.length);
+            if(!localStorage.getItem('viewed_feedback')) localStorage.setItem('viewed_feedback', globalFeedbackData.length);
+            if(!localStorage.getItem('viewed_volunteers')) localStorage.setItem('viewed_volunteers', globalVolunteersData.length);
         }
 
         function updateBadgesLogic() {
-            let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
-            let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
-
             let activeChatsCount = Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length;
             let newChats = activeChatsCount - (parseInt(localStorage.getItem('viewed_chats')) || 0);
-            let newFeedback = fbMsgs.length - (parseInt(localStorage.getItem('viewed_feedback')) || 0);
-            let newVolunteers = volMsgs.length - (parseInt(localStorage.getItem('viewed_volunteers')) || 0);
+            let newFeedback = globalFeedbackData.length - (parseInt(localStorage.getItem('viewed_feedback')) || 0);
+            let newVolunteers = globalVolunteersData.length - (parseInt(localStorage.getItem('viewed_volunteers')) || 0);
 
             if(currentTab === 'active-chats-tab') { newChats = 0; localStorage.setItem('viewed_chats', activeChatsCount); }
-            if(currentTab === 'feedback-tab') { newFeedback = 0; localStorage.setItem('viewed_feedback', fbMsgs.length); }
-            if(currentTab === 'volunteer-tab') { newVolunteers = 0; localStorage.setItem('viewed_volunteers', volMsgs.length); }
+            if(currentTab === 'feedback-tab') { newFeedback = 0; localStorage.setItem('viewed_feedback', globalFeedbackData.length); }
+            if(currentTab === 'volunteer-tab') { newVolunteers = 0; localStorage.setItem('viewed_volunteers', globalVolunteersData.length); }
 
             showBadgeElement('badge-chats', newChats); showBadgeElement('badge-feedback', newFeedback); showBadgeElement('badge-volunteers', newVolunteers);
         }
 
         function showBadgeElement(id, count) { const el = document.getElementById(id); if(count > 0) { el.innerText = count; el.style.display = 'flex'; } else { el.style.display = 'none'; } }
 
-        // Єдина функція малювання інтерфейсу на базі зліпку з Firebase Firestore
+        // ОНОВЛЕНО: Відображення даних з хмари у відповідних табах
         function renderAllDynamicData() {
             if (isConfirmingStatus) return;
             updateBadgesLogic();
 
+            // Малювання чатів
             const sessionsBox = document.getElementById('active-sessions-box'); const savedScrollTop = sessionsBox.scrollTop; sessionsBox.innerHTML = "";
             let activeCount = 0;
             
@@ -717,21 +745,36 @@
                 workspaceContent.innerHTML = `<div style="text-align:center; margin:auto; color:#666;" data-lang="ua">Оберіть чат зі списку</div>`;
             }
 
+            // Малювання заявок зворотного зв'язку з хмари Firebase
             const fbBox = document.getElementById('box-for-feedback'); fbBox.innerHTML = "";
-            let fbMsgs = JSON.parse(localStorage.getItem('siteFeedbackData')) || [];
-            if(fbMsgs.length === 0) fbBox.innerHTML = `<div class="no-msg">Заявок немає</div>`;
-            fbMsgs.slice().reverse().forEach(fb => { fbBox.innerHTML += `<div class='msg-item'><div class='meta-line'>👤 ${fb.name} | 📱 ${fb.contact} (${fb.time})</div><div class='msg-text'>${fb.message}</div></div>`; });
+            if(globalFeedbackData.length === 0) fbBox.innerHTML = `<div class="no-msg">Заявок немає</div>`;
+            globalFeedbackData.slice().reverse().forEach(fb => { 
+                fbBox.innerHTML += `
+                    <div class='msg-item'>
+                        <div class='meta-line'>👤 ${fb.name} | 📱 ${fb.contact} (${fb.time})</div>
+                        <div class='msg-text'>${fb.message}</div>
+                        <button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:8px; display:block;" onclick="deleteFeedbackItem('${fb.id}')">Видалити</button>
+                    </div>`; 
+            });
 
+            // Малювання бланків волонтерів з хмари Firebase
             const volBox = document.getElementById('box-for-volunteers'); volBox.innerHTML = "";
-            let volMsgs = JSON.parse(localStorage.getItem('siteVolunteerData')) || [];
-            if(volMsgs.length === 0) volBox.innerHTML = `<div class="no-msg">Бланків немає</div>`;
-            volMsgs.forEach(vol => {
+            if(globalVolunteersData.length === 0) volBox.innerHTML = `<div class="no-msg">Бланків немає</div>`;
+            globalVolunteersData.slice().reverse().forEach(vol => {
                 let imgHtml = vol.image ? `<img src="${vol.image}" class="attached-img-preview" onclick="openFullImage('${vol.image}')">` : '';
-                box.innerHTML += `<div class='msg-item'><div class='meta-line'>📋 ${vol.name} | 🏛️ ${vol.org} (${vol.time})</div><div class='msg-text' style='margin-bottom:5px;'>📞 <strong>Тел:</strong> ${vol.phone} | 💬 <strong>WhatsApp:</strong> ${vol.whatsapp}</div><div class='msg-text' style='color:#bbb;'>✉️ <strong>Повідомлення:</strong> ${vol.message}</div>${imgHtml}</div>`;
+                volBox.innerHTML += `
+                    <div class='msg-item'>
+                        <div class='meta-line'>📋 ${vol.name} | 🏛️ ${vol.org} (${vol.time})</div>
+                        <div class='msg-text' style='margin-bottom:5px;'>📞 <strong>Тел:</strong> ${vol.phone} | 💬 <strong>WhatsApp:</strong> ${vol.whatsapp}</div>
+                        <div class='msg-text' style='color:#bbb;'>✉️ <strong>Повідомлення:</strong> ${vol.message}</div>
+                        ${imgHtml}
+                        <button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:8px; display:block;" onclick="deleteVolunteerItem('${vol.id}')">Видалити</button>
+                    </div>`;
             });
 
             if (isSuperadminSession) { renderAdminAccountsList(); }
 
+            // Архів чатів
             const archiveBox = document.getElementById('box-for-archive'); archiveBox.innerHTML = "";
             let archiveCount = 0;
             Object.keys(globalChatsData).forEach(id => {
@@ -749,6 +792,20 @@
             if(archiveCount === 0) archiveBox.innerHTML = `<div class="no-msg">Архів порожній</div>`;
         }
 
+        // ОНОВЛЕНО: Функції видалення заявок та волонтерів безпосередньо з хмари Firebase
+        async function deleteFeedbackItem(id) {
+            if(confirm("Видалити цю заявку безповоротно з хмари?")) {
+                try { await db.collection("feedback").doc(id).delete(); } catch(e) { console.error(e); }
+            }
+        }
+
+        async function deleteVolunteerItem(id) {
+            if(confirm("Видалити цей бланк волонтера безповоротно з хмари?")) {
+                try { await db.collection("volunteers").doc(id).delete(); } catch(e) { console.error(e); }
+            }
+        }
+
+        // Локальний менеджмент додаткових адмін-профілів
         function createNewAdminAccount(event) {
             event.preventDefault();
             const lastName = document.getElementById('new-admin-lastname').value.trim();
@@ -772,7 +829,7 @@
             });
         }
 
-        function deleteAdminAccount(adminId) { if (confirm("Видалити?")) { let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins = currentAdmins.filter(a => a.id !== adminId); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); renderAllDynamicData(); } }
+        function deleteAdminAccount(adminId) { if (confirm("Видалити профиль?")) { let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins = currentAdmins.filter(a => a.id !== adminId); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); renderAllDynamicData(); } }
         function openFullImage(base64Data) { const newWindow = window.open(); newWindow.document.write(`<body style="margin:0; background:#121212; display:flex; justify-content:center; align-items:center; min-height:100vh;"><img src="${base64Data}" style="max-width:100%; max-height:100vh; object-fit:contain;"></body>`); }
         function selectChatSession(id) { currentSelectedChatId = id; renderAllDynamicData(); }
         function backToSessionsList() { currentSelectedChatId = null; renderAllDynamicData(); }
@@ -792,68 +849,37 @@
             if (wasAtBottom) { flow.scrollTop = flow.scrollHeight; }
         }
 
-        // Хмарна відправка тексту в Firebase
-        async function sendAdminReply() {
-            if (!currentSelectedChatId) return;
-            const input = document.getElementById('admin-reply-input'); const text = input.value.trim(); if(!text) return;
-            try {
-                await db.collection("chats").doc(currentSelectedChatId).update({
-                    messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'admin', text: text, type: 'text', time: Date.now() })
-                });
-                input.value = "";
-            } catch(e) { console.error("Помилка відправки:", e); }
-        }
-
-        // Хмарна відправка фото в Firebase
-        function sendAdminChatPhoto(input) {
-            if (!currentSelectedChatId || !input.files || !input.files[0]) return;
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                try {
-                    await db.collection("chats").doc(currentSelectedChatId).update({
-                        messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'admin', text: e.target.result, type: 'image', time: Date.now() })
-                    });
-                } catch(err) { console.error(err); }
-            }; reader.readAsDataURL(input.files[0]); input.value = "";
-        }
-
+        // Функція експорту хмарних даних у CSV (Excel)
         function exportToCSV(storageKey, fileName) {
-            const rawData = JSON.parse(localStorage.getItem(storageKey)) || []; if(rawData.length === 0) { alert("Немає даних!"); return; }
+            let rawData = [];
             let csvContent = "\uFEFF";
+            
             if(storageKey === 'siteFeedbackData') {
-                csvContent += "Дата,Ім'я,Контакт,Повідомлення\n"; rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.contact}","${item.message}"\n`; });
+                rawData = globalFeedbackData;
+                if(rawData.length === 0) { alert("Немає даних для експорту!"); return; }
+                csvContent += "Дата,Ім'я,Контакт,Повідомлення\n"; 
+                rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.contact}","${item.message}"\n`; });
             } else if(storageKey === 'siteVolunteerData') {
-                csvContent += "Дата,Прізвище Ім'я,Фонд,Телефон,WhatsApp,Повідомлення\n"; rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.org}","${item.phone}","${item.whatsapp}","${item.message}"\n`; });
+                rawData = globalVolunteersData;
+                if(rawData.length === 0) { alert("Немає даних для експорту!"); return; }
+                csvContent += "Дата,Прізвище Ім'я,Фонд,Телефон,WhatsApp,Повідомлення\n"; 
+                rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.org}","${item.phone}","${item.whatsapp}","${item.message}"\n`; });
             }
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.setAttribute("href", URL.createObjectURL(blob)); link.setAttribute("download", `${fileName}.csv`); link.click();
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); 
+            const link = document.createElement("a"); 
+            link.setAttribute("href", URL.createObjectURL(blob)); 
+            link.setAttribute("download", `${fileName}.csv`); 
+            link.click();
         }
 
-        // Хмарна зміна статусу обробки чату
-        async function confirmAndChangeStatus(id, newStatus, oldStatus) {
-            isConfirmingStatus = true;
-            if (confirm(`Змінити статус чату?`)) {
-                try {
-                    await db.collection("chats").doc(id).update({ adminStatus: newStatus });
-                } catch(e) { console.error(e); }
-            }
-            isConfirmingStatus = false; renderAllDynamicData();
-        }
-
-        document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'admin-reply-input') sendAdminReply(); });
-        
-        // Хмарне архівування чату
-        async function closeChatSession(id) { 
-            if (confirm('Закрити та перемістити цей чат в архів?')) { 
-                try {
-                    await db.collection("chats").doc(id).update({ status: 'closed' });
-                    currentSelectedChatId = null; 
-                    renderAllDynamicData();
-                } catch(e) { console.error(e); }
-            } 
-        }
-        
         function handleLogout() {
-            if(unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; } // Закриваємо з'єднання
+            // Закриваємо потоки при виході
+            if(unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; }
+            if(unsubscribeFeedback) { unsubscribeFeedback(); unsubscribeFeedback = null; }
+            if(unsubscribeVolunteers) { unsubscribeVolunteers(); unsubscribeVolunteers = null; }
+            if(unsubscribeSocials) { unsubscribeSocials(); unsubscribeSocials = null; }
+            
             isSuperadminSession = false; toggleSuperadminMode(false);
             const dashboard = document.getElementById('admin-dashboard'); dashboard.style.display = 'none'; dashboard.classList.remove('dashboard-mode');
             document.getElementById('username').value = ""; document.getElementById('password').value = ""; document.getElementById('login-card').style.display = 'block';
