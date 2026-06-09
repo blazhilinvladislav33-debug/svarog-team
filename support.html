@@ -3,7 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVAROG TEAM | Зв'язок з нами</title>
+    <title>SVAROG TEAM | Підтримка</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+            authDomain: "svarog-team.firebaseapp.com",
+            projectId: "svarog-team",
+            storageBucket: "svarog-team.firebasestorage.app",
+            messagingSenderId: "311449325528",
+            appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
+            measurementId: "G-56T1VN72PF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { width: 100%; min-height: 100%; height: 100%; }
@@ -82,7 +99,7 @@
             backdrop-filter: blur(8px);
         }
 
-        /* ОНОВЛЕНЕ ЗАОКРУГЛЕНЕ ВІКНА ЧАТУ (20px) */
+        /* ОКРУГЛЕНЕ ВІКНА ЧАТУ */
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
@@ -97,7 +114,7 @@
         .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
         .chat-input-area input:focus { border-color: rgba(0, 153, 255, 0.6); }
         
-        /* КРУГЛА КНОПКА З SVG-ЛІТАЧКОМ */
+        /* КНОПКА НАДСИЛАННЯ З SVG */
         .chat-send-btn { 
             width: 38px; 
             height: 38px; 
@@ -132,7 +149,7 @@
         <div class="navbar-container">
             <div class="left-side">
                 <button class="menu-toggle" id="menu-button"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-                <a href="index.html" class="logo-container">
+                <a href="https://svarogteam.com/index.html" class="logo-container">
                     <img src="logo.png" alt="SVAROG TEAM" class="logo-img">
                     <div class="logo-text-group">
                         <span class="logo-main">SVAROG TEAM</span>
@@ -145,11 +162,11 @@
                 <button class="lang-btn" onclick="setLanguage('en')">EN</button>
             </div>
             <ul class="nav-links" id="nav-menu">
-                <li><a href="index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
-                <li><a href="support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
-                <li><a href="about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
-                <li><a href="contact.html" class="current-page"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
-                <li style="margin-top: auto; padding-top: 15px;"><a href="admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'"><span data-lang="ua">Адмін</span><span data-lang="en">Admin</span></a></li>
+                <li><a href="https://svarogteam.com/index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
+                <li><a href="https://svarogteam.com/support.html" class="current-page"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
+                <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
+                <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li style="margin-top: auto; padding-top: 15px;"><a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'"><span data-lang="ua">Адмін</span><span data-lang="en">Admin</span></a></li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -158,10 +175,10 @@
     <div class="main-content">
         <div class="container">
             <div class="page-title-box">
-                <h1 data-lang="ua">Зв'язок з нами</h1>
-                <h1 data-lang="en">Contact us</h1>
-                <p data-lang="ua">Залиште повідомлення — ми відповімо найближчим часом.</p>
-                <p data-lang="en">Leave a message and we will reply shortly.</p>
+                <h1 data-lang="ua">Підтримка</h1>
+                <h1 data-lang="en">Support us</h1>
+                <p data-lang="ua">Залиште повідомлення або скористайтеся посиланнями нижче для підтримки команди SVAROG TEAM.</p>
+                <p data-lang="en">Leave a message or use the links below to support the SVAROG TEAM.</p>
             </div>
             <form id="feedback-form" onsubmit="sendFeedback(event)">
                 <div class="form-group"><input type="text" id="fb-name" class="form-input" data-placeholder-ua="Ім'я" data-placeholder-en="Name" placeholder="Ім'я" required></div>
@@ -226,10 +243,10 @@
             document.querySelectorAll('[data-placeholder-ua]').forEach(el => {
                 el.placeholder = lang === 'ua' ? el.getAttribute('data-placeholder-ua') : el.getAttribute('data-placeholder-en');
             });
-            document.title = lang === 'ua' ? "SVAROG TEAM | Зв'язок з нами" : 'SVAROG TEAM | Contact Us';
+            document.title = lang === 'ua' ? "SVAROG TEAM | Підтримка" : 'SVAROG TEAM | Support';
         }
 
-        /* ПОВНІСТЮ СИНХРОНІЗОВАНА РОБОЧА ЛОГІКА ЧАТУ */
+        /* РОБОЧА ЛОГІКА ЧАТУ */
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let lastMessagesLength = -1; 
         let lastChatStatus = '';
