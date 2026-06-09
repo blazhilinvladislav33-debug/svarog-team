@@ -18,7 +18,6 @@
             appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
             measurementId: "G-56T1VN72PF"
         };
-        // Ініціалізація хмари
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
@@ -75,8 +74,8 @@
         .admin-user-card { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 15px; margin-bottom: 12px; position: relative; }
         .admin-card-title { font-weight: bold; color: #00ffcc; font-size: 1rem; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px; margin-bottom: 8px; }
         .admin-card-info { font-size: 0.9rem; color: #e0e0e0; margin-bottom: 4px; }
-        .delete-admin-btn { background: none; border: 1px solid #ff4a4a; color: #ff4a4a; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; cursor: pointer; position: absolute; right: 15px; top: 13px; }
-        .edit-news-btn { background: none; border: 1px solid #00ffcc; color: #00ffcc; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; cursor: pointer; position: absolute; right: 105px; top: 13px; }
+        .delete-admin-btn { background: none; border: 1px solid #ff4a4a; color: #ff4a4a; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; cursor: pointer; position: absolute; right: 15px; top: 13px; z-index: 10; }
+        .edit-news-btn { background: none; border: 1px solid #00ffcc; color: #00ffcc; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; cursor: pointer; position: absolute; right: 105px; top: 13px; z-index: 10; }
 
         .chat-admin-layout { display: flex; gap: 20px; height: 480px; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; border: 1px solid rgba(255,255,255,0.05); }
         .chat-sessions-list { width: 240px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 10px; flex-shrink: 0; }
@@ -353,7 +352,8 @@
         let isSuperadminSession = false;
         let isSuperadminLoginMode = false;
         let newsPhotoBase64 = "";
-        let globalChatsData = {}; // Локальний хмарний зліпок чатів
+        let globalChatsData = {}; // Локальний зліпок чатів
+        let globalNewsData = [];  // Хмарний масив новин
         
         // Хмарні масиви даних
         let globalFeedbackData = [];
@@ -365,6 +365,7 @@
         let unsubscribeFeedback = null;
         let unsubscribeVolunteers = null;
         let unsubscribeSocials = null;
+        let unsubscribeNews = null;
 
         const menuButton = document.getElementById('menu-button');
         const navMenu = document.getElementById('nav-menu');
@@ -411,7 +412,6 @@
                     const d = authDoc.data();
                     if(d.admin_user) creds.admin_user = d.admin_user;
                     if(d.admin_pass) creds.admin_pass = d.admin_pass;
-                    if(d.password) creds.admin_pass = d.password; // зворотна сумісність
                     if(d.superadmin_user) creds.superadmin_user = d.superadmin_user;
                     if(d.superadmin_pass) creds.superadmin_pass = d.superadmin_pass;
                 }
@@ -436,7 +436,7 @@
             }
         }
 
-        // Зміна доступу системних користувачів (Admin та Superadmin)
+        // Зміна доступу системних користувачів
         async function updateSystemCredentials(role) {
             const userField = document.getElementById(`change-${role}-user`).value.trim();
             const passField = document.getElementById(`change-${role}-pass`).value.trim();
@@ -469,7 +469,7 @@
             document.getElementById('news-date-field').valueAsDate = new Date();
         }
 
-        // Повний стрім усіх даних з хмари Firebase в реальному часі
+        // Стрім усіх даних з хмари Firebase в реальному часі
         function initFirebaseRealtimeStreams() {
             unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
                 globalChatsData = {};
@@ -492,6 +492,13 @@
             unsubscribeSocials = db.collection("config").doc("socials").onSnapshot(doc => {
                 globalSocialNetworks = (doc.exists && doc.data().list) ? doc.data().list : [];
                 renderAdminSocialList();
+            }, e => console.error(e));
+
+            /* ОНОВЛЕНО: Хмарний стрім новин хроніки */
+            unsubscribeNews = db.collection("news").orderBy("date", "desc").onSnapshot(snapshot => {
+                globalNewsData = [];
+                snapshot.forEach(doc => { globalNewsData.push({ id: doc.id, ...doc.data() }); });
+                renderAdminNewsChronicle();
             }, e => console.error(e));
         }
 
@@ -562,7 +569,8 @@
             document.getElementById('news-button-config-box').style.display = checked ? 'block' : 'none';
         }
 
-        function publishNewsItem() {
+        /* ОНОВЛЕНО: Публікація новин безпосередньо у базу даних Firebase */
+        async function publishNewsItem() {
             const title = document.getElementById('news-title-field').value.trim();
             const body = document.getElementById('news-body-field').value.trim();
             const dateVal = document.getElementById('news-date-field').value;
@@ -578,43 +586,36 @@
                 if(!btnText || !btnUrl) { alert("Заповніть налаштування кнопки дії або вимкніть її!"); return; }
             }
 
-            let newsList = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
-            
-            if(editId) {
-                const index = newsList.findIndex(n => n.id === editId);
-                if(index !== -1) {
-                    newsList[index].title = title;
-                    newsList[index].body = body;
-                    newsList[index].date = dateVal;
-                    if(newsPhotoBase64) newsList[index].image = newsPhotoBase64;
-                    newsList[index].hasButton = hasBtn;
-                    newsList[index].btnText = btnText;
-                    newsList[index].btnUrl = btnUrl;
-                    alert("✓ Зміни збережено!");
-                }
-            } else {
-                const newPost = {
-                    id: 'news_' + Date.now(),
-                    title: title,
-                    body: body,
-                    date: dateVal,
-                    image: newsPhotoBase64 || null,
-                    hasButton: hasBtn,
-                    btnText: btnText,
-                    btnUrl: btnUrl
-                };
-                newsList.unshift(newPost);
-                alert("✓ Новину успішно опубліковано!");
-            }
+            const postObject = {
+                title: title,
+                body: body,
+                date: dateVal,
+                image: newsPhotoBase64 || null,
+                hasButton: hasBtn,
+                btnText: btnText,
+                btnUrl: btnUrl
+            };
 
-            localStorage.setItem('sitePublishedNewsChronicle', JSON.stringify(newsList));
-            cancelNewsEditing();
-            renderAdminNewsChronicle();
+            try {
+                if(editId) {
+                    await db.collection("news").doc(editId).set(postObject, { merge: true });
+                    alert("✓ Зміни успішно збережено в хмарі!");
+                } else {
+                    await db.collection("news").add({
+                        ...postObject,
+                        createdTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert("✓ Новину успішно опубліковано глобально!");
+                }
+                cancelNewsEditing();
+            } catch(err) {
+                console.error(err);
+                alert("Помилка бази даних: " + err.message);
+            }
         }
 
         function startEditNews(id) {
-            let newsList = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
-            const news = newsList.find(n => n.id === id);
+            const news = globalNewsData.find(n => n.id === id);
             if(!news) return;
 
             document.getElementById('edit-news-id').value = news.id;
@@ -664,12 +665,12 @@
             document.getElementById('news-date-field').valueAsDate = new Date();
         }
 
+        /* ОНОВЛЕНО: Відображення новин із хмарного зліпку Firebase */
         function renderAdminNewsChronicle() {
             const box = document.getElementById('box-for-published-news'); box.innerHTML = "";
-            let newsList = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
-            if(newsList.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:10px;">Немає опублікованих новин</div>`; return; }
+            if(globalNewsData.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:10px;">Немає опублікованих новин у хмарі</div>`; return; }
 
-            newsList.forEach(news => {
+            globalNewsData.forEach(news => {
                 let imgHtml = news.image ? `<img src="${news.image}" style="max-height:60px; border-radius:4px; margin-top:5px; display:block;">` : '';
                 let btnHtml = news.hasButton ? `<span style="background:rgba(0,255,204,0.1); color:#00ffcc; font-size:0.75rem; padding:2px 6px; border-radius:4px; margin-top:5px; display:inline-block;">Кнопка: ${news.btnText}</span>` : '';
                 
@@ -685,20 +686,19 @@
             });
         }
 
-        function deleteNewsItem(id) {
-            if(confirm("Видалити цю новину безповоротно?")) {
-                let newsList = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
-                newsList = newsList.filter(n => n.id !== id);
-                localStorage.setItem('sitePublishedNewsChronicle', JSON.stringify(newsList));
-                if(document.getElementById('edit-news-id').value === id) cancelNewsEditing();
-                renderAdminNewsChronicle();
+        /* ОНОВЛЕНО: Хмарне видалення новини */
+        async function deleteNewsItem(id) {
+            if(confirm("Видалити цю новину безповоротно з хмари?")) {
+                try {
+                    await db.collection("news").doc(id).delete();
+                    if(document.getElementById('edit-news-id').value === id) cancelNewsEditing();
+                } catch(e) { console.error("Помилка видалення новини:", e); }
             }
         }
 
         function showCurrentLinkInField() {
             const currentLink = localStorage.getItem('siteDonationLink') || "https://send.monobank.ua/...";
             document.getElementById('current-saved-link-input').value = currentLink;
-            renderAdminNewsChronicle();
         }
 
         function updateDonationLink() {
@@ -720,7 +720,7 @@
 
         function renderAdminSocialList() {
             const box = document.getElementById('box-for-social-list'); box.innerHTML = "";
-            if(globalSocialNetworks.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:5px;">Мереж немає</div>`; return; }
+            if(globalSocialNetworks.length === 0) { box.innerHTML = `<div class="no-msg">Мереж немає</div>`; return; }
             globalSocialNetworks.forEach(net => {
                 box.innerHTML += `
                     <div class="admin-user-card" style="border-left: 4px solid ${net.color}; padding: 10px 15px;">
@@ -776,7 +776,6 @@
             if (isConfirmingStatus) return;
             updateBadgesLogic();
 
-            // ЧАТИ
             const sessionsBox = document.getElementById('active-sessions-box'); const savedScrollTop = sessionsBox.scrollTop; sessionsBox.innerHTML = "";
             let activeCount = 0;
             
@@ -804,7 +803,6 @@
                 workspaceContent.innerHTML = `<div style="text-align:center; margin:auto; color:#666;" data-lang="ua">Оберіть чат зі списку</div>`;
             }
 
-            // ЗАЯВКИ FEEDBACK
             const fbBox = document.getElementById('box-for-feedback'); fbBox.innerHTML = "";
             if(globalFeedbackData.length === 0) fbBox.innerHTML = `<div class="no-msg">Заявок немає</div>`;
             globalFeedbackData.slice().reverse().forEach(fb => { 
@@ -816,7 +814,6 @@
                     </div>`; 
             });
 
-            // ВОЛОНТЕРИ
             const volBox = document.getElementById('box-for-volunteers'); volBox.innerHTML = "";
             if(globalVolunteersData.length === 0) volBox.innerHTML = `<div class="no-msg">Бланків немає</div>`;
             globalVolunteersData.slice().reverse().forEach(vol => {
@@ -833,7 +830,6 @@
 
             if (isSuperadminSession) { renderAdminAccountsList(); }
 
-            // АРХІВ ЧАТІВ
             const archiveBox = document.getElementById('box-for-archive'); archiveBox.innerHTML = "";
             let archiveCount = 0;
             Object.keys(globalChatsData).forEach(id => {
@@ -922,6 +918,7 @@
             if(unsubscribeFeedback) { unsubscribeFeedback(); unsubscribeFeedback = null; }
             if(unsubscribeVolunteers) { unsubscribeVolunteers(); unsubscribeVolunteers = null; }
             if(unsubscribeSocials) { unsubscribeSocials(); unsubscribeSocials = null; }
+            if(unsubscribeNews) { unsubscribeNews(); unsubscribeNews = null; }
             
             isSuperadminSession = false; toggleSuperadminMode(false);
             const dashboard = document.getElementById('admin-dashboard'); dashboard.style.display = 'none'; dashboard.classList.remove('dashboard-mode');
