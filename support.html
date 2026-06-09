@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script>
-        // Конфігурація вашого проєкту Firebase Svarog-Team
         const firebaseConfig = {
             apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
             authDomain: "svarog-team.firebaseapp.com",
@@ -18,7 +17,6 @@
             appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
             measurementId: "G-56T1VN72PF"
         };
-        // Ініціалізація хмари
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
@@ -29,7 +27,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             position: relative; overflow-x: hidden;
-            background-image: url('bg1.jpg'); 
+            background-image: url('bg1.jpg'); /* ВИПРАВЛЕНО: Стартовий фон тепер bg1.jpg */
             background-attachment: fixed;
             background-position: center; 
             background-repeat: no-repeat; 
@@ -66,6 +64,9 @@
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
 
+        /* ОНОВЛЕНО: Стиль для кнопки Admin без автоматичного відступу донизу */
+        .admin-menu-item { padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 5px; }
+
         .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: 5px; }
         .menu-chat-btn:hover { background: #0099ff !important; color: #ffffff !important; padding-left: 15px !important; }
 
@@ -89,7 +90,6 @@
             backdrop-filter: blur(8px);
         }
 
-        /* ЗАКРУГЛЕНЕ ВІКНО ЧАТУ (20px) */
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
@@ -128,7 +128,19 @@
         .user-clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.75); }
 
         [data-lang="en"] { display: none; }
-        @media (max-width: 768px) { .nav-links { width: 280px; } .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } }
+
+        /* ОНОВЛЕНО: КРИТИЧНІ СТИЛІ ДЛЯ ОПТИМІЗАЦІЇ ПІД МОБІЛЬНІ ТЕЛЕФОНИ */
+        @media (max-width: 768px) { 
+            .nav-links { width: 280px; } 
+            .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
+            
+            /* Мобільна оптимізація контенту */
+            .main-content { padding: 12px; margin-top: 75px; }
+            .container { padding: 30px 20px; width: 100%; }
+            h1 { font-size: 1.5rem; margin-bottom: 12px; }
+            p { font-size: 0.95rem; margin-bottom: 20px; }
+            .btn { width: 100%; padding: 12px 15px; font-size: 0.95rem; }
+        }
     </style>
 </head>
 <body>
@@ -153,7 +165,7 @@
                 <li><a href="support.html" class="current-page"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
                 <li><a href="about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
-                <li style="margin-top: auto; padding-top: 15px;">
+                <li class="admin-menu-item">
                     <a href="admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
                 </li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
@@ -230,7 +242,7 @@
             window.open(savedLink, '_blank');
         }
 
-        // --- ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE ДЛЯ СТОРІНКИ SUPPORT ---
+        // --- ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
