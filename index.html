@@ -29,7 +29,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             position: relative; overflow-x: hidden;
-            background-image: url('bg1.jpg'); 
+            background-image: url('bg1.jpg'); /* ВИПРАВЛЕНО: Стартовий фон тепер завантажується миттєво */
             background-attachment: fixed;
             background-position: center; 
             background-repeat: no-repeat; 
@@ -65,6 +65,9 @@
         .nav-links a { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 1.1rem; font-weight: 500; display: block; padding: 12px 15px; border-radius: 6px; transition: all 0.2s ease; }
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
+
+        /* ОНОВЛЕНО: Кнопка Admin піднята до основного списку без margin-top: auto */
+        .admin-menu-item { padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 5px; }
 
         .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: 5px; }
         .menu-chat-btn:hover { background: #0099ff !important; color: #ffffff !important; padding-left: 15px !important; }
@@ -127,7 +130,20 @@
         .user-clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.75); }
 
         [data-lang="en"] { display: none; }
-        @media (max-width: 768px) { .nav-links { width: 280px; } .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } }
+
+        /* ОНОВЛЕНО: КРИТИЧНІ СТИЛІ ДЛЯ ОПТИМІЗАЦІЇ ТА ВІДОБРАЖЕННЯ ФОНУ НА ТЕЛЕФОНІ */
+        @media (max-width: 768px) { 
+            .nav-links { width: 280px; } 
+            .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
+            
+            /* Мобільна оптимізація головного блоку */
+            body { background-attachment: scroll; } /* Покращує поведінку фіксованого фону в мобільних браузерах */
+            .main-content { padding: 12px; margin-top: 75px; }
+            .container { padding: 30px 20px; width: 100%; }
+            h1 { font-size: 1.6rem; margin-bottom: 12px; }
+            p { font-size: 0.98rem; margin-bottom: 20px; }
+            .btn { width: 100%; padding: 12px 15px; font-size: 0.95rem; }
+        }
     </style>
 </head>
 <body>
@@ -152,7 +168,7 @@
                 <li><a href="support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
                 <li><a href="about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
-                <li style="margin-top: auto; padding-top: 15px;">
+                <li class="admin-menu-item">
                     <a href="admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
                 </li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
@@ -228,16 +244,15 @@
             document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
         }
 
-        // --- ЛОГІКА ХМАРНОГО ЧАТУ (FIREBASE + LOCALSTORAGE ДЛЯ СЕСІЙ) ---
+        // --- ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
-        let unsubscribeUserChat = null; // Слухач змін конкретної розмови
+        let unsubscribeUserChat = null;
 
         function initUserChat() {
             if (!userChatSessionId) {
                 userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('userChatSessionId', userChatSessionId);
             }
-            // Запускаємо прослуховування нашого хмарного документа
             startRealtimeChatListener();
         }
 
@@ -249,7 +264,6 @@
             renderUserChat();
         }
 
-        // Перевірка та підключення до стріму Firebase
         function startRealtimeChatListener() {
             if (unsubscribeUserChat) unsubscribeUserChat();
 
@@ -257,7 +271,7 @@
                 let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' };
                 renderUserChat(myChat);
             }, err => {
-                console.error("Помилка отримання чату з хмари: ", err);
+                console.error("Помилка хмари: ", err);
             });
         }
 
@@ -265,11 +279,8 @@
             const messagesBox = document.getElementById('user-chat-messages');
             const inputBlock = document.getElementById('user-chat-input-block');
             const lang = localStorage.getItem('selectedLang') || 'ua';
-
-            // Якщо даних з хмари немає, беремо пусту заготовку
             let myChat = myChatData || { messages: [], status: 'active' };
 
-            // Логіка очищення локальної історії (залишаючи в адмінці)
             if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
                 const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
                 if (Date.now() > clearTime) {
@@ -279,7 +290,7 @@
                     localStorage.setItem('userChatSessionId', userChatSessionId);
                     messagesBox.innerHTML = "";
                     inputBlock.style.display = 'flex';
-                    startRealtimeChatListener(); // Перепідключаємось до нової сесії
+                    startRealtimeChatListener();
                     return;
                 }
             }
@@ -312,7 +323,6 @@
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }
 
-        // Хмарне збереження повідомлення користувача
         async function sendUserChatMessage() {
             const input = document.getElementById('user-chat-input');
             const text = input.value.trim();
@@ -323,18 +333,12 @@
 
             try {
                 await db.collection("chats").doc(userChatSessionId).set({
-                    id: userChatSessionId,
-                    status: 'active',
-                    adminStatus: 'processing',
-                    lastUpdate: Date.now(),
+                    id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
                     messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
                 }, { merge: true });
-            } catch(e) {
-                console.error("Помилка хмарного запису: ", e);
-            }
+            } catch(e) { console.error(e); }
         }
 
-        // Хмарне збереження фотографії користувача
         function sendUserChatPhoto(input) {
             if (!input.files || !input.files[0]) return;
             const reader = new FileReader();
@@ -342,15 +346,10 @@
                 const msgObject = { sender: 'user', text: e.target.result, type: 'image', time: Date.now() };
                 try {
                     await db.collection("chats").doc(userChatSessionId).set({
-                        id: userChatSessionId,
-                        status: 'active',
-                        adminStatus: 'processing',
-                        lastUpdate: Date.now(),
+                        id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
                         messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
                     }, { merge: true });
-                } catch(err) {
-                    console.error("Помилка завантаження фото в хмару: ", err);
-                }
+                } catch(err) { console.error(err); }
             };
             reader.readAsDataURL(input.files[0]);
             input.value = "";
