@@ -80,7 +80,7 @@
         .page-title-box h1 { font-size: 2.2rem; color: #ffffff; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .page-title-box p { color: #ccc; font-size: 1.05rem; }
 
-        /* НОВИЙ GRID ДИЗАЙН (BENTO BOX STYLE) */
+        /* GRID ДИЗАЙН (BENTO BOX STYLE) */
         .news-grid-wrapper {
             width: 100%;
             max-width: 1200px;
@@ -105,7 +105,6 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
             transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.4s, box-shadow 0.4s;
             
-            /* Spring анімація появи */
             opacity: 0;
             transform: translateY(60px) scale(0.95);
         }
@@ -217,12 +216,11 @@
         .expand-toggle-btn svg { width: 14px; height: 14px; fill: currentColor; transition: transform 0.3s ease; }
         .news-card.expanded .expand-toggle-btn svg { transform: rotate(180deg); }
 
-        /* Логіка зміни тексту кнопки без JS */
         .text-less { display: none; }
         .news-card.expanded .text-more { display: none; }
         .news-card.expanded .text-less { display: inline; }
 
-        /* АНОНІМНИЙ ЧАТ (Без змін, тільки колір підтягнувся зі змінних) */
+        /* АНОНІМНИЙ ЧАТ */
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
@@ -249,11 +247,10 @@
 
         [data-lang="en"] { display: none; }
 
-        /* АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ */
         @media (max-width: 768px) { 
             .nav-links { width: 280px; } 
             .page-title-box h1 { font-size: 1.8rem; }
-            .news-grid { grid-template-columns: 1fr; gap: 20px; } /* На телефоні 1 колонка */
+            .news-grid { grid-template-columns: 1fr; gap: 20px; } 
             .news-image-box { height: 200px; }
             .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
         }
@@ -279,8 +276,12 @@
             <ul class="nav-links" id="nav-menu">
                 <li><a href="https://svarogteam.com/index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
                 <li><a href="https://svarogteam.com/support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
+                <li><a href="https://svarogteam.com/shop.html"><span data-lang="ua">SVRG STORE</span><span data-lang="en">SVRG STORE</span></a></li>
                 <li><a href="https://svarogteam.com/about.html" class="current-page"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li class="admin-menu-item">
+                    <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
+                </li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -312,16 +313,12 @@
         <div class="chat-messages" id="user-chat-messages"></div>
         <div class="chat-input-area" id="user-chat-input-block">
             <button class="user-clip-btn" onclick="document.getElementById('user-chat-file').click()">
-                <svg viewBox="0 0 24 24">
-                    <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-3.31 2.69-6 6-6s6 2.69 6 6v12c0 4.42-3.58 8-8 8s-8-3.58-8-8V6h2v11c0 3.31 2.69 6 6 6s6-2.69 6-6V5c0-2.21-1.79-4-4-4s-4 1.79-4 4v12.5c0 1.1.9 2 2 2s2-.9 2-2V6h2z"/>
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-3.31 2.69-6 6-6s6 2.69 6 6v12c0 4.42-3.58 8-8 8s-8-3.58-8-8V6h2v11c0 3.31 2.69 6 6 6s6-2.69 6-6V5c0-2.21-1.79-4-4-4s-4 1.79-4 4v12.5c0 1.1.9 2 2 2s2-.9 2-2V6h2z"/></svg>
             </button>
             <input type="file" id="user-chat-file" accept="image/*" style="display:none;" onchange="sendUserChatPhoto(this)">
             <input type="text" id="user-chat-input" placeholder="...">
             <button class="chat-send-btn" onclick="sendUserChatMessage()">
-                <svg viewBox="0 0 24 24">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
         </div>
     </div>
@@ -400,7 +397,7 @@
 
                 const cardBlock = document.createElement('div');
                 cardBlock.className = `news-card`;
-                cardBlock.style.transitionDelay = `${(index % 3) * 0.1}s`; // Каскадна анімація
+                cardBlock.style.transitionDelay = `${(index % 3) * 0.1}s`; 
                 
                 cardBlock.innerHTML = `
                     <div class="news-image-box">
@@ -434,7 +431,6 @@
             initScrollAnimation();
         }
 
-        // Плавне розгортання тексту
         window.toggleNewsExpansion = function(btn) {
             const card = btn.closest('.news-card');
             const bodyZone = card.querySelector('.news-body-full');
@@ -464,7 +460,6 @@
             items.forEach(item => { observer.observe(item); });
         }
 
-        // --- ЛОГІКА АНОНІМНОГО ЧАТУ (БЕЗ ЗМІН) ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
