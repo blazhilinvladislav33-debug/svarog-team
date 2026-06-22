@@ -53,8 +53,9 @@
         
         h1 { color: #ffffff; margin-bottom: 20px; font-size: 1.6rem; text-align: center; }
         .form-group { width: 100%; margin-bottom: 15px; text-align: left; }
-        .form-input { width: 100%; padding: 12px 16px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; color: #ffffff; font-size: 1rem; outline: none; }
-        .form-input:focus { border-color: var(--theme-color); box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); }
+        .form-input, .form-select { width: 100%; padding: 12px 16px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; color: #ffffff; font-size: 1rem; outline: none; }
+        .form-input:focus, .form-select:focus { border-color: var(--theme-color); box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); }
+        .form-select option { background: #1a1a1a; color: #fff; }
         textarea.form-input { min-height: 120px; resize: vertical; font-family: inherit; }
 
         .btn { display: inline-block; width: 100%; padding: 12px; background-color: transparent; color: var(--theme-color); border: 2px solid var(--theme-color); border-radius: 4px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; text-align: center; text-decoration: none; }
@@ -123,7 +124,7 @@
 
         .msg-list { width: 100%; max-height: 450px; overflow-y: auto; padding-right: 5px; margin-top: 10px; }
         .msg-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 15px; margin-bottom: 15px; }
-        .meta-line { font-weight: bold; color: var(--theme-color); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 8px; font-size: 0.9rem; }
+        .meta-line { font-weight: bold; color: var(--theme-color); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 8px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
         .msg-text { font-size: 0.95rem; color: #e0e0e0; line-height: 1.5; word-wrap: break-word; }
         .no-msg { text-align: center; color: #666; font-style: italic; margin-top: 40px; width: 100%; font-size: 0.9rem; }
 
@@ -148,13 +149,21 @@
 
         /* Стилі для магазину в адмінці */
         .merch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px; }
-        .merch-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+        .merch-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
         .merch-card-img { width: 100%; height: 150px; object-fit: cover; background: rgba(0,0,0,0.6); }
         .merch-card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
         .merch-title { font-weight: bold; font-size: 1.1rem; color: #fff; margin-bottom: 5px; }
-        .merch-price { color: var(--theme-color); font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; }
+        .merch-price { color: var(--theme-color); font-weight: bold; font-size: 1.2rem; margin-bottom: 5px; }
+        .old-price { font-size: 0.9rem; color: #888; text-decoration: line-through; margin-right: 8px; }
         .merch-sizes { font-size: 0.85rem; color: #aaa; margin-bottom: 10px; }
         .merch-actions { margin-top: auto; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; }
+        
+        .cat-tag { display: inline-block; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-bottom: 8px; width: fit-content; }
+        .sale-badge { position: absolute; top: 10px; left: 10px; background: #ff4a4a; color: #fff; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; }
+
+        .category-list { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+        .cat-chip { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
+        .cat-remove { color: #ff4a4a; cursor: pointer; font-weight: bold; margin-left: 5px; }
 
         @media (max-width: 768px) {
             .main-content { padding: 10px; }
@@ -270,13 +279,26 @@
 
             <div id="shop-management-tab" class="tab-content">
                 <div class="superadmin-grid">
-                    <div class="admin-creator-form" style="flex: 1; min-width: 320px; border-color: var(--theme-color);">
-                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Налаштування Магазину</h3>
-                        <div class="switch-wrapper" onclick="toggleShopStatus()">
-                            <input type="checkbox" id="shop-active-checkbox">
-                            <label style="font-size:1rem; font-weight:bold; cursor:pointer;" id="shop-status-label">Магазин увімкнено</label>
+                    
+                    <div style="flex: 1; display:flex; flex-direction:column; gap:20px; min-width: 320px;">
+                        <div class="admin-creator-form" style="border-color: var(--theme-color);">
+                            <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Налаштування Магазину</h3>
+                            <div class="switch-wrapper" onclick="toggleShopStatus()">
+                                <input type="checkbox" id="shop-active-checkbox">
+                                <label style="font-size:1rem; font-weight:bold; cursor:pointer;" id="shop-status-label">Магазин увімкнено</label>
+                            </div>
+                            <p style="font-size:0.85rem; color:#aaa; margin-top:10px;">Якщо вимкнути, всі користувачі при переході в магазин будуть перенаправлені на головну сторінку.</p>
                         </div>
-                        <p style="font-size:0.85rem; color:#aaa; margin-top:10px;">Якщо вимкнути, всі користувачі при переході в магазин будуть перенаправлені на головну сторінку (Технічні роботи).</p>
+
+                        <div class="admin-creator-form">
+                            <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Категорії каталогу</h3>
+                            <div class="category-list" id="admin-category-list">
+                                </div>
+                            <div style="display:flex; gap:10px;">
+                                <input type="text" id="new-category-input" class="form-input" placeholder="Нова категорія (напр: Шеврони)">
+                                <button class="btn" style="width:auto; border-color:#00ffcc; color:#00ffcc;" onclick="addCategory()">Додати</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="admin-creator-form" style="flex: 2; min-width: 320px;">
@@ -284,10 +306,19 @@
                         <div class="form-group">
                             <input type="text" id="merch-title" class="form-input" placeholder="Назва товару (напр: Футболка 'SVAROG')" required autocomplete="off">
                         </div>
+                        
                         <div class="form-group" style="display: flex; gap: 10px;">
-                            <input type="number" id="merch-price" class="form-input" placeholder="Ціна (₴)" style="flex: 1;" required>
-                            <input type="number" id="merch-stock" class="form-input" placeholder="Кількість на складі (шт)" style="flex: 1;" required>
+                            <select id="merch-category" class="form-select" required>
+                                <option value="" disabled selected>Оберіть категорію...</option>
+                                </select>
+                            <input type="number" id="merch-stock" class="form-input" placeholder="Кількість (шт)" required>
                         </div>
+
+                        <div class="form-group" style="display: flex; gap: 10px; align-items:center;">
+                            <input type="number" id="merch-price" class="form-input" placeholder="Звичайна ціна (₴)" required>
+                            <input type="number" id="merch-discount-price" class="form-input" placeholder="Акційна ціна (₴) (необов'язково)">
+                        </div>
+
                         <div class="form-group">
                             <input type="text" id="merch-sizes" class="form-input" placeholder="Розміри (через кому, напр: S, M, L, XL)" autocomplete="off">
                             <small style="color:#aaa; font-size:0.75rem;">Залиште пустим, якщо товар не має розміру (наприклад, чашка)</small>
@@ -428,6 +459,7 @@
         let globalSocialNetworks = [];
         let globalOrdersData = [];
         let globalMerchData = [];
+        let globalCategories = []; // Масив категорій
 
         let unsubscribeChats = null;
         let unsubscribeFeedback = null;
@@ -568,7 +600,6 @@
                 renderAdminNewsChronicle();
             }, e => console.error(e));
 
-            // НОВІ СТРІМИ ДЛЯ МАГАЗИНУ
             unsubscribeOrders = db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
                 globalOrdersData = [];
                 snapshot.forEach(doc => { globalOrdersData.push({ id: doc.id, ...doc.data() }); });
@@ -582,7 +613,9 @@
             }, e => console.error(e));
 
             unsubscribeConfig = db.collection("config").doc("shop").onSnapshot(doc => {
-                const isActive = doc.exists ? doc.data().active : true; // За замовчуванням увімкнено
+                const data = doc.exists ? doc.data() : {};
+                const isActive = data.active !== undefined ? data.active : true; 
+                
                 const checkbox = document.getElementById('shop-active-checkbox');
                 const label = document.getElementById('shop-status-label');
                 checkbox.checked = isActive;
@@ -593,16 +626,56 @@
                     label.innerText = "Магазин вимкнено (Технічні роботи)";
                     label.style.color = "#ff4a4a";
                 }
+
+                globalCategories = data.categories || ['Одяг', 'Шеврони'];
+                renderCategoriesAdmin();
+                populateCategorySelect();
             }, e => console.error(e));
         }
 
-        // --- ЛОГІКА МАГАЗИНУ ---
+        // --- ЛОГІКА МАГАЗИНУ ТА КАТЕГОРІЙ ---
         async function toggleShopStatus() {
             const checkbox = document.getElementById('shop-active-checkbox');
-            const newStatus = !checkbox.checked; // Робимо навпаки, бо клік по обгортці спрацьовує до зміни чекбоксу
-            try {
-                await db.collection("config").doc("shop").set({ active: newStatus }, { merge: true });
-            } catch(e) { console.error("Помилка зміни статусу магазину:", e); }
+            const newStatus = !checkbox.checked; 
+            try { await db.collection("config").doc("shop").set({ active: newStatus }, { merge: true }); } 
+            catch(e) { console.error("Помилка зміни статусу магазину:", e); }
+        }
+
+        function renderCategoriesAdmin() {
+            const list = document.getElementById('admin-category-list');
+            list.innerHTML = "";
+            globalCategories.forEach(cat => {
+                list.innerHTML += `<div class="cat-chip">${cat} <span class="cat-remove" onclick="removeCategory('${cat}')">✖</span></div>`;
+            });
+        }
+
+        function populateCategorySelect() {
+            const select = document.getElementById('merch-category');
+            select.innerHTML = `<option value="" disabled selected>Оберіть категорію...</option>`;
+            globalCategories.forEach(cat => {
+                select.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        async function addCategory() {
+            const input = document.getElementById('new-category-input');
+            const val = input.value.trim();
+            if(!val) return;
+            if(globalCategories.includes(val)) { alert("Така категорія вже є!"); return; }
+            
+            const newCats = [...globalCategories, val];
+            try { 
+                await db.collection("config").doc("shop").set({ categories: newCats }, { merge: true }); 
+                input.value = "";
+            } catch(e) { console.error(e); }
+        }
+
+        async function removeCategory(catName) {
+            if(confirm(`Видалити категорію "${catName}"? Товари в ній залишаться, але не будуть відображатись у меню!`)) {
+                const newCats = globalCategories.filter(c => c !== catName);
+                try { await db.collection("config").doc("shop").set({ categories: newCats }, { merge: true }); } 
+                catch(e) { console.error(e); }
+            }
         }
 
         function previewMerchPhoto(input) {
@@ -619,17 +692,21 @@
 
         async function publishMerchItem() {
             const title = document.getElementById('merch-title').value.trim();
+            const category = document.getElementById('merch-category').value;
             const price = document.getElementById('merch-price').value.trim();
+            const discountPrice = document.getElementById('merch-discount-price').value.trim();
             const stock = document.getElementById('merch-stock').value.trim();
             const sizesStr = document.getElementById('merch-sizes').value.trim();
             
-            if(!title || !price || !stock) { alert("Заповніть назву, ціну та кількість!"); return; }
+            if(!title || !price || !stock || !category) { alert("Заповніть назву, категорію, ціну та кількість!"); return; }
 
-            const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim()).filter(s => s) : [];
+            const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : [];
 
             const merchObject = {
                 title: title,
+                category: category,
                 price: parseFloat(price),
+                discountPrice: discountPrice ? parseFloat(discountPrice) : null,
                 stock: parseInt(stock),
                 sizes: sizesArr,
                 image: merchPhotoBase64 || null,
@@ -640,15 +717,16 @@
                 await db.collection("merch").add(merchObject);
                 alert("✓ Товар успішно додано до вітрини!");
                 document.getElementById('merch-title').value = "";
+                document.getElementById('merch-category').value = "";
                 document.getElementById('merch-price').value = "";
+                document.getElementById('merch-discount-price').value = "";
                 document.getElementById('merch-stock').value = "";
                 document.getElementById('merch-sizes').value = "";
                 document.getElementById('merch-photo-file').value = "";
                 document.getElementById('merch-preview-element').style.display = 'none';
                 merchPhotoBase64 = "";
             } catch(err) {
-                console.error(err);
-                alert("Помилка: " + err.message);
+                console.error(err); alert("Помилка: " + err.message);
             }
         }
 
@@ -660,12 +738,21 @@
                 let imgHtml = item.image ? `<img src="${item.image}" class="merch-card-img">` : `<div class="merch-card-img" style="display:flex; justify-content:center; align-items:center; color:#666;">Немає фото</div>`;
                 let sizesHtml = item.sizes && item.sizes.length > 0 ? `Розміри: ${item.sizes.join(', ')}` : 'Універсальний розмір';
                 
+                let hasDiscount = item.discountPrice && item.discountPrice < item.price;
+                let priceHtml = hasDiscount 
+                    ? `<span class="old-price">${item.price} ₴</span> <span class="merch-price">${item.discountPrice} ₴</span>`
+                    : `<span class="merch-price">${item.price} ₴</span>`;
+                
+                let saleBadge = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
+
                 box.innerHTML += `
                     <div class="merch-card">
                         ${imgHtml}
+                        ${saleBadge}
                         <div class="merch-card-body">
+                            <div class="cat-tag">${item.category || 'Без категорії'}</div>
                             <div class="merch-title">${item.title}</div>
-                            <div class="merch-price">${item.price} ₴</div>
+                            <div style="margin-bottom:10px;">${priceHtml}</div>
                             <div class="merch-sizes">${sizesHtml} | Залишок: <strong style="color:${item.stock > 0 ? '#00ffcc' : '#ff4a4a'}">${item.stock} шт</strong></div>
                             <div class="merch-actions">
                                 <button class="delete-admin-btn" style="position:relative; right:auto; top:auto;" onclick="deleteMerchItem('${item.id}')">Видалити</button>
@@ -1018,27 +1105,47 @@
                     </div>`;
             });
 
-            // РЕНДЕР ЗАМОВЛЕНЬ
+            // РЕНДЕР ЗАМОВЛЕНЬ У ВИГЛЯДІ ЧЕКА
             const ordersBox = document.getElementById('box-for-orders'); ordersBox.innerHTML = "";
             if(globalOrdersData.length === 0) ordersBox.innerHTML = `<div class="no-msg">Замовлень немає</div>`;
             globalOrdersData.forEach(ord => {
                 let sLabel = ord.status === 'new' ? 'Нове' : (ord.status === 'sent' ? 'Відправлено' : 'Скасовано');
                 let sClass = ord.status === 'new' ? 'processing' : (ord.status === 'sent' ? 'success' : 'cancelled');
                 
+                // Формування списку товарів у замовленні
+                let itemsListHtml = '';
+                if(ord.items && Array.isArray(ord.items)) {
+                    ord.items.forEach(it => {
+                        itemsListHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.9rem; padding-left:10px; border-left:2px solid rgba(255,255,255,0.1);">
+                            <span>${it.merchTitle} [${it.size}] x${it.quantity}</span>
+                            <span style="color:var(--theme-color);">${it.totalPrice} ₴</span>
+                        </div>`;
+                    });
+                } else if(ord.orderTextDetails) {
+                    // Fallback для старих текстових записів
+                    itemsListHtml = `<pre style="font-family:inherit; font-size:0.9rem; margin-left:10px;">${ord.orderTextDetails}</pre>`;
+                }
+
                 ordersBox.innerHTML += `
                     <div class='msg-item'>
                         <div class='meta-line' style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>📦 ${ord.merchTitle} x${ord.quantity} (${ord.time})</span>
+                            <span>🛒 Замовлення від ${ord.time}</span>
                             <select class="status-select ${sClass}" onchange="changeOrderStatus('${ord.id}', this.value)">
                                 <option value="new" ${ord.status === 'new' ? 'selected' : ''}>Нове</option>
                                 <option value="sent" ${ord.status === 'sent' ? 'selected' : ''}>Відправлено</option>
                                 <option value="cancelled" ${ord.status === 'cancelled' ? 'selected' : ''}>Скасовано</option>
                             </select>
                         </div>
-                        <div class='msg-text' style='margin-bottom:5px;'>👤 <strong>ПІБ:</strong> ${ord.name} | 📞 <strong>Тел:</strong> ${ord.phone}</div>
-                        <div class='msg-text' style='margin-bottom:5px;'>Размір: <strong>${ord.size || 'Універсальний'}</strong> | Сума: <strong style="color:var(--theme-color)">${ord.totalPrice} ₴</strong></div>
-                        <div class='msg-text' style='color:#bbb;'>📍 <strong>Адреса (НП):</strong> ${ord.address}</div>
-                        <button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:12px; display:block;" onclick="deleteOrderItem('${ord.id}')">Видалити запис</button>
+                        <div class='msg-text' style='margin-bottom:5px;'>👤 <strong>${ord.name}</strong> | 📞 <strong>${ord.phone}</strong></div>
+                        <div class='msg-text' style='color:#bbb; margin-bottom:10px;'>📍 <strong>Адреса (НП):</strong> ${ord.address}</div>
+                        
+                        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:6px; margin-bottom:10px;">
+                            <div style="font-size:0.85rem; color:#aaa; margin-bottom:8px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:4px;">Склад замовлення:</div>
+                            ${itemsListHtml}
+                        </div>
+                        
+                        <div class='msg-text' style='text-align:right; font-size:1.1rem;'>Сума до сплати: <strong style="color:var(--theme-color)">${ord.totalPrice} ₴</strong></div>
+                        <button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:12px; display:block; width:100%; text-align:center;" onclick="deleteOrderItem('${ord.id}')">Видалити запис</button>
                     </div>`;
             });
 
@@ -1124,10 +1231,11 @@
                 csvContent += "Дата,Прізвище Ім'я,Фонд,Телефон,WhatsApp,Повідомлення\n"; 
                 rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.org}","${item.phone}","${item.whatsapp}","${item.message}"\n`; });
             } else if(storageKey === 'shopOrdersData') {
-                csvContent += "Дата,Статус,ПІБ,Телефон,Товар,Розмір,Кількість,Сума (₴),Адреса\n"; 
+                csvContent += "Дата,Статус,ПІБ,Телефон,Товари,Сума (₴),Адреса\n"; 
                 rawData.forEach(item => { 
                     let statusUa = item.status === 'new' ? 'Нове' : (item.status === 'sent' ? 'Відправлено' : 'Скасовано');
-                    csvContent += `"${item.time}","${statusUa}","${item.name}","${item.phone}","${item.merchTitle}","${item.size || '-'}","${item.quantity}","${item.totalPrice}","${item.address}"\n`; 
+                    let itemsStr = item.items ? item.items.map(i => `${i.merchTitle} [${i.size}] x${i.quantity}`).join('; ') : (item.orderTextDetails ? item.orderTextDetails.replace(/\n/g, ' ') : '');
+                    csvContent += `"${item.time}","${statusUa}","${item.name}","${item.phone}","${itemsStr}","${item.totalPrice}","${item.address}"\n`; 
                 });
             }
             
