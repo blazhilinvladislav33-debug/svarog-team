@@ -22,7 +22,6 @@
     </script>
 
     <style>
-        /* ГЛОБАЛЬНІ ЗМІННІ ДЛЯ НОВОГО КОЛЬОРУ */
         :root {
             --theme-color: #f0b48c;
             --theme-color-rgb: 240, 180, 140;
@@ -38,15 +37,9 @@
         }
         
         body::before { 
-            content: ""; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), var(--bg-image);
-            background-position: center; 
-            background-repeat: no-repeat; 
-            background-size: cover;
-            z-index: -1; 
+            background-position: center; background-repeat: no-repeat; background-size: cover; z-index: -1; 
         }
         
         /* ШАПКА */
@@ -82,82 +75,154 @@
         .menu-chat-btn:hover { background: var(--theme-color) !important; color: #121212 !important; padding-left: 15px !important; }
 
         /* ГОЛОВНИЙ КОНТЕНТ */
-        .main-content { margin-top: 80px; display: flex; flex-direction: column; align-items: center; flex-grow: 1; width: 100%; padding: 20px 10px; gap: 25px; }
-        .page-title-box { text-align: center; max-width: 600px; margin-bottom: 10px; }
-        .page-title-box h1 { font-size: 2rem; color: #ffffff; margin-bottom: 10px; }
+        .main-content { margin-top: 80px; display: flex; flex-direction: column; align-items: center; flex-grow: 1; width: 100%; padding: 20px; gap: 40px; }
+        .page-title-box { text-align: center; max-width: 600px; }
+        .page-title-box h1 { font-size: 2.2rem; color: #ffffff; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .page-title-box p { color: #ccc; font-size: 1.05rem; }
 
-        .container { text-align: center; padding: 30px 20px; border-radius: 12px; background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.82) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35); max-width: 600px; width: 100%; margin-bottom: 10px; }
-
-        /* ВЕРТИКАЛЬНИЙ ТАЙМЛАЙН */
-        .timeline-wrapper { position: relative; max-width: 950px; width: 100%; margin: 20px auto; padding: 20px 0; }
-        .timeline-wrapper::after {
-            content: ''; position: absolute; width: 4px;
-            background: linear-gradient(to bottom, var(--theme-color), rgba(var(--theme-color-rgb), 0.5), rgba(255,255,255,0.05));
-            top: 0; bottom: 0; left: 50%; margin-left: -2px; border-radius: 2px; box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.3);
+        /* НОВИЙ GRID ДИЗАЙН (BENTO BOX STYLE) */
+        .news-grid-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        /* КРУТЕ ПРОЯВЛЕННЯ (Spring Animation) */
-        .timeline-item {
-            position: relative; width: 50%; padding: 15px 40px; box-sizing: border-box;
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            width: 100%;
+        }
+
+        .news-card {
+            background: rgba(25, 25, 25, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.4s, box-shadow 0.4s;
+            
+            /* Spring анімація появи */
             opacity: 0;
+            transform: translateY(60px) scale(0.95);
+        }
+
+        .news-card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
             transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease;
         }
 
-        .timeline-item.left { left: 0; text-align: right; transform: translateX(-40px) translateY(60px) scale(0.9); }
-        .timeline-item.right { left: 50%; text-align: left; transform: translateX(40px) translateY(60px) scale(0.9); }
-        .timeline-item.visible { opacity: 1; transform: translate(0, 0) scale(1); }
-
-        .timeline-card { 
-            background: rgba(25, 25, 25, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); 
-            border-radius: 14px; padding: 20px; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            position: relative; display: inline-block; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-        }
-        .timeline-card:hover { 
-            transform: translateY(-5px) scale(1.02); 
-            border-color: rgba(var(--theme-color-rgb), 0.5); 
-            box-shadow: 0 15px 35px rgba(var(--theme-color-rgb), 0.15); 
+        .news-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(var(--theme-color-rgb), 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(var(--theme-color-rgb), 0.15);
         }
 
-        .timeline-item::before {
-            content: ''; position: absolute; width: 16px; height: 16px; right: -8px; top: 85px; 
-            background: #121212; border: 3px solid var(--theme-color); border-radius: 50%; z-index: 10; 
-            transition: all 0.3s; box-shadow: 0 0 8px rgba(var(--theme-color-rgb), 0.5);
-        }
-        .timeline-item.right::before { left: -8px; right: auto; }
-        .timeline-item:hover::before { transform: scale(1.3); background: var(--theme-color); box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.7); }
-
-        .card-header-zone { display: flex; gap: 20px; align-items: center; width: 100%; }
-        .timeline-item.left .card-header-zone { flex-direction: row-reverse; }
-
-        .card-image-box { 
-            width: 165px; height: 165px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); 
-            overflow: hidden; flex-shrink: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; 
-        }
-        .card-image-box img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .card-title-info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .card-title-info h2 { font-size: 1.4rem; color: #ffffff; font-weight: bold; line-height: 1.3; }
-        
-        .date-container { width: 100%; }
-        .card-date-badge { 
-            display: inline-block; font-size: 0.85rem; color: var(--theme-color); font-family: monospace; font-weight: bold; 
-            background: rgba(var(--theme-color-rgb), 0.1); padding: 4px 12px; border-radius: 6px; border: 1px solid rgba(var(--theme-color-rgb), 0.3); 
+        .news-image-box {
+            width: 100%;
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(0,0,0,0.5);
         }
 
-        .dropdown-arrow { font-size: 1.2rem; color: #888; transition: transform 0.3s ease; padding: 0 5px; }
-        .timeline-card.expanded .dropdown-arrow { transform: rotate(180deg); color: var(--theme-color); }
-
-        .card-body-zone { 
-            display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.12); 
-            animation: slideDown 0.3s ease; text-align: left !important;
+        .news-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
         }
-        .card-body-zone p { color: #e0e0e0; font-size: 0.98rem; line-height: 1.6; white-space: pre-line; margin-bottom: 12px; }
-        
-        .card-action-btn { display: inline-block; width: auto; padding: 8px 18px; border: 2px solid #ffffff; color: #ffffff; font-weight: bold; text-decoration: none; border-radius: 5px; font-size: 0.85rem; transition: all 0.2s ease; }
-        .card-action-btn:hover { background: #ffffff; color: #121212; }
 
-        /* АНОНІМНИЙ ЧАТ */
+        .news-card:hover .news-image-box img {
+            transform: scale(1.08);
+        }
+
+        .news-date-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(5px);
+            color: var(--theme-color);
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(var(--theme-color-rgb), 0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+
+        .news-content {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .news-content h2 {
+            font-size: 1.35rem;
+            color: #ffffff;
+            font-weight: bold;
+            line-height: 1.3;
+            margin-bottom: 15px;
+        }
+
+        .news-body-full {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), margin-top 0.4s;
+        }
+
+        .news-card.expanded .news-body-full {
+            margin-bottom: 20px;
+        }
+
+        .news-body-full p {
+            color: #d0d0d0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-line;
+            margin-bottom: 12px;
+        }
+
+        .card-action-btn { 
+            display: inline-block; padding: 8px 18px; border: 2px solid var(--theme-color); color: var(--theme-color); 
+            font-weight: bold; text-decoration: none; border-radius: 8px; font-size: 0.85rem; transition: all 0.2s ease; 
+        }
+        .card-action-btn:hover { background: var(--theme-color); color: #121212; }
+
+        .expand-toggle-btn {
+            margin-top: auto;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 0;
+            transition: color 0.3s ease;
+            align-self: flex-start;
+        }
+
+        .expand-toggle-btn:hover { color: var(--theme-color); }
+        .expand-toggle-btn svg { width: 14px; height: 14px; fill: currentColor; transition: transform 0.3s ease; }
+        .news-card.expanded .expand-toggle-btn svg { transform: rotate(180deg); }
+
+        /* Логіка зміни тексту кнопки без JS */
+        .text-less { display: none; }
+        .news-card.expanded .text-more { display: none; }
+        .news-card.expanded .text-less { display: inline; }
+
+        /* АНОНІМНИЙ ЧАТ (Без змін, тільки колір підтягнувся зі змінних) */
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
@@ -171,10 +236,8 @@
         .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
         .chat-input-area input:focus { border-color: rgba(var(--theme-color-rgb), 0.8); }
         
-        .chat-send-btn { 
-            width: 38px; height: 38px; background: var(--theme-color); border: none; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.3); flex-shrink: 0; padding: 0;
-        }
-        .chat-send-btn:hover { background: #d9a07a; box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.5); transform: scale(1.05); }
+        .chat-send-btn { width: 38px; height: 38px; background: var(--theme-color); border: none; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.3); flex-shrink: 0; padding: 0; }
+        .chat-send-btn:hover { filter: brightness(1.1); box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.5); transform: scale(1.05); }
         .chat-send-btn:active { transform: scale(0.95); }
         .chat-send-btn svg { width: 18px; height: 18px; fill: #121212; margin-left: 2px; }
 
@@ -184,26 +247,14 @@
 
         .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
 
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         [data-lang="en"] { display: none; }
 
         /* АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ */
         @media (max-width: 768px) { 
             .nav-links { width: 280px; } 
-            .page-title-box h1 { font-size: 1.6rem; }
-            .timeline-wrapper::after { left: 25px; } 
-            .timeline-item { width: 100%; padding-left: 45px; padding-right: 10px; }
-            
-            /* Адаптивне проявлення для мобільних (знизу-зліва) */
-            .timeline-item.left { text-align: left !important; transform: translateX(-30px) translateY(40px) scale(0.95); }
-            .timeline-item.right { left: 0; text-align: left !important; transform: translateX(-30px) translateY(40px) scale(0.95); }
-            .timeline-item.visible { transform: translate(0, 0) scale(1); }
-            
-            .timeline-item::before { left: 17px !important; right: auto !important; top: 60px; } 
-            .timeline-item.left .card-header-zone { flex-direction: column; align-items: flex-start; }
-            .timeline-item.right .card-header-zone { flex-direction: column; align-items: flex-start; }
-            .card-image-box { width: 100%; height: 180px; }
-            .card-title-info h2 { font-size: 1.2rem; }
+            .page-title-box h1 { font-size: 1.8rem; }
+            .news-grid { grid-template-columns: 1fr; gap: 20px; } /* На телефоні 1 колонка */
+            .news-image-box { height: 200px; }
             .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
         }
     </style>
@@ -236,16 +287,16 @@
     </nav>
 
     <div class="main-content">
-        <div class="container">
-            <div class="page-title-box">
-                <h1 data-lang="ua">Хроніка діяльності</h1>
-                <h1 data-lang="en">Operational Timeline</h1>
-                <p data-lang="ua">Основні етапи розвитку, новини підрозділу та виконана робота команди SVAROG TEAM.</p>
-                <p data-lang="en">Key developmental stages, unit updates, and completed work of the SVAROG TEAM.</p>
-            </div>
+        <div class="page-title-box">
+            <h1 data-lang="ua">Хроніка діяльності</h1>
+            <h1 data-lang="en">Operational Timeline</h1>
+            <p data-lang="ua">Основні етапи розвитку, новини підрозділу та виконана робота команди SVAROG TEAM.</p>
+            <p data-lang="en">Key developmental stages, unit updates, and completed work of the SVAROG TEAM.</p>
         </div>
 
-        <div class="timeline-wrapper" id="dynamic-about-timeline-box"></div>
+        <div class="news-grid-wrapper">
+            <div class="news-grid" id="dynamic-news-grid"></div>
+        </div>
     </div>
 
     <footer class="footer">
@@ -301,25 +352,23 @@
         }
 
         function initTimelineRealtimeStream() {
-            const container = document.getElementById('dynamic-about-timeline-box');
+            const container = document.getElementById('dynamic-news-grid');
             if(!container) return;
 
             db.collection("news").orderBy("date", "desc").onSnapshot(snapshot => {
                 let dataset = [];
-                snapshot.forEach(doc => {
-                    dataset.push({ id: doc.id, ...doc.data() });
-                });
-                renderAboutTimeline(dataset);
+                snapshot.forEach(doc => { dataset.push({ id: doc.id, ...doc.data() }); });
+                renderNewsGrid(dataset);
             }, err => {
                 console.error("Помилка хмари новин: ", err);
                 let localDataset = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
                 localDataset.sort((a, b) => new Date(b.date) - new Date(a.date));
-                renderAboutTimeline(localDataset);
+                renderNewsGrid(localDataset);
             });
         }
 
-        function renderAboutTimeline(dataset) {
-            const container = document.getElementById('dynamic-about-timeline-box');
+        function renderNewsGrid(dataset) {
+            const container = document.getElementById('dynamic-news-grid');
             if(!container) return;
             container.innerHTML = "";
 
@@ -327,14 +376,14 @@
 
             if(!dataset || dataset.length === 0) {
                 container.innerHTML = `
-                    <div style="text-align:center; color:#aaa; font-style:italic; padding: 40px 10px; background: rgba(0,0,0,0.2); border-radius:10px; border: 1px dashed rgba(255,255,255,0.1);">
-                        ${currentLang === 'en' ? 'No news chronicle updates yet...' : 'Хроніка новин наразі порожня...'}
+                    <div style="grid-column: 1 / -1; text-align:center; color:#aaa; font-style:italic; padding: 40px 10px; background: rgba(0,0,0,0.2); border-radius:20px; border: 1px dashed rgba(255,255,255,0.1);">
+                        <span data-lang="ua" style="display:${currentLang === 'ua' ? 'inline' : 'none'}">Хроніка новин наразі порожня...</span>
+                        <span data-lang="en" style="display:${currentLang === 'en' ? 'inline' : 'none'}">No news chronicle updates yet...</span>
                     </div>`;
                 return;
             }
 
             dataset.forEach((item, index) => {
-                let sideClass = (index % 2 === 0) ? 'left' : 'right';
                 let imgSrc = item.image ? item.image : 'logo_placeholder.png'; 
                 
                 let displayDate = item.date;
@@ -344,47 +393,64 @@
                         displayDate = parsedDate.toLocaleDateString('uk-UA');
                     }
                 } catch(err) {}
-
-                let dateHtml = displayDate ? `<div class="date-container"><span class="card-date-badge">${displayDate}</span></div>` : '';
                 
                 let defaultBtnText = currentLang === 'en' ? 'Open link' : 'Перейти';
                 let actualBtnText = item.btnText ? item.btnText : defaultBtnText;
                 let linkHtml = (item.hasButton && item.btnUrl) ? `<div style="margin-top:15px;"><a href="${item.btnUrl}" target="_blank" class="card-action-btn" onclick="event.stopPropagation();">${actualBtnText}</a></div>` : '';
 
-                const itemBlock = document.createElement('div');
-                itemBlock.className = `timeline-item ${sideClass}`;
+                const cardBlock = document.createElement('div');
+                cardBlock.className = `news-card`;
+                cardBlock.style.transitionDelay = `${(index % 3) * 0.1}s`; // Каскадна анімація
                 
-                itemBlock.innerHTML = `
-                    <div class="timeline-card" onclick="toggleCardExpansion(this)">
-                        <div class="card-header-zone">
-                            <div class="card-image-box">
-                                <img src="${imgSrc}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23aaa\'><path d=\'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z\'/></svg>'">
-                            </div>
-                            <div class="card-title-info">
-                                ${dateHtml}
-                                <h2>${item.title}</h2>
-                            </div>
-                            <div class="dropdown-arrow">▼</div>
-                        </div>
-                        <div class="card-body-zone">
+                cardBlock.innerHTML = `
+                    <div class="news-image-box">
+                        <img src="${imgSrc}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23aaa\'><path d=\'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z\'/></svg>'">
+                        ${displayDate ? `<div class="news-date-badge">${displayDate}</div>` : ''}
+                    </div>
+                    <div class="news-content">
+                        <h2>${item.title}</h2>
+                        
+                        <button class="expand-toggle-btn" onclick="toggleNewsExpansion(this)">
+                            <span class="text-more">
+                                <span data-lang="ua" style="display:${currentLang === 'ua' ? 'inline' : 'none'}">Читати далі</span>
+                                <span data-lang="en" style="display:${currentLang === 'en' ? 'inline' : 'none'}">Read more</span>
+                            </span>
+                            <span class="text-less">
+                                <span data-lang="ua" style="display:${currentLang === 'ua' ? 'inline' : 'none'}">Згорнути</span>
+                                <span data-lang="en" style="display:${currentLang === 'en' ? 'inline' : 'none'}">Show less</span>
+                            </span>
+                            <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                        </button>
+
+                        <div class="news-body-full">
                             <p>${item.body}</p>
                             ${linkHtml}
                         </div>
                     </div>
                 `;
-                container.appendChild(itemBlock);
+                container.appendChild(cardBlock);
             });
 
             initScrollAnimation();
         }
 
+        // Плавне розгортання тексту
+        window.toggleNewsExpansion = function(btn) {
+            const card = btn.closest('.news-card');
+            const bodyZone = card.querySelector('.news-body-full');
+            
+            if(card.classList.contains('expanded')) {
+                card.classList.remove('expanded');
+                bodyZone.style.maxHeight = '0px';
+            } else {
+                card.classList.add('expanded');
+                bodyZone.style.maxHeight = bodyZone.scrollHeight + 'px';
+            }
+        };
+
         function initScrollAnimation() {
-            const items = document.querySelectorAll('.timeline-item');
-            const observerOptions = {
-                root: null,
-                threshold: 0.05, 
-                rootMargin: "0px 0px -50px 0px"
-            };
+            const items = document.querySelectorAll('.news-card');
+            const observerOptions = { root: null, threshold: 0.05, rootMargin: "0px 0px -50px 0px" };
 
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
@@ -398,12 +464,7 @@
             items.forEach(item => { observer.observe(item); });
         }
 
-        function toggleCardExpansion(cardElement) {
-            const bodyZone = cardElement.querySelector('.card-body-zone');
-            cardElement.classList.toggle('expanded');
-            bodyZone.style.display = cardElement.classList.contains('expanded') ? 'block' : 'none';
-        }
-
+        // --- ЛОГІКА АНОНІМНОГО ЧАТУ (БЕЗ ЗМІН) ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
