@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script>
-        // Конфігурація вашого проєкту Firebase Svarog-Team
         const firebaseConfig = {
             apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
             authDomain: "svarog-team.firebaseapp.com",
@@ -18,7 +17,6 @@
             appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
             measurementId: "G-56T1VN72PF"
         };
-        // Ініціалізація хмари
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
@@ -39,16 +37,10 @@
         }
         
         body::before { 
-            content: ""; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), var(--bg-image);
-            background-position: center; 
-            background-repeat: no-repeat; 
-            background-size: cover;
-            transition: background-image 1s ease-in-out;
-            z-index: -1; 
+            background-position: center; background-repeat: no-repeat; background-size: cover;
+            transition: background-image 1s ease-in-out; z-index: -1; 
         }
         
         .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
@@ -84,25 +76,103 @@
         .menu-chat-btn { border: 2px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); margin-top: 5px; }
         .menu-chat-btn:hover { background: var(--theme-color) !important; color: #121212 !important; padding-left: 15px !important; }
 
-        .main-content { margin-top: 80px; display: flex; justify-content: center; align-items: center; flex-grow: 1; width: 100%; padding: 20px; }
+        /* ОНОВЛЕНИЙ MAIN CONTENT: Розділено на секції */
+        .main-content { 
+            margin-top: 65px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            flex-grow: 1; 
+            width: 100%; 
+        }
+
+        /* 1. Секція з головним банером */
+        .hero-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(85vh - 65px); /* Центрує плашку, залишаючи місце знизу */
+            width: 100%;
+            padding: 20px;
+        }
+
         .container { text-align: center; padding: 40px 30px; border-radius: 12px; background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.82) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35); max-width: 550px; width: 100%; }
-        h1 { color: #ffffff; margin-bottom: 15px; font-size: 2rem; }
-        p { color: #e0e0e0; font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; }
+        h1 { color: #ffffff; margin-bottom: 15px; font-size: 2.2rem; }
+        .hero-desc { color: #e0e0e0; font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; }
         
         .btn { display: inline-block; padding: 12px 30px; background-color: transparent; color: var(--theme-color); text-decoration: none; border: 2px solid var(--theme-color); border-radius: 8px; font-weight: bold; font-size: 1rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(var(--theme-color-rgb), 0.2); }
         .btn:hover { background-color: var(--theme-color); color: #121212; transform: translateY(-3px); box-shadow: 0 8px 25px rgba(var(--theme-color-rgb), 0.4); }
 
-        .footer {
+        /* 2. Секція з напрямками діяльності */
+        .activities-section {
             width: 100%;
-            padding: 20px 12px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.55);
-            font-size: 0.82rem;
-            margin-top: auto;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(10, 10, 10, 0.65);
-            backdrop-filter: blur(8px);
+            max-width: 1200px;
+            padding: 40px 20px 80px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
         }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #ffffff;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            width: 100%;
+        }
+
+        .activity-card {
+            background: rgba(25, 25, 25, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 35px 20px;
+            text-align: center;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.4s, box-shadow 0.4s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .activity-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(var(--theme-color-rgb), 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(var(--theme-color-rgb), 0.15);
+        }
+
+        .activity-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 20px;
+            fill: var(--theme-color);
+            filter: drop-shadow(0 4px 10px rgba(var(--theme-color-rgb), 0.3));
+            transition: transform 0.4s ease;
+        }
+
+        .activity-card:hover .activity-icon {
+            transform: scale(1.1);
+        }
+
+        .activity-card h3 {
+            font-size: 1.3rem;
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .activity-card p {
+            font-size: 0.95rem;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 0;
+        }
+
+        /* Футер і Чат (Без змін) */
+        .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
 
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
@@ -117,9 +187,7 @@
         .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
         .chat-input-area input:focus { border-color: rgba(var(--theme-color-rgb), 0.8); }
         
-        .chat-send-btn { 
-            width: 38px; height: 38px; background: var(--theme-color); border: none; color: #ffffff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); flex-shrink: 0; padding: 0;
-        }
+        .chat-send-btn { width: 38px; height: 38px; background: var(--theme-color); border: none; color: #ffffff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); flex-shrink: 0; padding: 0; }
         .chat-send-btn:hover { filter: brightness(1.1); box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.5); transform: scale(1.05); }
         .chat-send-btn:active { transform: scale(0.95); }
         .chat-send-btn svg { width: 18px; height: 18px; fill: #121212; margin-left: 2px; }
@@ -130,14 +198,18 @@
 
         [data-lang="en"] { display: none; }
 
+        @media (max-width: 850px) {
+            .activities-grid { grid-template-columns: 1fr; } /* 1 колонка на мобільних */
+            .hero-section { min-height: auto; padding-top: 40px; padding-bottom: 20px; }
+        }
+
         @media (max-width: 768px) { 
             .nav-links { width: 280px; } 
             .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
             
-            .main-content { padding: 12px; margin-top: 75px; }
             .container { padding: 30px 20px; width: 100%; }
-            h1 { font-size: 1.6rem; margin-bottom: 12px; }
-            p { font-size: 0.98rem; margin-bottom: 20px; }
+            h1 { font-size: 1.8rem; margin-bottom: 12px; }
+            .hero-desc { font-size: 0.98rem; margin-bottom: 20px; }
             .btn { width: 100%; padding: 12px 15px; font-size: 0.95rem; }
         }
     </style>
@@ -173,18 +245,68 @@
     </nav>
 
     <div class="main-content">
-        <div class="container">
-            <div data-lang="ua">
-                <h1>SVAROG TEAM</h1>
-                <p>Ласкаво просимо на головну сторінку нашого офіційного веб-ресурсу. Тут ви можете дізнатися більше про нашу діяльність або підтримати наш підрозділ.</p>
-                <a href="https://svarogteam.com/about.html" class="btn">Дізнатись більше</a>
+        <!-- ГОЛОВНИЙ БАНЕР -->
+        <section class="hero-section">
+            <div class="container">
+                <div data-lang="ua">
+                    <h1>SVAROG TEAM</h1>
+                    <p class="hero-desc">Ласкаво просимо на головну сторінку нашого офіційного веб-ресурсу. Тут ви можете дізнатися більше про нашу діяльність або підтримати наш підрозділ.</p>
+                    <a href="https://svarogteam.com/about.html" class="btn">Дізнатись більше</a>
+                </div>
+                <div data-lang="en">
+                    <h1>SVAROG TEAM</h1>
+                    <p class="hero-desc">Welcome to the main page of our official web resource. Here you can learn more about our activities or support our unit.</p>
+                    <a href="https://svarogteam.com/about.html" class="btn">Learn more</a>
+                </div>
             </div>
-            <div data-lang="en">
-                <h1>SVAROG TEAM</h1>
-                <p>Welcome to the main page of our official web resource. Here you can learn more about our activities or support our unit.</p>
-                <a href="https://svarogteam.com/about.html" class="btn">Learn more</a>
+        </section>
+
+        <!-- НАПРЯМКИ ДІЯЛЬНОСТІ -->
+        <section class="activities-section">
+            <h2 class="section-title">
+                <span data-lang="ua">Напрямки діяльності</span>
+                <span data-lang="en">Areas of Activity</span>
+            </h2>
+            
+            <div class="activities-grid">
+                <!-- Картка 1 -->
+                <div class="activity-card">
+                    <!-- Іконка Ока/Радара (Розвідка) -->
+                    <svg class="activity-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                    <h3 data-lang="ua">Повітряна розвідка</h3>
+                    <h3 data-lang="en">Aerial Reconnaissance</h3>
+                    <p data-lang="ua">Виявлення позицій противника, коригування вогню артилерії та збір стратегічних розвідданих у реальному часі.</p>
+                    <p data-lang="en">Detecting enemy positions, adjusting artillery fire, and gathering strategic real-time intelligence.</p>
+                </div>
+
+                <!-- Картка 2 -->
+                <div class="activity-card">
+                    <!-- Іконка Прицілу/Удару (Ударні системи) -->
+                    <svg class="activity-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2zM12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    <h3 data-lang="ua">Ударні системи</h3>
+                    <h3 data-lang="en">Strike Systems</h3>
+                    <p data-lang="ua">Точкове знищення ворожої техніки, укриттів та живої сили за допомогою ударних FPV-дронів та систем скидів.</p>
+                    <p data-lang="en">Pinpoint destruction of enemy equipment, shelters, and personnel using strike FPV drones and drop systems.</p>
+                </div>
+
+                <!-- Картка 3 -->
+                <div class="activity-card">
+                    <!-- Іконка Шестерні/Ключа (Інженерне забезпечення) -->
+                    <svg class="activity-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+                    </svg>
+                    <h3 data-lang="ua">Інженерне забезпечення</h3>
+                    <h3 data-lang="en">Engineering Support</h3>
+                    <p data-lang="ua">Ремонт, прошивка та модернізація безпілотних комплексів, виготовлення боєприпасів та нестандартних технічних рішень.</p>
+                    <p data-lang="en">Repair, flashing, and modernization of drone systems, production of munitions, and custom technical solutions.</p>
+                </div>
             </div>
-        </div>
+        </section>
     </div>
 
     <footer class="footer">
@@ -192,6 +314,7 @@
         <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
     </footer>
 
+    <!-- ЧАТ (Без змін) -->
     <div class="user-chat-modal" id="user-chat-window">
         <div class="chat-header">
             <span data-lang="ua">Анонімна розмова</span><span data-lang="en">Anonymous Chat</span>
