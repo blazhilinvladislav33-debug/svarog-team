@@ -23,16 +23,21 @@
     </script>
 
     <style>
+        /* ГЛОБАЛЬНІ ЗМІННІ ДЛЯ НОВОГО КОЛЬОРУ */
+        :root {
+            --theme-color: #f0b48c;
+            --theme-color-rgb: 240, 180, 140;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { width: 100%; min-height: 100%; } /* ВИПРАВЛЕНО: Прибрано жорстку висоту 100%, яка обрізала фон */
+        html, body { width: 100%; min-height: 100%; } 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             position: relative; overflow-x: hidden;
-            --bg-image: url('bg1.jpg'); /* ОНОВЛЕНО: Сучасна CSS-змінна для плавної зміни слайдів */
+            --bg-image: url('bg1.jpg'); 
         }
         
-        /* ВИПРАВЛЕНО: Фіксований псевдоелемент надійно тримає фон і затемнення на телефонах */
         body::before { 
             content: ""; 
             position: fixed; 
@@ -76,8 +81,8 @@
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
 
-        .menu-chat-btn { border: 2px solid #0099ff !important; color: #0099ff !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(0, 153, 255, 0.3); margin-top: 5px; }
-        .menu-chat-btn:hover { background: #0099ff !important; color: #ffffff !important; padding-left: 15px !important; }
+        .menu-chat-btn { border: 2px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); margin-top: 5px; }
+        .menu-chat-btn:hover { background: var(--theme-color) !important; color: #121212 !important; padding-left: 15px !important; }
 
         /* КОНТЕНТ */
         .main-content { margin-top: 100px; padding: 20px; display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; gap: 30px; }
@@ -86,23 +91,23 @@
         .page-title-box p { color: #ccc; font-size: 1.05rem; }
         
         .container { padding: 40px 30px; border-radius: 12px; background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.82) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 24px 60px rgba(0,0,0,0.35); max-width: 550px; width: 100%; text-align: center; }
+        
         .form-group { margin-bottom: 15px; text-align: left; }
-        .form-input, .form-textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; border-radius: 4px; outline: none; }
-        .form-input:focus, .form-textarea:focus { border-color: #00ffcc; box-shadow: 0 0 8px rgba(0, 255, 204, 0.2); }
+        .form-input, .form-textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; border-radius: 4px; outline: none; transition: all 0.3s; }
+        .form-input:focus, .form-textarea:focus { border-color: var(--theme-color); box-shadow: 0 0 8px rgba(var(--theme-color-rgb), 0.3); }
         .form-textarea { min-height: 110px; resize: vertical; font-family: inherit; }
         
-        .btn { width: 100%; padding: 12px; background: transparent; border: 1px solid #fff; color: #fff; cursor: pointer; margin-top: 10px; font-weight: bold; border-radius: 4px; transition: all 0.2s; font-size: 1rem; }
-        .btn:hover { background: #fff; color: #121212; }
+        /* Кнопки в новому стилі */
+        .btn { width: 100%; display: inline-block; padding: 12px 20px; background-color: transparent; color: var(--theme-color); border: 2px solid var(--theme-color); cursor: pointer; margin-top: 10px; font-weight: bold; border-radius: 8px; transition: all 0.3s ease; font-size: 1rem; box-shadow: 0 4px 15px rgba(var(--theme-color-rgb), 0.15); text-decoration: none; }
+        .btn:hover { background-color: var(--theme-color); color: #121212; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(var(--theme-color-rgb), 0.3); }
         
         /* ДИНАМІЧНИЙ БЛОК QR КОДУ */
-        .qr-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.1); }
-        .qr-image { width: 180px; height: 180px; background: #fff; border-radius: 6px; padding: 6px; box-shadow: 0 0 20px rgba(0, 255, 204, 0.15); }
-        .donation-action-btn { border-color: #00ffcc !important; color: #00ffcc !important; }
-        .donation-action-btn:hover { background: #00ffcc !important; color: #121212 !important; box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); }
+        .qr-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; padding: 25px 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); }
+        .qr-image { width: 180px; height: 180px; background: #fff; border-radius: 8px; padding: 6px; box-shadow: 0 0 20px rgba(var(--theme-color-rgb), 0.25); }
 
         .social-box { display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 550px; }
         .social-btn { padding: 10px 20px; border: 1px solid #fff; color: #fff; text-decoration: none; border-radius: 4px; font-weight: 500; transition: all 0.2s; }
-        .social-btn:hover { filter: brightness(1.2); background: rgba(255,255,255,0.05); }
+        .social-btn:hover { filter: brightness(1.2); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
         .attached-preview { max-width: 100%; max-height: 150px; border-radius: 6px; margin-top: 10px; display: none; border: 1px dashed rgba(255,255,255,0.3); object-fit: contain; }
 
         /* ФУТЕР */
@@ -114,26 +119,26 @@
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
         .chat-bubble { padding: 8px 12px; border-radius: 8px; max-width: 80%; word-wrap: break-word; line-height: 1.4; }
         .chat-bubble.user { background: rgba(255, 255, 255, 0.1); align-self: flex-end; border-bottom-right-radius: 2px; color: #ffffff; }
-        .chat-bubble.admin { background: rgba(0, 255, 204, 0.15); border: 1px solid rgba(0, 255, 204, 0.3); align-self: flex-start; border-bottom-left-radius: 2px; color: #ffffff; }
+        .chat-bubble.admin { background: rgba(var(--theme-color-rgb), 0.15); border: 1px solid rgba(var(--theme-color-rgb), 0.3); align-self: flex-start; border-bottom-left-radius: 2px; color: #ffffff; }
         .chat-bubble img { max-width: 100%; max-height: 140px; border-radius: 4px; display: block; cursor: pointer; margin-top: 3px; }
         .chat-bubble.system { background: rgba(255, 74, 74, 0.1); border: 1px solid rgba(255, 74, 74, 0.2); align-self: center; text-align: center; font-size: 0.8rem; max-width: 95%; color: #ff4a4a; border-radius: 6px; }
         
         .chat-input-area { padding: 12px; display: flex; gap: 8px; background: rgba(0,0,0,0.25); align-items: center; }
         .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
-        .chat-input-area input:focus { border-color: rgba(0, 153, 255, 0.6); }
+        .chat-input-area input:focus { border-color: rgba(var(--theme-color-rgb), 0.8); }
         
-        .chat-send-btn { width: 38px; height: 38px; background: #0099ff; border: none; color: #ffffff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(0, 153, 255, 0.2); flex-shrink: 0; padding: 0; }
-        .chat-send-btn:hover { background: #007acc; box-shadow: 0 0 15px rgba(0, 153, 255, 0.5); transform: scale(1.05); }
+        .chat-send-btn { width: 38px; height: 38px; background: var(--theme-color); border: none; color: #ffffff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); flex-shrink: 0; padding: 0; }
+        .chat-send-btn:hover { filter: brightness(1.1); box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.5); transform: scale(1.05); }
         .chat-send-btn:active { transform: scale(0.95); }
-        .chat-send-btn svg { width: 18px; height: 18px; fill: #ffffff; margin-left: 2px; }
+        .chat-send-btn svg { width: 18px; height: 18px; fill: #121212; margin-left: 2px; }
 
         .user-clip-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s, border-color 0.2s; padding: 0; }
         .user-clip-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
         .user-clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.75); }
         
         [data-lang="en"] { display: none; }
+        
         @media (max-width: 768px) { 
-            /* ВИПРАВЛЕНО: Видалено конфліктне правило attachment: scroll для стабільності на телефонах */
             .nav-links { width: 280px; } 
             .main-content { padding: 12px; margin-top: 75px; }
             .container { padding: 30px 20px; }
@@ -179,7 +184,7 @@
             
             <div class="qr-zone">
                 <img id="donation-qr" class="qr-image" src="" alt="Fundraiser QR">
-                <a id="donation-btn" href="#" target="_blank" class="btn donation-action-btn">
+                <a id="donation-btn" href="#" target="_blank" class="btn">
                     <span data-lang="ua">Перейти до Банки</span>
                     <span data-lang="en">Go to Fundraiser</span>
                 </a>
@@ -251,7 +256,6 @@
     </div>
 
     <script>
-        // ВИПРАВЛЕНО: Слайд-шоу тепер оновлює CSS-змінну для стабільності на телефонах
         const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
         let bgIndex = 0;
         setInterval(() => { 
