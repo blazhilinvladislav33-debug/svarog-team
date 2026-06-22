@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVAROG TEAM | Магазин</title>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- EmailJS (Для сповіщень на пошту) -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <script>
+        // Конфігурація проєкту Firebase Svarog-Team
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+            authDomain: "svarog-team.firebaseapp.com",
+            projectId: "svarog-team",
+            storageBucket: "svarog-team.firebasestorage.app",
+            messagingSenderId: "311449325528",
+            appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
+            measurementId: "G-56T1VN72PF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Ініціалізація EmailJS (Сюди треба буде вставити твій Public Key)
+        emailjs.init("YOUR_PUBLIC_KEY"); 
+    </script>
+
+    <style>
+        :root {
+            --theme-color: #f0b48c;
+            --theme-color-rgb: 240, 180, 140;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; min-height: 100%; } 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            position: relative; overflow-x: hidden;
+            --bg-image: url('bg1.jpg'); 
+        }
+        
+        body::before { 
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), var(--bg-image);
+            background-position: center; background-repeat: no-repeat; background-size: cover; z-index: -1; 
+        }
+        
+        /* НАВІГАЦІЯ */
+        .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
+        .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        .left-side { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
+        .menu-toggle:hover { transform: scale(1.05); background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); }
+        .menu-toggle.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .menu-toggle.open .bar:nth-child(2) { opacity: 0; transform: translateX(-10px); }
+        .menu-toggle.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-text-group { display: flex; flex-direction: column; line-height: 1.1; }
+        .logo-main { font-size: 1.1rem; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; }
+        .logo-sub { font-size: 0.7rem; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 1px; }
+        .logo-img { height: 40px; width: auto; display: block; }
+
+        .lang-switcher { display: flex; gap: 4px; background: rgba(0, 0, 0, 0.3); padding: 2px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .lang-btn { background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; font-weight: bold; padding: 4px 8px; cursor: pointer; border-radius: 3px; transition: all 0.3s ease; }
+        .lang-btn:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.1); }
+        .lang-btn.active { color: #121212; background-color: #ffffff; box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2); }
+        
+        .nav-links { list-style: none; display: flex; flex-direction: column; width: 260px; background-color: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); position: fixed; top: 65px; left: -280px; height: calc(100vh - 65px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); gap: 10px; box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5); transition: left 0.4s cubic-bezier(0.075, 0.82, 0.165, 1); }
+        .nav-links.active { left: 0; }
+        .nav-links a { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 1.1rem; font-weight: 500; display: block; padding: 12px 15px; border-radius: 6px; transition: all 0.2s ease; }
+        .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
+        .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
+
+        .menu-chat-btn { border: 2px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); margin-top: 5px; }
+        .menu-chat-btn:hover { background: var(--theme-color) !important; color: #121212 !important; padding-left: 15px !important; }
+
+        /* ОСНОВНИЙ КОНТЕНТ МАГАЗИНУ */
+        .main-content { margin-top: 100px; padding: 20px; display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; max-width: 1200px; }
+        .page-title-box { text-align: center; margin-bottom: 30px; }
+        .page-title-box h1 { font-size: 2.2rem; color: #ffffff; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .page-title-box p { color: #ccc; font-size: 1.05rem; }
+
+        /* ВІТРИНА ТОВАРІВ */
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; margin-bottom: 50px; }
+        .merch-card { background: rgba(25, 25, 25, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .merch-card:hover { transform: translateY(-8px); border-color: rgba(var(--theme-color-rgb), 0.4); box-shadow: 0 15px 40px rgba(var(--theme-color-rgb), 0.15); }
+        
+        .merch-img-box { width: 100%; height: 260px; background: rgba(0,0,0,0.5); overflow: hidden; position: relative; }
+        .merch-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .merch-card:hover .merch-img-box img { transform: scale(1.08); }
+        
+        .stock-badge { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); color: var(--theme-color); font-size: 0.8rem; font-weight: bold; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(var(--theme-color-rgb), 0.3); }
+        .stock-badge.empty { color: #ff4a4a; border-color: #ff4a4a; }
+
+        .merch-details { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .merch-title { font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 8px; }
+        .merch-price { font-size: 1.4rem; font-weight: 900; color: var(--theme-color); margin-bottom: 15px; }
+        
+        .merch-options { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
+        .merch-select { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 10px; border-radius: 6px; outline: none; font-size: 0.9rem; cursor: pointer; }
+        .merch-select:focus { border-color: var(--theme-color); }
+        .merch-qty { width: 70px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 6px; text-align: center; outline: none; }
+
+        .buy-btn { width: 100%; padding: 12px; background: transparent; color: var(--theme-color); border: 2px solid var(--theme-color); border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: all 0.3s; margin-top: auto; }
+        .buy-btn:hover:not(:disabled) { background: var(--theme-color); color: #121212; }
+        .buy-btn:disabled { border-color: #555; color: #555; cursor: not-allowed; background: transparent; }
+
+        /* МОДАЛЬНЕ ВІКНО ЗАМОВЛЕННЯ */
+        .order-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .order-modal { background: linear-gradient(180deg, rgba(30, 30, 30, 0.98) 0%, rgba(20, 20, 20, 0.95) 100%); border: 1px solid rgba(var(--theme-color-rgb), 0.3); border-radius: 16px; width: 100%; max-width: 450px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #888; cursor: pointer; transition: color 0.2s; }
+        .close-modal:hover { color: #fff; }
+        
+        .modal-title { font-size: 1.5rem; color: var(--theme-color); margin-bottom: 20px; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .order-summary { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5; color: #e0e0e0; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-input { width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; outline: none; font-size: 1rem; transition: border-color 0.3s; }
+        .form-input:focus { border-color: var(--theme-color); }
+        
+        .confirm-btn { width: 100%; padding: 14px; background: var(--theme-color); color: #121212; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; margin-top: 10px; box-shadow: 0 4px 15px rgba(var(--theme-color-rgb), 0.3); }
+        .confirm-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        /* ФУТЕР І ЧАТ */
+        .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
+
+        /* ЧАТ (без змін) */
+        .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 3000; flex-direction: column; overflow: hidden; }
+        .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
+        .chat-bubble { padding: 8px 12px; border-radius: 8px; max-width: 80%; word-wrap: break-word; line-height: 1.4; }
+        .chat-bubble.user { background: rgba(255, 255, 255, 0.1); align-self: flex-end; border-bottom-right-radius: 2px; color: #ffffff; }
+        .chat-bubble.admin { background: rgba(var(--theme-color-rgb), 0.15); border: 1px solid rgba(var(--theme-color-rgb), 0.3); align-self: flex-start; border-bottom-left-radius: 2px; color: #ffffff; }
+        .chat-bubble img { max-width: 100%; max-height: 140px; border-radius: 4px; display: block; cursor: pointer; margin-top: 3px; }
+        .chat-bubble.system { background: rgba(255, 74, 74, 0.1); border: 1px solid rgba(255, 74, 74, 0.2); align-self: center; text-align: center; font-size: 0.8rem; max-width: 95%; color: #ff4a4a; border-radius: 6px; }
+        .chat-input-area { padding: 12px; display: flex; gap: 8px; background: rgba(0,0,0,0.25); align-items: center; }
+        .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; }
+        .chat-input-area input:focus { border-color: rgba(var(--theme-color-rgb), 0.8); }
+        .chat-send-btn { width: 38px; height: 38px; background: var(--theme-color); border: none; color: #121212; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
+        .chat-send-btn svg { width: 18px; height: 18px; fill: #121212; margin-left: 2px; }
+        .user-clip-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
+        .user-clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.75); }
+        
+        [data-lang="en"] { display: none; }
+        @media (max-width: 768px) { 
+            .nav-links { width: 280px; } 
+            .page-title-box h1 { font-size: 1.8rem; }
+            .shop-grid { grid-template-columns: 1fr; gap: 20px; }
+            .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="left-side">
+                <button class="menu-toggle" id="menu-button"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+                <a href="https://svarogteam.com/index.html" class="logo-container">
+                    <img src="logo.png" alt="SVAROG TEAM" class="logo-img">
+                    <div class="logo-text-group">
+                        <span class="logo-main">SVAROG TEAM</span>
+                        <span class="logo-sub">35 POLK NGU</span>
+                    </div>
+                </a>
+            </div>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="setLanguage('ua')">UA</button>
+                <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+            </div>
+            <ul class="nav-links" id="nav-menu">
+                <li><a href="https://svarogteam.com/index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
+                <li><a href="https://svarogteam.com/support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
+                <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
+                <li><a href="https://svarogteam.com/shop.html" class="current-page"><span data-lang="ua">Магазин мерчу</span><span data-lang="en">Merch Shop</span></a></li>
+                <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-title-box">
+            <h1 data-lang="ua">Фірмовий Магазин</h1>
+            <h1 data-lang="en">Official Store</h1>
+            <p data-lang="ua">Купуючи наш мерч, ви безпосередньо підтримуєте роботу підрозділу SVAROG TEAM.</p>
+            <p data-lang="en">By purchasing our merch, you directly support the operations of the SVAROG TEAM.</p>
+        </div>
+
+        <div class="shop-grid" id="dynamic-shop-grid">
+            <!-- Товари будуть підвантажуватись сюди -->
+            <div style="text-align:center; grid-column: 1 / -1; color:#aaa;">Завантаження вітрини...</div>
+        </div>
+    </div>
+
+    <!-- Модальне вікно оформлення замовлення -->
+    <div class="order-modal-overlay" id="order-modal-wrapper">
+        <div class="order-modal">
+            <div class="close-modal" onclick="closeOrderModal()">×</div>
+            <h2 class="modal-title" data-lang="ua">Оформлення замовлення</h2>
+            <h2 class="modal-title" data-lang="en" style="display:none;">Checkout</h2>
+            
+            <div class="order-summary" id="order-summary-box">
+                <!-- Дані про товар -->
+            </div>
+
+            <form id="checkout-form" onsubmit="submitOrder(event)">
+                <div class="form-group">
+                    <input type="text" id="order-name" class="form-input" data-placeholder-ua="Ваше ПІБ" data-placeholder-en="Full Name" placeholder="Ваше ПІБ" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="order-phone" class="form-input" data-placeholder-ua="Номер телефону" data-placeholder-en="Phone Number" placeholder="Номер телефону" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="order-address" class="form-input" data-placeholder-ua="Місто та № відділення Нової Пошти" data-placeholder-en="City & Nova Poshta branch" placeholder="Місто та № відділення Нової Пошти" required autocomplete="off">
+                </div>
+                <button type="submit" class="confirm-btn" id="confirm-order-btn">
+                    <span data-lang="ua">Підтвердити замовлення</span>
+                    <span data-lang="en">Confirm Order</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <span data-lang="ua">SVAROG TEAM © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
+        <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
+    </footer>
+
+    <!-- ЧАТ В БУДЬ-ЯКОМУ МІСЦІ САЙТУ -->
+    <div class="user-chat-modal" id="user-chat-window">
+        <div class="chat-header">
+            <span data-lang="ua">Анонімна розмова</span><span data-lang="en">Anonymous Chat</span>
+            <span style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('user-chat-window').style.display='none'">×</span>
+        </div>
+        <div class="chat-messages" id="user-chat-messages"></div>
+        <div class="chat-input-area" id="user-chat-input-block">
+            <button class="user-clip-btn" onclick="document.getElementById('user-chat-file').click()">
+                <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-3.31 2.69-6 6-6s6 2.69 6 6v12c0 4.42-3.58 8-8 8s-8-3.58-8-8V6h2v11c0 3.31 2.69 6 6 6s6-2.69 6-6V5c0-2.21-1.79-4-4-4s-4 1.79-4 4v12.5c0 1.1.9 2 2 2s2-.9 2-2V6h2z"/></svg>
+            </button>
+            <input type="file" id="user-chat-file" accept="image/*" style="display:none;" onchange="sendUserChatPhoto(this)">
+            <input type="text" id="user-chat-input" placeholder="...">
+            <button class="chat-send-btn" onclick="sendUserChatMessage()">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Слайдер фону
+        const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
+        let bgIndex = 0;
+        setInterval(() => { 
+            bgIndex = (bgIndex + 1) % images.length; 
+            document.body.style.setProperty('--bg-image', `url('${images[bgIndex]}')`); 
+        }, 3000);
+
+        // Меню
+        const menuButton = document.getElementById('menu-button');
+        const navMenu = document.getElementById('nav-menu');
+        menuButton.addEventListener('click', (e) => { e.stopPropagation(); navMenu.classList.toggle('active'); menuButton.classList.toggle('open'); });
+        document.addEventListener('click', (e) => { if (!navMenu.contains(e.target) && !menuButton.contains(e.target)) { navMenu.classList.remove('active'); menuButton.classList.remove('open'); } });
+        
+        function setLanguage(lang) {
+            localStorage.setItem('selectedLang', lang);
+            document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
+            document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.innerText.toLowerCase() === lang));
+            document.querySelectorAll('[data-placeholder-ua]').forEach(el => {
+                el.placeholder = lang === 'ua' ? el.getAttribute('data-placeholder-ua') : el.getAttribute('data-placeholder-en');
+            });
+        }
+
+        // --- ЛОГІКА МАГАЗИНУ ---
+        let globalMerchList = [];
+        let currentOrderData = null; // Зберігаємо дані під час оформлення
+
+        // 1. Перевірка статусу магазину
+        db.collection("config").doc("shop").onSnapshot(doc => {
+            if (doc.exists && doc.data().active === false) {
+                // Якщо рубильник вимкнено - викидаємо на головну сторінку
+                window.location.href = 'index.html';
+            }
+        });
+
+        // 2. Підвантаження товарів
+        db.collection("merch").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+            globalMerchList = [];
+            snapshot.forEach(doc => { globalMerchList.push({ id: doc.id, ...doc.data() }); });
+            renderShopGrid();
+        }, err => console.error("Помилка завантаження товарів:", err));
+
+        function renderShopGrid() {
+            const grid = document.getElementById('dynamic-shop-grid');
+            const lang = localStorage.getItem('selectedLang') || 'ua';
+            grid.innerHTML = "";
+
+            if(globalMerchList.length === 0) {
+                grid.innerHTML = `<div style="text-align:center; grid-column: 1 / -1; color:#aaa;">${lang==='ua'?'Товарів поки немає.':'No items available.'}</div>`;
+                return;
+            }
+
+            globalMerchList.forEach(item => {
+                let imgHtml = item.image ? `<img src="${item.image}">` : `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#666;">No Image</div>`;
+                let isOutOfStock = item.stock <= 0;
+                let stockBadge = isOutOfStock 
+                    ? `<div class="stock-badge empty">${lang==='ua'?'Немає в наявності':'Out of stock'}</div>` 
+                    : `<div class="stock-badge">${lang==='ua'?'В наявності':'In stock'}</div>`;
+                
+                // Формування вибору розміру
+                let sizeSelectHtml = '';
+                if(item.sizes && item.sizes.length > 0) {
+                    sizeSelectHtml = `<select id="size-${item.id}" class="merch-select">` + 
+                        item.sizes.map(s => `<option value="${s}">Розмір / Size: ${s}</option>`).join('') + 
+                    `</select>`;
+                } else {
+                    sizeSelectHtml = `<div class="merch-select" style="display:flex; align-items:center; color:#aaa; cursor:default;" data-val="Універсальний">${lang==='ua'?'Універсальний розмір':'One size'}</div>`;
+                }
+
+                // Кнопка Купити
+                let buyBtnHtml = isOutOfStock 
+                    ? `<button class="buy-btn" disabled>${lang==='ua'?'Розпродано':'Sold out'}</button>`
+                    : `<button class="buy-btn" onclick="initiateOrder('${item.id}')">${lang==='ua'?'Купити':'Buy now'}</button>`;
+
+                grid.innerHTML += `
+                    <div class="merch-card">
+                        <div class="merch-img-box">
+                            ${imgHtml}
+                            ${stockBadge}
+                        </div>
+                        <div class="merch-details">
+                            <div class="merch-title">${item.title}</div>
+                            <div class="merch-price">${item.price} ₴</div>
+                            <div class="merch-options">
+                                ${sizeSelectHtml}
+                                <input type="number" id="qty-${item.id}" class="merch-qty" value="1" min="1" max="${item.stock}">
+                            </div>
+                            ${buyBtnHtml}
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // 3. Ініціалізація покупки (відкриття модалки)
+        function initiateOrder(merchId) {
+            const item = globalMerchList.find(m => m.id === merchId);
+            if(!item) return;
+
+            let qtyInput = document.getElementById(`qty-${item.id}`);
+            let qty = parseInt(qtyInput.value);
+            if(qty < 1 || qty > item.stock) {
+                alert("Неправильна кількість! / Invalid quantity!"); return;
+            }
+
+            let size = "Універсальний";
+            let sizeSelect = document.getElementById(`size-${item.id}`);
+            if(sizeSelect.tagName === 'SELECT') { size = sizeSelect.value; }
+
+            const total = item.price * qty;
+            const lang = localStorage.getItem('selectedLang') || 'ua';
+
+            currentOrderData = {
+                merchId: item.id,
+                merchTitle: item.title,
+                price: item.price,
+                size: size,
+                quantity: qty,
+                totalPrice: total
+            };
+
+            const summaryBox = document.getElementById('order-summary-box');
+            summaryBox.innerHTML = `
+                <div style="font-weight:bold; font-size:1.1rem; color:var(--theme-color); margin-bottom:10px;">${item.title}</div>
+                <div>${lang==='ua'?'Розмір':'Size'}: <strong>${size}</strong></div>
+                <div>${lang==='ua'?'Кількість':'Quantity'}: <strong>${qty} шт</strong></div>
+                <div style="margin-top:10px; padding-top:10px; border-top:1px dashed rgba(255,255,255,0.2); font-size:1.1rem;">
+                    ${lang==='ua'?'До сплати':'Total'}: <strong style="color:var(--theme-color)">${total} ₴</strong>
+                </div>
+            `;
+
+            document.getElementById('order-modal-wrapper').style.display = 'flex';
+        }
+
+        function closeOrderModal() {
+            document.getElementById('order-modal-wrapper').style.display = 'none';
+            document.getElementById('checkout-form').reset();
+            currentOrderData = null;
+        }
+
+        // 4. Підтвердження замовлення (Безпечна транзакція Firestore + EmailJS)
+        async function submitOrder(e) {
+            e.preventDefault();
+            if(!currentOrderData) return;
+
+            const name = document.getElementById('order-name').value.trim();
+            const phone = document.getElementById('order-phone').value.trim();
+            const address = document.getElementById('order-address').value.trim();
+            const lang = localStorage.getItem('selectedLang') || 'ua';
+            const btn = document.getElementById('confirm-order-btn');
+            
+            btn.innerText = "Обробка... / Processing...";
+            btn.disabled = true;
+
+            const merchRef = db.collection('merch').doc(currentOrderData.merchId);
+            const orderRef = db.collection('orders').doc();
+
+            try {
+                // Використовуємо транзакцію для безпечного зняття залишків
+                await db.runTransaction(async (transaction) => {
+                    const merchDoc = await transaction.get(merchRef);
+                    if (!merchDoc.exists) throw new Error("Товар не знайдено!");
+
+                    const newStock = merchDoc.data().stock - currentOrderData.quantity;
+                    if (newStock < 0) throw new Error(lang==='ua'?"Недостатньо товару на складі! Хтось встиг купити перед вами.":"Out of stock!");
+
+                    // Оновлюємо склад
+                    transaction.update(merchRef, { stock: newStock });
+
+                    // Записуємо замовлення
+                    transaction.set(orderRef, {
+                        ...currentOrderData,
+                        name: name,
+                        phone: phone,
+                        address: address,
+                        status: 'new', // Нове замовлення
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        time: new Date().toLocaleString('uk-UA')
+                    });
+                });
+
+                // --- ВІДПРАВКА EMAIL ЧЕРЕЗ EmailJS ---
+                // Щоб це працювало, зареєструйся на emailjs.com, додай пошту Gmail,
+                // створи шаблон і встав свої Service ID та Template ID сюди:
+                /*
+                emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+                    to_name: "Admin SVAROG",
+                    from_name: name,
+                    phone: phone,
+                    address: address,
+                    item: currentOrderData.merchTitle,
+                    size: currentOrderData.size,
+                    qty: currentOrderData.quantity,
+                    total: currentOrderData.totalPrice
+                }).then(() => console.log("Email sent!")).catch(e => console.error("Email error:", e));
+                */
+
+                alert(lang === 'ua' ? 'Замовлення успішно оформлено! Ми зв\'яжемося з вами найближчим часом.' : 'Order placed successfully! We will contact you soon.');
+                closeOrderModal();
+
+            } catch (err) {
+                console.error("Transaction failed: ", err);
+                alert(err.message);
+            } finally {
+                btn.innerHTML = `<span data-lang="ua">Підтвердити замовлення</span><span data-lang="en">Confirm Order</span>`;
+                btn.disabled = false;
+                setLanguage(lang); // Оновити мову кнопки
+            }
+        }
+
+
+        // --- ЛОГІКА АНОНІМНОГО ЧАТУ (БЕЗ ЗМІН) ---
+        let userChatSessionId = localStorage.getItem('userChatSessionId');
+        let unsubscribeUserChat = null;
+
+        function initUserChat() {
+            if (!userChatSessionId) {
+                userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('userChatSessionId', userChatSessionId);
+            }
+            startRealtimeChatListener();
+        }
+
+        function openUserChat(e) {
+            e.preventDefault();
+            if(navMenu) navMenu.classList.remove('active');
+            document.getElementById('user-chat-window').style.display = 'flex';
+            renderUserChat();
+        }
+
+        function startRealtimeChatListener() {
+            if (unsubscribeUserChat) unsubscribeUserChat();
+            unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(doc => {
+                let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' };
+                renderUserChat(myChat);
+            }, err => { console.error("Помилка чату: ", err); });
+        }
+
+        function renderUserChat(myChatData) {
+            const messagesBox = document.getElementById('user-chat-messages');
+            const inputBlock = document.getElementById('user-chat-input-block');
+            let myChat = myChatData || { messages: [], status: 'active' };
+
+            messagesBox.innerHTML = "";
+            myChat.messages.forEach(msg => {
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${msg.sender}`;
+                if(msg.type === 'image') bubble.innerHTML = `<img src="${msg.text}">`;
+                else bubble.innerText = msg.text;
+                messagesBox.appendChild(bubble);
+            });
+
+            if (myChat.status === 'closed') {
+                inputBlock.style.display = 'none';
+                messagesBox.innerHTML += `<div class="chat-bubble system">Чат завершено адміністратором.</div>`;
+            } else { 
+                inputBlock.style.display = 'flex'; 
+            }
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+
+        async function sendUserChatMessage() {
+            const input = document.getElementById('user-chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const msgObject = { sender: 'user', text: text, type: 'text', time: Date.now() };
+            input.value = "";
+            try {
+                await db.collection("chats").doc(userChatSessionId).set({
+                    id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
+                    messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
+                }, { merge: true });
+            } catch(e) { console.error(e); }
+        }
+
+        document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
+        
+        window.addEventListener('DOMContentLoaded', () => { 
+            setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
+            initUserChat(); 
+        });
+    </script>
+</body>
+</html>
