@@ -5,9 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVAROG TEAM</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- EmailJS (Для сповіщень на пошту) -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
     <script>
+        // Конфігурація проєкту Firebase Svarog-Team
         const firebaseConfig = {
             apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
             authDomain: "svarog-team.firebaseapp.com",
@@ -19,16 +26,19 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        // Ініціалізація EmailJS (Сюди треба буде вставити твій Public Key)
+        emailjs.init("YOUR_PUBLIC_KEY"); 
     </script>
 
     <style>
-        /* ГЛОБАЛЬНІ ЗМІННІ ДЛЯ КОЛЬОРУ */
         :root {
             --theme-color: #f0b48c;
             --theme-color-rgb: 240, 180, 140;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; min-height: 100%; } 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
@@ -37,22 +47,14 @@
         }
         
         body::before { 
-            content: ""; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), var(--bg-image);
-            background-position: center; 
-            background-repeat: no-repeat; 
-            background-size: cover;
-            transition: background-image 1s ease-in-out;
-            z-index: -1; 
+            background-position: center; background-repeat: no-repeat; background-size: cover; z-index: -1; 
         }
         
-        /* ШАПКА */
+        /* НАВІГАЦІЯ */
         .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
         .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
-        
         .left-side { display: flex; align-items: center; gap: 20px; }
         .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
@@ -77,8 +79,6 @@
         .nav-links a { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 1.1rem; font-weight: 500; display: block; padding: 12px 15px; border-radius: 6px; transition: all 0.2s ease; }
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
-
-        .admin-menu-item { padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 5px; }
 
         .menu-chat-btn { border: 2px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); margin-top: 5px; }
         .menu-chat-btn:hover { background: var(--theme-color) !important; color: #121212 !important; padding-left: 15px !important; }
@@ -183,7 +183,7 @@
             <ul class="nav-links" id="nav-menu">
                 <li><a href="https://svarogteam.com/index.html" class="current-page"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
                 <li><a href="https://svarogteam.com/support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
-                <li><a href="https://svarogteam.com/shop.html" style="color: var(--theme-color);"><span data-lang="ua">SVRG STORE</span><span data-lang="en">SVRG STORE</span></a></li>
+                <li><a href="https://svarogteam.com/shop.html"><span data-lang="ua">SVRG STORE</span><span data-lang="en">SVRG STORE</span></a></li>
                 <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
                 <li class="admin-menu-item">
@@ -195,6 +195,7 @@
     </nav>
 
     <div class="main-content">
+        <!-- ГОЛОВНИЙ БАНЕР -->
         <div class="hero-container">
             <div data-lang="ua">
                 <h1>SVAROG TEAM</h1>
@@ -208,6 +209,7 @@
             </div>
         </div>
 
+        <!-- НАПРЯМКИ ДІЯЛЬНОСТІ -->
         <div class="activities-wrapper">
             <h2>
                 <span data-lang="ua">Напрямки діяльності</span>
@@ -255,6 +257,7 @@
         <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
     </footer>
 
+    <!-- АНОНІМНИЙ ЧАТ -->
     <div class="user-chat-modal" id="user-chat-window">
         <div class="chat-header">
             <span data-lang="ua">Анонімна розмова</span><span data-lang="en">Anonymous Chat</span>
