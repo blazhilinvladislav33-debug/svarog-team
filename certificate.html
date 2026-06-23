@@ -22,33 +22,45 @@
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;900&display=swap');
         body { background: #121212; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; font-family: 'Montserrat', sans-serif; }
         
-        /* Компактніший контейнер */
         .cert-container { 
             width: 800px; height: 450px; 
             background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
             color: #fff; padding: 30px; position: relative;
             border: 2px solid #f0b48c; border-radius: 15px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            /* Тінь по краях 1 см */
+            box-shadow: inset 0 0 35px 5px rgba(240, 180, 140, 0.15), 0 15px 40px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
 
         .header-logos { display: flex; gap: 30px; margin-bottom: 20px; align-items: center; }
-        .logo-main { width: 100px; height: auto; } /* Збільшений логотип */
-        .logo-team { width: 140px; height: auto; }
+        .logo-main { width: 90px; height: auto; }
+        .logo-team { width: 130px; height: auto; }
         
-        h1 { font-size: 2rem; color: #f0b48c; text-transform: uppercase; margin: 5px 0; }
-        .subtitle { font-size: 0.9rem; color: #888; margin-bottom: 20px; }
+        h1 { font-size: 2rem; color: #f0b48c; text-transform: uppercase; margin: 10px 0; letter-spacing: 2px; }
         
-        .code-box { margin-top: 10px; background: rgba(240, 180, 140, 0.05); border: 1px solid #f0b48c; padding: 15px 30px; border-radius: 8px; }
-        .code-val { font-size: 2.5rem; font-weight: 900; color: #fff; }
+        .code-box { margin-top: 15px; margin-bottom: 25px; }
+        .code-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        .code-val { font-size: 2.2rem; font-weight: 900; color: #fff; }
+
+        .footer-cert { 
+            margin-top: auto; font-size: 0.85rem; color: #aaa; width: 100%; 
+            border-top: 1px solid #333; padding-top: 15px; font-style: italic;
+        }
+
+        .print-btn { margin-top: 30px; padding: 12px 30px; background: #f0b48c; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .print-btn:hover { background: #dcb092; }
 
         .promo-list { margin-top: 40px; width: 100%; max-width: 600px; }
-        .promo-item { display: flex; justify-content: space-between; padding: 10px; background: #222; margin-bottom: 5px; border-radius: 5px; color: #fff; cursor: pointer; transition: 0.2s; }
-        .promo-item:hover { background: #333; }
+        .promo-item { display: flex; justify-content: space-between; padding: 12px 20px; background: #222; margin-bottom: 8px; border-radius: 8px; color: #fff; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+        .promo-item:hover { background: #2a2a2a; border-color: #f0b48c; }
 
-        .print-btn { margin-top: 30px; padding: 12px 30px; background: #f0b48c; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        
-        @media print { .print-btn, .promo-list { display: none; } body { background: #fff; } .cert-container { border: 3px solid #f0b48c; color: #000; background: #fff; } h1, .code-val { color: #000; } }
+        @media print { 
+            .print-btn, .promo-list { display: none; } 
+            body { background: #fff; } 
+            .cert-container { border: 3px solid #f0b48c; color: #000; background: #fff; box-shadow: none; } 
+            h1, .code-val { color: #000; }
+            .footer-cert { color: #333; }
+        }
     </style>
 </head>
 <body>
@@ -60,29 +72,31 @@
     </div>
     
     <h1>Сертифікат підтримки</h1>
-    <p class="subtitle">Ваш внесок наближає перемогу SVAROG TEAM.</p>
     
     <div class="code-box">
-        <div class="code-val" id="cert-code">ВЕРІТЬ...</div>
+        <div class="code-label">Ваш код доступу</div>
+        <div class="code-val" id="cert-code">...</div>
+    </div>
+
+    <div class="footer-cert">
+        Ми щиро дякуємо за вашу небайдужість та фінансову допомогу. Ваш внесок — це не просто цифри, це наші очі в небі, які наближають неминучу перемогу SVAROG TEAM над ворогом.
     </div>
 </div>
 
 <button class="print-btn" onclick="window.print()">Друк сертифіката</button>
 
 <div class="promo-list" id="promo-list">
-    <h3 style="color:#fff; margin-bottom:10px;">Активні промокоди для вибору:</h3>
+    <h3 style="color:#fff; margin-bottom:15px; text-align: center;">Оберіть промокод для генерації:</h3>
 </div>
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
 
-    // Логіка вибору коду
     if(code) {
         document.getElementById('cert-code').innerText = code.toUpperCase();
     }
 
-    // Відображення списку всіх промокодів
     db.collection("promocodes").where("active", "==", true).get().then(snapshot => {
         const list = document.getElementById('promo-list');
         snapshot.forEach(doc => {
