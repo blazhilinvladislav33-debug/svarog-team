@@ -37,18 +37,17 @@
 
         .header-logos { display: flex; gap: 30px; margin-bottom: 20px; align-items: center; }
         .logo-main { width: 90px; height: auto; }
-        .logo-team { width: 180px; height: auto; } /* Збільшено логотип */
+        .logo-team { width: 180px; height: auto; }
         
         h1 { font-size: 2rem; color: #f0b48c; text-transform: uppercase; margin: 5px 0; letter-spacing: 2px; }
         
-        /* Стиль промокоду: напис над рамкою */
         .promo-wrapper { margin: 25px 0; display: flex; flex-direction: column; align-items: center; }
         .code-label { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
         .code-box { 
             padding: 15px 40px; 
-            border: 2px solid #f0b48c; /* Суцільна лінія */
+            border: 2px solid #f0b48c;
             border-radius: 8px;
-            box-shadow: 0 0 10px 5px rgba(240, 180, 140, 0.15); /* Тінь */
+            box-shadow: 0 0 10px 5px rgba(240, 180, 140, 0.15);
         }
         .code-val { font-size: 2.2rem; font-weight: 900; color: #fff; }
 
@@ -66,8 +65,8 @@
 
         @media print { 
             .print-btn, .promo-list { display: none; } 
-            body { background: #fff; } 
-            .cert-container { border: 3px solid #f0b48c; color: #000; background: #fff; box-shadow: none; } 
+            body { background: #fff; padding: 0; } 
+            .cert-container { border: 3px solid #f0b48c; color: #000; background: #fff; box-shadow: none; margin: 0; } 
             h1, .code-val { color: #000; }
             .footer-cert { color: #333; }
         }
@@ -86,7 +85,7 @@
     <div class="promo-wrapper">
         <div class="code-label">ВАШ ПРОМОКОД</div>
         <div class="code-box">
-            <div class="code-val" id="cert-code">...</div>
+            <div class="code-val" id="cert-code">ОБЕРІТЬ КОД</div>
         </div>
     </div>
 
@@ -106,20 +105,64 @@
     const code = urlParams.get('code');
 
     if(code) {
-        document.getElementById('cert-code').innerText = code.toUpperCase();
+        const codeUpper = code.toUpperCase();
+        // Робимо запит до документа, де ID — це сам промокод
+        const docRef = db.collection("promocodes").doc(codeUpper);
+
+        docRef.get().then(doc => {
+            if(doc.exists && doc.data().active) {
+                const promoData = doc.data();
+                
+                // Виводимо текст коду (якщо поля code немає в базі, беремо назву самого документа)
+                document.getElementById('cert-code').innerText = promoData.code || doc.id;
+                document.getElementById('cert-code').style.color = "#fff";
+                document.getElementById('cert-code').style.fontSize = "2.2rem";
+                
+                // Автоматична перевірка на одноразовість сертифіката
+                if(promoData.isSingleUse === true) {
+                    docRef.update({ active: false }).then(() => {
+                        console.log("✓ Одноразовий сертифікат активовано та вимкнено для наступних переглядів.");
+                    }).catch(err => {
+                        console.error("Помилка зміни статусу промокоду:", err);
+                    });
+                }
+            } else {
+                // Якщо сертифікат видалено, або він уже неактивний (використаний)
+                document.getElementById('cert-code').innerText = "ВИКОРИСТАНО / НЕАКТИВНИЙ";
+                document.getElementById('cert-code').style.color = "#ff4a4a";
+                document.getElementById('cert-code').style.fontSize = "1.5rem";
+            }
+        }).catch(err => {
+            console.error("Помилка завантаження сертифіката:", err);
+            document.getElementById('cert-code').innerText = "ПОМИЛКА БАЗИ";
+        });
     }
 
+    // Завантаження списку активних кодів для нижнього меню вибору
     db.collection("promocodes").where("active", "==", true).get().then(snapshot => {
         const list = document.getElementById('promo-list');
+        
+        if (snapshot.empty) {
+            list.innerHTML += `<div style="color:#666; text-align:center; font-style:italic;">Немає доступних активних сертифікатів</div>`;
+            return;
+        }
+
         snapshot.forEach(doc => {
             const p = doc.data();
+            const promoName = p.code || doc.id; // Сумісність за ID або за полем code
+            
+            // Якщо промокод одноразовий, додаємо красиву мітку в списку
+            const singleUseBadge = p.isSingleUse ? " <small style='color:#ffaa00;'>(Одноразовий)</small>" : "";
+            
             list.innerHTML += `
-                <div class="promo-item" onclick="window.location.href='?code=${p.code}'">
-                    <span>${p.code}</span>
+                <div class="promo-item" onclick="window.location.href='?code=${promoName}'">
+                    <span>${promoName}${singleUseBadge}</span>
                     <span>Знижка ${p.discount}%</span>
                 </div>
             `;
         });
+    }).catch(err => {
+        console.error("Помилка завантаження списку:", err);
     });
 </script>
 </body>
