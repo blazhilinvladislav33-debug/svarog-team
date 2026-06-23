@@ -775,6 +775,9 @@
             document.getElementById('order-modal-wrapper').style.display = 'none';
         }
 
+        // ==========================================
+        // ОНОВЛЕНА ФУНКЦІЯ APPLY PROMO
+        // ==========================================
         async function applyPromo() {
             const input = document.getElementById('promo-code-input');
             const msg = document.getElementById('promo-message');
@@ -790,8 +793,10 @@
             try {
                 const doc = await db.collection('promocodes').doc(code).get();
                 if(doc.exists && doc.data().active) {
-                    // ЗМІНА ТУТ: Використовуємо doc.id щоб точно зчитати назву коду
-                    currentPromo = { code: doc.id, discount: doc.data().discount }; 
+                    // НАДІЙНЕ ЗЧИТУВАННЯ КОДУ: беремо doc.id, якщо поля code немає
+                    let safeCodeName = doc.data().code || doc.id || "ПРОМОКОД";
+                    
+                    currentPromo = { code: safeCodeName, discount: doc.data().discount }; 
                     msg.style.color = '#00ffcc';
                     msg.innerText = lang === 'ua' ? `Код застосовано! Знижка ${currentPromo.discount}%` : `Code applied! Discount ${currentPromo.discount}%`;
                     renderCartModalContent(); 
@@ -874,7 +879,7 @@
         }
 
         // ==========================================
-        // ГЛОБАЛЬНА ЗМІНА: ФУНКЦІЯ SUBMIT ORDER
+        // ОНОВЛЕНА ФУНКЦІЯ SUBMIT ORDER
         // ==========================================
         async function submitOrder(e) {
             e.preventDefault();
@@ -915,7 +920,6 @@
                 await db.runTransaction(async (transaction) => {
                     let merchRefsAndData = [];
 
-                    // 1. Отримуємо дані всіх товарів
                     for(let item of shoppingCart) {
                         let ref = db.collection('merch').doc(item.merchId);
                         let doc = await transaction.get(ref);
@@ -923,7 +927,6 @@
                         merchRefsAndData.push({ ref: ref, data: doc.data(), cartItem: item });
                     }
 
-                    // 2. ПЕРЕВІРКА ТА ПОГАШЕННЯ ОДНОРАЗОВОГО ПРОМОКОДУ
                     let promoDocRef = null;
                     let pDocData = null;
                     if (currentPromo && currentPromo.code) {
@@ -937,7 +940,6 @@
                         }
                     }
 
-                    // 3. Перевірка залишків
                     for(let obj of merchRefsAndData) {
                         let currentStockObj = typeof obj.data.stock === 'object' ? { ...obj.data.stock } : {};
                         let sizeKey = obj.cartItem.size;
@@ -950,20 +952,20 @@
                         obj.newStockObj = currentStockObj;
                     }
 
-                    // 4. Оновлення залишків
                     for(let obj of merchRefsAndData) {
                         transaction.update(obj.ref, { stock: obj.newStockObj });
                     }
 
-                    // 5. ДЕАКТИВУЄМО ПРОМОКОД, ЯКЩО ВІН ОДНОРАЗОВИЙ
                     if (promoDocRef && pDocData && pDocData.isSingleUse === true) {
                         transaction.update(promoDocRef, { active: false });
                     }
 
-                    // 6. Створення замовлення
                     const orderRef = db.collection('orders').doc();
                     newlyCreatedOrderId = orderRef.id; 
                     let orderItemsString = shoppingCart.map(i => `${i.merchTitle} (Розмір: ${i.size}, К-сть: ${i.quantity})`).join('\n');
+
+                    // ЗАХИСТ ВІД UNDEFINED В ПРОМОКОДІ
+                    let safePromoCode = (currentPromo && currentPromo.code) ? String(currentPromo.code) : "Не застосовано";
 
                     transaction.set(orderRef, {
                         name: name,
@@ -975,7 +977,7 @@
                         quantity: shoppingCart.reduce((s, i) => s + i.quantity, 0),
                         orderTextDetails: orderItemsString,
                         totalPrice: finalSum, 
-                        promoCode: currentPromo ? currentPromo.code : "Не застосовано", 
+                        promoCode: safePromoCode, // <--- Ось тут виправлено!
                         paymentMethod: paymentMethodText,
                         paymentProof: base64Receipt, 
                         status: 'new', 
@@ -986,7 +988,6 @@
 
                 localStorage.setItem('svarog_active_order_id', newlyCreatedOrderId);
 
-                // ВІДПРАВКА В TELEGRAM
                 const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; 
                 const chatId = '647245223';
                 
@@ -1052,7 +1053,6 @@
                 setLanguage(lang); 
             }
         }
-        // ==========================================
 
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
