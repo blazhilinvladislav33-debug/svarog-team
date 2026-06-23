@@ -110,6 +110,7 @@
         .merch-select { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 10px; border-radius: 6px; outline: none; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
         .merch-select:focus { border-color: var(--theme-color); }
         .merch-select option { background: #1a1a1a; color: #fff; }
+        .merch-select option:disabled { color: #555; text-decoration: line-through; }
         
         .merch-qty { width: 60px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 6px; text-align: center; outline: none; transition: 0.3s; }
         .merch-qty:focus { border-color: var(--theme-color); }
@@ -246,6 +247,13 @@
             </div>
             
             <div class="modal-body">
+                <div id="active-order-status-box" style="display:none; margin-bottom: 20px; padding: 14px; background: rgba(0, 191, 255, 0.1); border: 1px solid rgba(0, 191, 255, 0.25); border-radius: 10px;">
+                    <div style="font-weight: bold; color: #00bfff; margin-bottom: 5px; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                        <span>🛰️</span> <span data-lang="ua">Ваше поточне замовлення:</span><span data-lang="en">Your active order:</span>
+                    </div>
+                    <div id="active-order-info" style="font-size: 0.88rem; color: #e0e0e0; line-height: 1.4;"></div>
+                </div>
+
                 <div class="cart-items-list" id="cart-items-container"></div>
                 
                 <div id="promo-block" style="display:none; margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
@@ -358,6 +366,7 @@
             });
             renderShopGrid(); 
             updateCartUI();   
+            listenToActiveOrderStatus();
         }
 
         function showToast(message) {
@@ -388,6 +397,44 @@
         let shoppingCart = JSON.parse(localStorage.getItem('svarog_shop_cart')) || [];
         let cartLastUpdated = localStorage.getItem('svarog_shop_cart_time') || Date.now();
         let currentPromo = null; 
+        let activeOrderUnsubscribe = null;
+
+        // СЛУХАЧ СТАТУСУ АКТИВНОГО ЗАМОВЛЕННЯ
+        function listenToActiveOrderStatus() {
+            const activeOrderId = localStorage.getItem('svarog_active_order_id');
+            const box = document.getElementById('active-order-status-box');
+            const info = document.getElementById('active-order-info');
+            const lang = localStorage.getItem('selectedLang') || 'ua';
+
+            if (!activeOrderId) {
+                box.style.display = 'none'; return;
+            }
+
+            if (activeOrderUnsubscribe) activeOrderUnsubscribe();
+
+            activeOrderUnsubscribe = db.collection('orders').doc(activeOrderId).onSnapshot(doc => {
+                if (doc.exists) {
+                    box.style.display = 'block';
+                    const data = doc.data();
+                    let status = data.status || 'new';
+
+                    let sLabel = status === 'new' ? (lang === 'ua' ? 'Нове замовлення' : 'New Order') : 
+                                 status === 'on_review' ? (lang === 'ua' ? 'На перевірці адміністратором ⏳' : 'On review ⏳') : 
+                                 status === 'accepted' ? (lang === 'ua' ? 'Прийнято / Очікує відправки ✓' : 'Accepted ✓') : 
+                                 status === 'sent' ? (lang === 'ua' ? 'Відправлено вам 📦' : 'Sent 📦') : 
+                                 status === 'delivered' ? (lang === 'ua' ? 'Доставлено 🎉' : 'Delivered 🎉') : 
+                                 status === 'cancelled' ? (lang === 'ua' ? 'Скасовано ✖' : 'Cancelled ✖') : (lang === 'ua' ? 'В архіві 📂' : 'Archived 📂');
+
+                    info.innerHTML = `
+                        <b>ID:</b> #${doc.id.substr(0, 8).toUpperCase()}<br>
+                        <b>${lang === 'ua' ? 'Поточний статус' : 'Current status'}:</b> <span style="font-weight:bold; color: var(--theme-color);">${sLabel}</span><br>
+                        <b>${lang === 'ua' ? 'Сума замовлення' : 'Total sum'}:</b> ${data.totalPrice} ₴
+                    `;
+                } else {
+                    box.style.display = 'none';
+                }
+            }, err => console.error("Помилка відстеження статусу:", err));
+        }
 
         function checkCartExpiry() {
             if(shoppingCart.length > 0) {
@@ -496,20 +543,24 @@
                 
                 let sizeSelectHtml = '';
                 let initialMaxStock = 0;
+                let isUniversalSize = !(item.sizes && item.sizes.length > 0);
 
-                if(item.sizes && item.sizes.length > 0) {
+                if(!isUniversalSize) {
                     let firstSize = item.sizes[0];
                     initialMaxStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[firstSize] || 0) : 0;
                     
+                    // Модифіковано: прибрано показ кількості штук, додано disabled, якщо немає в наявності
                     sizeSelectHtml = `<select id="size-${item.id}" class="merch-select" onchange="updateQtyMax('${item.id}')">` + 
                         item.sizes.map(s => {
                             let sStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[s] || 0) : 0;
-                            return `<option value="${s}">${lang==='ua'?'Розмір:':'Size:'} ${s} (${sStock} ${lang==='ua'?'шт':'pcs'})</option>`;
+                            let disabledAttr = sStock <= 0 ? 'disabled' : '';
+                            let outOfStockLabel = sStock <= 0 ? (lang === 'ua' ? ' (Немає)' : ' (Out of stock)') : '';
+                            return `<option value="${s}" ${disabledAttr}>${lang==='ua'?'Розмір:':'Size:'} ${s}${outOfStockLabel}</option>`;
                         }).join('') + 
                     `</select>`;
                 } else {
                     initialMaxStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock["Універсальний"] || 0) : totalStock;
-                    sizeSelectHtml = `<div class="merch-select" style="display:flex; align-items:center; color:#aaa; cursor:default;" data-val="Універсальний">${lang==='ua'?'Універсальний розмір':'One size'}</div>`;
+                    sizeSelectHtml = ''; // Модифіковано: повністю ховаємо рядок вибору для універсального розміру
                 }
 
                 let buyBtnHtml = isOutOfStock 
@@ -529,7 +580,7 @@
                             ${descHtml}
                             <div class="merch-options">
                                 ${sizeSelectHtml}
-                                <input type="number" id="qty-${item.id}" class="merch-qty" value="${initialMaxStock > 0 ? 1 : 0}" min="${initialMaxStock > 0 ? 1 : 0}" max="${initialMaxStock}">
+                                <input type="number" id="qty-${item.id}" class="merch-qty" value="${initialMaxStock > 0 ? 1 : 0}" min="${initialMaxStock > 0 ? 1 : 0}" max="${initialMaxStock}" style="${isUniversalSize ? 'width: 100%;' : ''}">
                             </div>
                             ${buyBtnHtml}
                         </div>
@@ -625,6 +676,7 @@
         function openCartModal() {
             document.getElementById('order-modal-wrapper').style.display = 'flex';
             renderCartModalContent();
+            listenToActiveOrderStatus(); // Оновлюємо статус активного замовлення при відкритті
         }
 
         function closeOrderModal() {
@@ -687,12 +739,15 @@
                 baseTotalSum += item.totalPrice;
                 let imgHtml = item.image ? `<img src="${item.image}" class="cart-item-img">` : `<div class="cart-item-img" style="display:flex; justify-content:center; align-items:center; font-size:0.7rem;">No IMG</div>`;
                 
+                // Прибираємо згадку про розмір в кошику, якщо він універсальний
+                let sizeLabelMeta = item.size === 'Універсальний' ? '' : `${lang==='ua'?'Розмір':'Size'}: ${item.size} | `;
+
                 container.innerHTML += `
                     <div class="cart-item">
                         ${imgHtml}
                         <div class="cart-item-info">
                             <div class="cart-item-title">${item.merchTitle}</div>
-                            <div class="cart-item-meta">${lang==='ua'?'Розмір':'Size'}: ${item.size} | ${lang==='ua'?'К-сть':'Qty'}: ${item.quantity} шт</div>
+                            <div class="cart-item-meta">${sizeLabelMeta}${lang==='ua'?'К-сть':'Qty'}: ${item.quantity} шт</div>
                             <div class="cart-item-price">${item.totalPrice} ₴</div>
                         </div>
                         <button class="cart-item-remove" onclick="removeFromCart('${item.cartId}')">✖</button>
@@ -745,6 +800,7 @@
             finalSum = Math.round(finalSum);
 
             let paymentMethodText = paymentMethod === 'bank' ? "Оплата на Банку" : "Накладений платіж";
+            let newlyCreatedOrderId = "";
 
             try {
                 await db.runTransaction(async (transaction) => {
@@ -774,6 +830,7 @@
                     }
 
                     const orderRef = db.collection('orders').doc();
+                    newlyCreatedOrderId = orderRef.id; // Зберігаємо ID для локального трекінгу
                     let orderItemsString = shoppingCart.map(i => `${i.merchTitle} (Розмір: ${i.size}, К-сть: ${i.quantity})`).join('\n');
 
                     transaction.set(orderRef, {
@@ -788,11 +845,14 @@
                         totalPrice: finalSum, 
                         promoCode: currentPromo ? currentPromo.code : "Не застосовано", 
                         paymentMethod: paymentMethodText,
-                        status: 'on_review', // Статус: "на перевірці"
+                        status: 'on_review', 
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
                     });
                 });
+
+                // Зберігаємо замовлення в LocalStorage для виводу клієнту
+                localStorage.setItem('svarog_active_order_id', newlyCreatedOrderId);
 
                 // ВІДПРАВКА В TELEGRAM
                 const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; 
@@ -814,7 +874,6 @@
                 const hasPhoto = paymentMethod === 'bank' && fileInput && fileInput.files.length > 0;
 
                 if (hasPhoto) {
-                    // Якщо є скріншот оплати, надсилаємо об'єкт FormData (метод sendPhoto)
                     let formData = new FormData();
                     formData.append('chat_id', chatId);
                     formData.append('photo', fileInput.files[0]);
@@ -827,7 +886,6 @@
                     }).then(res => console.log("Telegram замовлення з фото відправлено!"))
                       .catch(err => console.error("Помилка відправки фото в Telegram:", err));
                 } else {
-                    // Якщо накладений платіж (без фото)
                     fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -849,8 +907,8 @@
                 if(fileInput) fileInput.value = "";
                 
                 saveCart();
-                closeOrderModal();
                 updateCartUI();
+                listenToActiveOrderStatus(); // Запускаємо моніторинг щойно створеного замовлення
 
             } catch (err) {
                 console.error("Transaction failed: ", err);
@@ -928,7 +986,7 @@
         }
 
         function sendUserChatPhoto(input) {
-            console.warn("Функція sendUserChatPhoto викликана. Для роботи з фото потрібно налаштувати Firebase Storage.");
+            console.warn("Функція sendUserChatPhoto викликана. Для роботи з photo потрібно налаштувати Firebase Storage.");
             showToast(localStorage.getItem('selectedLang') === 'en' ? "Photo transfer is in development." : "Надсилання фото знаходиться в розробці.");
         }
 
@@ -939,6 +997,7 @@
             initUserChat(); 
             checkCartExpiry();
             updateCartUI(); 
+            listenToActiveOrderStatus();
         });
     </script>
 </body>
