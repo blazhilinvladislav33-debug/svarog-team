@@ -9,8 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
     <script>
         // Конфігурація проєкту Firebase Svarog-Team
         const firebaseConfig = {
@@ -24,9 +22,6 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
-        // Ініціалізація EmailJS (Сюди треба буде вставити твій Public Key)
-        emailjs.init("YOUR_PUBLIC_KEY"); 
     </script>
 
     <style>
@@ -82,15 +77,12 @@
         .menu-chat-btn:hover { background: var(--theme-color) !important; color: #121212 !important; padding-left: 15px !important; }
 
         /* ОСНОВНИЙ КОНТЕНТ */
-        /* ОПТИМІЗОВАНО: зменшено gap з 50px до 20px */
         .main-content { margin-top: 80px; display: flex; flex-direction: column; align-items: center; flex-grow: 1; width: 100%; padding: 20px; gap: 20px; }
         
         /* Блок 1: Головний банер */
-        /* ОПТИМІЗОВАНО: зменшено внутрішні відступи padding з 40px до 15px, а margin-top до 5px */
         .hero-container { text-align: center; padding: 15px 20px; border-radius: 12px; background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.82) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35); max-width: 600px; width: 100%; margin-top: 5px; }
         .hero-container p { color: #e0e0e0; font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; }
         
-        /* ОПТИМІЗОВАНО: фото розтягнуто без лімітів max-width, зменшено нижній відступ */
         .hero-logo {
             width: 100%;
             max-width: 100%;
@@ -169,12 +161,8 @@
             .main-content { padding: 15px; margin-top: 70px; gap: 20px; }
             .hero-container { padding: 15px 20px; width: 100%; }
             .hero-container p { font-size: 0.98rem; margin-bottom: 20px; }
-            
-            /* Фото зберігає 100% на мобільних, але має адаптований нижній зазор */
             .hero-logo { max-width: 100%; margin-bottom: 12px; }
-
             .btn { width: 100%; padding: 12px 15px; font-size: 0.95rem; }
-            
             .activities-wrapper h2 { font-size: 1.4rem; text-align: center; padding: 0 10px; }
             .activities-grid { gap: 15px; padding: 0 10px; }
             .activity-card { padding: 20px; }
@@ -207,6 +195,7 @@
                 <li><a href="https://svarogteam.com/shop.html"><span data-lang="ua">SVRG STORE</span><span data-lang="en">SVRG STORE</span></a></li>
                 <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li><a href="status.html"><span data-lang="ua">Статус замовлення</span><span data-lang="en">Order Status</span></a></li>
                 <li class="admin-menu-item">
                     <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
                 </li>
@@ -272,6 +261,9 @@
     </div>
 
     <footer class="footer">
+        <div style="margin-bottom: 10px;">
+            <a href="status.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.3);">Перевірити статус замовлення</a>
+        </div>
         <span data-lang="ua">SVAROG TEAM © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
         <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
     </footer>
