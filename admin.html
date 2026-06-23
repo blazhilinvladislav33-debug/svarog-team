@@ -22,6 +22,7 @@
     </script>
 
     <style>
+        /* ГЛОБАЛЬНІ ЗМІННІ ДЛЯ НОВОГО КОЛЬОРУ */
         :root {
             --theme-color: #f0b48c;
             --theme-color-rgb: 240, 180, 140;
@@ -150,6 +151,7 @@
         .switch-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
         .switch-wrapper input { cursor: pointer; width: 16px; height: 16px; accent-color: var(--theme-color); }
 
+        /* Стилі для підгруп замовлень та акордеонів */
         .orders-sub-tabs { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
         .orders-sub-btn { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.88rem; transition: all 0.3s; }
         .orders-sub-btn:hover { border-color: rgba(var(--theme-color-rgb), 0.6); }
@@ -160,6 +162,7 @@
         .order-accordion-header:hover { background: rgba(255, 255, 255, 0.06); }
         .order-accordion-body { padding: 20px 15px; border-top: 1px solid rgba(255, 255, 255, 0.05); display: none; background: rgba(0,0,0,0.15); }
 
+        /* Стилі для магазину в адмінці */
         .merch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px; }
         .merch-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
         .merch-card-img { width: 100%; height: 150px; object-fit: cover; background: rgba(0,0,0,0.6); }
@@ -229,7 +232,7 @@
             <form onsubmit="handleLogin(event)">
                 <div class="form-group"><input type="text" id="username" class="form-input" placeholder="Логін / Username" required autocomplete="off"></div>
                 <div class="form-group"><input type="password" id="password" class="form-input" placeholder="Пароль / Password" required></div>
-                <div class="submit-block"><button type="submit" class="btn"><span data-lang="ua">Увійти</span><span data-lang="en">Login</span></button></div>
+                <button type="submit" class="btn"><span data-lang="ua">Увійти</span><span data-lang="en">Login</span></button>
                 <div class="superadmin-link-wrapper">
                     <a class="superadmin-toggle-link" id="superadmin-mode-btn" onclick="toggleSuperadminMode(true)">Головний admin / Superadmin</a>
                 </div>
@@ -247,7 +250,7 @@
                 <button class="tab-button" onclick="switchTab('promo-tab', this)"><span data-lang="ua">🎟️ Промокоди</span><span data-lang="en">🎟️ Promos</span></button>
                 <button class="tab-button" onclick="switchTab('link-management-tab', this)"><span data-lang="ua">🔗 Контент</span><span data-lang="en">🔗 Content</span></button>
                 <button class="tab-button" id="superadmin-only-tab-btn" onclick="switchTab('admin-management-tab', this)" style="display:none; color:var(--theme-color); border-color:rgba(var(--theme-color-rgb),0.2);"><span data-lang="ua">⚙️ Адміни</span><span data-lang="en">⚙️ Managers</span></button>
-                <button class="tab-button" onclick="switchTab('archive-tab', this)"><span data-lang="ua">📦 Архів Чатів</span><span data-lang="en">📦 Chat Archive</span></button>
+                <button class="tab-button" onclick="switchTab('archive-tab', this)"><span data-lang="ua">📦 Архів</span><span data-lang="en">📦 Archive</span></button>
             </div>
 
             <div id="active-chats-tab" class="tab-content active">
@@ -427,17 +430,14 @@
                     <div style="flex: 1; display:flex; flex-direction:column; gap:20px;">
                         <div class="admin-creator-form" style="border-color: var(--theme-color);">
                             <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">💳 Управління реквізитами</h3>
-                            
                             <div class="form-group">
                                 <label style="font-size:0.8rem; color:#aaa; display:block; margin-bottom:4px;">Посилання на Банку (Monobank):</label>
                                 <input type="url" id="config-bank-url" class="form-input" placeholder="https://send.monobank.ua/...">
                             </div>
-                            
                             <div class="form-group">
                                 <label style="font-size:0.8rem; color:#aaa; display:block; margin-bottom:4px;">Номер карти для переказів:</label>
                                 <input type="text" id="config-card-number" class="form-input" placeholder="0000 0000 0000 0000">
                             </div>
-                            
                             <button class="btn" onclick="savePaymentCredentials()">Оновити платіжні дані</button>
                         </div>
 
@@ -507,7 +507,7 @@
         let currentSelectedChatId = null;
         let isConfirmingStatus = false;
         let currentTab = 'active-chats-tab';
-        let currentOrdersFilter = 'active'; 
+        let currentOrdersFilter = 'active';
         let isSuperadminSession = false;
         let isSuperadminLoginMode = false;
         let newsPhotoBase64 = "";
@@ -631,7 +631,7 @@
             dashboard.style.display = 'block'; dashboard.classList.add('dashboard-mode');
             initFirebaseRealtimeStreams();
             initBadges();
-            generateSizeStockInputs(); 
+            generateSizeStockInputs();
             document.getElementById('news-date-field').valueAsDate = new Date();
         }
 
@@ -712,6 +712,7 @@
             }, e => console.error(e));
         }
 
+        // ДИНАМІЧНИЙ МОНТАЖ ПОЛІВ КІЛЬКОСТІ ЗА РОЗМІРАМИ
         function generateSizeStockInputs(existingStockObj = null) {
             const container = document.getElementById('size-stock-fields-container');
             const sizesStr = document.getElementById('merch-sizes').value.trim();
@@ -757,212 +758,9 @@
                     bankUrl: bankUrl,
                     cardNumber: cardNumber
                 }, { merge: true });
-                alert("✓ Реквізити (Банка та Карта) успішно збережені в Firebase!");
+                alert("✓ Реквізити успішно оновлено!");
             } catch(e) {
-                console.error(e);
-                alert("Помилка збереження реквізитів: " + e.message);
-            }
-        }
-
-        async function toggleShopStatus() {
-            const checkbox = document.getElementById('shop-active-checkbox');
-            const newStatus = !checkbox.checked; 
-            try { await db.collection("config").doc("shop").set({ active: newStatus }, { merge: true }); } 
-            catch(e) { console.error("Помилка зміни статусу магазину:", e); }
-        }
-
-        function renderCategoriesAdmin() {
-            const list = document.getElementById('admin-category-list');
-            list.innerHTML = "";
-            globalCategories.forEach(cat => {
-                list.innerHTML += `<div class="cat-chip">${cat} <span class="cat-remove" onclick="removeCategory('${cat}')">✖</span></div>`;
-            });
-        }
-
-        function populateCategorySelect() {
-            const select = document.getElementById('merch-category');
-            select.innerHTML = `<option value="" disabled selected>Оберіть категорію...</option>`;
-            globalCategories.forEach(cat => {
-                select.innerHTML += `<option value="${cat}">${cat}</option>`;
-            });
-        }
-
-        async function addCategory() {
-            const input = document.getElementById('new-category-input');
-            const val = input.value.trim();
-            if(!val) return;
-            if(globalCategories.includes(val)) { alert("Така категорія вже є!"); return; }
-            
-            const newCats = [...globalCategories, val];
-            try { 
-                await db.collection("config").doc("shop").set({ categories: newCats }, { merge: true }); 
-                input.value = "";
-            } catch(e) { console.error(e); }
-        }
-
-        async function removeCategory(catName) {
-            if(confirm(`Видалити категорію "${catName}"? Товари в ній залишаться, але не будуть відображатись у меню!`)) {
-                const newCats = globalCategories.filter(c => c !== catName);
-                try { await db.collection("config").doc("shop").set({ categories: newCats }, { merge: true }); } 
-                catch(e) { console.error(e); }
-            }
-        }
-
-        function previewMerchPhoto(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    merchPhotoBase64 = e.target.result;
-                    const previewImg = document.getElementById('merch-preview-element');
-                    previewImg.src = merchPhotoBase64; previewImg.style.display = 'block';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function startEditMerch(id) {
-            const item = globalMerchData.find(m => m.id === id);
-            if(!item) return;
-
-            document.getElementById('edit-merch-id').value = item.id;
-            document.getElementById('merch-title').value = item.title;
-            document.getElementById('merch-category').value = item.category;
-            document.getElementById('merch-price').value = item.price;
-            document.getElementById('merch-discount-price').value = item.discountPrice || "";
-            document.getElementById('merch-sizes').value = item.sizes ? item.sizes.join(', ') : "";
-            document.getElementById('merch-description').value = item.description || "";
-
-            generateSizeStockInputs(item.stock);
-
-            if(item.image) {
-                merchPhotoBase64 = item.image;
-                const previewImg = document.getElementById('merch-preview-element');
-                previewImg.src = item.image; previewImg.style.display = 'block';
-            } else {
-                document.getElementById('merch-preview-element').style.display = 'none';
-                merchPhotoBase64 = "";
-            }
-
-            document.getElementById('merch-form-title').innerText = "📝 Редагування товару";
-            document.getElementById('merch-submit-btn').innerText = "Зберегти зміни";
-            document.getElementById('merch-cancel-edit-btn').style.display = 'inline-block';
-            
-            document.getElementById('shop-management-tab').scrollTop = 0;
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
-
-        function cancelMerchEditing() {
-            document.getElementById('edit-merch-id').value = "";
-            document.getElementById('merch-title').value = "";
-            document.getElementById('merch-category').value = "";
-            document.getElementById('merch-price').value = "";
-            document.getElementById('merch-discount-price').value = "";
-            document.getElementById('merch-sizes').value = "";
-            document.getElementById('merch-description').value = "";
-            document.getElementById('merch-photo-file').value = "";
-            document.getElementById('merch-preview-element').style.display = 'none';
-            merchPhotoBase64 = "";
-
-            generateSizeStockInputs();
-
-            document.getElementById('merch-form-title').innerText = "Додати новий товар (Мерч)";
-            document.getElementById('merch-submit-btn').innerText = "Зберегти товар у базу";
-            document.getElementById('merch-cancel-edit-btn').style.display = 'none';
-        }
-
-        async function publishMerchItem() {
-            const editId = document.getElementById('edit-merch-id').value;
-            const title = document.getElementById('merch-title').value.trim();
-            const category = document.getElementById('merch-category').value;
-            const price = document.getElementById('merch-price').value.trim();
-            const discountPrice = document.getElementById('merch-discount-price').value.trim();
-            const sizesStr = document.getElementById('merch-sizes').value.trim();
-            const description = document.getElementById('merch-description').value.trim();
-            
-            if(!title || !price || !category) { alert("Заповніть назву, категорію та ціну товару!"); return; }
-
-            const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : [];
-
-            let stockObj = {};
-            const stockInputs = document.querySelectorAll('.size-stock-value-input');
-            stockInputs.forEach(inp => {
-                const key = inp.getAttribute('data-size-key');
-                stockObj[key] = parseInt(inp.value) || 0;
-            });
-
-            const merchObject = {
-                title: title,
-                category: category,
-                price: parseFloat(price),
-                discountPrice: discountPrice ? parseFloat(discountPrice) : null,
-                stock: stockObj, 
-                sizes: sizesArr,
-                description: description,
-                image: merchPhotoBase64 || null
-            };
-
-            try {
-                if(editId) {
-                    await db.collection("merch").doc(editId).set(merchObject, { merge: true });
-                    alert("✓ Зміни товару успішно збережено!");
-                } else {
-                    merchObject.timestamp = firebase.firestore.FieldValue.serverTimestamp();
-                    await db.collection("merch").add(merchObject);
-                    alert("✓ Товар успішно додано до вітрини!");
-                }
-                cancelMerchEditing();
-            } catch(err) {
-                console.error(err); alert("Помилка: " + err.message);
-            }
-        }
-
-        function renderMerchList() {
-            const box = document.getElementById('box-for-merch-items'); box.innerHTML = "";
-            if(globalMerchData.length === 0) { box.innerHTML = `<div class="no-msg">Вітрина порожня</div>`; return; }
-
-            globalMerchData.forEach(item => {
-                let imgHtml = item.image ? `<img src="${item.image}" class="merch-card-img">` : `<div class="merch-card-img" style="display:flex; justify-content:center; align-items:center; color:#666;">Немає фото</div>`;
-                let sizesHtml = item.sizes && item.sizes.length > 0 ? `Розміри: ${item.sizes.join(', ')}` : 'Універсальний розмір';
-                
-                let hasDiscount = item.discountPrice && item.discountPrice < item.price;
-                let priceHtml = hasDiscount 
-                    ? `<span class="old-price">${item.price} ₴</span> <span class="merch-price">${item.discountPrice} ₴</span>`
-                    : `<span class="merch-price">${item.price} ₴</span>`;
-                
-                let saleBadge = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
-                let descHtml = item.description ? `<div class="merch-desc">${item.description}</div>` : '';
-
-                let stockLine = "";
-                if(typeof item.stock === 'object' && item.stock !== null) {
-                    stockLine = Object.entries(item.stock).map(([sz, q]) => `<b>${sz}</b>:${q}шт`).join(' | ');
-                } else {
-                    stockLine = `${item.stock || 0} шт`;
-                }
-
-                box.innerHTML += `
-                    <div class="merch-card">
-                        ${imgHtml}
-                        ${saleBadge}
-                        <div class="merch-card-body">
-                            <div class="cat-tag">${item.category || 'Без категорії'}</div>
-                            <div class="merch-title">${item.title}</div>
-                            <div style="margin-bottom:10px;">${priceHtml}</div>
-                            ${descHtml}
-                            <div class="merch-sizes" style="border-top:1px solid rgba(255,255,255,0.05); padding-top:5px;">${sizesHtml}</div>
-                            <div class="merch-sizes" style="color:#00ffcc; font-size:0.8rem; margin-bottom:12px;">Залишки: ${stockLine}</div>
-                            <div class="merch-actions">
-                                <button class="edit-news-btn" style="position:relative; right:auto; top:auto;" onclick="startEditMerch('${item.id}')">Редагувати</button>
-                                <button class="delete-admin-btn" style="position:relative; right:auto; top:auto;" onclick="deleteMerchItem('${item.id}')">Видалити</button>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        async function deleteMerchItem(id) {
-            if(confirm("Видалити цей товар з магазину?")) {
-                try { await db.collection("merch").doc(id).delete(); } 
-                catch(e) { console.error("Помилка видалення товару:", e); }
+                console.error(e); alert("Помилка збереження: " + e.message);
             }
         }
 
@@ -978,16 +776,8 @@
         function toggleOrderAccordion(headerElement) {
             const body = headerElement.nextElementSibling;
             const allBodies = document.querySelectorAll('.order-accordion-body');
-            
             allBodies.forEach(b => { if(b !== body) b.style.display = 'none'; });
             body.style.display = body.style.display === 'block' ? 'none' : 'block';
-        }
-
-        async function changeOrderStatus(id, newStatus) {
-            isConfirmingStatus = true;
-            try { await db.collection("orders").doc(id).update({ status: newStatus }); } 
-            catch(e) { console.error(e); }
-            finally { isConfirmingStatus = false; renderAllDynamicData(); }
         }
 
         function renderOrdersList() {
@@ -1006,8 +796,7 @@
             });
 
             if(filteredOrders.length === 0) { 
-                ordersBox.innerHTML = `<div class="no-msg">У цій підгрупі замовлень немає</div>`; 
-                return; 
+                ordersBox.innerHTML = `<div class="no-msg">Замовлень немає</div>`; return; 
             }
 
             filteredOrders.forEach(ord => {
@@ -1064,16 +853,15 @@
                                     <p class="msg-text"><b>Адреса:</b> ${ord.address}</p>
                                 </div>
                                 <div>
-                                    <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">💰 Стан та перевірка оплати:</h4>
+                                    <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">💰 Стан оплати:</h4>
                                     ${paymentMethodHtml}
                                     ${promoHtml}
                                     <p class="msg-text" style="font-size:1.05rem;"><b>Разом до сплати:</b> <span style="color:var(--theme-color); font-weight:bold;">${ord.totalPrice} ₴</span></p>
-                                    <p style="font-size:0.75rem; color:#aaa; margin-top:5px;">💡 Скріншоти від клієнтів завантажуються прямо у ваш Telegram-бот.</p>
                                 </div>
                             </div>
 
                             <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:6px; margin-bottom:15px;">
-                                <div style="font-size:0.85rem; color:#aaa; margin-bottom:8px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">Склад замовлення:</div>
+                                <div style="font-size:0.85rem; color:#aaa; margin-bottom:8px; font-weight:bold; text-transform:uppercase;">Склад замовлення:</div>
                                 ${itemsListHtml}
                             </div>
 
@@ -1091,7 +879,7 @@
                                 </div>
                                 <div style="display:flex; gap:8px;">
                                     <button class="btn" style="padding:6px 12px; font-size:0.8rem; border-color:#da70d6; color:#da70d6; width:auto;" onclick="changeOrderStatus('${ord.id}', 'archived')">📥 В архів</button>
-                                    <button class="delete-admin-btn" style="position:static; padding:6px 12px;" onclick="deleteOrderItem('${ord.id}')">Видалити запис</button>
+                                    <button class="delete-admin-btn" style="position:static; padding:6px 12px;" onclick="deleteOrderItem('${ord.id}')">Видалити</button>
                                 </div>
                             </div>
                         </div>
@@ -1099,95 +887,234 @@
             });
         }
 
-        async function deleteFeedbackItem(id) { if(confirm("Видалити цю заявку?")) { try { await db.collection("feedback").doc(id).delete(); } catch(e) { console.error(e); } } }
-        async function deleteVolunteerItem(id) { if(confirm("Видалити цей бланк волонтера?")) { try { await db.collection("volunteers").doc(id).delete(); } catch(e) { console.error(e); } } }
-        async function deleteOrderItem(id) { if(confirm("Видалити запис про це замовлення? (Залишки на складі НЕ повернуться автоматично)")) { try { await db.collection("orders").doc(id).delete(); } catch(e) { console.error(e); } } }
-
-        function createNewAdminAccount(event) {
-            event.preventDefault();
-            const lastName = document.getElementById('new-admin-lastname').value.trim();
-            const firstName = document.getElementById('new-admin-firstname').value.trim();
-            const phone = document.getElementById('new-admin-phone').value.trim();
-            const user = document.getElementById('new-admin-user').value.trim();
-            const pass = document.getElementById('new-admin-pass').value.trim();
-            let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
-            if (currentAdmins.some(a => a.user === user) || user === 'admin' || user === 'superadmin') { alert("Логін зайнятий!"); return; }
-            currentAdmins.push({ lastName, firstName, phone, user, pass, id: 'admin_' + Date.now() });
-            localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins));
-            document.getElementById('create-admin-form').reset(); renderAllDynamicData();
-        }
-
-        function renderAdminAccountsList() {
-            const listBox = document.getElementById('box-for-admin-accounts'); listBox.innerHTML = "";
-            let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
-            if(currentAdmins.length === 0) { listBox.innerHTML = `<div class="no-msg">Немає адмінів</div>`; return; }
-            currentAdmins.forEach(admin => {
-                listBox.innerHTML += `<div class="admin-user-card"><div class="admin-card-title">👤 ${admin.lastName} ${admin.firstName}</div><div class="admin-card-info">🔑 Login: ${admin.user}</div><button class="delete-admin-btn" onclick="deleteAdminAccount('${admin.id}')">Видалити</button></div>`;
-            });
-        }
-
-        function deleteAdminAccount(adminId) { if (confirm("Видалити профіль?")) { let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins = currentAdmins.filter(a => a.id !== adminId); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); renderAllDynamicData(); } }
-        function openFullImage(base64Data) { const newWindow = window.open(); newWindow.document.write(`<body style="margin:0; background:#121212; display:flex; justify-content:center; align-items:center; min-height:100vh;"><img src="${base64Data}" style="max-width:100%; max-height:100vh; object-fit:contain;"></body>`); }
-        function selectChatSession(id) { currentSelectedChatId = id; renderAllDynamicData(); }
-        function backToSessionsList() { currentSelectedChatId = null; renderAllDynamicData(); }
-
-        function renderWorkspaceContent(chatObj, targetElement) {
-            const flowBox = targetElement.querySelector('#admin-msg-flow'); const wasAtBottom = flowBox ? (flowBox.scrollHeight - flowBox.scrollTop <= flowBox.clientHeight + 50) : true;
-            targetElement.innerHTML = `<div class="workspace-header"><button class="back-to-list-btn" onclick="backToSessionsList()">←</button><span>ID: ${chatObj.id.substr(0,8)}</span><select class="status-select ${chatObj.adminStatus}" onchange="confirmAndChangeStatus('${chatObj.id}', this.value, '${chatObj.adminStatus}')"><option value="processing">В обробці</option><option value="success">Успішно</option><option value="unresolved">Не вирішено</option></select><button onclick="closeChatSession('${chatObj.id}')" style="background:none; border:1px solid #ff4a4a; color:#ff4a4a; padding:4px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.75rem;">X</button></div><div class="admin-messages-box" id="admin-msg-flow"></div>`;
+        // --- КЕРУВАННЯ СТРУКТУРОЮ ТОВАРІВ ---
+        async function publishMerchItem() {
+            const editId = document.getElementById('edit-merch-id').value;
+            const title = document.getElementById('merch-title').value.trim();
+            const category = document.getElementById('merch-category').value;
+            const price = document.getElementById('merch-price').value.trim();
+            const discountPrice = document.getElementById('merch-discount-price').value.trim();
+            const sizesStr = document.getElementById('merch-sizes').value.trim();
+            const description = document.getElementById('merch-description').value.trim();
             
-            const selectEl = targetElement.querySelector('.status-select');
-            if(selectEl) selectEl.value = chatObj.adminStatus;
+            if(!title || !price || !category) { alert("Заповніть назву, категорію та ціну!"); return; }
+            const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : [];
 
-            const flow = targetElement.querySelector('#admin-msg-flow');
-            chatObj.messages.forEach(m => {
-                const b = document.createElement('div'); b.className = `admin-bubble ${m.sender}`;
-                if(m.type === 'image') { b.innerHTML = `<img src="${m.text}" onclick="openFullImage('${m.text}')">`; } else { b.innerText = m.text; } flow.appendChild(b);
+            let stockObj = {};
+            document.querySelectorAll('.size-stock-value-input').forEach(inp => {
+                stockObj[inp.getAttribute('data-size-key')] = parseInt(inp.value) || 0;
             });
-            if (wasAtBottom) { flow.scrollTop = flow.scrollHeight; }
+
+            const merchObject = {
+                title: title, category: category, price: parseFloat(price),
+                discountPrice: discountPrice ? parseFloat(discountPrice) : null,
+                stock: stockObj, sizes: sizesArr, description: description, image: merchPhotoBase64 || null
+            };
+
+            try {
+                if(editId) {
+                    await db.collection("merch").doc(editId).set(merchObject, { merge: true });
+                    alert("✓ Зміни збережено!");
+                } else {
+                    merchObject.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection("merch").add(merchObject);
+                    alert("✓ Товар додано!");
+                }
+                cancelMerchEditing();
+            } catch(err) { alert("Помилка: " + err.message); }
         }
 
+        function renderMerchList() {
+            const box = document.getElementById('box-for-merch-items'); box.innerHTML = "";
+            if(globalMerchData.length === 0) { box.innerHTML = `<div class="no-msg">Вітрина порожня</div>`; return; }
+
+            globalMerchData.forEach(item => {
+                let imgHtml = item.image ? `<img src="${item.image}" class="merch-card-img">` : `<div class="merch-card-img" style="display:flex; justify-content:center; align-items:center; color:#666;">Немає фото</div>`;
+                let sizesHtml = item.sizes && item.sizes.length > 0 ? `Розміри: ${item.sizes.join(', ')}` : 'Універсальний розмір';
+                let priceHtml = item.discountPrice ? `<span class="old-price">${item.price} ₴</span> <span class="merch-price">${item.discountPrice} ₴</span>` : `<span class="merch-price">${item.price} ₴</span>`;
+                let stockLine = (typeof item.stock === 'object' && item.stock !== null) ? Object.entries(item.stock).map(([sz, q]) => `<b>${sz}</b>:${q}шт`).join(' | ') : `${item.stock || 0} шт`;
+
+                box.innerHTML += `
+                    <div class="merch-card">
+                        ${imgHtml}
+                        <div class="merch-card-body">
+                            <div class="cat-tag">${item.category || 'Без категорії'}</div>
+                            <div class="merch-title">${item.title}</div>
+                            <div style="margin-bottom:10px;">${priceHtml}</div>
+                            <div class="merch-sizes">${sizesHtml}</div>
+                            <div class="merch-sizes" style="color:#00ffcc; font-size:0.8rem; margin-bottom:12px;">Залишки: ${stockLine}</div>
+                            <div class="merch-actions">
+                                <button class="edit-news-btn" style="position:relative; right:auto; top:auto;" onclick="startEditMerch('${item.id}')">Редагувати</button>
+                                <button class="delete-admin-btn" style="position:relative; right:auto; top:auto;" onclick="deleteMerchItem('${item.id}')">Видалити</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function startEditMerch(id) {
+            const item = globalMerchData.find(m => m.id === id);
+            if(!item) return;
+            document.getElementById('edit-merch-id').value = item.id;
+            document.getElementById('merch-title').value = item.title;
+            document.getElementById('merch-category').value = item.category;
+            document.getElementById('merch-price').value = item.price;
+            document.getElementById('merch-discount-price').value = item.discountPrice || "";
+            document.getElementById('merch-sizes').value = item.sizes ? item.sizes.join(', ') : "";
+            document.getElementById('merch-description').value = item.description || "";
+            generateSizeStockInputs(item.stock);
+            if(item.image) {
+                merchPhotoBase64 = item.image;
+                document.getElementById('merch-preview-element').src = item.image;
+                document.getElementById('merch-preview-element').style.display = 'block';
+            }
+            document.getElementById('merch-form-title').innerText = "📝 Редагування товару";
+            document.getElementById('merch-submit-btn').innerText = "Зберегти зміни";
+            document.getElementById('merch-cancel-edit-btn').style.display = 'inline-block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // --- РЕШТА СТАНДАРТНИХ МЕТОДІВ ПАНЕЛІ ---
         async function publishNewsItem() {
             const title = document.getElementById('news-title-field').value.trim();
             const body = document.getElementById('news-body-field').value.trim();
             const dateVal = document.getElementById('news-date-field').value;
             const hasBtn = document.getElementById('news-has-btn-checkbox').checked;
             const editId = document.getElementById('edit-news-id').value;
-            
-            if(!title || !body || !dateVal) { alert("Заповніть заголовок, текст та дату новини!"); return; }
+            if(!title || !body || !dateVal) { alert("Заповніть форму!"); return; }
+            let btnText = hasBtn ? document.getElementById('news-btn-text-field').value.trim() : "";
+            let btnUrl = hasBtn ? document.getElementById('news-btn-url-field').value.trim() : "";
 
-            let btnText = ""; let btnUrl = "";
-            if(hasBtn) {
-                btnText = document.getElementById('news-btn-text-field').value.trim();
-                btnUrl = document.getElementById('news-btn-url-field').value.trim();
-                if(!btnText || !btnUrl) { alert("Заповніть налаштування кнопки дії або вимкніть її!"); return; }
-            }
-
-            const postObject = {
-                title: title,
-                body: body,
-                date: dateVal,
-                image: newsPhotoBase64 || null,
-                hasButton: hasBtn,
-                btnText: btnText,
-                btnUrl: btnUrl
-            };
-
+            const postObject = { title, body, date: dateVal, image: newsPhotoBase64 || null, hasButton: hasBtn, btnText, btnUrl };
             try {
                 if(editId) {
                     await db.collection("news").doc(editId).set(postObject, { merge: true });
-                    alert("✓ Зміни успішно збережено в хмарі!");
                 } else {
-                    await db.collection("news").add({
-                        ...postObject,
-                        createdTimestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    alert("✓ Новину успішно опубліковано глобально!");
+                    await db.collection("news").add({ ...postObject, createdTimestamp: firebase.firestore.FieldValue.serverTimestamp() });
                 }
                 cancelNewsEditing();
-            } catch(err) {
-                console.error(err); alert("Помилка бази даних: " + err.message);
-            }
+                alert("✓ Новину збережено!");
+            } catch(e) { console.error(e); }
         }
+
+        function renderAllDynamicData() {
+            if (isConfirmingStatus) return;
+            updateBadgesLogic();
+
+            const sessionsBox = document.getElementById('active-sessions-box'); const savedScrollTop = sessionsBox.scrollTop; sessionsBox.innerHTML = "";
+            let activeCount = 0;
+            
+            Object.keys(globalChatsData).forEach(id => {
+                if (globalChatsData[id].status === 'active') {
+                    activeCount++; const item = document.createElement('div');
+                    item.className = `session-item ${currentSelectedChatId === id ? 'selected' : ''}`;
+                    let statusLabel = globalChatsData[id].adminStatus === 'success' ? 'Успішно' : globalChatsData[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
+                    item.innerHTML = `<div><strong>ID: ${id.substr(0,8)}</strong> <span class="badge ${globalChatsData[id].adminStatus}">${statusLabel}</span></div>`;
+                    item.onclick = () => selectChatSession(id); sessionsBox.appendChild(item);
+                }
+            });
+            if(activeCount === 0) sessionsBox.innerHTML = `<div class="no-msg">Активних чатів немає</div>`;
+            sessionsBox.scrollTop = savedScrollTop;
+
+            const workspaceContent = document.getElementById('chat-messages-and-header');
+            const inputBlock = document.getElementById('global-admin-input-block');
+            const workspaceWrapper = document.getElementById('chat-workspace-block');
+
+            if (currentSelectedChatId && globalChatsData[currentSelectedChatId]) {
+                inputBlock.style.display = 'flex'; sessionsBox.classList.add('hide-on-mobile'); workspaceWrapper.classList.add('show-on-mobile');
+                renderWorkspaceContent(globalChatsData[currentSelectedChatId], workspaceContent);
+            } else {
+                inputBlock.style.display = 'none'; sessionsBox.classList.remove('hide-on-mobile'); workspaceWrapper.classList.remove('show-on-mobile');
+                workspaceContent.innerHTML = `<div style="text-align:center; margin:auto; color:#666;">Оберіть чат зі списку</div>`;
+            }
+
+            const fbBox = document.getElementById('box-for-feedback'); fbBox.innerHTML = "";
+            if(globalFeedbackData.length === 0) fbBox.innerHTML = `<div class="no-msg">Заявок немає</div>`;
+            globalFeedbackData.slice().reverse().forEach(fb => { 
+                fbBox.innerHTML += `<div class='msg-item'><div class='meta-line'>👤 ${fb.name} | 📱 ${fb.contact} (${fb.time})</div><div class='msg-text'>${fb.message}</div><button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:8px; display:block;" onclick="deleteFeedbackItem('${fb.id}')">Видалити</button></div>`; 
+            });
+
+            const volBox = document.getElementById('box-for-volunteers'); volBox.innerHTML = "";
+            if(globalVolunteersData.length === 0) volBox.innerHTML = `<div class="no-msg">Бланків немає</div>`;
+            globalVolunteersData.slice().reverse().forEach(vol => {
+                let imgHtml = vol.image ? `<img src="${vol.image}" class="attached-img-preview" onclick="openFullImage('${vol.image}')">` : '';
+                volBox.innerHTML += `<div class='msg-item'><div class='meta-line'>📋 ${vol.name} | 🏛️ ${vol.org} (${vol.time})</div><div class='msg-text'>📞 <strong>Тел:</strong> ${vol.phone} | 💬 <strong>WA:</strong> ${vol.whatsapp}</div><div class='msg-text' style='color:#bbb;'>✉️ ${vol.message}</div>${imgHtml}<button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:8px; display:block;" onclick="deleteVolunteerItem('${vol.id}')">Видалити</button></div>`;
+            });
+
+            renderOrdersList();
+            if (isSuperadminSession) renderAdminAccountsList();
+
+            const archiveBox = document.getElementById('box-for-archive'); archiveBox.innerHTML = "";
+            let archiveCount = 0;
+            Object.keys(globalChatsData).forEach(id => {
+                if (globalChatsData[id].status === 'closed') {
+                    archiveCount++;
+                    let statusLabel = globalChatsData[id].adminStatus === 'success' ? 'Успішно' : globalChatsData[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
+                    let chatHtml = `<div class='msg-item'><div class='meta-line'>📦 Архів: ${id.substr(0,8)} | <span class="badge ${globalChatsData[id].adminStatus}">${statusLabel}</span></div><div style='display:flex; flex-direction:column; gap:5px; margin-top:10px;'>`;
+                    globalChatsData[id].messages.forEach(m => {
+                        let contentHtml = m.type === 'image' ? `<img src="${m.text}" onclick="openFullImage('${m.text}')" style="max-height:100px;">` : m.text;
+                        chatHtml += `<div style='font-size:0.85rem; color:${m.sender === 'admin' ? 'var(--theme-color)' : '#bbb'}'><strong>${m.sender}:</strong> ${contentHtml}</div>`;
+                    });
+                    chatHtml += `</div></div>`; archiveBox.innerHTML += chatHtml;
+                }
+            });
+            if(archiveCount === 0) archiveBox.innerHTML = `<div class="no-msg">Архів порожній</div>`;
+        }
+
+        async function createPromoCode() {
+            let code = document.getElementById('promo-code-input').value.trim().toUpperCase();
+            let discount = parseInt(document.getElementById('promo-discount-input').value);
+            if(!code || isNaN(discount) || code.includes(" ")) { alert("Некоректний промокод!"); return; }
+            try {
+                await db.collection("promocodes").doc(code).set({ code, discount, active: true, created: firebase.firestore.FieldValue.serverTimestamp() });
+                document.getElementById('promo-code-input').value = ""; document.getElementById('promo-discount-input').value = "";
+                alert("✓ Промокод створено!");
+            } catch(e) { console.error(e); }
+        }
+
+        function renderPromocodes() {
+            const box = document.getElementById('box-for-promocodes'); box.innerHTML = "";
+            if(globalPromocodes.length === 0) { box.innerHTML = `<div class="no-msg">Немає промокодів</div>`; return; }
+            globalPromocodes.forEach(p => {
+                box.innerHTML += `
+                    <div class="admin-user-card" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-size:1.2rem; font-weight:900; color:var(--theme-color);">${p.code}</div>
+                            <div style="color:#aaa; font-size:0.9rem;">Знижка: <strong>${p.discount}%</strong> | Статус: <b>${p.active ? 'Активний':'Вимкнений'}</b></div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-direction:column;">
+                            <button class="btn" style="padding:6px 15px; font-size:0.8rem;" onclick="togglePromoStatus('${p.id}', ${p.active})">${p.active ? 'Вимкнути':'Увімкнути'}</button>
+                            <button class="delete-admin-btn" style="position:static; padding:6px 15px;" onclick="deletePromo('${p.id}')">Видалити</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        async function togglePromoStatus(id, currentStatus) { try { await db.collection("promocodes").doc(id).update({ active: !currentStatus }); } catch(e) { console.error(e); } }
+        async function deletePromo(id) { if(confirm("Видалити промокод?")) { try { await db.collection("promocodes").doc(id).delete(); } catch(e) { console.error(e); } } }
+        async function deleteFeedbackItem(id) { try { await db.collection("feedback").doc(id).delete(); } catch(e) { console.error(e); } }
+        async function deleteVolunteerItem(id) { try { await db.collection("volunteers").doc(id).delete(); } catch(e) { console.error(e); } }
+        async function deleteOrderItem(id) { try { await db.collection("orders").doc(id).delete(); } catch(e) { console.error(e); } }
+        async function sendAdminReply() { const input = document.getElementById('admin-reply-input'); const text = input.value.trim(); if (!text || !currentSelectedChatId) return; const msgObject = { sender: 'admin', text: text, type: 'text', time: Date.now() }; input.value = ""; try { await db.collection("chats").doc(currentSelectedChatId).update({ messages: firebase.firestore.FieldValue.arrayUnion(msgObject), lastUpdate: Date.now() }); } catch(e) { console.error(e); } }
+        function sendAdminChatPhoto(input) { if (!input.files || !input.files[0] || !currentSelectedChatId) return; const reader = new FileReader(); reader.onload = async function(e) { const msgObject = { sender: 'admin', text: e.target.result, type: 'image', time: Date.now() }; try { await db.collection("chats").doc(currentSelectedChatId).update({ messages: firebase.firestore.FieldValue.arrayUnion(msgObject), lastUpdate: Date.now() }); } catch(err) { console.error(err); } }; reader.readAsDataURL(input.files[0]); input.value = ""; }
+        async function confirmAndChangeStatus(id, newStatus, oldStatus) { isConfirmingStatus = true; try { await db.collection("chats").doc(id).update({ adminStatus: newStatus }); } catch(e) { console.error(e); } finally { isConfirmingStatus = false; renderAllDynamicData(); } }
+        async function closeChatSession(id) { if (confirm("Закрити чат?")) { try { await db.collection("chats").doc(id).update({ status: 'closed' }); if (currentSelectedChatId === id) currentSelectedChatId = null; } catch(e) { console.error(e); } } }
+        function previewNewsPhoto(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { newsPhotoBase64 = e.target.result; document.getElementById('news-preview-element').src = e.target.result; document.getElementById('news-preview-element').style.display = 'block'; }; reader.readAsDataURL(input.files[0]); } }
+        function toggleNewsButtonFields() { const checked = document.getElementById('news-has-btn-checkbox').checked; document.getElementById('news-button-config-box').style.display = checked ? 'block' : 'none'; }
+        function cancelNewsEditing() { document.getElementById('edit-news-id').value = ""; document.getElementById('news-title-field').value = ""; document.getElementById('news-body-field').value = ""; document.getElementById('news-preview-element').style.display = 'none'; newsPhotoBase64 = ""; }
+        function startEditNews(id) { const news = globalNewsData.find(n => n.id === id); if(!news) return; document.getElementById('edit-news-id').value = news.id; document.getElementById('news-title-field').value = news.title; document.getElementById('news-body-field').value = news.body; document.getElementById('news-date-field').value = news.date; }
+        function renderAdminNewsChronicle() { const box = document.getElementById('box-for-published-news'); box.innerHTML = ""; globalNewsData.forEach(news => { box.innerHTML += `<div class="admin-user-card"><b>${news.date}</b> — ${news.title} <button class="edit-news-btn" onclick="startEditNews('${news.id}')">Редагувати</button><button class="delete-admin-btn" onclick="deleteNewsItem('${news.id}')">Видалити</button></div>`; }); }
+        async function deleteNewsItem(id) { if(confirm("Видалити новину?")) { try { await db.collection("news").doc(id).delete(); } catch(e) { console.error(e); } } }
+        async function addNewSocialNetwork() { const name = document.getElementById('soc-name').value.trim(); const url = document.getElementById('soc-url').value.trim(); const color = document.getElementById('soc-color').value; if(!name || !url) return; let updatedList = [...globalSocialNetworks, { id: 'soc_' + Date.now(), name, url, color }]; try { await db.collection("config").doc("socials").set({ list: updatedList }); } catch(e) { console.error(e); } }
+        function renderAdminSocialList() { const box = document.getElementById('box-for-social-list'); box.innerHTML = ""; globalSocialNetworks.forEach(net => { box.innerHTML += `<div class="admin-user-card" style="border-left:4px solid ${net.color};">${net.name} <button class="delete-admin-btn" onclick="deleteSocialNetwork('${net.id}')">Видалити</button></div>`; }); }
+        async function deleteSocialNetwork(id) { let updatedList = globalSocialNetworks.filter(net => net.id !== id); try { await db.collection("config").doc("socials").set({ list: updatedList }); } catch(e) { console.error(e); } }
+        function createNewAdminAccount(event) { event.preventDefault(); const lastName = document.getElementById('new-admin-lastname').value.trim(); const firstName = document.getElementById('new-admin-firstname').value.trim(); const phone = document.getElementById('new-admin-phone').value.trim(); const user = document.getElementById('new-admin-user').value.trim(); const pass = document.getElementById('new-admin-pass').value.trim(); let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins.push({ lastName, firstName, phone, user, pass, id: 'admin_' + Date.now() }); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); renderAllDynamicData(); }
+        function renderAdminAccountsList() { const listBox = document.getElementById('box-for-admin-accounts'); listBox.innerHTML = ""; let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins.forEach(admin => { listBox.innerHTML += `<div class="admin-user-card"><b>${admin.lastName} ${admin.firstName}</b> <button class="delete-admin-btn" onclick="deleteAdminAccount('${admin.id}')">Видалити</button></div>`; }); }
+        function deleteAdminAccount(adminId) { let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins = currentAdmins.filter(a => a.id !== adminId); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); renderAllDynamicData(); }
+        function selectChatSession(id) { currentSelectedChatId = id; renderAllDynamicData(); }
+        function backToSessionsList() { currentSelectedChatId = null; renderAllDynamicData(); }
+        function renderWorkspaceContent(chatObj, targetElement) { targetElement.innerHTML = `<div class="workspace-header"><span>ID: ${chatObj.id.substr(0,8)}</span><select class="status-select ${chatObj.adminStatus}" onchange="confirmAndChangeStatus('${chatObj.id}', this.value)"><option value="processing">В обробці</option><option value="success">Успішно</option><option value="unresolved">Не вирішено</option></select><button onclick="closeChatSession('${chatObj.id}')">X</button></div><div class="admin-messages-box" id="admin-msg-flow"></div>`; const flow = targetElement.querySelector('#admin-msg-flow'); chatObj.messages.forEach(m => { const b = document.createElement('div'); b.className = `admin-bubble ${m.sender}`; b.innerText = m.text; flow.appendChild(b); }); flow.scrollTop = flow.scrollHeight; }
+        function handleLogout() { enterDashboard(); window.location.reload(); }
     </script>
 </body>
 </html>
