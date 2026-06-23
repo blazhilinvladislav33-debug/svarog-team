@@ -20,8 +20,18 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
-
-    <style>
+    <!-- Підключення PWA -->
+     <link rel="manifest" href="manifest.json">
+     <script>
+       if ('serviceWorker' in navigator) {
+         window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => console.log('SVAROG PWA: Активний', reg))
+                .catch(err => console.log('SVAROG PWA: Помилка', err));
+               });
+              }
+        </script>
+        <style>
         :root {
             --theme-color: #f0b48c;
             --theme-color-rgb: 240, 180, 140;
