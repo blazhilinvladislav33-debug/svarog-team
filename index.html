@@ -6,11 +6,9 @@
     <title>SVAROG TEAM</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
-    <!-- EmailJS (Для сповіщень на пошту) -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <script>
@@ -152,6 +150,7 @@
         @media (max-width: 850px) {
             .activities-grid { grid-template-columns: 1fr; }
         }
+        
         @media (max-width: 768px) { 
             .nav-links { width: 280px; } 
             .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
@@ -160,6 +159,14 @@
             .hero-container h1 { font-size: 1.8rem; margin-bottom: 12px; }
             .hero-container p { font-size: 0.98rem; margin-bottom: 20px; }
             .btn { width: 100%; padding: 12px 15px; font-size: 0.95rem; }
+            
+            /* Нові стилі для адаптації карток Напрямків діяльності */
+            .activities-wrapper h2 { font-size: 1.4rem; text-align: center; padding: 0 10px; }
+            .activities-grid { gap: 15px; padding: 0 10px; }
+            .activity-card { padding: 20px; }
+            .activity-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .activity-card p { font-size: 0.85rem; }
+            .activity-icon { width: 45px; height: 45px; margin: 0 auto 10px; }
         }
     </style>
 </head>
@@ -195,7 +202,6 @@
     </nav>
 
     <div class="main-content">
-        <!-- ГОЛОВНИЙ БАНЕР -->
         <div class="hero-container">
             <div data-lang="ua">
                 <h1>SVAROG TEAM</h1>
@@ -209,7 +215,6 @@
             </div>
         </div>
 
-        <!-- НАПРЯМКИ ДІЯЛЬНОСТІ -->
         <div class="activities-wrapper">
             <h2>
                 <span data-lang="ua">Напрямки діяльності</span>
@@ -257,7 +262,6 @@
         <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
     </footer>
 
-    <!-- АНОНІМНИЙ ЧАТ -->
     <div class="user-chat-modal" id="user-chat-window">
         <div class="chat-header">
             <span data-lang="ua">Анонімна розмова</span><span data-lang="en">Anonymous Chat</span>
