@@ -37,16 +37,19 @@
 
         .header-logos { display: flex; gap: 30px; margin-bottom: 20px; align-items: center; }
         .logo-main { width: 90px; height: auto; }
-        .logo-team { width: 130px; height: auto; }
+        .logo-team { width: 180px; height: auto; } /* Збільшено логотип */
         
         h1 { font-size: 2rem; color: #f0b48c; text-transform: uppercase; margin: 5px 0; letter-spacing: 2px; }
         
+        /* Стиль промокоду: напис над рамкою */
+        .promo-wrapper { margin: 25px 0; display: flex; flex-direction: column; align-items: center; }
+        .code-label { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
         .code-box { 
-            margin: 20px 0; padding: 15px 30px; 
-            border: 2px dashed #f0b48c; border-radius: 8px;
-            box-shadow: 0 0 10px 5px rgba(240, 180, 140, 0.15);
+            padding: 15px 40px; 
+            border: 2px solid #f0b48c; /* Суцільна лінія */
+            border-radius: 8px;
+            box-shadow: 0 0 10px 5px rgba(240, 180, 140, 0.15); /* Тінь */
         }
-        .code-label { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
         .code-val { font-size: 2.2rem; font-weight: 900; color: #fff; }
 
         .footer-cert { 
@@ -80,9 +83,11 @@
     
     <h1>Сертифікат підтримки</h1>
     
-    <div class="code-box">
-        <div class="code-label">Ваш промокод</div>
-        <div class="code-val" id="cert-code">...</div>
+    <div class="promo-wrapper">
+        <div class="code-label">ВАШ ПРОМОКОД</div>
+        <div class="code-box">
+            <div class="code-val" id="cert-code">...</div>
+        </div>
     </div>
 
     <div class="footer-cert">
