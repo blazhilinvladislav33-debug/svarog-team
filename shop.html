@@ -166,7 +166,6 @@
         .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-2px); }
         .confirm-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; box-shadow: none; }
 
-        /* ОПТИМІЗОВАНИЙ ДИЗАЙН ПУШ-СПОВІЩЕННЯ */
         .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(20, 20, 20, 0.98); backdrop-filter: blur(12px); border: 2px solid var(--theme-color); color: #fff; padding: 15px 25px; border-radius: 12px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 4000; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 12px; max-width: 90vw; width: max-content; text-align: center; line-height: 1.4; }
         .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast-icon { width: 22px; height: 22px; fill: var(--theme-color); flex-shrink: 0; }
@@ -377,7 +376,6 @@
         menuButton.addEventListener('click', (e) => { e.stopPropagation(); navMenu.classList.toggle('active'); menuButton.classList.toggle('open'); });
         document.addEventListener('click', (e) => { if (!navMenu.contains(e.target) && !menuButton.contains(e.target)) { navMenu.classList.remove('active'); menuButton.classList.remove('open'); } });
         
-        // МОДИФІКОВАНА ФУНКЦІЯ ОНОВЛЕНОГО ТАЙМАУТУ ДЛЯ СПОВІЩЕННЯ
         function showToast(message, duration = 3000) {
             const toast = document.getElementById('toast-msg');
             document.getElementById('toast-text').innerText = message;
@@ -398,7 +396,6 @@
             listenToActiveOrderStatus();
         }
 
-        // ДИНАМІЧНІ ДАНІ РЕКВІЗИТІВ З FIREBASE
         let dynamicBankUrl = "https://send.monobank.ua/YOUR_JAR";
         let dynamicCardNumber = "0000 0000 0000 0000";
         let dynamicCardName = "Не вказано";
@@ -793,7 +790,8 @@
             try {
                 const doc = await db.collection('promocodes').doc(code).get();
                 if(doc.exists && doc.data().active) {
-                    currentPromo = { code: doc.data().code, discount: doc.data().discount };
+                    // ЗМІНА ТУТ: Використовуємо doc.id щоб точно зчитати назву коду
+                    currentPromo = { code: doc.id, discount: doc.data().discount }; 
                     msg.style.color = '#00ffcc';
                     msg.innerText = lang === 'ua' ? `Код застосовано! Знижка ${currentPromo.discount}%` : `Code applied! Discount ${currentPromo.discount}%`;
                     renderCartModalContent(); 
@@ -875,6 +873,9 @@
             });
         }
 
+        // ==========================================
+        // ГЛОБАЛЬНА ЗМІНА: ФУНКЦІЯ SUBMIT ORDER
+        // ==========================================
         async function submitOrder(e) {
             e.preventDefault();
             if(shoppingCart.length === 0) return;
@@ -914,6 +915,7 @@
                 await db.runTransaction(async (transaction) => {
                     let merchRefsAndData = [];
 
+                    // 1. Отримуємо дані всіх товарів
                     for(let item of shoppingCart) {
                         let ref = db.collection('merch').doc(item.merchId);
                         let doc = await transaction.get(ref);
@@ -921,6 +923,21 @@
                         merchRefsAndData.push({ ref: ref, data: doc.data(), cartItem: item });
                     }
 
+                    // 2. ПЕРЕВІРКА ТА ПОГАШЕННЯ ОДНОРАЗОВОГО ПРОМОКОДУ
+                    let promoDocRef = null;
+                    let pDocData = null;
+                    if (currentPromo && currentPromo.code) {
+                        promoDocRef = db.collection('promocodes').doc(currentPromo.code);
+                        let pDoc = await transaction.get(promoDocRef);
+                        if (pDoc.exists) {
+                            pDocData = pDoc.data();
+                            if (pDocData.active === false) {
+                                throw new Error(lang === 'ua' ? "Цей промокод вже був використаний!" : "This promo code has already been used!");
+                            }
+                        }
+                    }
+
+                    // 3. Перевірка залишків
                     for(let obj of merchRefsAndData) {
                         let currentStockObj = typeof obj.data.stock === 'object' ? { ...obj.data.stock } : {};
                         let sizeKey = obj.cartItem.size;
@@ -933,10 +950,17 @@
                         obj.newStockObj = currentStockObj;
                     }
 
+                    // 4. Оновлення залишків
                     for(let obj of merchRefsAndData) {
                         transaction.update(obj.ref, { stock: obj.newStockObj });
                     }
 
+                    // 5. ДЕАКТИВУЄМО ПРОМОКОД, ЯКЩО ВІН ОДНОРАЗОВИЙ
+                    if (promoDocRef && pDocData && pDocData.isSingleUse === true) {
+                        transaction.update(promoDocRef, { active: false });
+                    }
+
+                    // 6. Створення замовлення
                     const orderRef = db.collection('orders').doc();
                     newlyCreatedOrderId = orderRef.id; 
                     let orderItemsString = shoppingCart.map(i => `${i.merchTitle} (Розмір: ${i.size}, К-сть: ${i.quantity})`).join('\n');
@@ -1000,7 +1024,6 @@
                     });
                 }
 
-                // МОДИФІКОВАНЕ СПОВІЩЕННЯ НА 6 СЕКУНД З ТЕКСТОМ ПЕРЕВІРКИ СТАТУСУ
                 showToast(
                     lang === 'ua' 
                         ? 'Замовлення прийнято! Статус замовлення можна перевірити в меню "Статус замовлення" або внизу сторінки. 📦' 
@@ -1029,6 +1052,7 @@
                 setLanguage(lang); 
             }
         }
+        // ==========================================
 
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
