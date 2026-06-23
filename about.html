@@ -129,11 +129,12 @@
             background: rgba(0,0,0,0.5);
         }
 
-        .news-image-box img {
+        .news-image-box img, .news-image-box iframe {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.6s ease;
+            border: none;
         }
 
         .news-card:hover .news-image-box img {
@@ -220,6 +221,12 @@
         .news-card.expanded .text-more { display: none; }
         .news-card.expanded .text-less { display: inline; }
 
+        /* СОЦІАЛЬНІ МЕРЕЖІ (З INDEX) */
+        .home-socials-wrapper { width: 100%; max-width: 1100px; margin-top: 10px; margin-bottom: 40px; }
+        .home-socials { display: flex; gap: 15px; justify-content: center; width: 100%; flex-wrap: wrap; }
+        .home-social-btn { flex: 1; min-width: 180px; padding: 14px 20px; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; color: #fff; text-align: center; text-decoration: none; font-weight: bold; background: rgba(0,0,0,0.4); transition: all 0.3s ease; backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; }
+        .home-social-btn:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(0,0,0,0.6); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(var(--theme-color-rgb), 0.15); }
+
         /* АНОНІМНИЙ ЧАТ */
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
@@ -253,6 +260,8 @@
             .news-grid { grid-template-columns: 1fr; gap: 20px; } 
             .news-image-box { height: 200px; }
             .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
+            .home-socials { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 10px; }
+            .home-social-btn { min-width: 0; padding: 12px; font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -298,6 +307,11 @@
 
         <div class="news-grid-wrapper">
             <div class="news-grid" id="dynamic-news-grid"></div>
+        </div>
+
+        <!-- БЛОК СОЦІАЛЬНИХ МЕРЕЖ -->
+        <div class="home-socials-wrapper">
+            <div class="home-socials" id="dynamic-user-social-container"></div>
         </div>
     </div>
 
@@ -350,8 +364,20 @@
             document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
             document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
             document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
-            document.title = lang === 'ua' ? "SVAROG TEAM | Про нас" : 'SVAROG TEAM | About Us';
         }
+
+        // --- ЛОГІКА СОЦІАЛЬНИХ МЕРЕЖ ---
+        db.collection("config").doc("socials").onSnapshot(doc => {
+            const container = document.getElementById('dynamic-user-social-container');
+            if(!container) return;
+            const nets = doc.exists ? doc.data().list : [];
+            if(nets && nets.length > 0) {
+                container.style.display = '';
+                container.innerHTML = nets.map(n => `<a href="${n.url}" target="_blank" class="home-social-btn">${n.name}</a>`).join('');
+            } else {
+                container.style.display = 'none';
+            }
+        });
 
         function initTimelineRealtimeStream() {
             const container = document.getElementById('dynamic-news-grid');
@@ -386,7 +412,28 @@
             }
 
             dataset.forEach((item, index) => {
-                let imgSrc = item.image ? item.image : 'logo_placeholder.png'; 
+                let mediaHtml = "";
+                
+                // Перевірка, чи це відео
+                if (item.mediaType === 'video' && item.videoUrl) {
+                    let videoId = "";
+                    if (item.videoUrl.includes('youtube.com/watch?v=')) {
+                        videoId = item.videoUrl.split('v=')[1].split('&')[0];
+                    } else if (item.videoUrl.includes('youtube.com/shorts/')) {
+                        videoId = item.videoUrl.split('shorts/')[1].split('?')[0];
+                    } else if (item.videoUrl.includes('youtu.be/')) {
+                        videoId = item.videoUrl.split('youtu.be/')[1].split('?')[0];
+                    }
+                    
+                    if (videoId) {
+                        mediaHtml = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+                    } else {
+                        mediaHtml = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#666;">Неправильне посилання на відео</div>`;
+                    }
+                } else {
+                    let imgSrc = item.image ? item.image : 'logo_placeholder.png'; 
+                    mediaHtml = `<img src="${imgSrc}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23aaa'><path d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/></svg>'">`;
+                }
                 
                 let displayDate = item.date;
                 try {
@@ -406,7 +453,7 @@
                 
                 cardBlock.innerHTML = `
                     <div class="news-image-box">
-                        <img src="${imgSrc}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23aaa\'><path d=\'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z\'/></svg>'">
+                        ${mediaHtml}
                         ${displayDate ? `<div class="news-date-badge">${displayDate}</div>` : ''}
                     </div>
                     <div class="news-content">
@@ -517,7 +564,7 @@
                 const bubble = document.createElement('div'); 
                 bubble.className = `chat-bubble ${msg.sender}`;
                 if(msg.type === 'image') { 
-                    bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src=\'${msg.text}\'>')">`; 
+                    bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src='${msg.text}'>')">`; 
                 } else { 
                     bubble.innerText = msg.text; 
                 }
