@@ -100,15 +100,17 @@
         .btn:hover:not(:disabled) { background-color: var(--theme-color); color: #121212; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(var(--theme-color-rgb), 0.3); }
         .btn:disabled { border-color: #555; color: #555; cursor: not-allowed; }
         
-        .social-box { display: flex; gap: 12px; margin-top: 25px; flex-direction: column; width: 100%; max-width: 550px; }
-        .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; border-radius: 6px; text-decoration: none; font-weight: bold; border: 1px solid; transition: 0.3s; font-size: 1rem; }
-        .social-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        /* СОЦІАЛЬНІ МЕРЕЖІ (З INDEX) */
+        .home-socials-wrapper { width: 100%; max-width: 1100px; margin-top: 40px; margin-bottom: 40px; }
+        .home-socials { display: flex; gap: 15px; justify-content: center; width: 100%; flex-wrap: wrap; }
+        .home-social-btn { flex: 1; min-width: 180px; padding: 14px 20px; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; color: #fff; text-align: center; text-decoration: none; font-weight: bold; background: rgba(0,0,0,0.4); transition: all 0.3s ease; backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; }
+        .home-social-btn:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(0,0,0,0.6); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(var(--theme-color-rgb), 0.15); }
 
         /* ФУТЕР */
         .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
 
         /* ЧАТ */
-        .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; }
+        .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
         .chat-bubble { padding: 8px 12px; border-radius: 8px; max-width: 80%; word-wrap: break-word; line-height: 1.4; }
@@ -136,6 +138,8 @@
             .main-content { padding: 12px; margin-top: 75px; }
             .container { padding: 30px 20px; }
             .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
+            .home-socials { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 10px; }
+            .home-social-btn { min-width: 0; padding: 12px; font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -196,7 +200,11 @@
                 </button>
             </form>
         </div>
-        <div class="social-box" id="dynamic-user-social-container"></div>
+        
+        <!-- БЛОК СОЦІАЛЬНИХ МЕРЕЖ ЯК НА INDEX -->
+        <div class="home-socials-wrapper">
+            <div class="home-socials" id="dynamic-user-social-container"></div>
+        </div>
     </div>
 
     <footer class="footer">
@@ -284,10 +292,16 @@
                 const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; 
                 const chatId = '647245223';
                 
-                let tgMessage = `📩 <b>НОВЕ ПОВІДОМЛЕННЯ!</b>\n\n` +
-                                `👤 <b>Ім'я:</b> ${name}\n` +
-                                `📞 <b>Контакт:</b> ${contact}\n\n` +
-                                `📝 <b>Текст:</b>\n${message}`;
+                let tgMessage = `📩 <b>НОВЕ ПОВІДОМЛЕННЯ!</b>
+
+` +
+                                `👤 <b>Ім'я:</b> ${name}
+` +
+                                `📞 <b>Контакт:</b> ${contact}
+
+` +
+                                `📝 <b>Текст:</b>
+${message}`;
 
                 await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                     method: 'POST',
@@ -311,11 +325,17 @@
             }
         }
 
+        // --- ЛОГІКА СОЦІАЛЬНИХ МЕРЕЖ (В СТИЛІ INDEX) ---
         db.collection("config").doc("socials").onSnapshot(doc => {
-            const box = document.getElementById('dynamic-user-social-container');
-            if(!box) return;
+            const container = document.getElementById('dynamic-user-social-container');
+            if(!container) return;
             const nets = doc.exists ? doc.data().list : [];
-            box.innerHTML = nets.map(n => `<a href="${n.url}" target="_blank" class="social-btn" style="border-color:${n.color}; color:#fff; text-align:center;">${n.name}</a>`).join('');
+            if(nets && nets.length > 0) {
+                container.style.display = '';
+                container.innerHTML = nets.map(n => `<a href="${n.url}" target="_blank" class="home-social-btn">${n.name}</a>`).join('');
+            } else {
+                container.style.display = 'none';
+            }
         });
 
         // --- ХМАРНИЙ ЧАТ FIREBASE ---
@@ -371,7 +391,7 @@
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${msg.sender}`;
                 if(msg.type === 'image') {
-                    bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src=\'${msg.text}\'>')">`;
+                    bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src='${msg.text}'>')">`;
                 } else { 
                     bubble.innerText = msg.text; 
                 }
