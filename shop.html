@@ -75,13 +75,11 @@
         .menu-chat-btn { border: 2px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); margin-top: 5px; }
         .menu-chat-btn:hover { background: var(--theme-color) !important; color: #121212 !important; padding-left: 15px !important; }
 
-        /* ОСНОВНИЙ КОНТЕНТ */
         .main-content { margin-top: 100px; padding: 20px; display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; max-width: 1200px; }
         .page-title-box { text-align: center; margin-bottom: 30px; }
         .page-title-box h1 { font-size: 2.2rem; color: #ffffff; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .page-title-box p { color: #ccc; font-size: 1.05rem; }
 
-        /* КАТЕГОРІЇ */
         .categories-nav { display: flex; gap: 10px; overflow-x: auto; width: 100%; justify-content: center; padding-bottom: 15px; margin-bottom: 20px; }
         .categories-nav::-webkit-scrollbar { height: 4px; }
         .categories-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
@@ -89,7 +87,6 @@
         .category-btn:hover { border-color: rgba(var(--theme-color-rgb), 0.6); }
         .category-btn.active { background: var(--theme-color); color: #121212; border-color: var(--theme-color); font-weight: bold; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.4); }
 
-        /* ВІТРИНА ТОВАРІВ */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; margin-bottom: 50px; }
         .merch-card { background: rgba(25, 25, 25, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .merch-card:hover { transform: translateY(-8px); border-color: rgba(var(--theme-color-rgb), 0.4); box-shadow: 0 15px 40px rgba(var(--theme-color-rgb), 0.15); }
@@ -121,13 +118,11 @@
         .buy-btn:hover:not(:disabled) { background: var(--theme-color); color: #121212; }
         .buy-btn:disabled { border-color: #555; color: #555; cursor: not-allowed; background: transparent; }
 
-        /* ПЛАВАЮЧА КНОПКА КОШИКА */
         .cart-fab { position: fixed; bottom: 25px; left: 25px; width: 60px; height: 60px; background: var(--theme-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 25px rgba(var(--theme-color-rgb), 0.4); transition: transform 0.3s, background 0.3s; z-index: 1500; }
         .cart-fab:hover { transform: scale(1.1); filter: brightness(1.1); }
         .cart-fab svg { width: 28px; height: 28px; fill: #121212; }
         .cart-badge { position: absolute; top: -5px; right: -5px; background: #ff4a4a; color: #fff; font-size: 0.75rem; font-weight: bold; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid #1a1a1a; }
 
-        /* МОДАЛЬНЕ ВІКНО КОШИКА / ОФОРМЛЕННЯ */
         .order-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
         .order-modal { background: linear-gradient(180deg, rgba(30, 30, 30, 0.98) 0%, rgba(20, 20, 20, 0.95) 100%); border: 1px solid rgba(var(--theme-color-rgb), 0.3); border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
         .modal-header { padding: 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
@@ -158,12 +153,10 @@
         .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-2px); }
         .confirm-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; box-shadow: none; }
 
-        /* СПЛИВАЮЧЕ ПОВІДОМЛЕННЯ (TOAST) */
         .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--theme-color); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 4000; opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 10px; }
         .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast-icon { width: 20px; height: 20px; fill: var(--theme-color); }
 
-        /* ФУТЕР І ЧАТ */
         .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
 
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 3000; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -257,9 +250,20 @@
                 <div class="cart-items-list" id="cart-items-container">
                     </div>
                 
+                <div id="promo-block" style="display:none; margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="promo-code-input" class="form-input" placeholder="Промокод (якщо є)" style="text-transform: uppercase; padding: 8px 12px; font-size: 0.9rem;">
+                        <button type="button" class="btn" style="width: auto; padding: 8px 15px; font-size: 0.9rem;" onclick="applyPromo()">Застосувати</button>
+                    </div>
+                    <div id="promo-message" style="font-size: 0.85rem; margin-top: 8px; font-weight: bold;"></div>
+                </div>
+
                 <div class="cart-total-box" id="cart-total-section" style="display:none;">
                     <div><span data-lang="ua">Разом до сплати:</span><span data-lang="en">Total sum:</span></div>
-                    <div class="cart-total-price" id="cart-total-sum">0 ₴</div>
+                    <div style="text-align: right;">
+                        <div id="cart-discount-sum" style="font-size: 0.9rem; color: #00ffcc; margin-bottom: 4px; display: none;"></div>
+                        <div class="cart-total-price" id="cart-total-sum">0 ₴</div>
+                    </div>
                 </div>
 
                 <form id="checkout-form" style="display:none;" onsubmit="submitOrder(event)">
@@ -344,14 +348,13 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        // --- ЛОГІКА МАГАЗИНУ (Кошик + Категорії + Знижки) ---
         let globalMerchList = [];
         let globalCategories = ['Всі товари']; 
         let activeCategory = 'Всі товари';
         
-        // 1-годинний таймер кошика (оновлюється при кожній зміні)
         let shoppingCart = JSON.parse(localStorage.getItem('svarog_shop_cart')) || [];
         let cartLastUpdated = localStorage.getItem('svarog_shop_cart_time') || Date.now();
+        let currentPromo = null; // ДОДАНО: Змінна для зберігання активного промокоду
 
         function checkCartExpiry() {
             if(shoppingCart.length > 0) {
@@ -359,13 +362,14 @@
                 const diffHours = (now - parseInt(cartLastUpdated)) / (1000 * 60 * 60);
                 if(diffHours >= 1) {
                     shoppingCart = [];
+                    currentPromo = null; // Скидаємо промокод при очищенні
                     saveCart();
                     updateCartUI();
                     showToast(localStorage.getItem('selectedLang') === 'en' ? "Your cart has expired." : "Час дії кошика вийшов. Він був очищений.");
                 }
             }
         }
-        setInterval(checkCartExpiry, 60000); // Перевірка щохвилини
+        setInterval(checkCartExpiry, 60000);
 
         db.collection("config").doc("shop").onSnapshot(doc => {
             if (doc.exists) {
@@ -517,13 +521,18 @@
         function removeFromCart(cartId) {
             shoppingCart = shoppingCart.filter(item => item.cartId !== cartId);
             cartLastUpdated = Date.now();
-            saveCart();
-            updateCartUI();
             
             if(shoppingCart.length === 0) {
+                currentPromo = null; // Скидаємо промокод
                 document.getElementById('checkout-form').style.display = 'none';
                 document.getElementById('cart-total-section').style.display = 'none';
+                document.getElementById('promo-block').style.display = 'none';
+                document.getElementById('promo-code-input').value = "";
+                document.getElementById('promo-message').innerText = "";
             }
+            
+            saveCart();
+            updateCartUI();
         }
 
         function saveCart() {
@@ -558,11 +567,45 @@
             document.getElementById('order-modal-wrapper').style.display = 'none';
         }
 
+        // ДОДАНО: Перевірка промокоду
+        async function applyPromo() {
+            const input = document.getElementById('promo-code-input');
+            const msg = document.getElementById('promo-message');
+            const code = input.value.trim().toUpperCase();
+            const lang = localStorage.getItem('selectedLang') || 'ua';
+
+            if(!code) {
+                msg.style.color = '#ff4a4a';
+                msg.innerText = lang === 'ua' ? 'Введіть код!' : 'Enter a code!';
+                return;
+            }
+
+            try {
+                const doc = await db.collection('promocodes').doc(code).get();
+                if(doc.exists && doc.data().active) {
+                    currentPromo = { code: doc.data().code, discount: doc.data().discount };
+                    msg.style.color = '#00ffcc';
+                    msg.innerText = lang === 'ua' ? `Код застосовано! Знижка ${currentPromo.discount}%` : `Code applied! Discount ${currentPromo.discount}%`;
+                    renderCartModalContent(); 
+                } else {
+                    currentPromo = null;
+                    msg.style.color = '#ff4a4a';
+                    msg.innerText = lang === 'ua' ? 'Недійсний або неактивний код!' : 'Invalid or inactive code!';
+                    renderCartModalContent(); 
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
         function renderCartModalContent() {
             const container = document.getElementById('cart-items-container');
             const totalSection = document.getElementById('cart-total-section');
             const formSection = document.getElementById('checkout-form');
+            const promoSection = document.getElementById('promo-block');
+            
             const totalSumEl = document.getElementById('cart-total-sum');
+            const discountSumEl = document.getElementById('cart-discount-sum');
             const lang = localStorage.getItem('selectedLang') || 'ua';
             
             container.innerHTML = "";
@@ -571,13 +614,14 @@
                 container.innerHTML = `<div style="text-align:center; padding: 40px 0; color:#888;">${lang==='ua'?'Ваш кошик порожній 😔':'Your cart is empty 😔'}</div>`;
                 totalSection.style.display = 'none';
                 formSection.style.display = 'none';
+                promoSection.style.display = 'none';
                 return;
             }
 
-            let totalSum = 0;
+            let baseTotalSum = 0;
 
             shoppingCart.forEach(item => {
-                totalSum += item.totalPrice;
+                baseTotalSum += item.totalPrice;
                 let imgHtml = item.image ? `<img src="${item.image}" class="cart-item-img">` : `<div class="cart-item-img" style="display:flex; justify-content:center; align-items:center; font-size:0.7rem;">No IMG</div>`;
                 
                 container.innerHTML += `
@@ -593,7 +637,20 @@
                 `;
             });
 
-            totalSumEl.innerText = `${totalSum} ₴`;
+            // Розрахунок знижки
+            let finalSum = baseTotalSum;
+            if(currentPromo) {
+                let discountAmount = baseTotalSum * (currentPromo.discount / 100);
+                finalSum = baseTotalSum - discountAmount;
+                discountSumEl.innerText = `Знижка (${currentPromo.discount}%): -${Math.round(discountAmount)} ₴`;
+                discountSumEl.style.display = 'block';
+            } else {
+                discountSumEl.style.display = 'none';
+            }
+
+            totalSumEl.innerText = `${Math.round(finalSum)} ₴`;
+            
+            promoSection.style.display = 'block';
             totalSection.style.display = 'flex';
             formSection.style.display = 'block';
         }
@@ -612,7 +669,13 @@
             btn.innerText = "Обробка... / Processing...";
             btn.disabled = true;
 
-            let totalSum = shoppingCart.reduce((sum, item) => sum + item.totalPrice, 0);
+            // Підрахунок фінальної суми для відправки
+            let baseTotal = shoppingCart.reduce((sum, item) => sum + item.totalPrice, 0);
+            let finalSum = baseTotal;
+            if(currentPromo) {
+                finalSum = baseTotal - (baseTotal * (currentPromo.discount / 100));
+            }
+            finalSum = Math.round(finalSum);
 
             try {
                 await db.runTransaction(async (transaction) => {
@@ -649,7 +712,8 @@
                         size: "Див. деталі", 
                         quantity: shoppingCart.reduce((s, i) => s + i.quantity, 0),
                         orderTextDetails: orderItemsString,
-                        totalPrice: totalSum,
+                        totalPrice: finalSum, // Записуємо суму ЗІ ЗНИЖКОЮ
+                        promoCode: currentPromo ? currentPromo.code : "Не застосовано", // Записуємо промокод у базу
                         status: 'new',
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
@@ -666,13 +730,18 @@
                     phone: phone,
                     address: address,
                     items_list: itemsListFormatted,
-                    total: totalSum
+                    total: finalSum, // Відправляємо фінальну суму
+                    promo_code: currentPromo ? currentPromo.code : "Не застосовано" // Відправляємо промокод у лист
                 }).then(() => console.log("Email успішно відправлено!"))
                   .catch(e => console.error("Помилка відправки Email:", e));
 
                 showToast(lang === 'ua' ? 'Замовлення успішно оформлено! 🎉' : 'Order placed successfully! 🎉');
                 
                 shoppingCart = [];
+                currentPromo = null; // Скидаємо промокод після успішного замовлення
+                document.getElementById('promo-code-input').value = "";
+                document.getElementById('promo-message').innerText = "";
+                
                 saveCart();
                 closeOrderModal();
                 updateCartUI();
@@ -754,7 +823,6 @@
         }
 
         function sendUserChatPhoto(input) {
-            // Безпечна заглушка для запобігання крашу сторінки
             console.warn("Функція sendUserChatPhoto викликана. Для роботи з фото потрібно налаштувати Firebase Storage.");
             showToast(localStorage.getItem('selectedLang') === 'en' ? "Photo transfer is in development." : "Надсилання фото знаходиться в розробці.");
         }
