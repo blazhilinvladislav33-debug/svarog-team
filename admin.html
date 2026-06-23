@@ -231,6 +231,7 @@
                 <button class="tab-button" onclick="switchTab('volunteer-tab', this)"><span data-lang="ua">📋 Волонтери</span><span data-lang="en">📋 Volunteers</span><div class="tab-badge" id="badge-volunteers">0</div></button>
                 <button class="tab-button" onclick="switchTab('orders-tab', this)"><span data-lang="ua">📦 Замовлення</span><span data-lang="en">📦 Orders</span><div class="tab-badge" id="badge-orders">0</div></button>
                 <button class="tab-button" onclick="switchTab('shop-management-tab', this)"><span data-lang="ua">🛍️ Магазин</span><span data-lang="en">🛍️ Shop</span></button>
+                <button class="tab-button" onclick="switchTab('promo-tab', this)"><span data-lang="ua">🎟️ Промокоди</span><span data-lang="en">🎟️ Promos</span></button>
                 
                 <button class="tab-button" onclick="switchTab('link-management-tab', this)"><span data-lang="ua">🔗 Контент</span><span data-lang="en">🔗 Content</span></button>
                 <button class="tab-button" id="superadmin-only-tab-btn" onclick="switchTab('admin-management-tab', this)" style="display:none; color:var(--theme-color); border-color:rgba(var(--theme-color-rgb),0.2);"><span data-lang="ua">⚙️ Адміни</span><span data-lang="en">⚙️ Managers</span></button>
@@ -334,6 +335,26 @@
                 
                 <h3 style="margin:25px 0 15px; font-size:1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:5px;" data-lang="ua">Вітрина товарів:</h3>
                 <div class="merch-grid" id="box-for-merch-items"></div>
+            </div>
+
+            <div id="promo-tab" class="tab-content">
+                <div class="superadmin-grid">
+                    <div class="admin-creator-form" style="flex: 1; min-width: 320px;">
+                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Створити промокод</h3>
+                        <div class="form-group">
+                            <input type="text" id="promo-code-input" class="form-input" placeholder="Код (напр: ZSU2026)" style="text-transform: uppercase;" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="promo-discount-input" class="form-input" placeholder="Знижка у % (напр: 10)">
+                        </div>
+                        <button class="btn" onclick="createPromoCode()">Зберегти промокод</button>
+                    </div>
+                    
+                    <div class="admin-accounts-list" style="flex: 2;">
+                        <h3 style="margin-bottom:15px; font-size:1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:5px;" data-lang="ua">Активні промокоди:</h3>
+                        <div id="box-for-promocodes"></div>
+                    </div>
+                </div>
             </div>
 
             <div id="link-management-tab" class="tab-content">
@@ -459,7 +480,8 @@
         let globalSocialNetworks = [];
         let globalOrdersData = [];
         let globalMerchData = [];
-        let globalCategories = []; // Масив категорій
+        let globalCategories = []; 
+        let globalPromocodes = []; // Новий масив для промокодів
 
         let unsubscribeChats = null;
         let unsubscribeFeedback = null;
@@ -469,6 +491,7 @@
         let unsubscribeOrders = null;
         let unsubscribeMerch = null;
         let unsubscribeConfig = null;
+        let unsubscribePromos = null; // Новий підписник для промокодів
 
         const menuButton = document.getElementById('menu-button');
         const navMenu = document.getElementById('nav-menu');
@@ -630,6 +653,13 @@
                 globalCategories = data.categories || ['Одяг', 'Шеврони'];
                 renderCategoriesAdmin();
                 populateCategorySelect();
+            }, e => console.error(e));
+
+            // Завантаження промокодів
+            unsubscribePromos = db.collection("promocodes").orderBy("created", "desc").onSnapshot(snapshot => {
+                globalPromocodes = [];
+                snapshot.forEach(doc => { globalPromocodes.push({ id: doc.id, ...doc.data() }); });
+                renderPromocodes();
             }, e => console.error(e));
         }
 
@@ -1126,6 +1156,12 @@
                     itemsListHtml = `<pre style="font-family:inherit; font-size:0.9rem; margin-left:10px;">${ord.orderTextDetails}</pre>`;
                 }
 
+                // Додавання інформації про промокод у чек (якщо він є)
+                let promoHtml = '';
+                if(ord.promoCode && ord.promoCode !== "Не застосовано") {
+                    promoHtml = `<div style="font-size:0.85rem; color:#00ffcc; margin-top:8px; text-align:right;">🎟️ Промокод: <strong>${ord.promoCode}</strong></div>`;
+                }
+
                 ordersBox.innerHTML += `
                     <div class='msg-item'>
                         <div class='meta-line' style="display:flex; justify-content:space-between; align-items:center;">
@@ -1144,7 +1180,8 @@
                             ${itemsListHtml}
                         </div>
                         
-                        <div class='msg-text' style='text-align:right; font-size:1.1rem;'>Сума до сплати: <strong style="color:var(--theme-color)">${ord.totalPrice} ₴</strong></div>
+                        ${promoHtml}
+                        <div class='msg-text' style='text-align:right; font-size:1.1rem; margin-top:5px;'>Сума до сплати: <strong style="color:var(--theme-color)">${ord.totalPrice} ₴</strong></div>
                         <button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:12px; display:block; width:100%; text-align:center;" onclick="deleteOrderItem('${ord.id}')">Видалити запис</button>
                     </div>`;
             });
@@ -1231,11 +1268,12 @@
                 csvContent += "Дата,Прізвище Ім'я,Фонд,Телефон,WhatsApp,Повідомлення\n"; 
                 rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.org}","${item.phone}","${item.whatsapp}","${item.message}"\n`; });
             } else if(storageKey === 'shopOrdersData') {
-                csvContent += "Дата,Статус,ПІБ,Телефон,Товари,Сума (₴),Адреса\n"; 
+                csvContent += "Дата,Статус,ПІБ,Телефон,Товари,Сума (₴),Адреса,Промокод\n"; 
                 rawData.forEach(item => { 
                     let statusUa = item.status === 'new' ? 'Нове' : (item.status === 'sent' ? 'Відправлено' : 'Скасовано');
                     let itemsStr = item.items ? item.items.map(i => `${i.merchTitle} [${i.size}] x${i.quantity}`).join('; ') : (item.orderTextDetails ? item.orderTextDetails.replace(/\n/g, ' ') : '');
-                    csvContent += `"${item.time}","${statusUa}","${item.name}","${item.phone}","${itemsStr}","${item.totalPrice}","${item.address}"\n`; 
+                    let pCode = item.promoCode || "-";
+                    csvContent += `"${item.time}","${statusUa}","${item.name}","${item.phone}","${itemsStr}","${item.totalPrice}","${item.address}","${pCode}"\n`; 
                 });
             }
             
@@ -1246,6 +1284,66 @@
             link.click();
         }
 
+        // --- ЛОГІКА ПРОМОКОДІВ ---
+        async function createPromoCode() {
+            let code = document.getElementById('promo-code-input').value.trim().toUpperCase();
+            let discount = parseInt(document.getElementById('promo-discount-input').value);
+            
+            if(!code || isNaN(discount) || discount <= 0 || discount > 100) {
+                alert("Введіть коректний код та відсоток знижки (від 1 до 100)!"); return;
+            }
+            if(code.includes(" ")) {
+                alert("Промокод не може містити пробіли!"); return;
+            }
+
+            try {
+                // Записуємо в Firebase. ID документа буде самим кодом.
+                await db.collection("promocodes").doc(code).set({
+                    code: code,
+                    discount: discount,
+                    active: true,
+                    created: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById('promo-code-input').value = "";
+                document.getElementById('promo-discount-input').value = "";
+                alert("✓ Промокод успішно створено!");
+            } catch(e) { console.error(e); alert("Помилка створення: " + e.message); }
+        }
+
+        function renderPromocodes() {
+            const box = document.getElementById('box-for-promocodes'); box.innerHTML = "";
+            if(globalPromocodes.length === 0) { box.innerHTML = `<div class="no-msg">Немає промокодів</div>`; return; }
+            
+            globalPromocodes.forEach(p => {
+                let statusColor = p.active ? "#00ffcc" : "#ff4a4a";
+                let statusText = p.active ? "Активний" : "Вимкнений";
+                box.innerHTML += `
+                    <div class="admin-user-card" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-size:1.2rem; font-weight:900; color:var(--theme-color); letter-spacing:1px;">${p.code}</div>
+                            <div style="color:#aaa; font-size:0.9rem; margin-top:5px;">Знижка: <strong style="color:#fff;">${p.discount}%</strong> | Статус: <span style="color:${statusColor}; font-weight:bold;">${statusText}</span></div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-direction:column;">
+                            <button class="btn" style="padding:6px 15px; font-size:0.8rem;" onclick="togglePromoStatus('${p.id}', ${p.active})">${p.active ? 'Вимкнути' : 'Увімкнути'}</button>
+                            <button class="delete-admin-btn" style="position:static; padding:6px 15px;" onclick="deletePromo('${p.id}')">Видалити</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        async function togglePromoStatus(id, currentStatus) {
+            try { await db.collection("promocodes").doc(id).update({ active: !currentStatus }); } 
+            catch(e) { console.error(e); }
+        }
+
+        async function deletePromo(id) {
+            if(confirm("Обережно! Ви дійсно хочете видалити цей промокод?")) {
+                try { await db.collection("promocodes").doc(id).delete(); } 
+                catch(e) { console.error(e); }
+            }
+        }
+        // -------------------------
+
         function handleLogout() {
             if(unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; }
             if(unsubscribeFeedback) { unsubscribeFeedback(); unsubscribeFeedback = null; }
@@ -1255,6 +1353,7 @@
             if(unsubscribeOrders) { unsubscribeOrders(); unsubscribeOrders = null; }
             if(unsubscribeMerch) { unsubscribeMerch(); unsubscribeMerch = null; }
             if(unsubscribeConfig) { unsubscribeConfig(); unsubscribeConfig = null; }
+            if(unsubscribePromos) { unsubscribePromos(); unsubscribePromos = null; }
             
             isSuperadminSession = false; toggleSuperadminMode(false);
             const dashboard = document.getElementById('admin-dashboard'); dashboard.style.display = 'none'; dashboard.classList.remove('dashboard-mode');
