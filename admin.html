@@ -152,16 +152,11 @@
         .switch-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
         .switch-wrapper input { cursor: pointer; width: 16px; height: 16px; accent-color: var(--theme-color); }
 
-        /* Стилі для підгруп замовлень та акордеонів */
+        /* Стилі для підгруп замовлень */
         .orders-sub-tabs { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
         .orders-sub-btn { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.88rem; transition: all 0.3s; }
         .orders-sub-btn:hover { border-color: rgba(var(--theme-color-rgb), 0.6); }
         .orders-sub-btn.active { background: var(--theme-color); color: #121212; border-color: var(--theme-color); font-weight: bold; }
-
-        .order-accordion-item { background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
-        .order-accordion-header { padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.02); transition: background 0.2s; flex-wrap: wrap; gap: 10px; }
-        .order-accordion-header:hover { background: rgba(255, 255, 255, 0.06); }
-        .order-accordion-body { padding: 20px 15px; border-top: 1px solid rgba(255, 255, 255, 0.05); display: none; background: rgba(0,0,0,0.15); }
 
         /* Стилі для магазину в адмінці */
         .merch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px; }
@@ -772,7 +767,7 @@
             }
         }
 
-        // --- ФУНКЦІЇ ДЛЯ ФІЛЬТРАЦІЇ ТА АКОРДЕОНІВ ЗАМОВЛЕНЬ ---
+        // --- ФУНКЦІЇ ДЛЯ ФІЛЬТРАЦІЇ ЗАМОВЛЕНЬ ---
         function setOrdersFilter(filterType) {
             currentOrdersFilter = filterType;
             document.querySelectorAll('.orders-sub-btn').forEach(btn => btn.classList.remove('active'));
@@ -782,15 +777,10 @@
             renderOrdersList();
         }
 
-        function toggleOrderAccordion(headerElement) {
-            const body = headerElement.nextElementSibling;
-            const allBodies = document.querySelectorAll('.order-accordion-body');
-            allBodies.forEach(b => { if(b !== body) b.style.display = 'none'; });
-            body.style.display = body.style.display === 'block' ? 'none' : 'block';
-        }
-
+        // РЕНДЕР ЗАМОВЛЕНЬ ЯК ВІДКРИТИХ КАРТОК (без акордеону)
         function renderOrdersList() {
-            const ordersBox = document.getElementById('box-for-orders'); ordersBox.innerHTML = "";
+            const ordersBox = document.getElementById('box-for-orders'); 
+            ordersBox.innerHTML = "";
             
             let filteredOrders = globalOrdersData.filter(ord => {
                 let status = ord.status || 'new';
@@ -805,7 +795,8 @@
             });
 
             if(filteredOrders.length === 0) { 
-                ordersBox.innerHTML = `<div class="no-msg">У цій підгрупі замовлень немає</div>`; return; 
+                ordersBox.innerHTML = `<div class="no-msg">У цій підгрупі замовлень немає</div>`; 
+                return; 
             }
 
             filteredOrders.forEach(ord => {
@@ -840,65 +831,55 @@
                 let promoHtml = (ord.promoCode && ord.promoCode !== "Не застосовано") ? `<div style="font-size:0.85rem; color:#00ffcc; margin-bottom:8px;">🎟️ Промокод: <b>${ord.promoCode}</b></div>` : '';
                 let paymentMethodHtml = ord.paymentMethod ? `<div style="font-size:0.9rem; color:#fff; margin-bottom:8px;">💳 <b>Оплата:</b> ${ord.paymentMethod}</div>` : '';
                 
-                // НОВЕ: Перегляд квитанції про оплату, якщо вона є
+                // Перегляд квитанції про оплату, якщо вона є
                 let paymentProofHtml = ord.paymentProof ? `<button class="btn" style="margin-top:10px; padding:6px 12px; width:auto; border-color:#00ffcc; color:#00ffcc;" onclick="openFullImage('${ord.paymentProof}')">📸 Переглянути квитанцію</button>` : '';
 
-                // НОВЕ: Підказка про можливість архівування, якщо доставлено
+                // Підказка про можливість архівування, якщо доставлено
                 let archiveHint = status === 'delivered' ? `<span style="font-size:0.75rem; color:#aaa; margin-left:10px;">(Можна в архів)</span>` : '';
 
                 ordersBox.innerHTML += `
-                    <div class="order-accordion-item">
-                        <div class="order-accordion-header" onclick="toggleOrderAccordion(this)">
-                            <div>
-                                <span style="font-weight:bold; color:var(--theme-color); margin-right:15px;">👤 ${ord.name}</span>
-                                <span style="font-size:0.85rem; color:#aaa;">📱 ${ord.phone} | 📅 ${ord.time || 'Не вказано'}</span>
-                            </div>
-                            <div>
-                                <span style="font-weight:bold; margin-right:15px; color:#fff;">${ord.totalPrice} ₴</span>
-                                <span class="badge ${sClass}">${sLabel}</span>
+                    <div class='msg-item' style="border-left: 4px solid var(--theme-color);">
+                        <div class='meta-line' style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                            <span>🛒 Замовлення від ${ord.time || 'Не вказано'}</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:0.85rem; color:#ccc;">Статус:</span>
+                                <select class="status-select ${sClass}" onchange="changeOrderStatus('${ord.id}', this.value)">
+                                    <option value="new" ${status === 'new' ? 'selected' : ''}>Нове</option>
+                                    <option value="on_review" ${status === 'on_review' ? 'selected' : ''}>На перевірці</option>
+                                    <option value="accepted" ${status === 'accepted' ? 'selected' : ''}>Прийнято</option>
+                                    <option value="sent" ${status === 'sent' ? 'selected' : ''}>Відправлено</option>
+                                    <option value="delivered" ${status === 'delivered' ? 'selected' : ''}>Доставлено</option>
+                                    <option value="cancelled" ${status === 'cancelled' ? 'selected' : ''}>Скасовано</option>
+                                    <option value="archived" ${status === 'archived' ? 'selected' : ''}>В архіві</option>
+                                </select>
                             </div>
                         </div>
                         
-                        <div class="order-accordion-body">
-                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:15px; margin-bottom:15px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:15px;">
-                                <div>
-                                    <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">📍 Дані доставки:</h4>
-                                    <p class="msg-text"><b>ПІБ:</b> ${ord.name}</p>
-                                    <p class="msg-text"><b>Тел:</b> ${ord.phone}</p>
-                                    <p class="msg-text"><b>Адреса:</b> ${ord.address}</p>
-                                </div>
-                                <div>
-                                    <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">💰 Стан та перевірка оплати:</h4>
-                                    ${paymentMethodHtml}
-                                    ${promoHtml}
-                                    <p class="msg-text" style="font-size:1.05rem;"><b>Разом до сплати:</b> <span style="color:var(--theme-color); font-weight:bold;">${ord.totalPrice} ₴</span></p>
-                                    ${paymentProofHtml}
-                                </div>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:15px; margin-bottom:15px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:15px; margin-top:15px;">
+                            <div>
+                                <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">📍 Дані доставки:</h4>
+                                <p class="msg-text">👤 <b>ПІБ:</b> ${ord.name}</p>
+                                <p class="msg-text">📞 <b>Тел:</b> ${ord.phone}</p>
+                                <p class="msg-text">📍 <b>Адреса:</b> ${ord.address}</p>
                             </div>
+                            <div>
+                                <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">💰 Оплата та підтвердження:</h4>
+                                ${paymentMethodHtml}
+                                ${promoHtml}
+                                <p class="msg-text" style="font-size:1.05rem;"><b>До сплати:</b> <span style="color:var(--theme-color); font-weight:bold;">${ord.totalPrice} ₴</span></p>
+                                ${paymentProofHtml}
+                            </div>
+                        </div>
 
-                            <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:6px; margin-bottom:15px;">
-                                <div style="font-size:0.85rem; color:#aaa; margin-bottom:8px; font-weight:bold;">Склад замовлення:</div>
-                                ${itemsListHtml}
-                            </div>
+                        <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:6px; margin-bottom:15px;">
+                            <div style="font-size:0.85rem; color:#aaa; margin-bottom:8px; font-weight:bold;">Склад замовлення:</div>
+                            ${itemsListHtml}
+                        </div>
 
-                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:rgba(255,255,255,0.02); padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
-                                <div style="display:flex; align-items:center; gap:8px;">
-                                    <span style="font-size:0.85rem; color:#ccc;">Змінити статус:</span>
-                                    <select class="status-select ${sClass}" onchange="changeOrderStatus('${ord.id}', this.value)">
-                                        <option value="on_review" ${status === 'on_review' ? 'selected' : ''}>На перевірці</option>
-                                        <option value="accepted" ${status === 'accepted' ? 'selected' : ''}>Прийнято</option>
-                                        <option value="sent" ${status === 'sent' ? 'selected' : ''}>Відправлено</option>
-                                        <option value="delivered" ${status === 'delivered' ? 'selected' : ''}>Доставлено</option>
-                                        <option value="cancelled" ${status === 'cancelled' ? 'selected' : ''}>Скасовано</option>
-                                        <option value="archived" ${status === 'archived' ? 'selected' : ''}>В архіві</option>
-                                    </select>
-                                </div>
-                                <div style="display:flex; align-items:center; gap:8px;">
-                                    ${archiveHint}
-                                    <button class="btn" style="padding:6px 12px; font-size:0.8rem; border-color:#da70d6; color:#da70d6; width:auto;" onclick="changeOrderStatus('${ord.id}', 'archived')">📥 В архів</button>
-                                    <button class="delete-admin-btn" style="position:static; padding:6px 12px;" onclick="deleteOrderItem('${ord.id}')">Видалити запис</button>
-                                </div>
-                            </div>
+                        <div style="display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:10px; background:rgba(255,255,255,0.02); padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
+                            ${archiveHint}
+                            <button class="btn" style="padding:6px 12px; font-size:0.8rem; border-color:#da70d6; color:#da70d6; width:auto;" onclick="changeOrderStatus('${ord.id}', 'archived')">📥 Перенести в архів</button>
+                            <button class="delete-admin-btn" style="position:static; padding:6px 12px;" onclick="deleteOrderItem('${ord.id}')">Видалити запис</button>
                         </div>
                     </div>`;
             });
@@ -1073,7 +1054,7 @@
                 let saleBadge = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
                 let descHtml = item.description ? `<div class="merch-desc">${item.description}</div>` : '';
 
-                // НОВЕ: Кольорові індикатори залишків
+                // Кольорові індикатори залишків
                 let stockLine = "";
                 if(typeof item.stock === 'object' && item.stock !== null) {
                     stockLine = Object.entries(item.stock).map(([sz, q]) => {
@@ -1220,7 +1201,7 @@
                     </div>`;
             });
 
-            renderOrdersList();
+            renderOrdersList(); // Відмальовує замовлення згідно з поточним фільтром (активні/архів)
 
             if (isSuperadminSession) { renderAdminAccountsList(); }
 
@@ -1230,7 +1211,7 @@
                 if (globalChatsData[id].status === 'closed') {
                     archiveCount++;
                     let statusLabel = globalChatsData[id].adminStatus === 'success' ? 'Успішно' : globalChatsData[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
-                    let chatHtml = `<div class='msg-item'><div class='meta-line'>📦 Архів: ${id.substr(0,8)} | <span class="badge ${globalChatsData[id].adminStatus}">${statusLabel}</span></div><div style='display:flex; flex-direction:column; gap:5px; margin-top:10px;'>`;
+                    let chatHtml = `<div class='msg-item'><div class='meta-line'>📦 Архів чату: ${id.substr(0,8)} | <span class="badge ${globalChatsData[id].adminStatus}">${statusLabel}</span></div><div style='display:flex; flex-direction:column; gap:5px; margin-top:10px;'>`;
                     globalChatsData[id].messages.forEach(m => {
                         let contentHtml = m.type === 'image' ? `<img src="${m.text}" onclick="openFullImage('${m.text}')" style="max-height:100px;">` : m.text;
                         chatHtml += `<div style='font-size:0.85rem; color:${m.sender === 'admin' ? 'var(--theme-color)' : '#bbb'}'><strong>${m.sender}:</strong> ${contentHtml}</div>`;
@@ -1238,7 +1219,7 @@
                     chatHtml += `</div></div>`; archiveBox.innerHTML += chatHtml;
                 }
             });
-            if(archiveCount === 0) archiveBox.innerHTML = `<div class="no-msg">Архів порожній</div>`;
+            if(archiveCount === 0) archiveBox.innerHTML = `<div class="no-msg">Архів чатів порожній</div>`;
         }
 
         async function deleteFeedbackItem(id) { if(confirm("Видалити цю заявку?")) { try { await db.collection("feedback").doc(id).delete(); } catch(e) { console.error(e); } } }
@@ -1293,7 +1274,6 @@
             if (wasAtBottom) { flow.scrollTop = flow.scrollHeight; }
         }
 
-        // ВІДНОВЛЕНІ ФУНКЦІЇ, ЯКІ БУЛИ ОБРІЗАНІ
         function exportToCSV(storageKey, fileName) {
             let rawData;
             if(storageKey === 'siteFeedbackData') rawData = globalFeedbackData;
