@@ -391,18 +391,41 @@
             <div id="link-management-tab" class="tab-content">
                 <div class="superadmin-grid">
                     <div class="admin-creator-form" style="flex: 1.3; min-width: 320px;">
-                        <h3 id="news-form-title" style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">📰 Публікація новини</h3>
+                        <h3 id="news-form-title" style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">📰 Публікація новини / звіту</h3>
                         <input type="hidden" id="edit-news-id" value="">
+                        
                         <div class="form-group">
-                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Фото новини:</label>
+                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Тип публікації:</label>
+                            <select id="news-publish-type" class="form-select">
+                                <option value="news">Новина (Хроніка)</option>
+                                <option value="report">Звіт (Донати)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Тип медіа:</label>
+                            <select id="news-media-type" class="form-select" onchange="toggleMediaInput()">
+                                <option value="image">Фото</option>
+                                <option value="video">Відео (YouTube/Shorts посилання)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="news-photo-zone">
+                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Фото:</label>
                             <input type="file" id="news-photo-file" accept="image/*" class="form-input" onchange="previewNewsPhoto(this)">
                             <img id="news-preview-element" class="news-img-preview" src="">
                         </div>
+                        
+                        <div class="form-group" id="news-video-zone" style="display:none;">
+                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Посилання на відео (YouTube):</label>
+                            <input type="url" id="news-video-url" class="form-input" placeholder="https://www.youtube.com/watch?v=...">
+                        </div>
+
                         <div class="form-group">
-                            <input type="text" id="news-title-field" class="form-input" placeholder="Заголовок новини" autocomplete="off">
+                            <input type="text" id="news-title-field" class="form-input" placeholder="Заголовок" autocomplete="off">
                         </div>
                         <div class="form-group">
-                            <textarea id="news-body-field" class="form-input" placeholder="Повний текст новини (розкритий текст)..."></textarea>
+                            <textarea id="news-body-field" class="form-input" placeholder="Повний текст / Опис..." style="min-height: 120px;"></textarea>
                         </div>
                         <div class="form-group">
                             <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Дата публікації:</label>
@@ -421,7 +444,7 @@
                             </div>
                         </div>
                         <div style="display:flex; gap:10px;">
-                            <button id="news-submit-btn" class="btn" onclick="publishNewsItem()" style="flex:2;">Опублікувати новину</button>
+                            <button id="news-submit-btn" class="btn" onclick="publishNewsItem()" style="flex:2;">Опублікувати</button>
                             <button id="news-cancel-edit-btn" class="btn" onclick="cancelNewsEditing()" style="border-color:#ff4a4a; color:#ff4a4a; display:none; flex:1;">Скасувати</button>
                         </div>
                     </div>
@@ -446,18 +469,22 @@
 
                         <div class="admin-creator-form">
                             <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Додати соціальну мережу</h3>
+                            <input type="hidden" id="edit-soc-id" value="">
                             <div class="form-group"><input type="text" id="soc-name" class="form-input" placeholder="Назва" autocomplete="off"></div>
                             <div class="form-group"><input type="url" id="soc-url" class="form-input" placeholder="Посилання" autocomplete="off"></div>
                             <div class="form-group" style="display:flex; align-items:center; gap:10px;">
                                 <label style="font-size:0.9rem; color:#bbb;">Колір кнопки:</label>
                                 <input type="color" id="soc-color" value="#f0b48c" style="background:none; border:none; width:40px; height:35px; cursor:pointer;">
                             </div>
-                            <button class="btn" onclick="addNewSocialNetwork()">Зберегти мережу</button>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn" id="soc-submit-btn" onclick="addNewSocialNetwork()" style="flex:2;">Зберегти мережу</button>
+                                <button id="soc-cancel-edit-btn" class="btn" onclick="cancelSocEditing()" style="border-color:#ff4a4a; color:#ff4a4a; display:none; flex:1;">Скасувати</button>
+                            </div>
                         </div>
                     </div>
 
                     <div class="admin-accounts-list" style="width:100%; max-height:none;">
-                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:#fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:5px;" data-lang="ua">Хроніка опублікованих новин:</h3>
+                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:#fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:5px;" data-lang="ua">Хроніка публікацій (Новини та Звіти):</h3>
                         <div id="box-for-published-news"></div>
                         <h3 style="margin-bottom:15px; font-size:1.1rem; color:#fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:5px; margin-top:30px;" data-lang="ua">Активні посилання соцмереж:</h3>
                         <div id="box-for-social-list"></div>
@@ -525,6 +552,7 @@
         let globalMerchData = [];
         let globalCategories = []; 
         let globalPromocodes = []; 
+        let globalReportsData = [];
 
         let unsubscribeChats = null;
         let unsubscribeFeedback = null;
@@ -536,6 +564,7 @@
         let unsubscribeConfig = null;
         let unsubscribePromos = null; 
         let unsubscribePaymentConfig = null;
+        let unsubscribeReports = null;
 
         const menuButton = document.getElementById('menu-button');
         const navMenu = document.getElementById('nav-menu');
@@ -713,8 +742,14 @@
 
             unsubscribeNews = db.collection("news").orderBy("date", "desc").onSnapshot(snapshot => {
                 globalNewsData = [];
-                snapshot.forEach(doc => { globalNewsData.push({ id: doc.id, ...doc.data() }); });
+                snapshot.forEach(doc => { globalNewsData.push({ id: doc.id, ...doc.data(), isReport: false }); });
                 renderAdminNewsChronicle();
+            }, e => console.error(e));
+            
+            unsubscribeReports = db.collection("reports").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+                globalReportsData = [];
+                snapshot.forEach(doc => { globalReportsData.push({ id: doc.id, ...doc.data(), isReport: true }); });
+                renderAdminNewsChronicle(); 
             }, e => console.error(e));
 
             unsubscribeOrders = db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
@@ -767,6 +802,14 @@
             }, e => console.error(e));
         }
 
+        function toggleMediaInput() {
+            const type = document.getElementById('news-media-type').value;
+            const photoZone = document.getElementById('news-photo-zone');
+            const videoZone = document.getElementById('news-video-zone');
+            if(photoZone) photoZone.style.display = type === 'image' ? 'block' : 'none';
+            if(videoZone) videoZone.style.display = type === 'video' ? 'block' : 'none';
+        }
+
         function previewNewsPhoto(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -788,48 +831,91 @@
             }
         }
 
-        function startEditNews(id) {
-            const news = globalNewsData.find(n => n.id === id);
-            if(!news) return;
-            document.getElementById('edit-news-id').value = news.id;
-            document.getElementById('news-title-field').value = news.title;
-            document.getElementById('news-body-field').value = news.body;
-            document.getElementById('news-date-field').value = news.date;
+        function startEditNews(id, isReport) {
+            const dataSet = isReport ? globalReportsData : globalNewsData;
+            const item = dataSet.find(n => n.id === id);
+            if(!item) return;
             
+            document.getElementById('edit-news-id').value = item.id;
+            
+            const publishTypeSelect = document.getElementById('news-publish-type');
+            if(publishTypeSelect) {
+                publishTypeSelect.value = isReport ? 'report' : 'news';
+                publishTypeSelect.disabled = true; 
+            }
+            
+            document.getElementById('news-title-field').value = isReport ? "Звіт по донатах" : (item.title || "");
+            if(isReport && document.getElementById('news-title-field')) document.getElementById('news-title-field').parentElement.style.display = 'none';
+            else if(!isReport && document.getElementById('news-title-field')) document.getElementById('news-title-field').parentElement.style.display = 'block';
+            
+            document.getElementById('news-body-field').value = isReport ? item.description : item.body;
+            document.getElementById('news-date-field').value = item.date || "";
+            
+            const mediaTypeSelect = document.getElementById('news-media-type');
+            if(mediaTypeSelect) {
+                mediaTypeSelect.value = item.mediaType || 'image';
+                toggleMediaInput();
+            }
+
             const previewImg = document.getElementById('news-preview-element');
-            if(news.image) {
-                newsPhotoBase64 = news.image;
-                if(previewImg) { previewImg.src = news.image; previewImg.style.display = 'block'; }
-            } else {
+            if(item.mediaType === 'image' || !item.mediaType) {
+                if(item.image) {
+                    newsPhotoBase64 = item.image;
+                    if(previewImg) { previewImg.src = item.image; previewImg.style.display = 'block'; }
+                } else {
+                    if(previewImg) previewImg.style.display = 'none';
+                    newsPhotoBase64 = "";
+                }
+                document.getElementById('news-video-url').value = "";
+            } else if (item.mediaType === 'video') {
+                document.getElementById('news-video-url').value = item.videoUrl || "";
                 if(previewImg) previewImg.style.display = 'none';
                 newsPhotoBase64 = "";
             }
 
             const hasBtnCheckbox = document.getElementById('news-has-btn-checkbox');
-            if(hasBtnCheckbox) hasBtnCheckbox.checked = news.hasButton;
+            if(hasBtnCheckbox) hasBtnCheckbox.checked = item.hasButton || false;
             const btnConfigBox = document.getElementById('news-button-config-box');
-            if(news.hasButton) {
+            if(item.hasButton) {
                 if(btnConfigBox) btnConfigBox.style.display = 'block';
-                document.getElementById('news-btn-text-field').value = news.btnText || "";
-                document.getElementById('news-btn-url-field').value = news.btnUrl || "";
+                document.getElementById('news-btn-text-field').value = item.btnText || "";
+                document.getElementById('news-btn-url-field').value = item.btnUrl || "";
             } else {
                 if(btnConfigBox) btnConfigBox.style.display = 'none';
             }
 
-            document.getElementById('news-form-title').innerText = "📝 Редагування новини";
+            document.getElementById('news-form-title').innerText = isReport ? "📝 Редагування звіту" : "📝 Редагування новини";
             document.getElementById('news-submit-btn').innerText = "Зберегти зміни";
             const cancelBtn = document.getElementById('news-cancel-edit-btn');
             if(cancelBtn) cancelBtn.style.display = 'inline-block';
+            document.getElementById('link-management-tab').scrollTop = 0;
         }
 
         function cancelNewsEditing() {
             document.getElementById('edit-news-id').value = "";
-            document.getElementById('news-title-field').value = "";
+            
+            const publishTypeSelect = document.getElementById('news-publish-type');
+            if(publishTypeSelect) {
+                publishTypeSelect.value = 'news';
+                publishTypeSelect.disabled = false; 
+            }
+            if(document.getElementById('news-title-field')) {
+                document.getElementById('news-title-field').value = "";
+                document.getElementById('news-title-field').parentElement.style.display = 'block';
+            }
+            
             document.getElementById('news-body-field').value = "";
+            
+            const mediaTypeSelect = document.getElementById('news-media-type');
+            if(mediaTypeSelect) mediaTypeSelect.value = 'image';
+            toggleMediaInput();
+            
             const photoFile = document.getElementById('news-photo-file');
             if(photoFile) photoFile.value = "";
             const previewImg = document.getElementById('news-preview-element');
             if(previewImg) previewImg.style.display = 'none';
+            document.getElementById('news-video-url').value = "";
+            
             const hasBtnCheckbox = document.getElementById('news-has-btn-checkbox');
             if(hasBtnCheckbox) hasBtnCheckbox.checked = false;
             const btnConfigBox = document.getElementById('news-button-config-box');
@@ -838,8 +924,8 @@
             document.getElementById('news-btn-url-field').value = "";
             newsPhotoBase64 = "";
 
-            document.getElementById('news-form-title').innerText = "📰 Публікація новини";
-            document.getElementById('news-submit-btn').innerText = "Опублікувати новину";
+            document.getElementById('news-form-title').innerText = "📰 Публікація новини / звіту";
+            document.getElementById('news-submit-btn').innerText = "Опублікувати";
             const cancelBtn = document.getElementById('news-cancel-edit-btn');
             if(cancelBtn) cancelBtn.style.display = 'none';
             document.getElementById('news-date-field').valueAsDate = new Date();
@@ -849,39 +935,104 @@
             const box = document.getElementById('box-for-published-news'); 
             if(!box) return;
             box.innerHTML = "";
-            if(globalNewsData.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:10px;">Немає опублікованих новин у хмарі</div>`; return; }
-            globalNewsData.forEach(news => {
-                let imgHtml = news.image ? `<img src="${news.image}" style="max-height:60px; border-radius:4px; margin-top:5px; display:block;">` : '';
-                let btnHtml = news.hasButton ? `<span style="background:rgba(240,180,140,0.1); color:var(--theme-color); font-size:0.75rem; padding:2px 6px; border-radius:4px; margin-top:5px; display:inline-block;">Кнопка: ${news.btnText}</span>` : '';
+            
+            let combinedData = [...globalNewsData, ...globalReportsData];
+            
+            combinedData.sort((a, b) => {
+                let timeA = a.date ? new Date(a.date).getTime() : (a.timestamp ? a.timestamp.toMillis() : 0);
+                let timeB = b.date ? new Date(b.date).getTime() : (b.timestamp ? b.timestamp.toMillis() : 0);
+                return timeB - timeA;
+            });
+
+            if(combinedData.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:10px;">Немає публікацій</div>`; return; }
+            
+            combinedData.forEach(item => {
+                let imgHtml = "";
+                if(item.mediaType === 'video' && item.videoUrl) {
+                    imgHtml = `<div style="font-size:0.8rem; color:#aaa; margin-top:5px;">🎥 Відео: ${item.videoUrl}</div>`;
+                } else if (item.image) {
+                    imgHtml = `<img src="${item.image}" style="max-height:60px; border-radius:4px; margin-top:5px; display:block;">`;
+                }
+
+                let btnHtml = item.hasButton ? `<span style="background:rgba(240,180,140,0.1); color:var(--theme-color); font-size:0.75rem; padding:2px 6px; border-radius:4px; margin-top:5px; display:inline-block;">Кнопка: ${item.btnText}</span>` : '';
+                
+                let typeBadge = item.isReport 
+                    ? `<span style="background:#00ffcc; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold; margin-right:5px;">ЗВІТ</span>` 
+                    : `<span style="background:var(--theme-color); color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold; margin-right:5px;">НОВИНА</span>`;
+
+                let title = item.isReport ? "Фінансовий звіт" : item.title;
+                let bodyText = item.isReport ? item.description : item.body;
+
                 box.innerHTML += `
                     <div class="admin-user-card" style="padding: 12px 15px;">
-                        <div style="font-size:0.8rem; color:var(--theme-color); font-weight:bold;">📅 ${news.date}</div>
-                        <div style="font-weight:bold; margin:4px 0; font-size:1rem; padding-right:180px;">${news.title}</div>
-                        <div style="font-size:0.85rem; color:#ccc; max-height:45px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${news.body}</div>
+                        <div style="font-size:0.8rem; color:var(--theme-color); font-weight:bold; margin-bottom:5px;">${typeBadge} 📅 ${item.date || new Date(item.timestamp?.toMillis() || Date.now()).toLocaleDateString('uk-UA')}</div>
+                        <div style="font-weight:bold; margin:4px 0; font-size:1rem; padding-right:180px;">${title}</div>
+                        <div style="font-size:0.85rem; color:#ccc; max-height:45px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${bodyText}</div>
                         ${imgHtml} ${btnHtml}
-                        <button class="edit-news-btn" onclick="startEditNews('${news.id}')">Редагувати</button>
-                        <button class="delete-admin-btn" onclick="deleteNewsItem('${news.id}')">Видалити</button>
+                        <button class="edit-news-btn" onclick="startEditNews('${item.id}', ${item.isReport})">Редагувати</button>
+                        <button class="delete-admin-btn" onclick="deleteNewsItem('${item.id}', ${item.isReport})">Видалити</button>
                     </div>`;
             });
         }
 
-        async function deleteNewsItem(id) {
-            if(confirm("Видалити цю новину безповоротно з хмари?")) {
+        async function deleteNewsItem(id, isReport) {
+            let collectionName = isReport ? "reports" : "news";
+            if(confirm(`Видалити цей запис безповоротно?`)) {
                 try {
-                    await db.collection("news").doc(id).delete();
+                    await db.collection(collectionName).doc(id).delete();
                     if(document.getElementById('edit-news-id').value === id) cancelNewsEditing();
-                } catch(e) { console.error("Помилка видалення новини:", e); }
+                } catch(e) { console.error("Помилка видалення:", e); }
             }
         }
 
+        function startEditSocialNetwork(id) {
+            const net = globalSocialNetworks.find(n => n.id === id);
+            if(!net) return;
+            document.getElementById('edit-soc-id').value = net.id;
+            document.getElementById('soc-name').value = net.name;
+            document.getElementById('soc-url').value = net.url;
+            document.getElementById('soc-color').value = net.color;
+            
+            document.getElementById('soc-submit-btn').innerText = "Зберегти зміни";
+            document.getElementById('soc-cancel-edit-btn').style.display = 'inline-block';
+        }
+
+        function cancelSocEditing() {
+            document.getElementById('edit-soc-id').value = "";
+            document.getElementById('soc-name').value = "";
+            document.getElementById('soc-url').value = "";
+            document.getElementById('soc-color').value = "#f0b48c";
+            
+            document.getElementById('soc-submit-btn').innerText = "Зберегти мережу";
+            document.getElementById('soc-cancel-edit-btn').style.display = 'none';
+        }
+
         async function addNewSocialNetwork() {
-            const nameField = document.getElementById('soc-name'); const urlField = document.getElementById('soc-url'); const colorField = document.getElementById('soc-color');
-            const name = nameField.value.trim(); const url = urlField.value.trim(); const color = colorField.value;
+            const editId = document.getElementById('edit-soc-id').value;
+            const nameField = document.getElementById('soc-name'); 
+            const urlField = document.getElementById('soc-url'); 
+            const colorField = document.getElementById('soc-color');
+            
+            const name = nameField.value.trim(); 
+            const url = urlField.value.trim(); 
+            const color = colorField.value;
+            
             if(!name || !url) { alert("Заповніть назву та посилання!"); return; }
-            let updatedList = [...globalSocialNetworks, { id: 'soc_' + Date.now(), name, url, color }];
+            
+            let updatedList = [...globalSocialNetworks];
+            
+            if(editId) {
+                let index = updatedList.findIndex(n => n.id === editId);
+                if(index > -1) {
+                    updatedList[index] = { id: editId, name, url, color };
+                }
+            } else {
+                updatedList.push({ id: 'soc_' + Date.now(), name, url, color });
+            }
+
             try {
                 await db.collection("config").doc("socials").set({ list: updatedList });
-                nameField.value = ""; urlField.value = "";
+                cancelSocEditing();
             } catch(e) { console.error("Помилка соцмережі:", e); }
         }
 
@@ -895,6 +1046,7 @@
                     <div class="admin-user-card" style="border-left: 4px solid ${net.color}; padding: 10px 15px;">
                         <span style="font-weight:bold; color:${net.color};">${net.name}</span>
                         <div style="font-size:0.8rem; color:#aaa; margin-top:4px; word-break:break-all;">${net.url}</div>
+                        <button class="edit-news-btn" onclick="startEditSocialNetwork('${net.id}')">Редагувати</button>
                         <button class="delete-admin-btn" style="top:8px;" onclick="deleteSocialNetwork('${net.id}')">Видалити</button>
                     </div>`;
             });
@@ -903,18 +1055,28 @@
         async function deleteSocialNetwork(id) {
             if(confirm("Видалити цю соцмережу?")) {
                 let updatedList = globalSocialNetworks.filter(net => net.id !== id);
-                try { await db.collection("config").doc("socials").set({ list: updatedList }); } catch(e) { console.error(e); }
+                try { 
+                    await db.collection("config").doc("socials").set({ list: updatedList }); 
+                    if(document.getElementById('edit-soc-id').value === id) cancelSocEditing();
+                } catch(e) { console.error(e); }
             }
         }
 
         async function publishNewsItem() {
+            const publishType = document.getElementById('news-publish-type').value;
+            const mediaType = document.getElementById('news-media-type').value;
+            
             const title = document.getElementById('news-title-field').value.trim();
             const body = document.getElementById('news-body-field').value.trim();
-            const dateVal = document.getElementById('news-date-field').value;
+            const dateVal = document.getElementById('news-date-field').value || new Date().toISOString().split('T')[0];
+            const videoUrl = document.getElementById('news-video-url').value.trim();
+            
             const hasBtn = document.getElementById('news-has-btn-checkbox').checked;
             const editId = document.getElementById('edit-news-id').value;
             
-            if(!title || !body || !dateVal) { alert("Заповніть заголовок, текст та дату новини!"); return; }
+            if(publishType === 'news' && !title) { alert("Заповніть заголовок новини!"); return; }
+            if(!body) { alert("Заповніть текст/опис!"); return; }
+            if(mediaType === 'video' && !videoUrl) { alert("Вставте посилання на відео!"); return; }
 
             let btnText = ""; let btnUrl = "";
             if(hasBtn) {
@@ -923,18 +1085,40 @@
                 if(!btnText || !btnUrl) { alert("Заповніть налаштування кнопки дії або вимкніть її!"); return; }
             }
 
-            const postObject = {
-                title: title, body: body, date: dateVal, image: newsPhotoBase64 || null,
-                hasButton: hasBtn, btnText: btnText, btnUrl: btnUrl
-            };
+            let postObject = {};
+            let collectionName = "";
+
+            if (publishType === 'news') {
+                collectionName = "news";
+                postObject = {
+                    title: title, 
+                    body: body, 
+                    date: dateVal, 
+                    mediaType: mediaType,
+                    image: mediaType === 'image' ? (newsPhotoBase64 || null) : null,
+                    videoUrl: mediaType === 'video' ? videoUrl : null,
+                    hasButton: hasBtn, 
+                    btnText: btnText, 
+                    btnUrl: btnUrl
+                };
+            } else if (publishType === 'report') {
+                collectionName = "reports";
+                postObject = {
+                    description: body, 
+                    date: dateVal,
+                    mediaType: mediaType,
+                    image: mediaType === 'image' ? (newsPhotoBase64 || null) : null,
+                    videoUrl: mediaType === 'video' ? videoUrl : null,
+                };
+            }
 
             try {
                 if(editId) {
-                    await db.collection("news").doc(editId).set(postObject, { merge: true });
+                    await db.collection(collectionName).doc(editId).set(postObject, { merge: true });
                     alert("✓ Зміни успішно збережено в хмарі!");
                 } else {
-                    await db.collection("news").add({ ...postObject, createdTimestamp: firebase.firestore.FieldValue.serverTimestamp() });
-                    alert("✓ Новину успішно опубліковано глобально!");
+                    await db.collection(collectionName).add({ ...postObject, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                    alert("✓ Успішно опубліковано!");
                 }
                 cancelNewsEditing();
             } catch(err) {
@@ -1311,273 +1495,6 @@
             finally { isConfirmingStatus = false; renderAllDynamicData(); }
         }
 
-        function renderAllDynamicData() {
-            if (isConfirmingStatus) return;
-            updateBadgesLogic();
-
-            const sessionsBox = document.getElementById('active-sessions-box'); 
-            if(sessionsBox) {
-                const savedScrollTop = sessionsBox.scrollTop; sessionsBox.innerHTML = "";
-                let activeCount = 0;
-                Object.keys(globalChatsData).forEach(id => {
-                    if (globalChatsData[id].status === 'active') {
-                        activeCount++; const item = document.createElement('div');
-                        item.className = `session-item ${currentSelectedChatId === id ? 'selected' : ''}`;
-                        let statusLabel = globalChatsData[id].adminStatus === 'success' ? 'Успішно' : globalChatsData[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
-                        item.innerHTML = `<div><strong>ID: ${id.substr(0,8)}</strong> <span class="badge ${globalChatsData[id].adminStatus}">${statusLabel}</span></div>`;
-                        item.onclick = () => selectChatSession(id); sessionsBox.appendChild(item);
-                    }
-                });
-                if(activeCount === 0) sessionsBox.innerHTML = `<div class="no-msg">Активних чатів немає</div>`;
-                sessionsBox.scrollTop = savedScrollTop;
-            }
-
-            const workspaceContent = document.getElementById('chat-messages-and-header');
-            const inputBlock = document.getElementById('global-admin-input-block');
-            const workspaceWrapper = document.getElementById('chat-workspace-block');
-
-            if (currentSelectedChatId && globalChatsData[currentSelectedChatId]) {
-                if(inputBlock) inputBlock.style.display = 'flex'; 
-                if(sessionsBox) sessionsBox.classList.add('hide-on-mobile'); 
-                if(workspaceWrapper) workspaceWrapper.classList.add('show-on-mobile');
-                if(workspaceContent) renderWorkspaceContent(globalChatsData[currentSelectedChatId], workspaceContent);
-            } else {
-                if(inputBlock) inputBlock.style.display = 'none'; 
-                if(sessionsBox) sessionsBox.classList.remove('hide-on-mobile'); 
-                if(workspaceWrapper) workspaceWrapper.classList.remove('show-on-mobile');
-                if(workspaceContent) workspaceContent.innerHTML = `<div style="text-align:center; margin:auto; color:#666;" data-lang="ua">Оберіть чат зі списку</div>`;
-            }
-
-            const fbBox = document.getElementById('box-for-feedback'); 
-            if(fbBox) {
-                fbBox.innerHTML = "";
-                if(globalFeedbackData.length === 0) fbBox.innerHTML = `<div class="no-msg">Заявок немає</div>`;
-                globalFeedbackData.slice().reverse().forEach(fb => { 
-                    fbBox.innerHTML += `
-                        <div class='msg-item'>
-                            <div class='meta-line'>👤 ${fb.name} | 📱 ${fb.contact} (${fb.time})</div>
-                            <div class='msg-text'>${fb.message}</div>
-                            <button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:8px; display:block;" onclick="deleteFeedbackItem('${fb.id}')">Видалити</button>
-                        </div>`; 
-                });
-            }
-
-            const volBox = document.getElementById('box-for-volunteers'); 
-            if(volBox) {
-                volBox.innerHTML = "";
-                if(globalVolunteersData.length === 0) volBox.innerHTML = `<div class="no-msg">Бланків немає</div>`;
-                globalVolunteersData.slice().reverse().forEach(vol => {
-                    let imgHtml = vol.image ? `<img src="${vol.image}" class="attached-img-preview" onclick="openFullImage('${vol.image}')">` : '';
-                    volBox.innerHTML += `
-                        <div class='msg-item'>
-                            <div class='meta-line'>📋 ${vol.name} | 🏛️ ${vol.org} (${vol.time})</div>
-                            <div class='msg-text' style='margin-bottom:5px;'>📞 <strong>Тел:</strong> ${vol.phone} | 💬 <strong>WhatsApp:</strong> ${vol.whatsapp}</div>
-                            <div class='msg-text' style='color:#bbb;'>✉️ <strong>Повідомлення:</strong> ${vol.message}</div>
-                            ${imgHtml}
-                            <button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:8px; display:block;" onclick="deleteVolunteerItem('${vol.id}')">Видалити</button>
-                        </div>`;
-                });
-            }
-
-            renderOrdersList();
-
-            if (isSuperadminSession) { renderAdminAccountsList(); }
-
-            const archiveBox = document.getElementById('box-for-archive'); 
-            if(archiveBox) {
-                archiveBox.innerHTML = "";
-                let archiveCount = 0;
-                Object.keys(globalChatsData).forEach(id => {
-                    if (globalChatsData[id].status === 'closed') {
-                        archiveCount++;
-                        let statusLabel = globalChatsData[id].adminStatus === 'success' ? 'Успішно' : globalChatsData[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
-                        let chatHtml = `<div class='msg-item'><div class='meta-line'>📦 Архів чату: ${id.substr(0,8)} | <span class="badge ${globalChatsData[id].adminStatus}">${statusLabel}</span></div><div style='display:flex; flex-direction:column; gap:5px; margin-top:10px;'>`;
-                        globalChatsData[id].messages.forEach(m => {
-                            let contentHtml = m.type === 'image' ? `<img src="${m.text}" onclick="openFullImage('${m.text}')" style="max-height:100px;">` : m.text;
-                            chatHtml += `<div style='font-size:0.85rem; color:${m.sender === 'admin' ? 'var(--theme-color)' : '#bbb'}'><strong>${m.sender}:</strong> ${contentHtml}</div>`;
-                        });
-                        chatHtml += `</div></div>`; archiveBox.innerHTML += chatHtml;
-                    }
-                });
-                if(archiveCount === 0) archiveBox.innerHTML = `<div class="no-msg">Архів чатів порожній</div>`;
-            }
-        }
-
-        async function deleteFeedbackItem(id) { if(confirm("Видалити цю заявку?")) { try { await db.collection("feedback").doc(id).delete(); } catch(e) { console.error(e); } } }
-        async function deleteVolunteerItem(id) { if(confirm("Видалити цей бланк волонтера?")) { try { await db.collection("volunteers").doc(id).delete(); } catch(e) { console.error(e); } } }
-        async function deleteOrderItem(id) { if(confirm("Видалити запис про це замовлення? (Залишки на складі НЕ повернуться автоматично)")) { try { await db.collection("orders").doc(id).delete(); } catch(e) { console.error(e); } } }
-
-        function createNewAdminAccount(event) {
-            event.preventDefault();
-            const lastName = document.getElementById('new-admin-lastname').value.trim();
-            const firstName = document.getElementById('new-admin-firstname').value.trim();
-            const phone = document.getElementById('new-admin-phone').value.trim();
-            const user = document.getElementById('new-admin-user').value.trim();
-            const pass = document.getElementById('new-admin-pass').value.trim();
-            let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
-            if (currentAdmins.some(a => a.user === user) || user === 'admin' || user === 'superadmin') { alert("Логін зайнятий!"); return; }
-            currentAdmins.push({ lastName, firstName, phone, user, pass, id: 'admin_' + Date.now() });
-            localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins));
-            document.getElementById('create-admin-form').reset(); renderAllDynamicData();
-        }
-
-        function renderAdminAccountsList() {
-            const listBox = document.getElementById('box-for-admin-accounts'); 
-            if(!listBox) return;
-            listBox.innerHTML = "";
-            let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
-            if(currentAdmins.length === 0) { listBox.innerHTML = `<div class="no-msg">Немає адмінів</div>`; return; }
-            currentAdmins.forEach(admin => {
-                listBox.innerHTML += `<div class="admin-user-card"><div class="admin-card-title">👤 ${admin.lastName} ${admin.firstName}</div><div class="admin-card-info">🔑 Login: ${admin.user}</div><button class="delete-admin-btn" onclick="deleteAdminAccount('${admin.id}')">Видалити</button></div>`;
-            });
-        }
-
-        function deleteAdminAccount(adminId) { if (confirm("Видалити профіль?")) { let currentAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || []; currentAdmins = currentAdmins.filter(a => a.id !== adminId); localStorage.setItem('siteCreatedAdminAccounts', JSON.stringify(currentAdmins)); renderAllDynamicData(); } }
-        
-        function openFullImage(base64Data) { 
-            const newWindow = window.open(); 
-            newWindow.document.write(`<body style="margin:0; background:#121212; display:flex; justify-content:center; align-items:center; min-height:100vh;"><img src="${base64Data}" style="max-width:100%; max-height:100vh; object-fit:contain;"></body>`); 
-        }
-        
-        function selectChatSession(id) { currentSelectedChatId = id; renderAllDynamicData(); }
-        function backToSessionsList() { currentSelectedChatId = null; renderAllDynamicData(); }
-
-        function renderWorkspaceContent(chatObj, targetElement) {
-            const flowBox = targetElement.querySelector('#admin-msg-flow'); const wasAtBottom = flowBox ? (flowBox.scrollHeight - flowBox.scrollTop <= flowBox.clientHeight + 50) : true;
-            targetElement.innerHTML = `<div class="workspace-header"><button class="back-to-list-btn" onclick="backToSessionsList()">←</button><span>ID: ${chatObj.id.substr(0,8)}</span><select class="status-select ${chatObj.adminStatus}" onchange="confirmAndChangeStatus('${chatObj.id}', this.value, '${chatObj.adminStatus}')"><option value="processing">В обробці</option><option value="success">Успішно</option><option value="unresolved">Не вирішено</option></select><button onclick="closeChatSession('${chatObj.id}')" style="background:none; border:1px solid #ff4a4a; color:#ff4a4a; padding:4px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.75rem;">X</button></div><div class="admin-messages-box" id="admin-msg-flow"></div>`;
-            
-            const selectEl = targetElement.querySelector('.status-select');
-            if(selectEl) selectEl.value = chatObj.adminStatus;
-
-            const flow = targetElement.querySelector('#admin-msg-flow');
-            chatObj.messages.forEach(m => {
-                const b = document.createElement('div'); b.className = `admin-bubble ${m.sender}`;
-                if(m.type === 'image') { b.innerHTML = `<img src="${m.text}" onclick="openFullImage('${m.text}')">`; } else { b.innerText = m.text; } flow.appendChild(b);
-            });
-            if (wasAtBottom) { flow.scrollTop = flow.scrollHeight; }
-        }
-
-        async function closeChatSession(id) {
-            if (confirm("Завершити цей сеанс чату та перенести його в архів?")) {
-                try {
-                    await db.collection("chats").doc(id).update({ status: 'closed' });
-                    if (currentSelectedChatId === id) currentSelectedChatId = null;
-                } catch(e) { console.error("Помилка закриття сесії:", e); }
-            }
-        }
-
-        async function sendAdminReply() {
-            const input = document.getElementById('admin-reply-input');
-            const text = input.value.trim();
-            if (!text || !currentSelectedChatId) return;
-
-            const msgObject = { sender: 'admin', text: text, type: 'text', time: Date.now() };
-            input.value = "";
-            try {
-                await db.collection("chats").doc(currentSelectedChatId).update({
-                    messages: firebase.firestore.FieldValue.arrayUnion(msgObject),
-                    lastUpdate: Date.now()
-                });
-            } catch(e) { console.error("Помилка відповіді адміна: ", e); }
-        }
-
-        function sendAdminChatPhoto(input) {
-            if (!input.files || !input.files[0] || !currentSelectedChatId) return;
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const msgObject = { sender: 'admin', text: e.target.result, type: 'image', time: Date.now() };
-                try {
-                    await db.collection("chats").doc(currentSelectedChatId).update({
-                        messages: firebase.firestore.FieldValue.arrayUnion(msgObject), lastUpdate: Date.now()
-                    });
-                } catch(err) { console.error("Помилка фото адміна: ", err); }
-            };
-            reader.readAsDataURL(input.files[0]);
-            input.value = "";
-        }
-
-        async function confirmAndChangeStatus(id, newStatus, oldStatus) {
-            isConfirmingStatus = true;
-            try { await db.collection("chats").doc(id).update({ adminStatus: newStatus }); } 
-            catch(e) { console.error(e); }
-            finally { isConfirmingStatus = false; renderAllDynamicData(); }
-        }
-
-        function exportToCSV(storageKey, fileName) {
-            let rawData;
-            if(storageKey === 'siteFeedbackData') rawData = globalFeedbackData;
-            else if (storageKey === 'siteVolunteerData') rawData = globalVolunteersData;
-            else if (storageKey === 'shopOrdersData') rawData = globalOrdersData;
-
-            if(rawData.length === 0) { alert("Немає даних для експорту!"); return; }
-            let csvContent = "\uFEFF";
-            
-            if(storageKey === 'siteFeedbackData') {
-                csvContent += "Дата,Ім'я,Контакт,Повідомлення\n"; 
-                rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.contact}","${item.message}"\n`; });
-            } else if(storageKey === 'siteVolunteerData') {
-                csvContent += "Дата,Прізвище Ім'я,Фонд,Телефон,WhatsApp,Повідомлення\n"; 
-                rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.org}","${item.phone}","${item.whatsapp}","${item.message}"\n`; });
-            } else if(storageKey === 'shopOrdersData') {
-                csvContent += "Дата,Статус,ПІБ,Телефон,Товари,Сума (₴),Адреса,Промокод\n"; 
-                rawData.forEach(item => { 
-                    let statusUa = item.status === 'new' ? 'Нове' : (item.status === 'sent' ? 'Відправлено' : 'Скасовано');
-                    let itemsStr = item.items ? item.items.map(i => `${i.merchTitle} [${i.size}] x${i.quantity}`).join('; ') : (item.orderTextDetails ? item.orderTextDetails.replace(/\n/g, ' ') : '');
-                    let pCode = item.promoCode || "-";
-                    csvContent += `"${item.time}","${statusUa}","${item.name}","${item.phone}","${itemsStr}","${item.totalPrice}","${item.address}","${pCode}"\n`; 
-                });
-            }
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); 
-            const link = document.createElement("a"); 
-            link.setAttribute("href", URL.createObjectURL(blob)); 
-            link.setAttribute("download", `${fileName}.csv`); 
-            link.click();
-        }
-
-        async function createPromoCode() {
-            let code = document.getElementById('promo-code-input').value.trim().toUpperCase();
-            let discount = parseInt(document.getElementById('promo-discount-input').value);
-            
-            if(!code || isNaN(discount) || discount <= 0 || discount > 100) { alert("Введіть коректний код та відсоток знижки (від 1 до 100)!"); return; }
-            if(code.includes(" ")) { alert("Промокод не може містити пробіли!"); return; }
-
-            try {
-                await db.collection("promocodes").doc(code).set({
-                    code: code, discount: discount, active: true, created: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                document.getElementById('promo-code-input').value = "";
-                document.getElementById('promo-discount-input').value = "";
-                alert("✓ Промокод успішно створено!");
-            } catch(e) { console.error(e); alert("Помилка створення: " + e.message); }
-        }
-
-        function renderPromocodes() {
-            const box = document.getElementById('box-for-promocodes'); 
-            if(!box) return;
-            box.innerHTML = "";
-            if(globalPromocodes.length === 0) { box.innerHTML = `<div class="no-msg">Немає промокодів</div>`; return; }
-            
-            globalPromocodes.forEach(p => {
-                let statusColor = p.active ? "#00ffcc" : "#ff4a4a";
-                let statusText = p.active ? "Активний" : "Вимкнений";
-                box.innerHTML += `
-                    <div class="admin-user-card" style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-size:1.2rem; font-weight:900; color:var(--theme-color); letter-spacing:1px;">${p.code}</div>
-                            <div style="color:#aaa; font-size:0.9rem; margin-top:5px;">Знижка: <strong style="color:#fff;">${p.discount}%</strong> | Статус: <span style="color:${statusColor}; font-weight:bold;">${statusText}</span></div>
-                        </div>
-                        <div style="display:flex; gap:10px; flex-direction:column;">
-                            <button class="btn" style="padding:6px 15px; font-size:0.8rem;" onclick="togglePromoStatus('${p.id}', ${p.active})">${p.active ? 'Вимкнути' : 'Увімкнути'}</button>
-                            <button class="delete-admin-btn" style="position:static; padding:6px 15px;" onclick="deletePromo('${p.id}')">Видалити</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        async function togglePromoStatus(id, currentStatus) { try { await db.collection("promocodes").doc(id).update({ active: !currentStatus }); } catch(e) { console.error(e); } }
-        async function deletePromo(id) { if(confirm("Обережно! Ви дійсно хочете видалити цей промокод?")) { try { await db.collection("promocodes").doc(id).delete(); } catch(e) { console.error(e); } } }
-
         function handleLogout() {
             if(unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; }
             if(unsubscribeFeedback) { unsubscribeFeedback(); unsubscribeFeedback = null; }
@@ -1589,6 +1506,8 @@
             if(unsubscribeConfig) { unsubscribeConfig(); unsubscribeConfig = null; }
             if(unsubscribePromos) { unsubscribePromos(); unsubscribePromos = null; }
             if(unsubscribePaymentConfig) { unsubscribePaymentConfig(); unsubscribePaymentConfig = null; }
+            if(unsubscribeStats) { unsubscribeStats(); unsubscribeStats = null; }
+            if(unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
             
             isSuperadminSession = false; toggleSuperadminMode(false);
             const dashboard = document.getElementById('admin-dashboard'); dashboard.style.display = 'none'; dashboard.classList.remove('dashboard-mode');
