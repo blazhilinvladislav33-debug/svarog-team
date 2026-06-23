@@ -7,6 +7,8 @@
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
     <script>
         // Конфігурація вашого проєкту Firebase
         const firebaseConfig = {
@@ -34,7 +36,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             position: relative; overflow-x: hidden;
-            background-color: #121212; /* Заглушка, якщо фото не завантажиться */
+            background-color: #121212;
             background-image: url('bg1.jpg'); background-attachment: fixed;
             background-position: center; background-repeat: no-repeat; background-size: cover;
         }
@@ -62,10 +64,6 @@
         .btn { display: inline-block; width: 100%; padding: 12px; background-color: transparent; color: var(--theme-color); border: 2px solid var(--theme-color); border-radius: 4px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; text-align: center; text-decoration: none; }
         .btn:hover { background-color: var(--theme-color); color: #121212; }
         .error-msg { color: #ff4a4a; font-size: 0.9rem; margin-top: 15px; display: none; text-align: center; font-weight: bold; }
-
-        .superadmin-link-wrapper { text-align: center; margin-top: 15px; }
-        .superadmin-toggle-link { font-size: 0.8rem; color: #ffffff; opacity: 0.3; text-decoration: none; cursor: pointer; transition: opacity 0.2s ease; }
-        .superadmin-toggle-link:hover { opacity: 0.8; color: var(--theme-color); }
 
         .tabs-header { display: flex; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         .tab-button { flex: 1; min-width: 90px; padding: 10px 5px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; text-align: center; position: relative; display: flex; justify-content: center; align-items: center; gap: 5px; }
@@ -181,17 +179,20 @@
     </nav>
 
     <div class="main-content">
-        <div class="container" id="login-card">
+        <div class="container" id="login-card" style="display: none;">
             <h1 id="login-title-text" data-lang="ua">Вхід в панель</h1>
             <h1 id="login-title-text-en" data-lang="en">Admin Login</h1>
             <form onsubmit="handleLogin(event)">
-                <div class="form-group"><input type="text" id="username" class="form-input" placeholder="Логін / Username" required autocomplete="off"></div>
-                <div class="form-group"><input type="password" id="password" class="form-input" placeholder="Пароль / Password" required></div>
-                <button type="submit" class="btn"><span data-lang="ua">Увійти</span><span data-lang="en">Login</span></button>
-                <div class="superadmin-link-wrapper">
-                    <a class="superadmin-toggle-link" id="superadmin-mode-btn" onclick="toggleSuperadminMode(true)">Головний admin / Superadmin</a>
+                <div class="form-group">
+                    <input type="email" id="user-email" class="form-input" placeholder="Email адміністратора" required autocomplete="email">
                 </div>
-                <div class="error-msg" id="error-block">Невірні дані / Invalid credentials</div>
+                <div class="form-group">
+                    <input type="password" id="user-password" class="form-input" placeholder="Пароль / Password" required>
+                </div>
+                <button type="submit" class="btn" id="login-btn-submit">
+                    <span data-lang="ua">Увійти</span><span data-lang="en">Login</span>
+                </button>
+                <div class="error-msg" id="error-block"></div>
             </form>
         </div>
 
@@ -469,32 +470,24 @@
                 <div class="superadmin-grid">
                     <div class="admin-creator-form">
                         <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Управління безпекою системи</h3>
+                        <p style="font-size: 0.85rem; color: #ffaa00; margin-bottom: 20px; line-height: 1.4;">
+                            Оскільки сайт переведено на нову захищену систему авторизації (Firebase Auth), 
+                            управління паролями та додавання нових адміністраторів тепер здійснюється виключно через панель управління <b>Firebase Console -> Authentication</b>.
+                        </p>
                         
                         <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.15);">
-                            <h4 style="font-size: 0.9rem; color: #aaa; margin-bottom: 10px;">Зміна доступу звичайного Admin</h4>
-                            <div class="form-group"><input type="text" id="change-admin-user" class="form-input" placeholder="Новий логін Admin"></div>
-                            <div class="form-group"><input type="password" id="change-admin-pass" class="form-input" placeholder="Новий пароль Admin"></div>
-                            <button class="btn" onclick="updateSystemCredentials('admin')" style="padding:8px; font-size:0.9rem;">Оновити Admin</button>
-                        </div>
-
-                        <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.15);">
-                            <h4 style="font-size: 0.9rem; color: #aaa; margin-bottom: 10px;">Зміна доступу Головного Superadmin</h4>
-                            <div class="form-group"><input type="text" id="change-superadmin-user" class="form-input" placeholder="Новий логін Superadmin"></div>
-                            <div class="form-group"><input type="password" id="change-superadmin-pass" class="form-input" placeholder="Новий пароль Superadmin"></div>
-                            <button class="btn" onclick="updateSystemCredentials('superadmin')" style="padding:8px; font-size:0.9rem;">Оновити Superadmin</button>
+                            <h4 style="font-size: 0.9rem; color: #aaa; margin-bottom: 10px;">Зміна доступу Admin / Superadmin</h4>
+                            <button class="btn" onclick="alert('Увага!\nЩоб змінити пароль або логін адміністратора, відкрийте Firebase Console -> Authentication -> Users. Там ви можете скинути пароль або видалити/створити новий акаунт.');" style="padding:8px; font-size:0.9rem; border-color:#888; color:#ccc;">Інструкція: Як змінити пароль?</button>
                         </div>
 
                         <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Створити додаткового адміна</h3>
-                        <form id="create-admin-form" onsubmit="createNewAdminAccount(event)">
-                            <div class="form-group"><input type="text" id="new-admin-lastname" class="form-input" placeholder="Прізвище" required autocomplete="off"></div>
-                            <div class="form-group"><input type="text" id="new-admin-firstname" class="form-input" placeholder="Ім'я" required autocomplete="off"></div>
-                            <div class="form-group"><input type="tel" id="new-admin-phone" class="form-input" placeholder="Номер телефону" required autocomplete="off"></div>
-                            <div class="form-group"><input type="text" id="new-admin-user" class="form-input" placeholder="Логін для входу" required autocomplete="off"></div>
-                            <div class="form-group"><input type="password" id="new-admin-pass" class="form-input" placeholder="Пароль" required></div>
-                            <button type="submit" class="btn" style="padding:10px;">Зберегти адміна</button>
-                        </form>
+                        <button class="btn" onclick="alert('Щоб додати нового адміна:\n1. Зайдіть у Firebase Console -> Authentication та додайте Email/Пароль.\n2. Зайдіть у Firestore Database -> колекція admins і створіть документ, де ID = Email нового адміна.\n3. Додайте всередині поле role (значення admin або superadmin).');" style="padding:10px;">Інструкція: Додати адміністратора</button>
                     </div>
-                    <div class="admin-accounts-list" id="box-for-admin-accounts"></div>
+                    <div class="admin-accounts-list" id="box-for-admin-accounts">
+                        <div style="text-align:center; padding:30px; color:#666; font-style:italic;">
+                            Тут раніше був локальний список.<br>Тепер всі адміністратори захищені сервером.
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -513,7 +506,6 @@
         let currentTab = 'active-chats-tab';
         let currentOrdersFilter = 'active'; 
         let isSuperadminSession = false;
-        let isSuperadminLoginMode = false;
         let newsPhotoBase64 = "";
         let merchPhotoBase64 = "";
         
@@ -550,7 +542,131 @@
             document.addEventListener('click', (e) => { if (!navMenu.contains(e.target) && !menuButton.contains(e.target)) { navMenu.classList.remove('active'); menuButton.classList.remove('open'); } });
         }
 
-        // --- ДОДАНО ТА ВИПРАВЛЕНО ОСНОВНІ ФУНКЦІЇ ---
+        // ==========================================
+        // ЛОГІКА АВТОРИЗАЦІЇ FIREBASE AUTH + FIRESTORE
+        // ==========================================
+
+        // Функція перевірки прав адміністратора в колекції 'admins'
+        async function checkAdminAccess(userEmail) {
+            if (!userEmail) return false;
+            try {
+                const adminDoc = await db.collection("admins").doc(userEmail).get();
+                if (adminDoc.exists) {
+                    const role = adminDoc.data().role;
+                    if (role === "admin" || role === "superadmin") {
+                        isSuperadminSession = (role === "superadmin");
+                        const superadminTabBtn = document.getElementById('superadmin-only-tab-btn');
+                        if(superadminTabBtn) {
+                            superadminTabBtn.style.display = isSuperadminSession ? 'block' : 'none';
+                        }
+                        return true;
+                    }
+                }
+            } catch (error) {
+                console.error("Помилка доступу до бази:", error);
+            }
+            return false;
+        }
+
+        // Відстеження стану сесії
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                const isAdmin = await checkAdminAccess(user.email);
+                if (isAdmin) {
+                    enterDashboard();
+                } else {
+                    document.getElementById('error-block').innerText = "У вас немає прав доступу до панелі (відсутній в колекції admins)";
+                    document.getElementById('error-block').style.display = 'block';
+                    await firebase.auth().signOut();
+                }
+            } else {
+                // Користувач не залогінений
+                document.getElementById('login-card').style.display = 'block';
+                const dashboard = document.getElementById('admin-dashboard');
+                if(dashboard) {
+                    dashboard.style.display = 'none';
+                    dashboard.classList.remove('dashboard-mode');
+                }
+            }
+        });
+
+        // Обробка форми логіну
+        async function handleLogin(event) {
+            event.preventDefault();
+            const emailInp = document.getElementById('user-email').value.trim();
+            const passInp = document.getElementById('user-password').value.trim();
+            const errorBlock = document.getElementById('error-block');
+            const submitBtn = document.getElementById('login-btn-submit');
+
+            errorBlock.style.display = 'none';
+            submitBtn.innerText = "Перевірка...";
+            submitBtn.disabled = true;
+
+            try {
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(emailInp, passInp);
+                const isAdmin = await checkAdminAccess(userCredential.user.email);
+                
+                if (!isAdmin) {
+                    errorBlock.innerText = "Доступ заборонено (відсутній в колекції admins)";
+                    errorBlock.style.display = 'block';
+                    await firebase.auth().signOut();
+                }
+            } catch (error) {
+                errorBlock.style.display = 'block';
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                    errorBlock.innerText = "Акаунт не знайдено або невірні дані.";
+                } else if (error.code === 'auth/wrong-password') {
+                    errorBlock.innerText = "Невірний пароль.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorBlock.innerText = "Некоректний формат Email.";
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorBlock.innerText = "Забагато спроб входу. Спробуйте пізніше.";
+                } else {
+                    errorBlock.innerText = "Помилка входу: " + error.message;
+                }
+            } finally {
+                submitBtn.innerHTML = `<span data-lang="ua">Увійти</span><span data-lang="en">Login</span>`;
+                setLanguage(localStorage.getItem('selectedLang') || 'ua');
+                submitBtn.disabled = false;
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await firebase.auth().signOut();
+                
+                if(unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; }
+                if(unsubscribeFeedback) { unsubscribeFeedback(); unsubscribeFeedback = null; }
+                if(unsubscribeVolunteers) { unsubscribeVolunteers(); unsubscribeVolunteers = null; }
+                if(unsubscribeSocials) { unsubscribeSocials(); unsubscribeSocials = null; }
+                if(unsubscribeNews) { unsubscribeNews(); unsubscribeNews = null; }
+                if(unsubscribeOrders) { unsubscribeOrders(); unsubscribeOrders = null; }
+                if(unsubscribeMerch) { unsubscribeMerch(); unsubscribeMerch = null; }
+                if(unsubscribeConfig) { unsubscribeConfig(); unsubscribeConfig = null; }
+                if(unsubscribePromos) { unsubscribePromos(); unsubscribePromos = null; }
+                if(unsubscribePaymentConfig) { unsubscribePaymentConfig(); unsubscribePaymentConfig = null; }
+                if(unsubscribeStats) { unsubscribeStats(); unsubscribeStats = null; }
+                if(unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
+                
+                isSuperadminSession = false; 
+                document.getElementById('user-email').value = ""; 
+                document.getElementById('user-password').value = ""; 
+            } catch (error) {
+                console.error("Помилка при виході:", error);
+            }
+        }
+
+        function enterDashboard() {
+            document.getElementById('login-card').style.display = 'none';
+            const dashboard = document.getElementById('admin-dashboard');
+            dashboard.style.display = 'block'; dashboard.classList.add('dashboard-mode');
+            initFirebaseRealtimeStreams();
+            initBadges();
+            generateSizeStockInputs(); 
+            document.getElementById('news-date-field').valueAsDate = new Date();
+        }
+
+        // --- БАЗОВІ ФУНКЦІЇ З ОРИГІНАЛЬНОГО КОДУ ---
 
         function renderAllDynamicData() {
             renderOrdersList();
@@ -610,11 +726,6 @@
             }
         }
 
-        function createNewAdminAccount(e) {
-            e.preventDefault();
-            alert("Функція додавання нових адмінів підключена до системи авторизації локально. У розробці інтеграція з Firebase Auth.");
-        }
-
         // ПРОМОКОДИ
         async function createPromoCode() {
             const codeInput = document.getElementById('promo-code-input');
@@ -635,7 +746,7 @@
                     discount: discount,
                     created: firebase.firestore.FieldValue.serverTimestamp(),
                     active: true,
-                    isSingleUse: isSingleUse // <-- Зберігаємо мітку одноразовості
+                    isSingleUse: isSingleUse
                 });
                 alert("✓ Промокод успішно створено!");
                 codeInput.value = ""; discountInput.value = ""; singleUseCheckbox.checked = false;
@@ -670,8 +781,6 @@
                 catch(e) { console.error("Помилка видалення:", e); }
             }
         }
-
-        // --- БАЗОВІ ФУНКЦІЇ З ОРИГІНАЛЬНОГО КОДУ ---
 
         function setLanguage(lang) {
             localStorage.setItem('selectedLang', lang);
@@ -728,92 +837,6 @@
                 if(count > 0) { el.innerText = count; el.style.display = 'flex'; } 
                 else { el.style.display = 'none'; } 
             }
-        }
-
-        function toggleSuperadminMode(activate) {
-            isSuperadminLoginMode = activate;
-            const titleUa = document.getElementById('login-title-text');
-            const toggleBtn = document.getElementById('superadmin-mode-btn');
-            const errBlock = document.getElementById('error-block');
-            if(errBlock) errBlock.style.display = 'none';
-            if(activate) {
-                if(titleUa) titleUa.innerText = "Головна адмін панель"; 
-                if(toggleBtn) { toggleBtn.innerText = "← Звичайний admin"; toggleBtn.setAttribute('onclick', 'toggleSuperadminMode(false)'); }
-            } else {
-                if(titleUa) titleUa.innerText = "Вхід в панель"; 
-                if(toggleBtn) { toggleBtn.innerText = "Головний адмін / Superadmin"; toggleBtn.setAttribute('onclick', 'toggleSuperadminMode(true)'); }
-            }
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            const userInp = document.getElementById('username').value.trim();
-            const passInp = document.getElementById('password').value.trim();
-
-            try {
-                const authDoc = await db.collection("config").doc("auth").get();
-                let creds = {
-                    admin_user: "admin", admin_pass: "admin123",
-                    superadmin_user: "superadmin", superadmin_pass: "super123"
-                };
-                
-                if (authDoc.exists) {
-                    const d = authDoc.data();
-                    if(d.admin_user) creds.admin_user = d.admin_user;
-                    if(d.admin_pass) creds.admin_pass = d.admin_pass;
-                    if(d.superadmin_user) creds.superadmin_user = d.superadmin_user;
-                    if(d.superadmin_pass) creds.superadmin_pass = d.superadmin_pass;
-                }
-
-                if (isSuperadminLoginMode) {
-                    if (userInp === creds.superadmin_user && passInp === creds.superadmin_pass) {
-                        isSuperadminSession = true;
-                        document.getElementById('superadmin-only-tab-btn').style.display = 'block'; enterDashboard();
-                    } else { document.getElementById('error-block').style.display = 'block'; }
-                } else {
-                    let createdAdmins = JSON.parse(localStorage.getItem('siteCreatedAdminAccounts')) || [];
-                    const matchedAdmin = createdAdmins.find(a => a.user === userInp && a.pass === passInp);
-
-                    if ((userInp === creds.admin_user && passInp === creds.admin_pass) || matchedAdmin) {
-                        isSuperadminSession = false;
-                        document.getElementById('superadmin-only-tab-btn').style.display = 'none'; enterDashboard();
-                    } else { document.getElementById('error-block').style.display = 'block'; }
-                }
-            } catch(e) {
-                console.error(e);
-                document.getElementById('error-block').style.display = 'block';
-            }
-        }
-
-        async function updateSystemCredentials(role) {
-            const userField = document.getElementById(`change-${role}-user`).value.trim();
-            const passField = document.getElementById(`change-${role}-pass`).value.trim();
-            if (!userField && !passField) { alert("Заповніть хоча б одне поле для зміни!"); return; }
-
-            try {
-                let updateData = {};
-                if (role === 'admin') {
-                    if (userField) updateData.admin_user = userField;
-                    if (passField) updateData.admin_pass = passField;
-                } else {
-                    if (userField) updateData.superadmin_user = userField;
-                    if (passField) updateData.superadmin_pass = passField;
-                }
-                await db.collection("config").doc("auth").set(updateData, { merge: true });
-                document.getElementById(`change-${role}-user`).value = "";
-                document.getElementById(`change-${role}-pass`).value = "";
-                alert(`✓ Доступи для ${role} успішно оновлено у Firebase!`);
-            } catch(e) { alert("Помилка оновлення: " + e.message); }
-        }
-
-        function enterDashboard() {
-            document.getElementById('login-card').style.display = 'none';
-            const dashboard = document.getElementById('admin-dashboard');
-            dashboard.style.display = 'block'; dashboard.classList.add('dashboard-mode');
-            initFirebaseRealtimeStreams();
-            initBadges();
-            generateSizeStockInputs(); 
-            document.getElementById('news-date-field').valueAsDate = new Date();
         }
 
         function initFirebaseRealtimeStreams() {
@@ -1631,25 +1654,6 @@
             finally { isConfirmingStatus = false; renderAllDynamicData(); }
         }
 
-        function handleLogout() {
-            if(unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; }
-            if(unsubscribeFeedback) { unsubscribeFeedback(); unsubscribeFeedback = null; }
-            if(unsubscribeVolunteers) { unsubscribeVolunteers(); unsubscribeVolunteers = null; }
-            if(unsubscribeSocials) { unsubscribeSocials(); unsubscribeSocials = null; }
-            if(unsubscribeNews) { unsubscribeNews(); unsubscribeNews = null; }
-            if(unsubscribeOrders) { unsubscribeOrders(); unsubscribeOrders = null; }
-            if(unsubscribeMerch) { unsubscribeMerch(); unsubscribeMerch = null; }
-            if(unsubscribeConfig) { unsubscribeConfig(); unsubscribeConfig = null; }
-            if(unsubscribePromos) { unsubscribePromos(); unsubscribePromos = null; }
-            if(unsubscribePaymentConfig) { unsubscribePaymentConfig(); unsubscribePaymentConfig = null; }
-            if(unsubscribeStats) { unsubscribeStats(); unsubscribeStats = null; }
-            if(unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
-            
-            isSuperadminSession = false; toggleSuperadminMode(false);
-            const dashboard = document.getElementById('admin-dashboard'); dashboard.style.display = 'none'; dashboard.classList.remove('dashboard-mode');
-            document.getElementById('username').value = ""; document.getElementById('password').value = ""; document.getElementById('login-card').style.display = 'block';
-        }
-        
         window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); });
     </script>
 </body>
