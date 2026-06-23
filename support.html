@@ -169,6 +169,7 @@
                 <li><a href="https://svarogteam.com/shop.html"><span data-lang="ua">SVRG STORE</span><span data-lang="en">SVRG STORE</span></a></li>
                 <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li><a href="status.html"><span data-lang="ua">Статус замовлення</span><span data-lang="en">Order Status</span></a></li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -222,7 +223,9 @@
                     <input type="file" id="vol-file" accept="image/*" class="form-input" onchange="previewVolunteerPhoto(this)">
                     <img id="vol-preview-element" class="attached-preview" src="">
                 </div>
-                <button type="submit" class="btn"><span data-lang="ua">Надіслати анкету</span><span data-lang="en">Submit Application</span></button>
+                <button type="submit" class="btn" id="vol-submit-btn">
+                    <span data-lang="ua">Надіслати анкету</span><span data-lang="en">Submit Application</span>
+                </button>
             </form>
         </div>
 
@@ -230,6 +233,9 @@
     </div>
 
     <footer class="footer">
+        <div style="margin-bottom: 10px;">
+            <a href="status.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.3);">Перевірити статус замовлення</a>
+        </div>
         <span data-lang="ua">SVAROG TEAM © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
         <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
     </footer>
@@ -285,15 +291,19 @@
             document.title = lang === 'ua' ? "SVAROG TEAM | Підтримка" : 'SVAROG TEAM | Support';
         }
 
-        // --- ЛОГІКА ДИНАМІЧНОГО ЗЧИТУВАННЯ БАНКИ ТА QR-КОДУ ---
-        function initDonationLinkAndQR() {
-            const currentLink = localStorage.getItem('siteDonationLink') || "https://send.monobank.ua/jar/default";
+        // --- ЛОГІКА ДИНАМІЧНОГО ЗЧИТУВАННЯ БАНКИ ТА QR-КОДУ (З FIREBASE) ---
+        db.collection("config").doc("payment").onSnapshot(doc => {
+            let currentLink = "https://send.monobank.ua/jar/default";
+            if (doc.exists && doc.data().bankUrl) {
+                currentLink = doc.data().bankUrl;
+            }
+            
             document.getElementById('donation-btn').href = currentLink;
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(currentLink)}`;
             document.getElementById('donation-qr').src = qrApiUrl;
-        }
+        });
 
-        // --- ЛОГІКА ВОЛОНТЕРСЬКОЇ АНКЕТИ (FIREBASE) ---
+        // --- ЛОГІКА ВОЛОНТЕРСЬКОЇ АНКЕТИ (FIREBASE + TELEGRAM) ---
         let volunteerImgBase64 = "";
 
         function previewVolunteerPhoto(input) {
@@ -316,8 +326,14 @@
             const whatsapp = document.getElementById('vol-whatsapp').value.trim();
             const message = document.getElementById('vol-message').value.trim();
             const lang = localStorage.getItem('selectedLang') || 'ua';
+            const btn = document.getElementById('vol-submit-btn');
+
+            btn.disabled = true;
+            btn.innerHTML = `<span data-lang="ua">Відправка...</span><span data-lang="en">Sending...</span>`;
+            setLanguage(lang);
 
             try {
+                // 1. Відправка в Firebase (для Адмін-панелі)
                 await db.collection("volunteers").add({
                     name: name,
                     org: org,
@@ -329,13 +345,54 @@
                     time: new Date().toLocaleString('uk-UA')
                 });
 
-                alert(lang === 'ua' ? 'Анкету успішно надіслано в адмін-панель!' : 'Application successfully sent to the admin panel!'); 
+                // 2. Відправка в Telegram
+                const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; 
+                const chatId = '647245223';
+                
+                let tgMessage = `🤝 <b>НОВА АНКЕТА ВОЛОНТЕРА!</b>\n\n` +
+                                `👤 <b>Ім'я:</b> ${name}\n` +
+                                `🏛 <b>Організація:</b> ${org}\n` +
+                                `📞 <b>Телефон:</b> ${phone}\n` +
+                                `💬 <b>Telegram/WA:</b> ${whatsapp}\n\n` +
+                                `📝 <b>Повідомлення:</b>\n${message}`;
+
+                const fileInput = document.getElementById('vol-file');
+                
+                if (fileInput && fileInput.files.length > 0) {
+                    let formData = new FormData();
+                    formData.append('chat_id', chatId);
+                    formData.append('photo', fileInput.files[0]);
+                    formData.append('caption', tgMessage);
+                    formData.append('parse_mode', 'HTML');
+
+                    await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else {
+                    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: tgMessage,
+                            parse_mode: 'HTML'
+                        })
+                    });
+                }
+
+                alert(lang === 'ua' ? 'Анкету успішно надіслано!' : 'Application successfully sent!'); 
                 document.getElementById('volunteer-form').reset();
                 document.getElementById('vol-preview-element').style.display = 'none';
                 volunteerImgBase64 = "";
+
             } catch (err) {
                 console.error("Помилка відправки анкети: ", err);
-                alert(lang === 'ua' ? 'Помилка хмари: ' + err.message : 'Cloud error: ' + err.message);
+                alert(lang === 'ua' ? 'Помилка: ' + err.message : 'Error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span data-lang="ua">Надіслати анкету</span><span data-lang="en">Submit Application</span>`;
+                setLanguage(lang);
             }
         }
 
@@ -456,7 +513,6 @@
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
         
         window.addEventListener('DOMContentLoaded', () => { 
-            initDonationLinkAndQR();
             setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
             initUserChat(); 
         });
