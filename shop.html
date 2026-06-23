@@ -321,7 +321,8 @@
                     </div>
                     
                     <div id="bank-payment-info" style="display: none; margin-bottom: 15px; padding: 12px; background: rgba(240, 180, 140, 0.1); border: 1px solid rgba(240, 180, 140, 0.3); border-radius: 6px; font-size: 0.9rem;">
-                        </div>
+                        <!-- Інформація про оплату згенерується JS -->
+                    </div>
 
                     <button type="submit" class="confirm-btn" id="confirm-order-btn">
                         <span data-lang="ua">Оформити замовлення</span>
@@ -399,12 +400,14 @@
         // ДИНАМІЧНІ ДАНІ РЕКВІЗИТІВ З FIREBASE
         let dynamicBankUrl = "https://send.monobank.ua/YOUR_JAR";
         let dynamicCardNumber = "0000 0000 0000 0000";
+        let dynamicCardName = "Не вказано";
 
         db.collection("config").doc("payment").onSnapshot(doc => {
             if (doc.exists) {
                 const data = doc.data();
                 if (data.bankUrl) dynamicBankUrl = data.bankUrl;
                 if (data.cardNumber) dynamicCardNumber = data.cardNumber;
+                if (data.cardName) dynamicCardName = data.cardName;
             }
             updatePaymentDetailsUI();
         });
@@ -447,6 +450,7 @@
                     <div style="line-height:1.5;">
                         💳 <b>Картка для переказу:</b> <span style="color: var(--theme-color); font-weight: bold; letter-spacing: 0.5px;">${dynamicCardNumber}</span>
                         <button type="button" class="copy-btn" onclick="copyToClipboard('${dynamicCardNumber}')">Скопіювати</button><br>
+                        👤 <b>Отримувач:</b> ${dynamicCardName}<br>
                         Будь ласка, зробіть переказ на карту та прикріпіть скріншот чека:
                     </div>
                     <input type="file" id="receipt-file" class="form-input" accept="image/*" style="margin-top: 10px;" required>
@@ -469,7 +473,6 @@
         let currentPromo = null; 
         let activeOrderUnsubscribe = null;
 
-        // СЛУХАЧ СТАТУСУ ЗГОРТАННЯ АРХІВУ
         function listenToActiveOrderStatus() {
             const activeOrderId = localStorage.getItem('svarog_active_order_id');
             const box = document.getElementById('active-order-status-box');
@@ -904,7 +907,6 @@
             let base64Receipt = null;
 
             try {
-                // Якщо є файл квитанції - конвертуємо його перед збереженням в БД
                 if (fileInput && fileInput.files.length > 0) {
                     base64Receipt = await getBase64Image(fileInput.files[0]);
                 }
@@ -939,7 +941,6 @@
                     newlyCreatedOrderId = orderRef.id; 
                     let orderItemsString = shoppingCart.map(i => `${i.merchTitle} (Розмір: ${i.size}, К-сть: ${i.quantity})`).join('\n');
 
-                    // Записуємо замовлення з фотографією (якщо вона є)
                     transaction.set(orderRef, {
                         name: name,
                         phone: phone,
