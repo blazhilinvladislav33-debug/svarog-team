@@ -77,8 +77,6 @@
         .admin-accounts-list { flex: 1.2; min-width: 320px; max-height: 550px; overflow-y: auto; }
 
         .admin-user-card { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 15px; margin-bottom: 12px; position: relative; }
-        .admin-card-title { font-weight: bold; color: var(--theme-color); font-size: 1rem; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px; margin-bottom: 8px; }
-        .admin-card-info { font-size: 0.9rem; color: #e0e0e0; margin-bottom: 4px; }
         
         .delete-admin-btn { background: none; border: 1px solid #ff4a4a; color: #ff4a4a; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; cursor: pointer; position: absolute; right: 15px; top: 13px; z-index: 10; transition: all 0.2s; }
         .delete-admin-btn:hover { background: #ff4a4a; color: #fff; }
@@ -150,19 +148,16 @@
         .switch-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
         .switch-wrapper input { cursor: pointer; width: 16px; height: 16px; accent-color: var(--theme-color); }
 
-        /* Стилі для підгруп замовлень */
         .orders-sub-tabs { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
         .orders-sub-btn { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.88rem; transition: all 0.3s; }
         .orders-sub-btn:hover { border-color: rgba(var(--theme-color-rgb), 0.6); }
         .orders-sub-btn.active { background: var(--theme-color); color: #121212; border-color: var(--theme-color); font-weight: bold; }
 
-        /* Стилі для акордеона замовлень */
         .order-accordion-item { background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
         .order-accordion-header { padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.02); transition: background 0.2s; flex-wrap: wrap; gap: 10px; }
         .order-accordion-header:hover { background: rgba(255, 255, 255, 0.06); }
         .order-accordion-body { padding: 20px 15px; border-top: 1px solid rgba(255, 255, 255, 0.05); display: none; background: rgba(0,0,0,0.15); }
 
-        /* Стилі для магазину в адмінці */
         .merch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px; }
         .merch-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
         .merch-card-img { width: 100%; height: 150px; object-fit: cover; background: rgba(0,0,0,0.6); }
@@ -428,12 +423,22 @@
                     </div>
 
                     <div style="flex: 1; display:flex; flex-direction:column; gap:20px;">
-                        <div class="admin-creator-form">
-                            <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Посилання збору (Банка)</h3>
-                            <div class="form-group"><input type="text" id="current-saved-link-input" class="form-input" readonly style="color:var(--theme-color); opacity:0.7;"></div>
-                            <div class="form-group"><input type="url" id="new-donation-link-field" class="form-input" placeholder="https://send.monobank.ua/..."></div>
-                            <button class="btn" onclick="updateDonationLink()">Оновити Банку</button>
+                        <div class="admin-creator-form" style="border-color: var(--theme-color);">
+                            <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">💳 Управління реквізитами</h3>
+                            
+                            <div class="form-group">
+                                <label style="font-size:0.8rem; color:#aaa; display:block; margin-bottom:4px;">Посилання на Банку (Monobank):</label>
+                                <input type="url" id="config-bank-url" class="form-input" placeholder="https://send.monobank.ua/...">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="font-size:0.8rem; color:#aaa; display:block; margin-bottom:4px;">Номер карти для переказів:</label>
+                                <input type="text" id="config-card-number" class="form-input" placeholder="0000 0000 0000 0000">
+                            </div>
+                            
+                            <button class="btn" onclick="savePaymentCredentials()">Оновити платіжні дані</button>
                         </div>
+
                         <div class="admin-creator-form">
                             <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Додати соціальну мережу</h3>
                             <div class="form-group"><input type="text" id="soc-name" class="form-input" placeholder="Назва" autocomplete="off"></div>
@@ -479,7 +484,7 @@
                             <div class="form-group"><input type="text" id="new-admin-lastname" class="form-input" placeholder="Прізвище" required autocomplete="off"></div>
                             <div class="form-group"><input type="text" id="new-admin-firstname" class="form-input" placeholder="Ім'я" required autocomplete="off"></div>
                             <div class="form-group"><input type="tel" id="new-admin-phone" class="form-input" placeholder="Номер телефону" required autocomplete="off"></div>
-                            <div class="form-group"><input type="text" id="new-admin-user" class="form-input" placeholder="Логін для входу" required autocomplete="off"></div>
+                            <div class="form-group"><input type="text" id="new-admin-user" class="form-input" placeholder="Логін для vходу" required autocomplete="off"></div>
                             <div class="form-group"><input type="password" id="new-admin-pass" class="form-input" placeholder="Пароль" required></div>
                             <button type="submit" class="btn" style="padding:10px;">Зберегти адміна</button>
                         </form>
@@ -500,7 +505,7 @@
         let currentSelectedChatId = null;
         let isConfirmingStatus = false;
         let currentTab = 'active-chats-tab';
-        let currentOrdersFilter = 'active'; // Фільтр замовлень: 'active', 'sent', 'archive'
+        let currentOrdersFilter = 'active'; 
         let isSuperadminSession = false;
         let isSuperadminLoginMode = false;
         let newsPhotoBase64 = "";
@@ -525,6 +530,7 @@
         let unsubscribeMerch = null;
         let unsubscribeConfig = null;
         let unsubscribePromos = null; 
+        let unsubscribePaymentConfig = null;
 
         const menuButton = document.getElementById('menu-button');
         const navMenu = document.getElementById('nav-menu');
@@ -623,7 +629,7 @@
             dashboard.style.display = 'block'; dashboard.classList.add('dashboard-mode');
             initFirebaseRealtimeStreams();
             initBadges();
-            generateSizeStockInputs(); // Базова ініціалізація полів
+            generateSizeStockInputs(); 
             document.getElementById('news-date-field').valueAsDate = new Date();
         }
 
@@ -694,6 +700,15 @@
                 snapshot.forEach(doc => { globalPromocodes.push({ id: doc.id, ...doc.data() }); });
                 renderPromocodes();
             }, e => console.error(e));
+
+            // Прослуховування реквізитів з Firebase
+            unsubscribePaymentConfig = db.collection("config").doc("payment").onSnapshot(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    if(data.bankUrl) document.getElementById('config-bank-url').value = data.bankUrl;
+                    if(data.cardNumber) document.getElementById('config-card-number').value = data.cardNumber;
+                }
+            }, e => console.error(e));
         }
 
         // --- ЛОГІКА ДИНАМІЧНИХ РОЗМІРІВ ТА ЗАЛИШКІВ ---
@@ -705,7 +720,6 @@
             const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : [];
 
             if (sizesArr.length === 0) {
-                // Якщо товар без розмірної сітки
                 let baseVal = 0;
                 if(existingStockObj) {
                     baseVal = typeof existingStockObj === 'object' ? (existingStockObj["Універсальний"] || 0) : existingStockObj;
@@ -716,7 +730,6 @@
                         <input type="number" data-size-key="Універсальний" class="form-input size-stock-value-input" style="padding: 6px; text-align:center; font-size:0.9rem;" value="${baseVal}" min="0">
                     </div>`;
             } else {
-                // Якщо є розмірна сітка
                 sizesArr.forEach(size => {
                     let baseVal = 0;
                     if(existingStockObj && typeof existingStockObj === 'object') {
@@ -728,6 +741,27 @@
                             <input type="number" data-size-key="${size}" class="form-input size-stock-value-input" style="padding: 6px; text-align:center; font-size:0.9rem;" value="${baseVal}" min="0">
                         </div>`;
                 });
+            }
+        }
+
+        // --- ФУНКЦІЯ ОНОВЛЕННЯ РЕКВІЗИТІВ У FIREBASE ---
+        async function savePaymentCredentials() {
+            const bankUrl = document.getElementById('config-bank-url').value.trim();
+            const cardNumber = document.getElementById('config-card-number').value.trim();
+            
+            if(!bankUrl || !cardNumber) {
+                alert("Заповніть обидва поля реквізитів!"); return;
+            }
+
+            try {
+                await db.collection("config").doc("payment").set({
+                    bankUrl: bankUrl,
+                    cardNumber: cardNumber
+                }, { merge: true });
+                alert("✓ Реквізити (Банка та Карта) успішно збережені в Firebase!");
+            } catch(e) {
+                console.error(e);
+                alert("Помилка збереження реквізитів: " + e.message);
             }
         }
 
@@ -851,7 +885,6 @@
 
             const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : [];
 
-            // Збір об'єкта залишків за розмірами
             let stockObj = {};
             const stockInputs = document.querySelectorAll('.size-stock-value-input');
             stockInputs.forEach(inp => {
@@ -864,7 +897,7 @@
                 category: category,
                 price: parseFloat(price),
                 discountPrice: discountPrice ? parseFloat(discountPrice) : null,
-                stock: stockObj, // Записуємо об'єкт { "S": 5, "M": 10 }
+                stock: stockObj, 
                 sizes: sizesArr,
                 description: description,
                 image: merchPhotoBase64 || null
@@ -877,7 +910,7 @@
                 } else {
                     merchObject.timestamp = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection("merch").add(merchObject);
-                    alert("✓ Товар успішно додано до вітрини!");
+                    alert("✓ Тovar успішно додано до вітрини!");
                 }
                 cancelMerchEditing();
             } catch(err) {
@@ -901,7 +934,6 @@
                 let saleBadge = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
                 let descHtml = item.description ? `<div class="merch-desc">${item.description}</div>` : '';
 
-                // Гарний вивід лінійки залишків
                 let stockLine = "";
                 if(typeof item.stock === 'object' && item.stock !== null) {
                     stockLine = Object.entries(item.stock).map(([sz, q]) => `<b>${sz}</b>:${q}шт`).join(' | ');
@@ -950,16 +982,13 @@
             const body = headerElement.nextElementSibling;
             const allBodies = document.querySelectorAll('.order-accordion-body');
             
-            // Закриваємо інші для чистоти, відкриваємо поточний
             allBodies.forEach(b => { if(b !== body) b.style.display = 'none'; });
             body.style.display = body.style.display === 'block' ? 'none' : 'block';
         }
 
         async function changeOrderStatus(id, newStatus) {
             isConfirmingStatus = true;
-            try { 
-                await db.collection("orders").doc(id).update({ status: newStatus }); 
-            } 
+            try { await db.collection("orders").doc(id).update({ status: newStatus }); } 
             catch(e) { console.error(e); }
             finally { isConfirmingStatus = false; renderAllDynamicData(); }
         }
@@ -967,7 +996,6 @@
         function renderOrdersList() {
             const ordersBox = document.getElementById('box-for-orders'); ordersBox.innerHTML = "";
             
-            // Фільтрація замовлень за підгрупами
             let filteredOrders = globalOrdersData.filter(ord => {
                 let status = ord.status || 'new';
                 if (currentOrdersFilter === 'active') {
@@ -1003,9 +1031,10 @@
                 let itemsListHtml = '';
                 if(ord.items && Array.isArray(ord.items)) {
                     ord.items.forEach(it => {
+                        let sizeMeta = it.size === 'Універсальний' ? '' : ` [Розмір: ${it.size}]`;
                         itemsListHtml += `
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem; padding-left:10px; border-left:2px solid var(--theme-color);">
-                            <span><b>${it.merchTitle}</b> [Розмір: ${it.size}] x${it.quantity} шт</span>
+                            <span><b>${it.merchTitle}</b>${sizeMeta} x${it.quantity} шт</span>
                             <span style="color:var(--theme-color); font-weight:bold;">${it.totalPrice} ₴</span>
                         </div>`;
                     });
@@ -1167,7 +1196,7 @@
 
             try {
                 if(editId) {
-                    await db.collection("news").doc(editId).set(postObject, { merge: true });
+                    await db.collection("news").doc(editId PostObject, { merge: true });
                     alert("✓ Зміни успішно збережено в хмарі!");
                 } else {
                     await db.collection("news").add({
@@ -1263,13 +1292,7 @@
         }
 
         function showCurrentLinkInField() {
-            const currentLink = localStorage.getItem('siteDonationLink') || "https://send.monobank.ua/...";
-            document.getElementById('current-saved-link-input').value = currentLink;
-        }
-
-        function updateDonationLink() {
-            const inputField = document.getElementById('new-donation-link-field'); const newUrl = inputField.value.trim(); if(!newUrl) return;
-            localStorage.setItem('siteDonationLink', newUrl); showCurrentLinkInField(); inputField.value = ""; alert("✓ Банку успішно оновлено!");
+            // Перегляд платіжних даних виконується автоматично через Firestore Stream (PaymentConfig)
         }
 
         async function addNewSocialNetwork() {
@@ -1314,7 +1337,6 @@
             if(tabId === 'feedback-tab') localStorage.setItem('viewed_feedback', globalFeedbackData.length);
             if(tabId === 'volunteer-tab') localStorage.setItem('viewed_volunteers', globalVolunteersData.length);
             if(tabId === 'orders-tab') localStorage.setItem('viewed_orders', globalOrdersData.length);
-            if(tabId === 'link-management-tab') showCurrentLinkInField();
             renderAllDynamicData();
         }
 
@@ -1401,7 +1423,6 @@
                     </div>`;
             });
 
-            // Виклик рендеру замовлень з новою логікою акордеонів
             renderOrdersList();
 
             if (isSuperadminSession) { renderAdminAccountsList(); }
@@ -1469,119 +1490,6 @@
             });
             if (wasAtBottom) { flow.scrollTop = flow.scrollHeight; }
         }
-
-        function exportToCSV(storageKey, fileName) {
-            let rawData;
-            if(storageKey === 'siteFeedbackData') rawData = globalFeedbackData;
-            else if (storageKey === 'siteVolunteerData') rawData = globalVolunteersData;
-            else if (storageKey === 'shopOrdersData') rawData = globalOrdersData;
-
-            if(rawData.length === 0) { alert("Немає даних для експорту!"); return; }
-            let csvContent = "\uFEFF";
-            
-            if(storageKey === 'siteFeedbackData') {
-                csvContent += "Дата,Ім'я,Контакт,Повідомлення\n"; 
-                rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.contact}","${item.message}"\n`; });
-            } else if(storageKey === 'siteVolunteerData') {
-                csvContent += "Дата,Прізвище Ім'я,Фонд,Телефон,WhatsApp,Повідомлення\n"; 
-                rawData.forEach(item => { csvContent += `"${item.time}","${item.name}","${item.org}","${item.phone}","${item.whatsapp}","${item.message}"\n`; });
-            } else if(storageKey === 'shopOrdersData') {
-                csvContent += "Дата,Статус,ПІБ,Телефон,Товари,Сума (₴),Адреса,Спосіб Оплати,Промокод\n"; 
-                rawData.forEach(item => { 
-                    let statusUa = item.status === 'new' ? 'Нове' : item.status === 'on_review' ? 'На перевірці' : item.status === 'accepted' ? 'Прийнято' : item.status === 'sent' ? 'Відправлено' : item.status === 'delivered' ? 'Доставлено' : item.status === 'cancelled' ? 'Скасовано' : 'В архіві';
-                    let itemsStr = item.items ? item.items.map(i => `${i.merchTitle} [${i.size}] x${i.quantity}`).join('; ') : (item.orderTextDetails ? item.orderTextDetails.replace(/\n/g, ' ') : '');
-                    let pCode = item.promoCode || "-";
-                    let pMethod = item.paymentMethod || "Не вказано";
-                    csvContent += `"${item.time}","${statusUa}","${item.name}","${item.phone}","${itemsStr}","${item.totalPrice}","${item.address}","${pMethod}","${pCode}"\n`; 
-                });
-            }
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); 
-            const link = document.createElement("a"); 
-            link.setAttribute("href", URL.createObjectURL(blob)); 
-            link.setAttribute("download", `${fileName}.csv`); 
-            link.click();
-        }
-
-        // --- ЛОГІКА ПРОМОКОДІВ ---
-        async function createPromoCode() {
-            let code = document.getElementById('promo-code-input').value.trim().toUpperCase();
-            let discount = parseInt(document.getElementById('promo-discount-input').value);
-            
-            if(!code || isNaN(discount) || discount <= 0 || discount > 100) {
-                alert("Введіть коректний код та відсоток знижки (від 1 до 100)!"); return;
-            }
-            if(code.includes(" ")) {
-                alert("Промокод не може містити пробіли!"); return;
-            }
-
-            try {
-                await db.collection("promocodes").doc(code).set({
-                    code: code,
-                    discount: discount,
-                    active: true,
-                    created: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                document.getElementById('promo-code-input').value = "";
-                document.getElementById('promo-discount-input').value = "";
-                alert("✓ Промокод успішно створено!");
-            } catch(e) { console.error(e); alert("Помилка створення: " + e.message); }
-        }
-
-        function renderPromocodes() {
-            const box = document.getElementById('box-for-promocodes'); box.innerHTML = "";
-            if(globalPromocodes.length === 0) { box.innerHTML = `<div class="no-msg">Немає промокодів</div>`; return; }
-            
-            globalPromocodes.forEach(p => {
-                let statusColor = p.active ? "#00ffcc" : "#ff4a4a";
-                let statusText = p.active ? "Активний" : "Вимкнений";
-                box.innerHTML += `
-                    <div class="admin-user-card" style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-size:1.2rem; font-weight:900; color:var(--theme-color); letter-spacing:1px;">${p.code}</div>
-                            <div style="color:#aaa; font-size:0.9rem; margin-top:5px;">Знижка: <strong style="color:#fff;">${p.discount}%</strong> | Статус: <span style="color:${statusColor}; font-weight:bold;">${statusText}</span></div>
-                        </div>
-                        <div style="display:flex; gap:10px; flex-direction:column;">
-                            <button class="btn" style="padding:6px 15px; font-size:0.8rem;" onclick="togglePromoStatus('${p.id}', ${p.active})">${p.active ? 'Вимкнути' : 'Увімкнути'}</button>
-                            <button class="delete-admin-btn" style="position:static; padding:6px 15px;" onclick="deletePromo('${p.id}')">Видалити</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        async function togglePromoStatus(id, currentStatus) {
-            try { await db.collection("promocodes").doc(id).update({ active: !currentStatus }); } 
-            catch(e) { console.error(e); }
-        }
-
-        async function deletePromo(id) {
-            if(confirm("Обережно! Ви дійсно хочете видалити цей промокод?")) {
-                try { await db.collection("promocodes").doc(id).delete(); } 
-                catch(e) { console.error(e); }
-            }
-        }
-
-        function handleLogout() {
-            if(unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; }
-            if(unsubscribeFeedback) { unsubscribeFeedback(); unsubscribeFeedback = null; }
-            if(unsubscribeVolunteers) { unsubscribeVolunteers(); unsubscribeVolunteers = null; }
-            if(unsubscribeSocials) { unsubscribeSocials(); unsubscribeSocials = null; }
-            if(unsubscribeNews) { unsubscribeNews(); unsubscribeNews = null; }
-            if(unsubscribeOrders) { unsubscribeOrders(); unsubscribeOrders = null; }
-            if(unsubscribeMerch) { unsubscribeMerch(); unsubscribeMerch = null; }
-            if(unsubscribeConfig) { unsubscribeConfig(); unsubscribeConfig = null; }
-            if(unsubscribePromos) { unsubscribePromos(); unsubscribePromos = null; }
-            
-            isSuperadminSession = false; toggleSuperadminMode(false);
-            const dashboard = document.getElementById('admin-dashboard'); dashboard.style.display = 'none'; dashboard.classList.remove('dashboard-mode');
-            document.getElementById('username').value = ""; document.getElementById('password').value = ""; document.getElementById('login-card').style.display = 'block';
-        }
-        
-        document.addEventListener('keydown', function(e) { 
-            if (e.key === 'Enter' && document.activeElement.id === 'admin-reply-input') sendAdminReply(); 
-        });
-
-        window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); });
     </script>
 </body>
 </html>
