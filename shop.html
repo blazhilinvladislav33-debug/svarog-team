@@ -44,7 +44,7 @@
         }
         
         .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
-        .navbar-container { max-width: 1200px; margin: 0 Auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .left-side { display: flex; align-items: center; gap: 20px; }
         .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
@@ -100,7 +100,6 @@
         .merch-details { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
         .merch-title { font-size: 1.25rem; font-weight: bold; color: #fff; margin-bottom: 8px; line-height: 1.3; }
         
-        /* СТИЛЬ ДЛЯ ОПИСУ ТОВАРУ */
         .merch-desc { font-size: 0.85rem; color: #bbb; margin-bottom: 15px; line-height: 1.45; white-space: pre-wrap; flex-grow: 1; }
         
         .price-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
@@ -226,8 +225,7 @@
             <p data-lang="en">By purchasing our merch, you directly support the operations of the SVAROG TEAM.</p>
         </div>
 
-        <div class="categories-nav" id="category-bar">
-            </div>
+        <div class="categories-nav" id="category-bar"></div>
 
         <div class="shop-grid" id="dynamic-shop-grid">
             <div style="text-align:center; grid-column: 1 / -1; color:#aaa;">Завантаження вітрини...</div>
@@ -248,8 +246,7 @@
             </div>
             
             <div class="modal-body">
-                <div class="cart-items-list" id="cart-items-container">
-                    </div>
+                <div class="cart-items-list" id="cart-items-container"></div>
                 
                 <div id="promo-block" style="display:none; margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="display: flex; gap: 10px;">
@@ -280,6 +277,27 @@
                     <div class="form-group">
                         <input type="text" id="order-address" class="form-input" data-placeholder-ua="Місто та № відділення Нової Пошти" data-placeholder-en="City & Nova Poshta branch" placeholder="Місто та № відділення Нової Пошти" required autocomplete="off">
                     </div>
+                    
+                    <div class="form-group">
+                        <select id="payment-method" class="form-input" onchange="togglePaymentFields()" required>
+                            <option value="" disabled selected>--- Оберіть спосіб оплати / Select payment ---</option>
+                            <option value="bank">Оплата на Банку / Bank Card Transfer</option>
+                            <option value="cod">Накладений платіж / Cash on Delivery</option>
+                        </select>
+                    </div>
+                    
+                    <div id="bank-payment-info" style="display: none; margin-bottom: 15px; padding: 12px; background: rgba(240, 180, 140, 0.1); border: 1px solid rgba(240, 180, 140, 0.3); border-radius: 6px; font-size: 0.9rem;">
+                        <div data-lang="ua">
+                            💰 <b>Посилання на Банку:</b> <a href="https://send.monobank.ua/YOUR_JAR" target="_blank" style="color: var(--theme-color); font-weight: bold; text-decoration: underline;">Перейти до оплати 🔗</a><br>
+                            Будь ласка, оплатіть замовлення та прикріпіть скріншот квитанції:
+                        </div>
+                        <div data-lang="en">
+                            💰 <b>Our Bank Link:</b> <a href="https://send.monobank.ua/YOUR_JAR" target="_blank" style="color: var(--theme-color); font-weight: bold; text-decoration: underline;">Pay here 🔗</a><br>
+                            Please pay the order and attach a screenshot of your receipt below:
+                        </div>
+                        <input type="file" id="receipt-file" class="form-input" accept="image/*" style="margin-top: 10px;">
+                    </div>
+
                     <button type="submit" class="confirm-btn" id="confirm-order-btn">
                         <span data-lang="ua">Оформити замовлення</span>
                         <span data-lang="en">Place Order</span>
@@ -349,6 +367,20 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
+        function togglePaymentFields() {
+            const method = document.getElementById('payment-method').value;
+            const bankInfo = document.getElementById('bank-payment-info');
+            const receiptInput = document.getElementById('receipt-file');
+            if (method === 'bank') {
+                bankInfo.style.display = 'block';
+                receiptInput.required = true;
+            } else {
+                bankInfo.style.display = 'none';
+                receiptInput.required = false;
+                receiptInput.value = '';
+            }
+        }
+
         let globalMerchList = [];
         let globalCategories = ['Всі товари']; 
         let activeCategory = 'Всі товари';
@@ -409,6 +441,21 @@
             });
         }
 
+        function updateQtyMax(itemId) {
+            const item = globalMerchList.find(m => m.id === itemId);
+            if (!item) return;
+            const sizeSelect = document.getElementById(`size-${itemId}`);
+            let selectedSize = sizeSelect ? sizeSelect.value : "Універсальний";
+            let sStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[selectedSize] || 0) : 0;
+            const qtyInput = document.getElementById(`qty-${itemId}`);
+            if (qtyInput) {
+                qtyInput.max = sStock;
+                if (parseInt(qtyInput.value) > sStock || sStock === 0) {
+                    qtyInput.value = sStock > 0 ? 1 : 0;
+                }
+            }
+        }
+
         function renderShopGrid() {
             const grid = document.getElementById('dynamic-shop-grid');
             const lang = localStorage.getItem('selectedLang') || 'ua';
@@ -427,28 +474,41 @@
             filteredList.forEach(item => {
                 let imgHtml = item.image ? `<img src="${item.image}">` : `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#666;">No Image</div>`;
                 
-                let isOutOfStock = item.stock <= 0;
+                let totalStock = 0;
+                if (typeof item.stock === 'object' && item.stock !== null) {
+                    totalStock = Object.values(item.stock).reduce((a, b) => a + parseInt(b || 0), 0);
+                } else {
+                    totalStock = parseInt(item.stock || 0);
+                }
+
+                let isOutOfStock = totalStock <= 0;
                 let stockBadge = isOutOfStock 
                     ? `<div class="stock-badge empty">${lang==='ua'?'Немає в наявності':'Out of stock'}</div>` 
                     : ``; 
 
                 let hasDiscount = item.discountPrice && item.discountPrice < item.price;
-                
                 let priceHtml = hasDiscount 
                     ? `<span class="old-price">${item.price} ₴</span> <span class="merch-price">${item.discountPrice} ₴</span>`
                     : `<span class="merch-price">${item.price} ₴</span>`;
                 
                 let saleBadgeHtml = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
-                
-                // Вивід опису товару, якщо він є
                 let descHtml = item.description ? `<div class="merch-desc">${item.description}</div>` : '';
                 
                 let sizeSelectHtml = '';
+                let initialMaxStock = 0;
+
                 if(item.sizes && item.sizes.length > 0) {
-                    sizeSelectHtml = `<select id="size-${item.id}" class="merch-select">` + 
-                        item.sizes.map(s => `<option value="${s}">${lang==='ua'?'Розмір:':'Size:'} ${s}</option>`).join('') + 
+                    let firstSize = item.sizes[0];
+                    initialMaxStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[firstSize] || 0) : 0;
+                    
+                    sizeSelectHtml = `<select id="size-${item.id}" class="merch-select" onchange="updateQtyMax('${item.id}')">` + 
+                        item.sizes.map(s => {
+                            let sStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[s] || 0) : 0;
+                            return `<option value="${s}">${lang==='ua'?'Розмір:':'Size:'} ${s} (${sStock} ${lang==='ua'?'шт':'pcs'})</option>`;
+                        }).join('') + 
                     `</select>`;
                 } else {
+                    initialMaxStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock["Універсальний"] || 0) : totalStock;
                     sizeSelectHtml = `<div class="merch-select" style="display:flex; align-items:center; color:#aaa; cursor:default;" data-val="Універсальний">${lang==='ua'?'Універсальний розмір':'One size'}</div>`;
                 }
 
@@ -469,7 +529,7 @@
                             ${descHtml}
                             <div class="merch-options">
                                 ${sizeSelectHtml}
-                                <input type="number" id="qty-${item.id}" class="merch-qty" value="1" min="1" max="${item.stock}">
+                                <input type="number" id="qty-${item.id}" class="merch-qty" value="${initialMaxStock > 0 ? 1 : 0}" min="${initialMaxStock > 0 ? 1 : 0}" max="${initialMaxStock}">
                             </div>
                             ${buyBtnHtml}
                         </div>
@@ -477,28 +537,28 @@
             });
         }
 
-        // --- ЛОГІКА КОШИКА ---
         function addToCart(merchId) {
             const item = globalMerchList.find(m => m.id === merchId);
-            if(!item || item.stock <= 0) return;
-
-            let qtyInput = document.getElementById(`qty-${item.id}`);
-            let qty = parseInt(qtyInput.value);
-            if(qty < 1 || qty > item.stock) {
-                showToast("Неправильна кількість!"); return;
-            }
+            if(!item) return;
 
             let size = "Універсальний";
             let sizeSelect = document.getElementById(`size-${item.id}`);
             if(sizeSelect && sizeSelect.tagName === 'SELECT') { size = sizeSelect.value; }
 
-            let actualPrice = (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price;
+            let itemStockForSize = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[size] || 0) : parseInt(item.stock || 0);
 
+            let qtyInput = document.getElementById(`qty-${item.id}`);
+            let qty = parseInt(qtyInput.value);
+            if(qty < 1 || qty > itemStockForSize || itemStockForSize <= 0) {
+                showToast(localStorage.getItem('selectedLang') === 'en' ? "Incorrect quantity or out of stock!" : "Неправильна кількість або немає в наявності!"); return;
+            }
+
+            let actualPrice = (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price;
             let existingItemIndex = shoppingCart.findIndex(cartItem => cartItem.merchId === item.id && cartItem.size === size);
             
             if (existingItemIndex > -1) {
-                if(shoppingCart[existingItemIndex].quantity + qty > item.stock) {
-                    showToast("Недостатньо товару на складі!"); return;
+                if(shoppingCart[existingItemIndex].quantity + qty > itemStockForSize) {
+                    showToast(localStorage.getItem('selectedLang') === 'en' ? "Not enough stock!" : "Недостатньо товару на складі!"); return;
                 }
                 shoppingCart[existingItemIndex].quantity += qty;
                 shoppingCart[existingItemIndex].totalPrice = shoppingCart[existingItemIndex].quantity * actualPrice;
@@ -547,7 +607,6 @@
 
         function updateCartUI() {
             const badge = document.getElementById('cart-badge-count');
-            
             let totalItems = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
             badge.innerText = totalItems;
 
@@ -665,6 +724,13 @@
             const name = document.getElementById('order-name').value.trim();
             const phone = document.getElementById('order-phone').value.trim();
             const address = document.getElementById('order-address').value.trim();
+            const paymentMethod = document.getElementById('payment-method').value;
+            const fileInput = document.getElementById('receipt-file');
+            
+            if(!paymentMethod) {
+                alert("Будь ласка, оберіть спосіб оплати!"); return;
+            }
+
             const lang = localStorage.getItem('selectedLang') || 'ua';
             const btn = document.getElementById('confirm-order-btn');
             
@@ -678,6 +744,8 @@
             }
             finalSum = Math.round(finalSum);
 
+            let paymentMethodText = paymentMethod === 'bank' ? "Оплата на Банку" : "Накладений платіж";
+
             try {
                 await db.runTransaction(async (transaction) => {
                     let merchRefsAndData = [];
@@ -690,15 +758,19 @@
                     }
 
                     for(let obj of merchRefsAndData) {
-                        let currentStock = obj.data.stock;
-                        if (currentStock < obj.cartItem.quantity) {
-                            throw new Error(lang==='ua' ? `Недостатньо товару "${obj.cartItem.merchTitle}" на складі! В наявності: ${currentStock}` : `Not enough stock for ${obj.cartItem.merchTitle}!`);
+                        let currentStockObj = typeof obj.data.stock === 'object' ? { ...obj.data.stock } : {};
+                        let sizeKey = obj.cartItem.size;
+                        let currentStockForSize = parseInt(currentStockObj[sizeKey] || 0);
+                        
+                        if (currentStockForSize < obj.cartItem.quantity) {
+                            throw new Error(lang==='ua' ? `Недостатньо товару "${obj.cartItem.merchTitle}" (Розмір: ${sizeKey}) на складі!` : `Not enough stock for ${obj.cartItem.merchTitle} (Size: ${sizeKey})!`);
                         }
-                        obj.newStock = currentStock - obj.cartItem.quantity;
+                        currentStockObj[sizeKey] = currentStockForSize - obj.cartItem.quantity;
+                        obj.newStockObj = currentStockObj;
                     }
 
                     for(let obj of merchRefsAndData) {
-                        transaction.update(obj.ref, { stock: obj.newStock });
+                        transaction.update(obj.ref, { stock: obj.newStockObj });
                     }
 
                     const orderRef = db.collection('orders').doc();
@@ -715,7 +787,8 @@
                         orderTextDetails: orderItemsString,
                         totalPrice: finalSum, 
                         promoCode: currentPromo ? currentPromo.code : "Не застосовано", 
-                        status: 'new',
+                        paymentMethod: paymentMethodText,
+                        status: 'on_review', // Статус: "на перевірці"
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
                     });
@@ -732,20 +805,40 @@
                                 `👤 <b>Клієнт:</b> ${name}\n` +
                                 `📞 <b>Телефон:</b> ${phone}\n` +
                                 `📍 <b>Адреса:</b> ${address}\n` +
+                                `💳 <b>Метод оплати:</b> ${paymentMethodText}\n` +
+                                `⏳ <b>Статус:</b> На перевірці\n` +
                                 tgPromoText +
                                 `\n🛒 <b>Склад замовлення:</b>\n${itemsListFormatted}\n\n` +
                                 `💰 <b>До сплати:</b> ${finalSum} ₴`;
 
-                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: tgMessage,
-                        parse_mode: 'HTML'
-                    })
-                }).then(res => console.log("Telegram відправлено!"))
-                  .catch(err => console.error("Помилка Telegram:", err));
+                const hasPhoto = paymentMethod === 'bank' && fileInput && fileInput.files.length > 0;
+
+                if (hasPhoto) {
+                    // Якщо є скріншот оплати, надсилаємо об'єкт FormData (метод sendPhoto)
+                    let formData = new FormData();
+                    formData.append('chat_id', chatId);
+                    formData.append('photo', fileInput.files[0]);
+                    formData.append('caption', tgMessage);
+                    formData.append('parse_mode', 'HTML');
+
+                    fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    }).then(res => console.log("Telegram замовлення з фото відправлено!"))
+                      .catch(err => console.error("Помилка відправки фото в Telegram:", err));
+                } else {
+                    // Якщо накладений платіж (без фото)
+                    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: tgMessage,
+                            parse_mode: 'HTML'
+                        })
+                    }).then(res => console.log("Telegram повідомлення відправлено!"))
+                      .catch(err => console.error("Помилка Telegram:", err));
+                }
 
                 showToast(lang === 'ua' ? 'Замовлення успішно оформлено! 🎉' : 'Order placed successfully! 🎉');
                 
@@ -753,6 +846,7 @@
                 currentPromo = null; 
                 document.getElementById('promo-code-input').value = "";
                 document.getElementById('promo-message').innerText = "";
+                if(fileInput) fileInput.value = "";
                 
                 saveCart();
                 closeOrderModal();
