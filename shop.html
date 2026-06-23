@@ -44,7 +44,7 @@
         }
         
         .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
-        .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        .navbar-container { max-width: 1200px; margin: 0 Auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .left-side { display: flex; align-items: center; gap: 20px; }
         .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
@@ -112,14 +112,12 @@
         .merch-select option { background: #1a1a1a; color: #fff; }
         .merch-select option:disabled { color: #555; text-decoration: line-through; }
 
-        /* КАСТОМНИЙ КРАСИВИЙ ЛІЧИЛЬНИК КІЛЬКОСТІ */
         .qty-container { display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; overflow: hidden; width: 100px; height: 38px; justify-content: space-between; }
         .qty-btn { background: none; border: none; color: #fff; width: 32px; height: 100%; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
         .qty-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); color: var(--theme-color); }
         .qty-btn:disabled { color: #444; cursor: not-allowed; }
         .qty-val { flex: 1; text-align: center; font-weight: bold; font-size: 0.95rem; user-select: none; }
         
-        /* КРАСИВІ СТИЛЬНІ ПЛАШКИ ОПЛАТИ */
         .payment-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .payment-tile { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: bold; }
         .payment-tile:hover { border-color: rgba(var(--theme-color-rgb), 0.5); }
@@ -164,7 +162,6 @@
         .form-input { width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; outline: none; font-size: 1rem; transition: border-color 0.3s; }
         .form-input:focus { border-color: var(--theme-color); box-shadow: 0 0 8px rgba(var(--theme-color-rgb), 0.2); }
         
-        .modal-footer { padding: 20px 25px; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
         .confirm-btn { width: 100%; padding: 14px; background: var(--theme-color); color: #121212; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(var(--theme-color-rgb), 0.3); }
         .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-2px); }
         .confirm-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; box-shadow: none; }
@@ -225,6 +222,7 @@
                 <li><a href="https://svarogteam.com/shop.html" class="current-page"><span data-lang="ua">SVRG STORE</span><span data-lang="en">SVRG STORE</span></a></li>
                 <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li><a href="status.html"><span data-lang="ua">Статус замовлення</span><span data-lang="en">Order Status</span></a></li>
                 <li class="admin-menu-item">
                     <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
                 </li>
@@ -340,6 +338,9 @@
     </div>
 
     <footer class="footer">
+        <div style="margin-bottom: 10px;">
+            <a href="status.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.3);">Перевірити статус замовлення</a>
+        </div>
         <span data-lang="ua">SVAROG TEAM © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
         <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
     </footer>
@@ -486,7 +487,6 @@
                     const data = doc.data();
                     let status = data.status || 'new';
 
-                    // Розумне маскування: якщо в архіві (archived) або скасовано (cancelled) - приховуємо плашку повністю
                     if (status === 'archived' || status === 'cancelled') {
                         box.style.display = 'none'; return;
                     }
@@ -561,7 +561,6 @@
             });
         }
 
-        // ЛОГІКА СТИЛЬНОГО ЛІЧИЛЬНИКА КІЛЬКОСТІ В КАРТКАХ
         function adjustGridQty(itemId, amount) {
             const item = globalMerchList.find(m => m.id === itemId);
             if (!item) return;
@@ -863,6 +862,16 @@
             formSection.style.display = 'block';
         }
 
+        // КОНВЕРТАЦІЯ ФОТО В BASE64 ДЛЯ ЗБЕРЕЖЕННЯ В БАЗУ ДАНИХ
+        function getBase64Image(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
         async function submitOrder(e) {
             e.preventDefault();
             if(shoppingCart.length === 0) return;
@@ -892,8 +901,14 @@
 
             let paymentMethodText = paymentMethod === 'bank' ? "Оплата на Банку" : (paymentMethod === 'card' ? "Переказ на карту" : "Накладений платіж");
             let newlyCreatedOrderId = "";
+            let base64Receipt = null;
 
             try {
+                // Якщо є файл квитанції - конвертуємо його перед збереженням в БД
+                if (fileInput && fileInput.files.length > 0) {
+                    base64Receipt = await getBase64Image(fileInput.files[0]);
+                }
+
                 await db.runTransaction(async (transaction) => {
                     let merchRefsAndData = [];
 
@@ -924,6 +939,7 @@
                     newlyCreatedOrderId = orderRef.id; 
                     let orderItemsString = shoppingCart.map(i => `${i.merchTitle} (Розмір: ${i.size}, К-сть: ${i.quantity})`).join('\n');
 
+                    // Записуємо замовлення з фотографією (якщо вона є)
                     transaction.set(orderRef, {
                         name: name,
                         phone: phone,
@@ -936,6 +952,7 @@
                         totalPrice: finalSum, 
                         promoCode: currentPromo ? currentPromo.code : "Не застосовано", 
                         paymentMethod: paymentMethodText,
+                        paymentProof: base64Receipt, // НОВЕ ПОЛЕ ДЛЯ АДМІНКИ
                         status: 'on_review', 
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
