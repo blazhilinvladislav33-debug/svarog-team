@@ -37,7 +37,6 @@
             box-shadow: inset 0 0 35px 5px rgba(240, 180, 140, 0.15), 0 15px 40px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
             box-sizing: border-box;
-            /* Важливо для збереження кольорів при друку в браузерах */
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
@@ -74,9 +73,8 @@
         .promo-item { display: flex; justify-content: space-between; padding: 12px 20px; background: #222; margin-bottom: 8px; border-radius: 8px; color: #fff; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
         .promo-item:hover { background: #2a2a2a; border-color: #f0b48c; }
 
-        /* Стилі спеціально для друку */
+        /* Стилі для горизонтального друку */
         @media print { 
-            /* Робимо орієнтацію горизонтальною (альбомною) */
             @page { 
                 size: landscape; 
                 margin: 0;
@@ -94,7 +92,6 @@
                 border: 2px solid #f0b48c !important; 
                 box-shadow: inset 0 0 35px 5px rgba(240, 180, 140, 0.15) !important;
                 margin: 0 !important; 
-                /* Примусове збереження темного градієнту фону */
                 background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%) !important;
                 color: #fff !important;
             } 
@@ -147,18 +144,11 @@
             if(doc.exists && doc.data().active) {
                 const promoData = doc.data();
                 
+                // Тільки виводимо дані, нічого не перезаписуємо в базі при перегляді!
                 document.getElementById('cert-code').innerText = promoData.code || doc.id;
                 document.getElementById('cert-code').style.color = "#fff";
                 document.getElementById('cert-code').style.fontSize = "2.2rem";
                 
-                // Перевірка на одноразовість сертифіката
-                if(promoData.isSingleUse === true) {
-                    docRef.update({ active: false }).then(() => {
-                        console.log("✓ Одноразовий сертифікат активовано та вимкнено для наступних переглядів.");
-                    }).catch(err => {
-                        console.error("Помилка зміни статусу промокоду:", err);
-                    });
-                }
             } else {
                 document.getElementById('cert-code').innerText = "ВИКОРИСТАНО / НЕАКТИВНИЙ";
                 document.getElementById('cert-code').style.color = "#ff4a4a";
@@ -195,28 +185,23 @@
         console.error("Помилка завантаження списку:", err);
     });
 
-    // ФУНКЦІЯ СТВОРЕННЯ ТА СКАЧУВАННЯ PNG КАРТИНКИ
+    // Функція створення та скачування PNG картинки
     function downloadCertificatePNG() {
         const element = document.getElementById('certificate-card');
         const currentCode = document.getElementById('cert-code').innerText;
         
-        // Налаштування для правильного рендерингу країв та прозорості
         html2canvas(element, {
-            backgroundColor: null, // null робить простір навколо закруглених кутів прозорим (справжній PNG)
-            scale: 2,             // Збільшує якість картинки у два рази, щоб текст не розмивався
-            useCORS: true         // Дозволяє коректно завантажувати логотипи та сторонні картинки
+            backgroundColor: null, // Робить краї навколо куточків прозорими
+            scale: 2,             // Висока якість
+            useCORS: true         // Підтримка картинок з бази
         }).then(canvas => {
-            // Перетворюємо у формат картинки
             const image = canvas.toDataURL("image/png");
-            
-            // Створюємо тимчасове посилання для скачування файлу
             const link = document.createElement('a');
             link.download = `SVAROG_Certificate_${currentCode}.png`;
             link.href = image;
             link.click();
         }).catch(err => {
             console.error("Не вдалося сформувати фото сертифіката:", err);
-            alert("Сталася помилка при створенні PNG файлу.");
         });
     }
 </script>
