@@ -5,6 +5,8 @@
     <title>SVAROG TEAM | Сертифікат підтримки</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
@@ -26,13 +28,18 @@
             padding: 40px 20px; font-family: 'Montserrat', sans-serif; min-height: 100vh;
         }
         
+        /* Контейнер сертифіката */
         .cert-container { 
             width: 800px; height: 450px; 
-            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%) !important;
             color: #fff; padding: 30px; position: relative;
             border: 2px solid #f0b48c; border-radius: 15px;
             box-shadow: inset 0 0 35px 5px rgba(240, 180, 140, 0.15), 0 15px 40px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
+            box-sizing: border-box;
+            /* Важливо для збереження кольорів при друку в браузерах */
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         .header-logos { display: flex; gap: 30px; margin-bottom: 20px; align-items: center; }
@@ -48,6 +55,7 @@
             border: 2px solid #f0b48c;
             border-radius: 8px;
             box-shadow: 0 0 10px 5px rgba(240, 180, 140, 0.15);
+            background: rgba(0, 0, 0, 0.3);
         }
         .code-val { font-size: 2.2rem; font-weight: 900; color: #fff; }
 
@@ -56,25 +64,49 @@
             border-top: 1px solid #333; padding-top: 15px; font-style: italic;
         }
 
-        .print-btn { margin-top: 30px; padding: 12px 30px; background: #f0b48c; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-wrapper { display: flex; gap: 15px; margin-top: 30px; }
+        .print-btn { padding: 12px 30px; background: #f0b48c; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .print-btn:hover { background: #dcb092; }
+        .png-btn { padding: 12px 30px; background: #222; border: 2px solid #f0b48c; color: #f0b48c; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .png-btn:hover { background: #f0b48c; color: #121212; }
 
         .promo-list { margin-top: 40px; width: 100%; max-width: 600px; }
         .promo-item { display: flex; justify-content: space-between; padding: 12px 20px; background: #222; margin-bottom: 8px; border-radius: 8px; color: #fff; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
         .promo-item:hover { background: #2a2a2a; border-color: #f0b48c; }
 
+        /* Стилі спеціально для друку */
         @media print { 
-            .print-btn, .promo-list { display: none; } 
-            body { background: #fff; padding: 0; } 
-            .cert-container { border: 3px solid #f0b48c; color: #000; background: #fff; box-shadow: none; margin: 0; } 
-            h1, .code-val { color: #000; }
-            .footer-cert { color: #333; }
+            /* Робимо орієнтацію горизонтальною (альбомною) */
+            @page { 
+                size: landscape; 
+                margin: 0;
+            } 
+            body { 
+                background: transparent !important; 
+                padding: 0; 
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            } 
+            .btn-wrapper, .promo-list { display: none !important; } 
+            .cert-container { 
+                border: 2px solid #f0b48c !important; 
+                box-shadow: inset 0 0 35px 5px rgba(240, 180, 140, 0.15) !important;
+                margin: 0 !important; 
+                /* Примусове збереження темного градієнту фону */
+                background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%) !important;
+                color: #fff !important;
+            } 
+            h1 { color: #f0b48c !important; }
+            .code-val { color: #fff !important; }
+            .footer-cert { color: #aaa !important; }
         }
     </style>
 </head>
 <body>
 
-<div class="cert-container">
+<div class="cert-container" id="certificate-card">
     <div class="header-logos">
         <img src="logo.png" class="logo-main" alt="Logo">
         <img src="SvarogTeam.png" class="logo-team" alt="SVAROG TEAM">
@@ -94,7 +126,10 @@
     </div>
 </div>
 
-<button class="print-btn" onclick="window.print()">Друк сертифіката</button>
+<div class="btn-wrapper">
+    <button class="print-btn" onclick="window.print()">Друк сертифіката (PDF)</button>
+    <button class="png-btn" onclick="downloadCertificatePNG()">Завантажити PNG</button>
+</div>
 
 <div class="promo-list" id="promo-list">
     <h3 style="color:#fff; margin-bottom:15px; text-align: center;">Оберіть промокод для генерації:</h3>
@@ -106,19 +141,17 @@
 
     if(code) {
         const codeUpper = code.toUpperCase();
-        // Робимо запит до документа, де ID — це сам промокод
         const docRef = db.collection("promocodes").doc(codeUpper);
 
         docRef.get().then(doc => {
             if(doc.exists && doc.data().active) {
                 const promoData = doc.data();
                 
-                // Виводимо текст коду (якщо поля code немає в базі, беремо назву самого документа)
                 document.getElementById('cert-code').innerText = promoData.code || doc.id;
                 document.getElementById('cert-code').style.color = "#fff";
                 document.getElementById('cert-code').style.fontSize = "2.2rem";
                 
-                // Автоматична перевірка на одноразовість сертифіката
+                // Перевірка на одноразовість сертифіката
                 if(promoData.isSingleUse === true) {
                     docRef.update({ active: false }).then(() => {
                         console.log("✓ Одноразовий сертифікат активовано та вимкнено для наступних переглядів.");
@@ -127,7 +160,6 @@
                     });
                 }
             } else {
-                // Якщо сертифікат видалено, або він уже неактивний (використаний)
                 document.getElementById('cert-code').innerText = "ВИКОРИСТАНО / НЕАКТИВНИЙ";
                 document.getElementById('cert-code').style.color = "#ff4a4a";
                 document.getElementById('cert-code').style.fontSize = "1.5rem";
@@ -149,9 +181,7 @@
 
         snapshot.forEach(doc => {
             const p = doc.data();
-            const promoName = p.code || doc.id; // Сумісність за ID або за полем code
-            
-            // Якщо промокод одноразовий, додаємо красиву мітку в списку
+            const promoName = p.code || doc.id;
             const singleUseBadge = p.isSingleUse ? " <small style='color:#ffaa00;'>(Одноразовий)</small>" : "";
             
             list.innerHTML += `
@@ -164,6 +194,31 @@
     }).catch(err => {
         console.error("Помилка завантаження списку:", err);
     });
+
+    // ФУНКЦІЯ СТВОРЕННЯ ТА СКАЧУВАННЯ PNG КАРТИНКИ
+    function downloadCertificatePNG() {
+        const element = document.getElementById('certificate-card');
+        const currentCode = document.getElementById('cert-code').innerText;
+        
+        // Налаштування для правильного рендерингу країв та прозорості
+        html2canvas(element, {
+            backgroundColor: null, // null робить простір навколо закруглених кутів прозорим (справжній PNG)
+            scale: 2,             // Збільшує якість картинки у два рази, щоб текст не розмивався
+            useCORS: true         // Дозволяє коректно завантажувати логотипи та сторонні картинки
+        }).then(canvas => {
+            // Перетворюємо у формат картинки
+            const image = canvas.toDataURL("image/png");
+            
+            // Створюємо тимчасове посилання для скачування файлу
+            const link = document.createElement('a');
+            link.download = `SVAROG_Certificate_${currentCode}.png`;
+            link.href = image;
+            link.click();
+        }).catch(err => {
+            console.error("Не вдалося сформувати фото сертифіката:", err);
+            alert("Сталася помилка при створенні PNG файлу.");
+        });
+    }
 </script>
 </body>
 </html>
