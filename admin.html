@@ -247,6 +247,7 @@
                 <button class="tab-button" onclick="switchTab('shop-management-tab', this)"><span data-lang="ua">🛍️ Магазин</span><span data-lang="en">🛍️ Shop</span></button>
                 <button class="tab-button" onclick="switchTab('promo-tab', this)"><span data-lang="ua">🎟️ Промокоди</span><span data-lang="en">🎟️ Promos</span></button>
                 <button class="tab-button" onclick="switchTab('link-management-tab', this)"><span data-lang="ua">🔗 Контент</span><span data-lang="en">🔗 Content</span></button>
+                <button class="tab-button" onclick="switchTab('stats-tab', this)"><span data-lang="ua">📈 Статистика</span><span data-lang="en">📈 Stats</span></button>
                 <button class="tab-button" id="superadmin-only-tab-btn" onclick="switchTab('admin-management-tab', this)" style="display:none; color:var(--theme-color); border-color:rgba(var(--theme-color-rgb),0.2);"><span data-lang="ua">⚙️ Адміни</span><span data-lang="en">⚙️ Managers</span></button>
                 <button class="tab-button" onclick="switchTab('archive-tab', this)"><span data-lang="ua">📦 Архів</span><span data-lang="en">📦 Archive</span></button>
             </div>
@@ -492,6 +493,27 @@
                 </div>
             </div>
 
+            <div id="stats-tab" class="tab-content">
+                <div class="admin-creator-form" style="max-width: 600px; margin: 0 auto;">
+                    <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">📊 Жива статистика на головній</h3>
+                    <p style="font-size:0.85rem; color:#aaa; margin-bottom:15px;">Ці числа відображатимуться з красивою анімацією на головній сторінці сайту (index.html).</p>
+                    
+                    <div class="form-group">
+                        <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Знищено цілей:</label>
+                        <input type="number" id="stat-targets" class="form-input" placeholder="Напр: 142">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Зібрано на дрони (₴):</label>
+                        <input type="number" id="stat-funds" class="form-input" placeholder="Напр: 500000">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Бойових вильотів:</label>
+                        <input type="number" id="stat-missions" class="form-input" placeholder="Напр: 830">
+                    </div>
+                    <button class="btn" onclick="saveStatistics()">Зберегти статистику</button>
+                </div>
+            </div>
+
             <div id="admin-management-tab" class="tab-content">
                 <div class="superadmin-grid">
                     <div class="admin-creator-form">
@@ -565,6 +587,7 @@
         let unsubscribePromos = null; 
         let unsubscribePaymentConfig = null;
         let unsubscribeReports = null;
+        let unsubscribeStats = null;
 
         const menuButton = document.getElementById('menu-button');
         const navMenu = document.getElementById('nav-menu');
@@ -800,6 +823,30 @@
                     if(data.cardName && cardNameInp) cardNameInp.value = data.cardName;
                 }
             }, e => console.error(e));
+            
+            unsubscribeStats = db.collection("config").doc("statistics").onSnapshot(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    if(document.getElementById('stat-targets')) document.getElementById('stat-targets').value = data.targets || 0;
+                    if(document.getElementById('stat-funds')) document.getElementById('stat-funds').value = data.funds || 0;
+                    if(document.getElementById('stat-missions')) document.getElementById('stat-missions').value = data.missions || 0;
+                }
+            }, e => console.error(e));
+        }
+
+        async function saveStatistics() {
+            const targets = parseInt(document.getElementById('stat-targets').value) || 0;
+            const funds = parseInt(document.getElementById('stat-funds').value) || 0;
+            const missions = parseInt(document.getElementById('stat-missions').value) || 0;
+            
+            try {
+                await db.collection("config").doc("statistics").set({
+                    targets: targets, funds: funds, missions: missions
+                }, { merge: true });
+                alert("✓ Статистику успішно оновлено на головній сторінці!");
+            } catch(e) {
+                console.error(e); alert("Помилка збереження: " + e.message);
+            }
         }
 
         function toggleMediaInput() {
