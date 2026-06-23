@@ -44,7 +44,7 @@
         }
         
         .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
-        .navbar-container { max-width: 1200px; margin: 0 Auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .left-side { display: flex; align-items: center; gap: 20px; }
         .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
@@ -166,9 +166,10 @@
         .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-2px); }
         .confirm-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; box-shadow: none; }
 
-        .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--theme-color); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 4000; opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 10px; }
+        /* ОПТИМІЗОВАНИЙ ДИЗАЙН ПУШ-СПОВІЩЕННЯ */
+        .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(20, 20, 20, 0.98); backdrop-filter: blur(12px); border: 2px solid var(--theme-color); color: #fff; padding: 15px 25px; border-radius: 12px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 4000; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 12px; max-width: 90vw; width: max-content; text-align: center; line-height: 1.4; }
         .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast-icon { width: 20px; height: 20px; fill: var(--theme-color); }
+        .toast-icon { width: 22px; height: 22px; fill: var(--theme-color); flex-shrink: 0; }
 
         .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
 
@@ -321,8 +322,7 @@
                     </div>
                     
                     <div id="bank-payment-info" style="display: none; margin-bottom: 15px; padding: 12px; background: rgba(240, 180, 140, 0.1); border: 1px solid rgba(240, 180, 140, 0.3); border-radius: 6px; font-size: 0.9rem;">
-                        <!-- Інформація про оплату згенерується JS -->
-                    </div>
+                        </div>
 
                     <button type="submit" class="confirm-btn" id="confirm-order-btn">
                         <span data-lang="ua">Оформити замовлення</span>
@@ -335,7 +335,7 @@
 
     <div class="toast-notification" id="toast-msg">
         <svg class="toast-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-        <span id="toast-text">Товар додано в кошик!</span>
+        <span id="toast-text">Сповіщення</span>
     </div>
 
     <footer class="footer">
@@ -377,24 +377,25 @@
         menuButton.addEventListener('click', (e) => { e.stopPropagation(); navMenu.classList.toggle('active'); menuButton.classList.toggle('open'); });
         document.addEventListener('click', (e) => { if (!navMenu.contains(e.target) && !menuButton.contains(e.target)) { navMenu.classList.remove('active'); menuButton.classList.remove('open'); } });
         
+        // МОДИФІКОВАНА ФУНКЦІЯ ОНОВЛЕНОГО ТАЙМАУТУ ДЛЯ СПОВІЩЕННЯ
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast-msg');
+            document.getElementById('toast-text').innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, duration);
+        }
+
         function setLanguage(lang) {
             localStorage.setItem('selectedLang', lang);
             document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
             document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.innerText.toLowerCase() === lang));
+            document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
             document.querySelectorAll('[data-placeholder-ua]').forEach(el => {
                 el.placeholder = lang === 'ua' ? el.getAttribute('data-placeholder-ua') : el.getAttribute('data-placeholder-en');
             });
             renderShopGrid(); 
             updateCartUI();   
             listenToActiveOrderStatus();
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast-msg');
-            document.getElementById('toast-text').innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
         // ДИНАМІЧНІ ДАНІ РЕКВІЗИТІВ З FIREBASE
@@ -865,7 +866,6 @@
             formSection.style.display = 'block';
         }
 
-        // КОНВЕРТАЦІЯ ФОТО В BASE64 ДЛЯ ЗБЕРЕЖЕННЯ В БАЗУ ДАНИХ
         function getBase64Image(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -953,8 +953,8 @@
                         totalPrice: finalSum, 
                         promoCode: currentPromo ? currentPromo.code : "Не застосовано", 
                         paymentMethod: paymentMethodText,
-                        paymentProof: base64Receipt, // НОВЕ ПОЛЕ ДЛЯ АДМІНКИ
-                        status: 'on_review', 
+                        paymentProof: base64Receipt, 
+                        status: 'new', 
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
                     });
@@ -974,7 +974,7 @@
                                 `📞 <b>Телефон:</b> ${phone}\n` +
                                 `📍 <b>Адреса:</b> ${address}\n` +
                                 `💳 <b>Метод оплати:</b> ${paymentMethodText}\n` +
-                                `⏳ <b>Статус:</b> На перевірці\n` +
+                                `⏳ <b>Статус:</b> Нове замовлення\n` +
                                 tgPromoText +
                                 `\n🛒 <b>Склад замовлення:</b>\n${itemsListFormatted}\n\n` +
                                 `💰 <b>До сплати:</b> ${finalSum} ₴`;
@@ -991,21 +991,22 @@
                     fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
                         method: 'POST',
                         body: formData
-                    }).then(res => console.log("Telegram замовлення відправлено!"))
-                      .catch(err => console.error("Помилка відправки фото в Telegram:", err));
+                    }).catch(err => console.error("Помилка Telegram:", err));
                 } else {
                     fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: chatId,
-                            text: tgMessage,
-                            parse_mode: 'HTML'
-                        })
-                    }).then(res => console.log("Telegram замовлення відправлено!"));
+                        body: JSON.stringify({ chat_id: chatId, text: tgMessage, parse_mode: 'HTML' })
+                    });
                 }
 
-                showToast(lang === 'ua' ? 'Замовлення успішно оформлено! 🎉' : 'Order placed successfully! 🎉');
+                // МОДИФІКОВАНЕ СПОВІЩЕННЯ НА 6 СЕКУНД З ТЕКСТОМ ПЕРЕВІРКИ СТАТУСУ
+                showToast(
+                    lang === 'ua' 
+                        ? 'Замовлення прийнято! Статус замовлення можна перевірити в меню "Статус замовлення" або внизу сторінки. 📦' 
+                        : 'Order accepted! You can check your order status in the "Order Status" menu or at the bottom of the page. 📦', 
+                    6000
+                );
                 
                 shoppingCart = [];
                 currentPromo = null; 
@@ -1020,7 +1021,7 @@
                 listenToActiveOrderStatus(); 
 
             } catch (err) {
-                console.error("Transaction failed: ", err);
+                console.error("Помилка транзакції: ", err);
                 alert(err.message);
             } finally {
                 btn.innerHTML = `<span data-lang="ua">Оформити замовлення</span><span data-lang="en">Place Order</span>`;
@@ -1095,8 +1096,7 @@
         }
 
         function sendUserChatPhoto(input) {
-            console.warn("Функція sendUserChatPhoto викликана. Для роботи з photo потрібно налаштувати Firebase Storage.");
-            showToast(localStorage.getItem('selectedLang') === 'en' ? "Photo transfer is in development." : "Надсилання фото знаходиться в розробці.");
+            alert(localStorage.getItem('selectedLang') === 'en' ? "Photo transfer is in development." : "Надсилання фото знаходиться в розробці.");
         }
 
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
