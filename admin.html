@@ -985,6 +985,7 @@
             
             let combinedData = [...globalNewsData, ...globalReportsData];
             
+            // Сортування по даті (якщо є) або по timestamp
             combinedData.sort((a, b) => {
                 let timeA = a.date ? new Date(a.date).getTime() : (a.timestamp ? a.timestamp.toMillis() : 0);
                 let timeB = b.date ? new Date(b.date).getTime() : (b.timestamp ? b.timestamp.toMillis() : 0);
