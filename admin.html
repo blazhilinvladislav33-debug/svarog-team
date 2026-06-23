@@ -77,6 +77,8 @@
         .admin-accounts-list { flex: 1.2; min-width: 320px; max-height: 550px; overflow-y: auto; }
 
         .admin-user-card { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 15px; margin-bottom: 12px; position: relative; }
+        .admin-card-title { font-weight: bold; color: var(--theme-color); font-size: 1rem; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px; margin-bottom: 8px; }
+        .admin-card-info { font-size: 0.9rem; color: #e0e0e0; margin-bottom: 4px; }
         
         .delete-admin-btn { background: none; border: 1px solid #ff4a4a; color: #ff4a4a; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; cursor: pointer; position: absolute; right: 15px; top: 13px; z-index: 10; transition: all 0.2s; }
         .delete-admin-btn:hover { background: #ff4a4a; color: #fff; }
@@ -484,7 +486,7 @@
                             <div class="form-group"><input type="text" id="new-admin-lastname" class="form-input" placeholder="Прізвище" required autocomplete="off"></div>
                             <div class="form-group"><input type="text" id="new-admin-firstname" class="form-input" placeholder="Ім'я" required autocomplete="off"></div>
                             <div class="form-group"><input type="tel" id="new-admin-phone" class="form-input" placeholder="Номер телефону" required autocomplete="off"></div>
-                            <div class="form-group"><input type="text" id="new-admin-user" class="form-input" placeholder="Логін для vходу" required autocomplete="off"></div>
+                            <div class="form-group"><input type="text" id="new-admin-user" class="form-input" placeholder="Логін для входу" required autocomplete="off"></div>
                             <div class="form-group"><input type="password" id="new-admin-pass" class="form-input" placeholder="Пароль" required></div>
                             <button type="submit" class="btn" style="padding:10px;">Зберегти адміна</button>
                         </form>
@@ -701,7 +703,6 @@
                 renderPromocodes();
             }, e => console.error(e));
 
-            // Прослуховування реквізитів з Firebase
             unsubscribePaymentConfig = db.collection("config").doc("payment").onSnapshot(doc => {
                 if (doc.exists) {
                     const data = doc.data();
@@ -711,7 +712,6 @@
             }, e => console.error(e));
         }
 
-        // --- ЛОГІКА ДИНАМІЧНИХ РОЗМІРІВ ТА ЗАЛИШКІВ ---
         function generateSizeStockInputs(existingStockObj = null) {
             const container = document.getElementById('size-stock-fields-container');
             const sizesStr = document.getElementById('merch-sizes').value.trim();
@@ -744,7 +744,6 @@
             }
         }
 
-        // --- ФУНКЦІЯ ОНОВЛЕННЯ РЕКВІЗИТІВ У FIREBASE ---
         async function savePaymentCredentials() {
             const bankUrl = document.getElementById('config-bank-url').value.trim();
             const cardNumber = document.getElementById('config-card-number').value.trim();
@@ -765,7 +764,6 @@
             }
         }
 
-        // --- ЛОГІКА МАГАЗИНУ ТА КАТЕГОРІЙ ---
         async function toggleShopStatus() {
             const checkbox = document.getElementById('shop-active-checkbox');
             const newStatus = !checkbox.checked; 
@@ -910,7 +908,7 @@
                 } else {
                     merchObject.timestamp = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection("merch").add(merchObject);
-                    alert("✓ Тovar успішно додано до вітрини!");
+                    alert("✓ Товар успішно додано до вітрини!");
                 }
                 cancelMerchEditing();
             } catch(err) {
@@ -968,7 +966,6 @@
             }
         }
 
-        // --- ЛОГІКА СУБ-ФІЛЬТРАЦІЇ ТА АКОРДЕОНА ЗАМОВЛЕНЬ ---
         function setOrdersFilter(filterType) {
             currentOrdersFilter = filterType;
             document.querySelectorAll('.orders-sub-btn').forEach(btn => btn.classList.remove('active'));
@@ -1102,348 +1099,6 @@
             });
         }
 
-        // --- РЕШТА ФУНКЦІОНАЛУ ЧАТІВ ТА ПАНЕЛІ ---
-        async function sendAdminReply() {
-            const input = document.getElementById('admin-reply-input');
-            const text = input.value.trim();
-            if (!text || !currentSelectedChatId) return;
-
-            const msgObject = { sender: 'admin', text: text, type: 'text', time: Date.now() };
-            input.value = "";
-
-            try {
-                await db.collection("chats").doc(currentSelectedChatId).update({
-                    messages: firebase.firestore.FieldValue.arrayUnion(msgObject),
-                    lastUpdate: Date.now()
-                });
-            } catch(e) { console.error("Помилка відповіді адміна: ", e); }
-        }
-
-        function sendAdminChatPhoto(input) {
-            if (!input.files || !input.files[0] || !currentSelectedChatId) return;
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const msgObject = { sender: 'admin', text: e.target.result, type: 'image', time: Date.now() };
-                try {
-                    await db.collection("chats").doc(currentSelectedChatId).update({
-                        messages: firebase.firestore.FieldValue.arrayUnion(msgObject),
-                        lastUpdate: Date.now()
-                    });
-                } catch(err) { console.error("Помилка фото адміна: ", err); }
-            };
-            reader.readAsDataURL(input.files[0]);
-            input.value = "";
-        }
-
-        async function confirmAndChangeStatus(id, newStatus, oldStatus) {
-            isConfirmingStatus = true;
-            try { await db.collection("chats").doc(id).update({ adminStatus: newStatus }); } 
-            catch(e) { console.error(e); }
-            finally { isConfirmingStatus = false; renderAllDynamicData(); }
-        }
-
-        async function closeChatSession(id) {
-            if (confirm("Завершити цей сеанс чату та перенести його в архів?")) {
-                try {
-                    await db.collection("chats").doc(id).update({ status: 'closed' });
-                    if (currentSelectedChatId === id) currentSelectedChatId = null;
-                } catch(e) { console.error("Помилка закриття сесії:", e); }
-            }
-        }
-
-        function previewNewsPhoto(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    newsPhotoBase64 = e.target.result;
-                    const previewImg = document.getElementById('news-preview-element');
-                    previewImg.src = newsPhotoBase64; previewImg.style.display = 'block';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function toggleNewsButtonFields() {
-            const checked = document.getElementById('news-has-btn-checkbox').checked;
-            document.getElementById('news-button-config-box').style.display = checked ? 'block' : 'none';
-        }
-
-        async function publishNewsItem() {
-            const title = document.getElementById('news-title-field').value.trim();
-            const body = document.getElementById('news-body-field').value.trim();
-            const dateVal = document.getElementById('news-date-field').value;
-            const hasBtn = document.getElementById('news-has-btn-checkbox').checked;
-            const editId = document.getElementById('edit-news-id').value;
-            
-            if(!title || !body || !dateVal) { alert("Заповніть заголовок, текст та дату новини!"); return; }
-
-            let btnText = ""; let btnUrl = "";
-            if(hasBtn) {
-                btnText = document.getElementById('news-btn-text-field').value.trim();
-                btnUrl = document.getElementById('news-btn-url-field').value.trim();
-                if(!btnText || !btnUrl) { alert("Заповніть налаштування кнопки дії або вимкніть її!"); return; }
-            }
-
-            const postObject = {
-                title: title,
-                body: body,
-                date: dateVal,
-                image: newsPhotoBase64 || null,
-                hasButton: hasBtn,
-                btnText: btnText,
-                btnUrl: btnUrl
-            };
-
-            try {
-                if(editId) {
-                    await db.collection("news").doc(editId PostObject, { merge: true });
-                    alert("✓ Зміни успішно збережено в хмарі!");
-                } else {
-                    await db.collection("news").add({
-                        ...postObject,
-                        createdTimestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    alert("✓ Новину успішно опубліковано глобально!");
-                }
-                cancelNewsEditing();
-            } catch(err) {
-                console.error(err); alert("Помилка бази даних: " + err.message);
-            }
-        }
-
-        function startEditNews(id) {
-            const news = globalNewsData.find(n => n.id === id);
-            if(!news) return;
-
-            document.getElementById('edit-news-id').value = news.id;
-            document.getElementById('news-title-field').value = news.title;
-            document.getElementById('news-body-field').value = news.body;
-            document.getElementById('news-date-field').value = news.date;
-            
-            if(news.image) {
-                newsPhotoBase64 = news.image;
-                const previewImg = document.getElementById('news-preview-element');
-                previewImg.src = news.image; previewImg.style.display = 'block';
-            } else {
-                document.getElementById('news-preview-element').style.display = 'none';
-                newsPhotoBase64 = "";
-            }
-
-            document.getElementById('news-has-btn-checkbox').checked = news.hasButton;
-            if(news.hasButton) {
-                document.getElementById('news-button-config-box').style.display = 'block';
-                document.getElementById('news-btn-text-field').value = news.btnText || "";
-                document.getElementById('news-btn-url-field').value = news.btnUrl || "";
-            } else {
-                document.getElementById('news-button-config-box').style.display = 'none';
-            }
-
-            document.getElementById('news-form-title').innerText = "📝 Редагування новини";
-            document.getElementById('news-submit-btn').innerText = "Зберегти зміни";
-            document.getElementById('news-cancel-edit-btn').style.display = 'inline-block';
-            document.getElementById('link-management-tab').scrollTop = 0;
-        }
-
-        function cancelNewsEditing() {
-            document.getElementById('edit-news-id').value = "";
-            document.getElementById('news-title-field').value = "";
-            document.getElementById('news-body-field').value = "";
-            document.getElementById('news-photo-file').value = "";
-            document.getElementById('news-preview-element').style.display = 'none';
-            document.getElementById('news-has-btn-checkbox').checked = false;
-            document.getElementById('news-button-config-box').style.display = 'none';
-            document.getElementById('news-btn-text-field').value = "";
-            document.getElementById('news-btn-url-field').value = "";
-            newsPhotoBase64 = "";
-
-            document.getElementById('news-form-title').innerText = "📰 Публікація новини";
-            document.getElementById('news-submit-btn').innerText = "Опублікувати новину";
-            document.getElementById('news-cancel-edit-btn').style.display = 'none';
-            document.getElementById('news-date-field').valueAsDate = new Date();
-        }
-
-        function renderAdminNewsChronicle() {
-            const box = document.getElementById('box-for-published-news'); box.innerHTML = "";
-            if(globalNewsData.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:10px;">Немає опублікованих новин у хмарі</div>`; return; }
-
-            globalNewsData.forEach(news => {
-                let imgHtml = news.image ? `<img src="${news.image}" style="max-height:60px; border-radius:4px; margin-top:5px; display:block;">` : '';
-                let btnHtml = news.hasButton ? `<span style="background:rgba(240,180,140,0.1); color:var(--theme-color); font-size:0.75rem; padding:2px 6px; border-radius:4px; margin-top:5px; display:inline-block;">Кнопка: ${news.btnText}</span>` : '';
-                
-                box.innerHTML += `
-                    <div class="admin-user-card" style="padding: 12px 15px;">
-                        <div style="font-size:0.8rem; color:var(--theme-color); font-weight:bold;">📅 ${news.date}</div>
-                        <div style="font-weight:bold; margin:4px 0; font-size:1rem; padding-right:180px;">${news.title}</div>
-                        <div style="font-size:0.85rem; color:#ccc; max-height:45px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${news.body}</div>
-                        ${imgHtml} ${btnHtml}
-                        <button class="edit-news-btn" onclick="startEditNews('${news.id}')">Редагувати</button>
-                        <button class="delete-admin-btn" onclick="deleteNewsItem('${news.id}')">Видалити</button>
-                    </div>`;
-            });
-        }
-
-        async function deleteNewsItem(id) {
-            if(confirm("Видалити цю новину безповоротно з хмари?")) {
-                try {
-                    await db.collection("news").doc(id).delete();
-                    if(document.getElementById('edit-news-id').value === id) cancelNewsEditing();
-                } catch(e) { console.error("Помилка видалення новини:", e); }
-            }
-        }
-
-        function showCurrentLinkInField() {
-            // Перегляд платіжних даних виконується автоматично через Firestore Stream (PaymentConfig)
-        }
-
-        async function addNewSocialNetwork() {
-            const nameField = document.getElementById('soc-name'); const urlField = document.getElementById('soc-url'); const colorField = document.getElementById('soc-color');
-            const name = nameField.value.trim(); const url = urlField.value.trim(); const color = colorField.value;
-            if(!name || !url) { alert("Заповніть назву та посилання!"); return; }
-            
-            let updatedList = [...globalSocialNetworks, { id: 'soc_' + Date.now(), name, url, color }];
-            try {
-                await db.collection("config").doc("socials").set({ list: updatedList });
-                nameField.value = ""; urlField.value = "";
-            } catch(e) { console.error("Помилка соцмережі:", e); }
-        }
-
-        function renderAdminSocialList() {
-            const box = document.getElementById('box-for-social-list'); box.innerHTML = "";
-            if(globalSocialNetworks.length === 0) { box.innerHTML = `<div class="no-msg">Мереж немає</div>`; return; }
-            globalSocialNetworks.forEach(net => {
-                box.innerHTML += `
-                    <div class="admin-user-card" style="border-left: 4px solid ${net.color}; padding: 10px 15px;">
-                        <span style="font-weight:bold; color:${net.color};">${net.name}</span>
-                        <div style="font-size:0.8rem; color:#aaa; margin-top:4px; word-break:break-all;">${net.url}</div>
-                        <button class="delete-admin-btn" style="top:8px;" onclick="deleteSocialNetwork('${net.id}')">Видалити</button>
-                    </div>`;
-            });
-        }
-
-        async function deleteSocialNetwork(id) {
-            if(confirm("Видалити цю соцмережу?")) {
-                let updatedList = globalSocialNetworks.filter(net => net.id !== id);
-                try { await db.collection("config").doc("socials").set({ list: updatedList }); } catch(e) { console.error(e); }
-            }
-        }
-
-        function switchTab(tabId, button) {
-            currentTab = tabId;
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active'); button.classList.add('active');
-
-            if(tabId === 'active-chats-tab') localStorage.setItem('viewed_chats', Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length);
-            if(tabId === 'feedback-tab') localStorage.setItem('viewed_feedback', globalFeedbackData.length);
-            if(tabId === 'volunteer-tab') localStorage.setItem('viewed_volunteers', globalVolunteersData.length);
-            if(tabId === 'orders-tab') localStorage.setItem('viewed_orders', globalOrdersData.length);
-            renderAllDynamicData();
-        }
-
-        function initBadges() {
-            if(!localStorage.getItem('viewed_chats')) localStorage.setItem('viewed_chats', Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length);
-            if(!localStorage.getItem('viewed_feedback')) localStorage.setItem('viewed_feedback', globalFeedbackData.length);
-            if(!localStorage.getItem('viewed_volunteers')) localStorage.setItem('viewed_volunteers', globalVolunteersData.length);
-            if(!localStorage.getItem('viewed_orders')) localStorage.setItem('viewed_orders', globalOrdersData.length);
-        }
-
-        function updateBadgesLogic() {
-            let activeChatsCount = Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length;
-            let newChats = activeChatsCount - (parseInt(localStorage.getItem('viewed_chats')) || 0);
-            let newFeedback = globalFeedbackData.length - (parseInt(localStorage.getItem('viewed_feedback')) || 0);
-            let newVolunteers = globalVolunteersData.length - (parseInt(localStorage.getItem('viewed_volunteers')) || 0);
-            let newOrders = globalOrdersData.length - (parseInt(localStorage.getItem('viewed_orders')) || 0);
-
-            if(currentTab === 'active-chats-tab') { newChats = 0; localStorage.setItem('viewed_chats', activeChatsCount); }
-            if(currentTab === 'feedback-tab') { newFeedback = 0; localStorage.setItem('viewed_feedback', globalFeedbackData.length); }
-            if(currentTab === 'volunteer-tab') { newVolunteers = 0; localStorage.setItem('viewed_volunteers', globalVolunteersData.length); }
-            if(currentTab === 'orders-tab') { newOrders = 0; localStorage.setItem('viewed_orders', globalOrdersData.length); }
-
-            showBadgeElement('badge-chats', newChats); 
-            showBadgeElement('badge-feedback', newFeedback); 
-            showBadgeElement('badge-volunteers', newVolunteers);
-            showBadgeElement('badge-orders', newOrders);
-        }
-
-        function showBadgeElement(id, count) { const el = document.getElementById(id); if(count > 0) { el.innerText = count; el.style.display = 'flex'; } else { el.style.display = 'none'; } }
-
-        function renderAllDynamicData() {
-            if (isConfirmingStatus) return;
-            updateBadgesLogic();
-
-            const sessionsBox = document.getElementById('active-sessions-box'); const savedScrollTop = sessionsBox.scrollTop; sessionsBox.innerHTML = "";
-            let activeCount = 0;
-            
-            Object.keys(globalChatsData).forEach(id => {
-                if (globalChatsData[id].status === 'active') {
-                    activeCount++; const item = document.createElement('div');
-                    item.className = `session-item ${currentSelectedChatId === id ? 'selected' : ''}`;
-                    let statusLabel = globalChatsData[id].adminStatus === 'success' ? 'Успішно' : globalChatsData[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
-                    item.innerHTML = `<div><strong>ID: ${id.substr(0,8)}</strong> <span class="badge ${globalChatsData[id].adminStatus}">${statusLabel}</span></div>`;
-                    item.onclick = () => selectChatSession(id); sessionsBox.appendChild(item);
-                }
-            });
-            if(activeCount === 0) sessionsBox.innerHTML = `<div class="no-msg">Активних чатів немає</div>`;
-            sessionsBox.scrollTop = savedScrollTop;
-
-            const workspaceContent = document.getElementById('chat-messages-and-header');
-            const inputBlock = document.getElementById('global-admin-input-block');
-            const workspaceWrapper = document.getElementById('chat-workspace-block');
-
-            if (currentSelectedChatId && globalChatsData[currentSelectedChatId]) {
-                inputBlock.style.display = 'flex'; sessionsBox.classList.add('hide-on-mobile'); workspaceWrapper.classList.add('show-on-mobile');
-                renderWorkspaceContent(globalChatsData[currentSelectedChatId], workspaceContent);
-            } else {
-                inputBlock.style.display = 'none'; sessionsBox.classList.remove('hide-on-mobile'); workspaceWrapper.classList.remove('show-on-mobile');
-                workspaceContent.innerHTML = `<div style="text-align:center; margin:auto; color:#666;" data-lang="ua">Оберіть чат зі списку</div>`;
-            }
-
-            const fbBox = document.getElementById('box-for-feedback'); fbBox.innerHTML = "";
-            if(globalFeedbackData.length === 0) fbBox.innerHTML = `<div class="no-msg">Заявок немає</div>`;
-            globalFeedbackData.slice().reverse().forEach(fb => { 
-                fbBox.innerHTML += `
-                    <div class='msg-item'>
-                        <div class='meta-line'>👤 ${fb.name} | 📱 ${fb.contact} (${fb.time})</div>
-                        <div class='msg-text'>${fb.message}</div>
-                        <button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:8px; display:block;" onclick="deleteFeedbackItem('${fb.id}')">Видалити</button>
-                    </div>`; 
-            });
-
-            const volBox = document.getElementById('box-for-volunteers'); volBox.innerHTML = "";
-            if(globalVolunteersData.length === 0) volBox.innerHTML = `<div class="no-msg">Бланків немає</div>`;
-            globalVolunteersData.slice().reverse().forEach(vol => {
-                let imgHtml = vol.image ? `<img src="${vol.image}" class="attached-img-preview" onclick="openFullImage('${vol.image}')">` : '';
-                volBox.innerHTML += `
-                    <div class='msg-item'>
-                        <div class='meta-line'>📋 ${vol.name} | 🏛️ ${vol.org} (${vol.time})</div>
-                        <div class='msg-text' style='margin-bottom:5px;'>📞 <strong>Тел:</strong> ${vol.phone} | 💬 <strong>WhatsApp:</strong> ${vol.whatsapp}</div>
-                        <div class='msg-text' style='color:#bbb;'>✉️ <strong>Повідомлення:</strong> ${vol.message}</div>
-                        ${imgHtml}
-                        <button class="delete-admin-btn" style="position:relative; right:auto; top:auto; margin-top:8px; display:block;" onclick="deleteVolunteerItem('${vol.id}')">Видалити</button>
-                    </div>`;
-            });
-
-            renderOrdersList();
-
-            if (isSuperadminSession) { renderAdminAccountsList(); }
-
-            const archiveBox = document.getElementById('box-for-archive'); archiveBox.innerHTML = "";
-            let archiveCount = 0;
-            Object.keys(globalChatsData).forEach(id => {
-                if (globalChatsData[id].status === 'closed') {
-                    archiveCount++;
-                    let statusLabel = globalChatsData[id].adminStatus === 'success' ? 'Успішно' : globalChatsData[id].adminStatus === 'unresolved' ? 'Не вирішено' : 'В обробці';
-                    let chatHtml = `<div class='msg-item'><div class='meta-line'>📦 Архів: ${id.substr(0,8)} | <span class="badge ${globalChatsData[id].adminStatus}">${statusLabel}</span></div><div style='display:flex; flex-direction:column; gap:5px; margin-top:10px;'>`;
-                    globalChatsData[id].messages.forEach(m => {
-                        let contentHtml = m.type === 'image' ? `<img src="${m.text}" onclick="openFullImage('${m.text}')" style="max-height:100px;">` : m.text;
-                        chatHtml += `<div style='font-size:0.85rem; color:${m.sender === 'admin' ? 'var(--theme-color)' : '#bbb'}'><strong>${m.sender}:</strong> ${contentHtml}</div>`;
-                    });
-                    chatHtml += `</div></div>`; archiveBox.innerHTML += chatHtml;
-                }
-            });
-            if(archiveCount === 0) archiveBox.innerHTML = `<div class="no-msg">Архів порожній</div>`;
-        }
-
         async function deleteFeedbackItem(id) { if(confirm("Видалити цю заявку?")) { try { await db.collection("feedback").doc(id).delete(); } catch(e) { console.error(e); } } }
         async function deleteVolunteerItem(id) { if(confirm("Видалити цей бланк волонтера?")) { try { await db.collection("volunteers").doc(id).delete(); } catch(e) { console.error(e); } } }
         async function deleteOrderItem(id) { if(confirm("Видалити запис про це замовлення? (Залишки на складі НЕ повернуться автоматично)")) { try { await db.collection("orders").doc(id).delete(); } catch(e) { console.error(e); } } }
@@ -1489,6 +1144,49 @@
                 if(m.type === 'image') { b.innerHTML = `<img src="${m.text}" onclick="openFullImage('${m.text}')">`; } else { b.innerText = m.text; } flow.appendChild(b);
             });
             if (wasAtBottom) { flow.scrollTop = flow.scrollHeight; }
+        }
+
+        async function publishNewsItem() {
+            const title = document.getElementById('news-title-field').value.trim();
+            const body = document.getElementById('news-body-field').value.trim();
+            const dateVal = document.getElementById('news-date-field').value;
+            const hasBtn = document.getElementById('news-has-btn-checkbox').checked;
+            const editId = document.getElementById('edit-news-id').value;
+            
+            if(!title || !body || !dateVal) { alert("Заповніть заголовок, текст та дату новини!"); return; }
+
+            let btnText = ""; let btnUrl = "";
+            if(hasBtn) {
+                btnText = document.getElementById('news-btn-text-field').value.trim();
+                btnUrl = document.getElementById('news-btn-url-field').value.trim();
+                if(!btnText || !btnUrl) { alert("Заповніть налаштування кнопки дії або вимкніть її!"); return; }
+            }
+
+            const postObject = {
+                title: title,
+                body: body,
+                date: dateVal,
+                image: newsPhotoBase64 || null,
+                hasButton: hasBtn,
+                btnText: btnText,
+                btnUrl: btnUrl
+            };
+
+            try {
+                if(editId) {
+                    await db.collection("news").doc(editId).set(postObject, { merge: true });
+                    alert("✓ Зміни успішно збережено в хмарі!");
+                } else {
+                    await db.collection("news").add({
+                        ...postObject,
+                        createdTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert("✓ Новину успішно опубліковано глобально!");
+                }
+                cancelNewsEditing();
+            } catch(err) {
+                console.error(err); alert("Помилка бази даних: " + err.message);
+            }
         }
     </script>
 </body>
