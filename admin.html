@@ -156,6 +156,7 @@
         .merch-price { color: var(--theme-color); font-weight: bold; font-size: 1.2rem; margin-bottom: 5px; }
         .old-price { font-size: 0.9rem; color: #888; text-decoration: line-through; margin-right: 8px; }
         .merch-sizes { font-size: 0.85rem; color: #aaa; margin-bottom: 10px; }
+        .merch-desc { font-size: 0.85rem; color: #ccc; margin-bottom: 10px; max-height: 60px; overflow: hidden; text-overflow: ellipsis; }
         .merch-actions { margin-top: auto; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; }
         
         .cat-tag { display: inline-block; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-bottom: 8px; width: fit-content; }
@@ -303,7 +304,9 @@
                     </div>
 
                     <div class="admin-creator-form" style="flex: 2; min-width: 320px;">
-                        <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Додати новий товар (Мерч)</h3>
+                        <h3 id="merch-form-title" style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Додати новий товар (Мерч)</h3>
+                        <input type="hidden" id="edit-merch-id" value="">
+                        
                         <div class="form-group">
                             <input type="text" id="merch-title" class="form-input" placeholder="Назва товару (напр: Футболка 'SVAROG')" required autocomplete="off">
                         </div>
@@ -324,12 +327,20 @@
                             <input type="text" id="merch-sizes" class="form-input" placeholder="Розміри (через кому, напр: S, M, L, XL)" autocomplete="off">
                             <small style="color:#aaa; font-size:0.75rem;">Залиште пустим, якщо товар не має розміру (наприклад, чашка)</small>
                         </div>
+                        
+                        <div class="form-group">
+                            <textarea id="merch-description" class="form-input" placeholder="Опис товару (необов'язково)" style="min-height: 80px;"></textarea>
+                        </div>
+
                         <div class="form-group">
                             <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Фото товару:</label>
                             <input type="file" id="merch-photo-file" accept="image/*" class="form-input" onchange="previewMerchPhoto(this)">
                             <img id="merch-preview-element" class="news-img-preview" src="">
                         </div>
-                        <button class="btn" onclick="publishMerchItem()">Зберегти товар у базу</button>
+                        <div style="display:flex; gap:10px;">
+                            <button id="merch-submit-btn" class="btn" onclick="publishMerchItem()" style="flex:2;">Зберегти товар у базу</button>
+                            <button id="merch-cancel-edit-btn" class="btn" onclick="cancelMerchEditing()" style="border-color:#ff4a4a; color:#ff4a4a; display:none; flex:1;">Скасувати</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -481,7 +492,7 @@
         let globalOrdersData = [];
         let globalMerchData = [];
         let globalCategories = []; 
-        let globalPromocodes = []; // Новий масив для промокодів
+        let globalPromocodes = []; 
 
         let unsubscribeChats = null;
         let unsubscribeFeedback = null;
@@ -491,7 +502,7 @@
         let unsubscribeOrders = null;
         let unsubscribeMerch = null;
         let unsubscribeConfig = null;
-        let unsubscribePromos = null; // Новий підписник для промокодів
+        let unsubscribePromos = null; 
 
         const menuButton = document.getElementById('menu-button');
         const navMenu = document.getElementById('nav-menu');
@@ -655,7 +666,6 @@
                 populateCategorySelect();
             }, e => console.error(e));
 
-            // Завантаження промокодів
             unsubscribePromos = db.collection("promocodes").orderBy("created", "desc").onSnapshot(snapshot => {
                 globalPromocodes = [];
                 snapshot.forEach(doc => { globalPromocodes.push({ id: doc.id, ...doc.data() }); });
@@ -720,13 +730,66 @@
             }
         }
 
+        // НОВЕ: Логіка старту редагування товару
+        function startEditMerch(id) {
+            const item = globalMerchData.find(m => m.id === id);
+            if(!item) return;
+
+            document.getElementById('edit-merch-id').value = item.id;
+            document.getElementById('merch-title').value = item.title;
+            document.getElementById('merch-category').value = item.category;
+            document.getElementById('merch-price').value = item.price;
+            document.getElementById('merch-discount-price').value = item.discountPrice || "";
+            document.getElementById('merch-stock').value = item.stock;
+            document.getElementById('merch-sizes').value = item.sizes ? item.sizes.join(', ') : "";
+            document.getElementById('merch-description').value = item.description || "";
+
+            if(item.image) {
+                merchPhotoBase64 = item.image;
+                const previewImg = document.getElementById('merch-preview-element');
+                previewImg.src = item.image; previewImg.style.display = 'block';
+            } else {
+                document.getElementById('merch-preview-element').style.display = 'none';
+                merchPhotoBase64 = "";
+            }
+
+            document.getElementById('merch-form-title').innerText = "📝 Редагування товару";
+            document.getElementById('merch-submit-btn').innerText = "Зберегти зміни";
+            document.getElementById('merch-cancel-edit-btn').style.display = 'inline-block';
+            
+            // Прокрутка сторінки до форми
+            document.getElementById('shop-management-tab').scrollTop = 0;
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // НОВЕ: Скасування редагування товару
+        function cancelMerchEditing() {
+            document.getElementById('edit-merch-id').value = "";
+            document.getElementById('merch-title').value = "";
+            document.getElementById('merch-category').value = "";
+            document.getElementById('merch-price').value = "";
+            document.getElementById('merch-discount-price').value = "";
+            document.getElementById('merch-stock').value = "";
+            document.getElementById('merch-sizes').value = "";
+            document.getElementById('merch-description').value = "";
+            document.getElementById('merch-photo-file').value = "";
+            document.getElementById('merch-preview-element').style.display = 'none';
+            merchPhotoBase64 = "";
+
+            document.getElementById('merch-form-title').innerText = "Додати новий товар (Мерч)";
+            document.getElementById('merch-submit-btn').innerText = "Зберегти товар у базу";
+            document.getElementById('merch-cancel-edit-btn').style.display = 'none';
+        }
+
         async function publishMerchItem() {
+            const editId = document.getElementById('edit-merch-id').value;
             const title = document.getElementById('merch-title').value.trim();
             const category = document.getElementById('merch-category').value;
             const price = document.getElementById('merch-price').value.trim();
             const discountPrice = document.getElementById('merch-discount-price').value.trim();
             const stock = document.getElementById('merch-stock').value.trim();
             const sizesStr = document.getElementById('merch-sizes').value.trim();
+            const description = document.getElementById('merch-description').value.trim();
             
             if(!title || !price || !stock || !category) { alert("Заповніть назву, категорію, ціну та кількість!"); return; }
 
@@ -739,22 +802,22 @@
                 discountPrice: discountPrice ? parseFloat(discountPrice) : null,
                 stock: parseInt(stock),
                 sizes: sizesArr,
-                image: merchPhotoBase64 || null,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                description: description,
+                image: merchPhotoBase64 || null
             };
 
             try {
-                await db.collection("merch").add(merchObject);
-                alert("✓ Товар успішно додано до вітрини!");
-                document.getElementById('merch-title').value = "";
-                document.getElementById('merch-category').value = "";
-                document.getElementById('merch-price').value = "";
-                document.getElementById('merch-discount-price').value = "";
-                document.getElementById('merch-stock').value = "";
-                document.getElementById('merch-sizes').value = "";
-                document.getElementById('merch-photo-file').value = "";
-                document.getElementById('merch-preview-element').style.display = 'none';
-                merchPhotoBase64 = "";
+                if(editId) {
+                    // Якщо редагуємо існуючий
+                    await db.collection("merch").doc(editId).set(merchObject, { merge: true });
+                    alert("✓ Зміни товару успішно збережено!");
+                } else {
+                    // Якщо створюємо новий
+                    merchObject.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection("merch").add(merchObject);
+                    alert("✓ Товар успішно додано до вітрини!");
+                }
+                cancelMerchEditing();
             } catch(err) {
                 console.error(err); alert("Помилка: " + err.message);
             }
@@ -774,6 +837,9 @@
                     : `<span class="merch-price">${item.price} ₴</span>`;
                 
                 let saleBadge = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
+                
+                // Опис товару в карточці адмінки
+                let descHtml = item.description ? `<div class="merch-desc">${item.description}</div>` : '';
 
                 box.innerHTML += `
                     <div class="merch-card">
@@ -783,8 +849,10 @@
                             <div class="cat-tag">${item.category || 'Без категорії'}</div>
                             <div class="merch-title">${item.title}</div>
                             <div style="margin-bottom:10px;">${priceHtml}</div>
+                            ${descHtml}
                             <div class="merch-sizes">${sizesHtml} | Залишок: <strong style="color:${item.stock > 0 ? '#00ffcc' : '#ff4a4a'}">${item.stock} шт</strong></div>
                             <div class="merch-actions">
+                                <button class="edit-news-btn" style="position:relative; right:auto; top:auto;" onclick="startEditMerch('${item.id}')">Редагувати</button>
                                 <button class="delete-admin-btn" style="position:relative; right:auto; top:auto;" onclick="deleteMerchItem('${item.id}')">Видалити</button>
                             </div>
                         </div>
