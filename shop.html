@@ -107,13 +107,28 @@
         .old-price { font-size: 1rem; color: #888; text-decoration: line-through; }
         
         .merch-options { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
-        .merch-select { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 10px; border-radius: 6px; outline: none; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
+        .merch-select { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 10px; border-radius: 6px; outline: none; font-size: 0.9rem; cursor: pointer; transition: 0.3s; height: 38px; }
         .merch-select:focus { border-color: var(--theme-color); }
         .merch-select option { background: #1a1a1a; color: #fff; }
         .merch-select option:disabled { color: #555; text-decoration: line-through; }
+
+        /* КАСТОМНИЙ КРАСИВИЙ ЛІЧИЛЬНИК КІЛЬКОСТІ */
+        .qty-container { display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; overflow: hidden; width: 100px; height: 38px; justify-content: space-between; }
+        .qty-btn { background: none; border: none; color: #fff; width: 32px; height: 100%; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); color: var(--theme-color); }
+        .qty-btn:disabled { color: #444; cursor: not-allowed; }
+        .qty-val { flex: 1; text-align: center; font-weight: bold; font-size: 0.95rem; user-select: none; }
         
-        .merch-qty { width: 60px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 6px; text-align: center; outline: none; transition: 0.3s; }
-        .merch-qty:focus { border-color: var(--theme-color); }
+        /* КРАСИВІ СТИЛЬНІ ПЛАШКИ ОПЛАТИ */
+        .payment-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .payment-tile { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: bold; }
+        .payment-tile:hover { border-color: rgba(var(--theme-color-rgb), 0.5); }
+        .payment-tile.active { border-color: var(--theme-color); background: rgba(var(--theme-color-rgb), 0.12); box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.25); }
+        .payment-tile svg { width: 22px; height: 22px; fill: rgba(255,255,255,0.6); transition: fill 0.3s; }
+        .payment-tile.active svg { fill: var(--theme-color); }
+
+        .copy-btn { background: var(--theme-color); color: #121212; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; cursor: pointer; margin-left: 8px; transition: opacity 0.2s; display: inline-block; vertical-align: middle; }
+        .copy-btn:hover { opacity: 0.9; }
 
         .buy-btn { width: 100%; padding: 12px; background: transparent; color: var(--theme-color); border: 2px solid var(--theme-color); border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: all 0.3s; margin-top: auto; }
         .buy-btn:hover:not(:disabled) { background: var(--theme-color); color: #121212; }
@@ -287,24 +302,28 @@
                     </div>
                     
                     <div class="form-group">
-                        <select id="payment-method" class="form-input" onchange="togglePaymentFields()" required>
-                            <option value="" disabled selected>--- Оберіть спосіб оплати / Select payment ---</option>
-                            <option value="bank">Оплата на Банку / Bank Card Transfer</option>
-                            <option value="cod">Накладений платіж / Cash on Delivery</option>
-                        </select>
+                        <label style="font-size:0.88rem; color:#aaa; display:block; margin-bottom:8px;" data-lang="ua">Оберіть спосіб оплати:</label>
+                        <label style="font-size:0.88rem; color:#aaa; display:block; margin-bottom:8px;" data-lang="en">Select payment method:</label>
+                        
+                        <div class="payment-tiles">
+                            <div class="payment-tile" id="tile-bank" onclick="selectPaymentTile('bank')">
+                                <svg viewBox="0 0 24 24"><path d="M11.5 2L2 6v2h19V6L11.5 2zm0 14c1.38 0 2.5-1.12 2.5-2.5S12.88 11 11.5 11 9 12.12 9 13.5s1.12 2.5 2.5 2.5zM2 22h19v-2H2v2zm4-12v6h3v-6H6zm6 0v6h3v-6h-3zm6 0v6h3v-6h-3z"/></svg>
+                                <span data-lang="ua">На Банку</span><span data-lang="en">To Jar</span>
+                            </div>
+                            <div class="payment-tile" id="tile-card" onclick="selectPaymentTile('card')">
+                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                                <span data-lang="ua">На Карту</span><span data-lang="en">To Card</span>
+                            </div>
+                            <div class="payment-tile" id="tile-cod" onclick="selectPaymentTile('cod')">
+                                <svg viewBox="0 0 24 24"><path d="M20 8H4V6h16v2zm-2 5H6v-2h12v2zm-2 5H8v-2h8v2zM2 4v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2z"/></svg>
+                                <span data-lang="ua">Накладений</span><span data-lang="en">C.O.D.</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selected-payment-method" value="" required>
                     </div>
                     
                     <div id="bank-payment-info" style="display: none; margin-bottom: 15px; padding: 12px; background: rgba(240, 180, 140, 0.1); border: 1px solid rgba(240, 180, 140, 0.3); border-radius: 6px; font-size: 0.9rem;">
-                        <div data-lang="ua">
-                            💰 <b>Посилання на Банку:</b> <a href="https://send.monobank.ua/YOUR_JAR" target="_blank" style="color: var(--theme-color); font-weight: bold; text-decoration: underline;">Перейти до оплати 🔗</a><br>
-                            Будь ласка, оплатіть замовлення та прикріпіть скріншот квитанції:
                         </div>
-                        <div data-lang="en">
-                            💰 <b>Our Bank Link:</b> <a href="https://send.monobank.ua/YOUR_JAR" target="_blank" style="color: var(--theme-color); font-weight: bold; text-decoration: underline;">Pay here 🔗</a><br>
-                            Please pay the order and attach a screenshot of your receipt below:
-                        </div>
-                        <input type="file" id="receipt-file" class="form-input" accept="image/*" style="margin-top: 10px;">
-                    </div>
 
                     <button type="submit" class="confirm-btn" id="confirm-order-btn">
                         <span data-lang="ua">Оформити замовлення</span>
@@ -376,18 +395,68 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        function togglePaymentFields() {
-            const method = document.getElementById('payment-method').value;
-            const bankInfo = document.getElementById('bank-payment-info');
-            const receiptInput = document.getElementById('receipt-file');
-            if (method === 'bank') {
-                bankInfo.style.display = 'block';
-                receiptInput.required = true;
-            } else {
-                bankInfo.style.display = 'none';
-                receiptInput.required = false;
-                receiptInput.value = '';
+        // ДИНАМІЧНІ ДАНІ РЕКВІЗИТІВ З FIREBASE
+        let dynamicBankUrl = "https://send.monobank.ua/YOUR_JAR";
+        let dynamicCardNumber = "0000 0000 0000 0000";
+
+        db.collection("config").doc("payment").onSnapshot(doc => {
+            if (doc.exists) {
+                const data = doc.data();
+                if (data.bankUrl) dynamicBankUrl = data.bankUrl;
+                if (data.cardNumber) dynamicCardNumber = data.cardNumber;
             }
+            updatePaymentDetailsUI();
+        });
+
+        function selectPaymentTile(method) {
+            document.querySelectorAll('.payment-tile').forEach(t => t.classList.remove('active'));
+            document.getElementById('selected-payment-method').value = method;
+            
+            const bankInfo = document.getElementById('bank-payment-info');
+            
+            if (method === 'bank') {
+                document.getElementById('tile-bank').classList.add('active');
+                bankInfo.style.display = 'block';
+            } else if (method === 'card') {
+                document.getElementById('tile-card').classList.add('active');
+                bankInfo.style.display = 'block';
+            } else if (method === 'cod') {
+                document.getElementById('tile-cod').classList.add('active');
+                bankInfo.style.display = 'none';
+            }
+            updatePaymentDetailsUI();
+        }
+
+        function updatePaymentDetailsUI() {
+            const method = document.getElementById('selected-payment-method').value;
+            const bankInfo = document.getElementById('bank-payment-info');
+            if (!bankInfo || bankInfo.style.display === 'none') return;
+            const lang = localStorage.getItem('selectedLang') || 'ua';
+            
+            if (method === 'bank') {
+                bankInfo.innerHTML = `
+                    <div style="line-height:1.5;">
+                        💰 <b>Посилання на Банку:</b> <a href="${dynamicBankUrl}" target="_blank" style="color: var(--theme-color); font-weight: bold; text-decoration: underline;">Перейти до оплати 🔗</a><br>
+                        Будь ласка, оплатіть та прикріпіть скріншот квитанції:
+                    </div>
+                    <input type="file" id="receipt-file" class="form-input" accept="image/*" style="margin-top: 10px;" required>
+                `;
+            } else if (method === 'card') {
+                bankInfo.innerHTML = `
+                    <div style="line-height:1.5;">
+                        💳 <b>Картка для переказу:</b> <span style="color: var(--theme-color); font-weight: bold; letter-spacing: 0.5px;">${dynamicCardNumber}</span>
+                        <button type="button" class="copy-btn" onclick="copyToClipboard('${dynamicCardNumber}')">Скопіювати</button><br>
+                        Будь ласка, зробіть переказ на карту та прикріпіть скріншот чека:
+                    </div>
+                    <input type="file" id="receipt-file" class="form-input" accept="image/*" style="margin-top: 10px;" required>
+                `;
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text.replace(/\s/g, '')).then(() => {
+                alert(localStorage.getItem('selectedLang') === 'en' ? "Card number copied!" : "Номер картки скопійовано!");
+            });
         }
 
         let globalMerchList = [];
@@ -399,7 +468,7 @@
         let currentPromo = null; 
         let activeOrderUnsubscribe = null;
 
-        // СЛУХАЧ СТАТУСУ АКТИВНОГО ЗАМОВЛЕННЯ
+        // СЛУХАЧ СТАТУСУ ЗГОРТАННЯ АРХІВУ
         function listenToActiveOrderStatus() {
             const activeOrderId = localStorage.getItem('svarog_active_order_id');
             const box = document.getElementById('active-order-status-box');
@@ -414,16 +483,20 @@
 
             activeOrderUnsubscribe = db.collection('orders').doc(activeOrderId).onSnapshot(doc => {
                 if (doc.exists) {
-                    box.style.display = 'block';
                     const data = doc.data();
                     let status = data.status || 'new';
 
+                    // Розумне маскування: якщо в архіві (archived) або скасовано (cancelled) - приховуємо плашку повністю
+                    if (status === 'archived' || status === 'cancelled') {
+                        box.style.display = 'none'; return;
+                    }
+
+                    box.style.display = 'block';
                     let sLabel = status === 'new' ? (lang === 'ua' ? 'Нове замовлення' : 'New Order') : 
                                  status === 'on_review' ? (lang === 'ua' ? 'На перевірці адміністратором ⏳' : 'On review ⏳') : 
                                  status === 'accepted' ? (lang === 'ua' ? 'Прийнято / Очікує відправки ✓' : 'Accepted ✓') : 
                                  status === 'sent' ? (lang === 'ua' ? 'Відправлено вам 📦' : 'Sent 📦') : 
-                                 status === 'delivered' ? (lang === 'ua' ? 'Доставлено 🎉' : 'Delivered 🎉') : 
-                                 status === 'cancelled' ? (lang === 'ua' ? 'Скасовано ✖' : 'Cancelled ✖') : (lang === 'ua' ? 'В архіві 📂' : 'Archived 📂');
+                                 status === 'delivered' ? (lang === 'ua' ? 'Доставлено 🎉' : 'Delivered 🎉') : '';
 
                     info.innerHTML = `
                         <b>ID:</b> #${doc.id.substr(0, 8).toUpperCase()}<br>
@@ -433,7 +506,7 @@
                 } else {
                     box.style.display = 'none';
                 }
-            }, err => console.error("Помилка відстеження статусу:", err));
+            }, err => console.error("Помилка трекінгу:", err));
         }
 
         function checkCartExpiry() {
@@ -488,18 +561,34 @@
             });
         }
 
+        // ЛОГІКА СТИЛЬНОГО ЛІЧИЛЬНИКА КІЛЬКОСТІ В КАРТКАХ
+        function adjustGridQty(itemId, amount) {
+            const item = globalMerchList.find(m => m.id === itemId);
+            if (!item) return;
+            const sizeSelect = document.getElementById(`size-${itemId}`);
+            let selectedSize = sizeSelect ? sizeSelect.value : "Універсальний";
+            let maxStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[selectedSize] || 0) : parseInt(item.stock || 0);
+            
+            const valEl = document.getElementById(`qty-val-${itemId}`);
+            let current = parseInt(valEl.innerText) || 0;
+            let newQty = current + amount;
+            if (newQty < 1) newQty = 1;
+            if (newQty > maxStock) newQty = maxStock;
+            if (maxStock <= 0) newQty = 0;
+            valEl.innerText = newQty;
+        }
+
         function updateQtyMax(itemId) {
             const item = globalMerchList.find(m => m.id === itemId);
             if (!item) return;
             const sizeSelect = document.getElementById(`size-${itemId}`);
             let selectedSize = sizeSelect ? sizeSelect.value : "Універсальний";
             let sStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[selectedSize] || 0) : 0;
-            const qtyInput = document.getElementById(`qty-${itemId}`);
-            if (qtyInput) {
-                qtyInput.max = sStock;
-                if (parseInt(qtyInput.value) > sStock || sStock === 0) {
-                    qtyInput.value = sStock > 0 ? 1 : 0;
-                }
+            const qtyValEl = document.getElementById(`qty-val-${itemId}`);
+            if (qtyValEl) {
+                let current = parseInt(qtyValEl.innerText);
+                if (sStock === 0) qtyValEl.innerText = 0;
+                else if (current > sStock || current === 0) qtyValEl.innerText = 1;
             }
         }
 
@@ -549,7 +638,6 @@
                     let firstSize = item.sizes[0];
                     initialMaxStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[firstSize] || 0) : 0;
                     
-                    // Модифіковано: прибрано показ кількості штук, додано disabled, якщо немає в наявності
                     sizeSelectHtml = `<select id="size-${item.id}" class="merch-select" onchange="updateQtyMax('${item.id}')">` + 
                         item.sizes.map(s => {
                             let sStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[s] || 0) : 0;
@@ -560,7 +648,7 @@
                     `</select>`;
                 } else {
                     initialMaxStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock["Універсальний"] || 0) : totalStock;
-                    sizeSelectHtml = ''; // Модифіковано: повністю ховаємо рядок вибору для універсального розміру
+                    sizeSelectHtml = ''; 
                 }
 
                 let buyBtnHtml = isOutOfStock 
@@ -580,7 +668,11 @@
                             ${descHtml}
                             <div class="merch-options">
                                 ${sizeSelectHtml}
-                                <input type="number" id="qty-${item.id}" class="merch-qty" value="${initialMaxStock > 0 ? 1 : 0}" min="${initialMaxStock > 0 ? 1 : 0}" max="${initialMaxStock}" style="${isUniversalSize ? 'width: 100%;' : ''}">
+                                <div class="qty-container" id="qty-container-${item.id}" style="${isUniversalSize ? 'width: 100%;' : ''}">
+                                    <button type="button" class="qty-btn" onclick="adjustGridQty('${item.id}', -1)">−</button>
+                                    <span class="qty-val" id="qty-val-${item.id}">${initialMaxStock > 0 ? 1 : 0}</span>
+                                    <button type="button" class="qty-btn" onclick="adjustGridQty('${item.id}', 1)">+</button>
+                                </div>
                             </div>
                             ${buyBtnHtml}
                         </div>
@@ -598,8 +690,8 @@
 
             let itemStockForSize = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[size] || 0) : parseInt(item.stock || 0);
 
-            let qtyInput = document.getElementById(`qty-${item.id}`);
-            let qty = parseInt(qtyInput.value);
+            let qtyValEl = document.getElementById(`qty-val-${item.id}`);
+            let qty = parseInt(qtyValEl.innerText);
             if(qty < 1 || qty > itemStockForSize || itemStockForSize <= 0) {
                 showToast(localStorage.getItem('selectedLang') === 'en' ? "Incorrect quantity or out of stock!" : "Неправильна кількість або немає в наявності!"); return;
             }
@@ -676,7 +768,7 @@
         function openCartModal() {
             document.getElementById('order-modal-wrapper').style.display = 'flex';
             renderCartModalContent();
-            listenToActiveOrderStatus(); // Оновлюємо статус активного замовлення при відкритті
+            listenToActiveOrderStatus(); 
         }
 
         function closeOrderModal() {
@@ -739,7 +831,6 @@
                 baseTotalSum += item.totalPrice;
                 let imgHtml = item.image ? `<img src="${item.image}" class="cart-item-img">` : `<div class="cart-item-img" style="display:flex; justify-content:center; align-items:center; font-size:0.7rem;">No IMG</div>`;
                 
-                // Прибираємо згадку про розмір в кошику, якщо він універсальний
                 let sizeLabelMeta = item.size === 'Універсальний' ? '' : `${lang==='ua'?'Розмір':'Size'}: ${item.size} | `;
 
                 container.innerHTML += `
@@ -779,7 +870,7 @@
             const name = document.getElementById('order-name').value.trim();
             const phone = document.getElementById('order-phone').value.trim();
             const address = document.getElementById('order-address').value.trim();
-            const paymentMethod = document.getElementById('payment-method').value;
+            const paymentMethod = document.getElementById('selected-payment-method').value;
             const fileInput = document.getElementById('receipt-file');
             
             if(!paymentMethod) {
@@ -799,7 +890,7 @@
             }
             finalSum = Math.round(finalSum);
 
-            let paymentMethodText = paymentMethod === 'bank' ? "Оплата на Банку" : "Накладений платіж";
+            let paymentMethodText = paymentMethod === 'bank' ? "Оплата на Банку" : (paymentMethod === 'card' ? "Переказ на карту" : "Накладений платіж");
             let newlyCreatedOrderId = "";
 
             try {
@@ -830,7 +921,7 @@
                     }
 
                     const orderRef = db.collection('orders').doc();
-                    newlyCreatedOrderId = orderRef.id; // Зберігаємо ID для локального трекінгу
+                    newlyCreatedOrderId = orderRef.id; 
                     let orderItemsString = shoppingCart.map(i => `${i.merchTitle} (Розмір: ${i.size}, К-сть: ${i.quantity})`).join('\n');
 
                     transaction.set(orderRef, {
@@ -851,7 +942,6 @@
                     });
                 });
 
-                // Зберігаємо замовлення в LocalStorage для виводу клієнту
                 localStorage.setItem('svarog_active_order_id', newlyCreatedOrderId);
 
                 // ВІДПРАВКА В TELEGRAM
@@ -871,7 +961,7 @@
                                 `\n🛒 <b>Склад замовлення:</b>\n${itemsListFormatted}\n\n` +
                                 `💰 <b>До сплати:</b> ${finalSum} ₴`;
 
-                const hasPhoto = paymentMethod === 'bank' && fileInput && fileInput.files.length > 0;
+                const hasPhoto = (paymentMethod === 'bank' || paymentMethod === 'card') && fileInput && fileInput.files.length > 0;
 
                 if (hasPhoto) {
                     let formData = new FormData();
@@ -883,7 +973,7 @@
                     fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
                         method: 'POST',
                         body: formData
-                    }).then(res => console.log("Telegram замовлення з фото відправлено!"))
+                    }).then(res => console.log("Telegram замовлення відправлено!"))
                       .catch(err => console.error("Помилка відправки фото в Telegram:", err));
                 } else {
                     fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -894,8 +984,7 @@
                             text: tgMessage,
                             parse_mode: 'HTML'
                         })
-                    }).then(res => console.log("Telegram повідомлення відправлено!"))
-                      .catch(err => console.error("Помилка Telegram:", err));
+                    }).then(res => console.log("Telegram замовлення відправлено!"));
                 }
 
                 showToast(lang === 'ua' ? 'Замовлення успішно оформлено! 🎉' : 'Order placed successfully! 🎉');
@@ -904,11 +993,13 @@
                 currentPromo = null; 
                 document.getElementById('promo-code-input').value = "";
                 document.getElementById('promo-message').innerText = "";
-                if(fileInput) fileInput.value = "";
+                document.getElementById('selected-payment-method').value = "";
+                document.querySelectorAll('.payment-tile').forEach(t => t.classList.remove('active'));
                 
                 saveCart();
                 updateCartUI();
-                listenToActiveOrderStatus(); // Запускаємо моніторинг щойно створеного замовлення
+                closeOrderModal();
+                listenToActiveOrderStatus(); 
 
             } catch (err) {
                 console.error("Transaction failed: ", err);
