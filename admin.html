@@ -212,8 +212,10 @@
             <ul class="nav-links" id="nav-menu">
                 <li><a href="https://svarogteam.com/index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
                 <li><a href="https://svarogteam.com/support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
+                <li><a href="https://svarogteam.com/shop.html"><span data-lang="ua">SVRG STORE</span><span data-lang="en">SVRG STORE</span></a></li>
                 <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li><a href="status.html"><span data-lang="ua">Статус замовлення</span><span data-lang="en">Order Status</span></a></li>
                 <li style="margin-top: auto; padding-top: 15px;">
                     <a href="https://svarogteam.com/admin.html" class="current-page" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
                 </li>
@@ -777,7 +779,6 @@
             renderOrdersList();
         }
 
-        // РЕНДЕР ЗАМОВЛЕНЬ ЯК ВІДКРИТИХ КАРТОК (без акордеону)
         function renderOrdersList() {
             const ordersBox = document.getElementById('box-for-orders'); 
             ordersBox.innerHTML = "";
@@ -831,10 +832,7 @@
                 let promoHtml = (ord.promoCode && ord.promoCode !== "Не застосовано") ? `<div style="font-size:0.85rem; color:#00ffcc; margin-bottom:8px;">🎟️ Промокод: <b>${ord.promoCode}</b></div>` : '';
                 let paymentMethodHtml = ord.paymentMethod ? `<div style="font-size:0.9rem; color:#fff; margin-bottom:8px;">💳 <b>Оплата:</b> ${ord.paymentMethod}</div>` : '';
                 
-                // Перегляд квитанції про оплату, якщо вона є
                 let paymentProofHtml = ord.paymentProof ? `<button class="btn" style="margin-top:10px; padding:6px 12px; width:auto; border-color:#00ffcc; color:#00ffcc;" onclick="openFullImage('${ord.paymentProof}')">📸 Переглянути квитанцію</button>` : '';
-
-                // Підказка про можливість архівування, якщо доставлено
                 let archiveHint = status === 'delivered' ? `<span style="font-size:0.75rem; color:#aaa; margin-left:10px;">(Можна в архів)</span>` : '';
 
                 ordersBox.innerHTML += `
@@ -1201,7 +1199,7 @@
                     </div>`;
             });
 
-            renderOrdersList(); // Відмальовує замовлення згідно з поточним фільтром (активні/архів)
+            renderOrdersList();
 
             if (isSuperadminSession) { renderAdminAccountsList(); }
 
