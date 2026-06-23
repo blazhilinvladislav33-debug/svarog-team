@@ -97,7 +97,8 @@
         .form-textarea { min-height: 110px; resize: vertical; font-family: inherit; }
         
         .btn { width: 100%; display: inline-block; padding: 12px 20px; background-color: transparent; color: var(--theme-color); border: 2px solid var(--theme-color); cursor: pointer; margin-top: 10px; font-weight: bold; border-radius: 8px; transition: all 0.3s ease; font-size: 1rem; box-shadow: 0 4px 15px rgba(var(--theme-color-rgb), 0.15); text-decoration: none; }
-        .btn:hover { background-color: var(--theme-color); color: #121212; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(var(--theme-color-rgb), 0.3); }
+        .btn:hover:not(:disabled) { background-color: var(--theme-color); color: #121212; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(var(--theme-color-rgb), 0.3); }
+        .btn:disabled { border-color: #555; color: #555; cursor: not-allowed; }
         
         .social-box { display: flex; gap: 12px; margin-top: 25px; flex-direction: column; width: 100%; max-width: 550px; }
         .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; border-radius: 6px; text-decoration: none; font-weight: bold; border: 1px solid; transition: 0.3s; font-size: 1rem; }
@@ -161,6 +162,7 @@
                 <li><a href="https://svarogteam.com/shop.html"><span data-lang="ua">SVRG STORE</span><span data-lang="en">SVRG STORE</span></a></li>
                 <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html" class="current-page"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
+                <li><a href="status.html"><span data-lang="ua">Статус замовлення</span><span data-lang="en">Order Status</span></a></li>
                 <li class="admin-menu-item">
                     <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
                 </li>
@@ -188,7 +190,7 @@
                 <div class="form-group">
                     <textarea id="fb-message" class="form-textarea" data-placeholder-ua="Повідомлення" data-placeholder-en="Message" placeholder="Повідомлення" required></textarea>
                 </div>
-                <button type="submit" class="btn">
+                <button type="submit" class="btn" id="fb-submit-btn">
                     <span data-lang="ua">Надіслати</span>
                     <span data-lang="en">Send</span>
                 </button>
@@ -198,6 +200,9 @@
     </div>
 
     <footer class="footer">
+        <div style="margin-bottom: 10px;">
+            <a href="status.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.3);">Перевірити статус замовлення</a>
+        </div>
         <span data-lang="ua">SVAROG TEAM © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
         <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
     </footer>
@@ -259,8 +264,14 @@
             const contact = document.getElementById('fb-contact').value.trim();
             const message = document.getElementById('fb-message').value.trim();
             const lang = localStorage.getItem('selectedLang') || 'ua';
+            const btn = document.getElementById('fb-submit-btn');
+
+            btn.disabled = true;
+            btn.innerHTML = `<span data-lang="ua">Відправка...</span><span data-lang="en">Sending...</span>`;
+            setLanguage(lang);
 
             try {
+                // 1. Запис в Firebase
                 await db.collection("feedback").add({
                     name: name,
                     contact: contact,
@@ -268,11 +279,35 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     time: new Date().toLocaleString('uk-UA')
                 });
-                alert(lang === 'ua' ? 'Повідомлення успішно надіслано в адмін-панель!' : 'Message successfully sent to the admin panel!'); 
+
+                // 2. Відправка в Telegram
+                const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; 
+                const chatId = '647245223';
+                
+                let tgMessage = `📩 <b>НОВЕ ПОВІДОМЛЕННЯ!</b>\n\n` +
+                                `👤 <b>Ім'я:</b> ${name}\n` +
+                                `📞 <b>Контакт:</b> ${contact}\n\n` +
+                                `📝 <b>Текст:</b>\n${message}`;
+
+                await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: tgMessage,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                alert(lang === 'ua' ? 'Повідомлення успішно надіслано!' : 'Message successfully sent!'); 
                 document.getElementById('feedback-form').reset();
             } catch(err) {
                 console.error("Помилка відправки: ", err);
                 alert(lang === 'ua' ? 'Помилка: ' + err.message : 'Error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span data-lang="ua">Надіслати</span><span data-lang="en">Send</span>`;
+                setLanguage(lang);
             }
         }
 
