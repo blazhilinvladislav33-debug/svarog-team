@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>SVAROG TEAM | Сертифікат</title>
+    <title>SVAROG TEAM | Сертифікат підтримки</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script>
@@ -20,14 +20,17 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;900&display=swap');
-        body { background: #121212; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; font-family: 'Montserrat', sans-serif; }
+        
+        body { 
+            background: #121212; display: flex; flex-direction: column; align-items: center; 
+            padding: 40px 20px; font-family: 'Montserrat', sans-serif; min-height: 100vh;
+        }
         
         .cert-container { 
             width: 800px; height: 450px; 
             background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
             color: #fff; padding: 30px; position: relative;
             border: 2px solid #f0b48c; border-radius: 15px;
-            /* Тінь по краях 1 см */
             box-shadow: inset 0 0 35px 5px rgba(240, 180, 140, 0.15), 0 15px 40px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
@@ -36,10 +39,14 @@
         .logo-main { width: 90px; height: auto; }
         .logo-team { width: 130px; height: auto; }
         
-        h1 { font-size: 2rem; color: #f0b48c; text-transform: uppercase; margin: 10px 0; letter-spacing: 2px; }
+        h1 { font-size: 2rem; color: #f0b48c; text-transform: uppercase; margin: 5px 0; letter-spacing: 2px; }
         
-        .code-box { margin-top: 15px; margin-bottom: 25px; }
-        .code-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        .code-box { 
+            margin: 20px 0; padding: 15px 30px; 
+            border: 2px dashed #f0b48c; border-radius: 8px;
+            box-shadow: 0 0 10px 5px rgba(240, 180, 140, 0.15);
+        }
+        .code-label { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
         .code-val { font-size: 2.2rem; font-weight: 900; color: #fff; }
 
         .footer-cert { 
@@ -74,7 +81,7 @@
     <h1>Сертифікат підтримки</h1>
     
     <div class="code-box">
-        <div class="code-label">Ваш код доступу</div>
+        <div class="code-label">Ваш промокод</div>
         <div class="code-val" id="cert-code">...</div>
     </div>
 
