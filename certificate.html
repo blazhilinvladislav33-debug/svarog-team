@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>SVAROG | Сертифікат</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        body { background: #1a1a1a; display: flex; flex-direction: column; align-items: center; padding: 20px; font-family: sans-serif; }
+        .cert-container { width: 800px; height: 500px; background: #fff; color: #000; padding: 40px; position: relative; border: 10px solid #f0b48c; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .logo { width: 100px; }
+        h1 { font-size: 3rem; margin: 20px 0; text-transform: uppercase; }
+        .code { font-size: 2rem; color: #f0b48c; border: 2px dashed #000; padding: 10px; display: inline-block; }
+        .print-btn { margin-top: 20px; padding: 15px 30px; background: #f0b48c; border: none; cursor: pointer; font-weight: bold; }
+        @media print { .print-btn { display: none; } body { background: none; } }
+    </style>
+</head>
+<body>
+
+<div class="cert-container" id="cert">
+    <img src="logo.png" class="logo">
+    <h1>Сертифікат підтримки</h1>
+    <p>Цей сертифікат підтверджує внесок у розвиток підрозділу SVAROG TEAM.</p>
+    <div class="code" id="cert-code">ЗАВАНТАЖЕННЯ...</div>
+</div>
+
+<button class="print-btn" onclick="window.print()">Друк сертифіката</button>
+
+<script>
+    const firebaseConfig = { /* Встав сюди свій config */ };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+
+    if(code) {
+        db.collection("promocodes").doc(code.toUpperCase()).get().then(doc => {
+            if(doc.exists) {
+                document.getElementById('cert-code').innerText = doc.data().code;
+            } else {
+                document.getElementById('cert-code').innerText = "НЕЗНАЙДЕНО";
+            }
+        });
+    }
+</script>
+</body>
+</html>
