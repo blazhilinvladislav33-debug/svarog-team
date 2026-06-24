@@ -89,7 +89,8 @@
         .merch-card { background: rgba(25, 25, 25, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .merch-card:hover { transform: translateY(-8px); border-color: rgba(var(--theme-color-rgb), 0.4); box-shadow: 0 15px 40px rgba(var(--theme-color-rgb), 0.15); }
         
-        .merch-img-box { width: 100%; height: 260px; background: rgba(0,0,0,0.5); overflow: hidden; position: relative; }
+        /* Збільшення фото (Lightbox) */
+        .merch-img-box { width: 100%; height: 260px; background: rgba(0,0,0,0.5); overflow: hidden; position: relative; cursor: zoom-in; }
         .merch-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
         .merch-card:hover .merch-img-box img { transform: scale(1.08); }
         
@@ -100,6 +101,12 @@
         .merch-details { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
         .merch-title { font-size: 1.25rem; font-weight: bold; color: #fff; margin-bottom: 8px; line-height: 1.3; }
         
+        /* Кольорові варіанти */
+        .color-options { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .color-btn { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; transition: 0.2s; padding: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .color-btn:hover { transform: scale(1.1); }
+        .color-btn.active { border-color: var(--theme-color); transform: scale(1.2); box-shadow: 0 0 8px rgba(var(--theme-color-rgb), 0.8); }
+
         .merch-desc { font-size: 0.85rem; color: #bbb; margin-bottom: 15px; line-height: 1.45; white-space: pre-wrap; flex-grow: 1; }
         
         .price-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
@@ -169,6 +176,12 @@
         .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(20, 20, 20, 0.98); backdrop-filter: blur(12px); border: 2px solid var(--theme-color); color: #fff; padding: 15px 25px; border-radius: 12px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 4000; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 12px; max-width: 90vw; width: max-content; text-align: center; line-height: 1.4; }
         .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast-icon { width: 22px; height: 22px; fill: var(--theme-color); flex-shrink: 0; }
+
+        /* Стилі для Lightbox (Збільшення фото) */
+        .lightbox-overlay { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center; cursor: zoom-out; }
+        .lightbox-content { max-width: 90%; max-height: 90vh; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.8); object-fit: contain; border: 1px solid rgba(255,255,255,0.1); }
+        .lightbox-close { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
+        .lightbox-close:hover { color: var(--theme-color); }
 
         .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
 
@@ -244,6 +257,11 @@
         </div>
     </div>
 
+    <div id="image-lightbox" class="lightbox-overlay" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+
     <div class="cart-fab" onclick="openCartModal()">
         <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
         <div class="cart-badge" id="cart-badge-count">0</div>
@@ -278,7 +296,7 @@
                 <div class="cart-total-box" id="cart-total-section" style="display:none;">
                     <div><span data-lang="ua">Разом до сплати:</span><span data-lang="en">Total sum:</span></div>
                     <div style="text-align: right;">
-                        <div id="cart-discount-sum" style="font-size: 0.9rem; color: #777777; margin-bottom: 4px; display: none;"></div>
+                        <div id="cart-discount-sum" style="font-size: 0.9rem; color: #00ffcc; margin-bottom: 4px; display: none;"></div>
                         <div class="cart-total-price" id="cart-total-sum">0 ₴</div>
                     </div>
                 </div>
@@ -381,6 +399,17 @@
             setTimeout(() => { toast.classList.remove('show'); }, duration);
         }
 
+        // Функції для Lightbox (Збільшення фото)
+        function openLightbox(src) {
+            if(!src) return;
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('image-lightbox').style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.getElementById('image-lightbox').style.display = 'none';
+        }
+
         function setLanguage(lang) {
             localStorage.setItem('selectedLang', lang);
             document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
@@ -456,7 +485,7 @@
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text.replace(/\s/g, '')).then(() => {
-                alert(localStorage.getItem('selectedLang') === 'en' ? "Card number copied!" : "Номер картки скопійовано!");
+                showToast(localStorage.getItem('selectedLang') === 'en' ? "Card number copied!" : "Номер картки скопійовано!");
             });
         }
 
@@ -468,6 +497,9 @@
         let cartLastUpdated = localStorage.getItem('svarog_shop_cart_time') || Date.now();
         let currentPromo = null; 
         let activeOrderUnsubscribe = null;
+        
+        // Зберігаємо обрані варіанти для кожного товару { 'itemId': variantIndex }
+        window.selectedVariants = {}; 
 
         function listenToActiveOrderStatus() {
             const activeOrderId = localStorage.getItem('svarog_active_order_id');
@@ -560,16 +592,26 @@
             });
         }
 
+        // Функція для зміни варіанту
+        window.changeVariant = function(itemId, variantIndex) {
+            window.selectedVariants[itemId] = variantIndex;
+            renderShopGrid(); // Перерендеримо сітку для оновлення фото/опису
+        }
+
         function adjustGridQty(itemId, amount) {
             const item = globalMerchList.find(m => m.id === itemId);
             if (!item) return;
-            const sizeSelect = document.getElementById(`size-${itemId}`);
+            
+            let isVariant = item.variants && item.variants.length > 0;
+            let activeVarIdx = window.selectedVariants[item.id] || 0;
+            let currentStockObj = isVariant ? (item.variants[activeVarIdx].stock || item.stock) : item.stock;
+
+            const sizeSelect = document.getElementById(`size-${item.id}`);
             let selectedSize = sizeSelect ? sizeSelect.value : "Універсальний";
             
-            // Якщо передзамовлення, запас не обмежений
-            let maxStock = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[selectedSize] || 0) : parseInt(item.stock || 0));
+            let maxStock = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj[selectedSize] || 0) : parseInt(currentStockObj || 0));
             
-            const valEl = document.getElementById(`qty-val-${itemId}`);
+            const valEl = document.getElementById(`qty-val-${item.id}`);
             let current = parseInt(valEl.innerText) || 0;
             let newQty = current + amount;
             if (newQty < 1) newQty = 1;
@@ -581,10 +623,15 @@
         function updateQtyMax(itemId) {
             const item = globalMerchList.find(m => m.id === itemId);
             if (!item) return;
-            const sizeSelect = document.getElementById(`size-${itemId}`);
+            
+            let isVariant = item.variants && item.variants.length > 0;
+            let activeVarIdx = window.selectedVariants[item.id] || 0;
+            let currentStockObj = isVariant ? (item.variants[activeVarIdx].stock || item.stock) : item.stock;
+
+            const sizeSelect = document.getElementById(`size-${item.id}`);
             let selectedSize = sizeSelect ? sizeSelect.value : "Універсальний";
             
-            let sStock = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[selectedSize] || 0) : 0);
+            let sStock = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj[selectedSize] || 0) : 0);
             
             const qtyValEl = document.getElementById(`qty-val-${itemId}`);
             if (qtyValEl) {
@@ -610,20 +657,47 @@
             }
 
             filteredList.forEach(item => {
-                let imgHtml = item.image ? `<img src="${item.image}">` : `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#666;">No Image</div>`;
+                // Перевірка наявності кольорових варіацій
+                let isVariant = item.variants && item.variants.length > 0;
+                if(isVariant && window.selectedVariants[item.id] === undefined) {
+                    window.selectedVariants[item.id] = 0;
+                }
+                let activeVarIdx = window.selectedVariants[item.id] || 0;
+                
+                let currentImage = isVariant ? (item.variants[activeVarIdx].image || item.image) : item.image;
+                let currentDesc = isVariant ? (item.variants[activeVarIdx].description || item.description) : item.description;
+                let currentSizes = isVariant ? (item.variants[activeVarIdx].sizes || item.sizes) : item.sizes;
+                let currentStockObj = isVariant ? (item.variants[activeVarIdx].stock || item.stock) : item.stock;
+
+                // Кнопки кольорів
+                let variantsHtml = '';
+                if (isVariant) {
+                    variantsHtml = '<div class="color-options">';
+                    item.variants.forEach((varObj, idx) => {
+                        let activeClass = idx === activeVarIdx ? 'active' : '';
+                        let colorHex = varObj.colorHex || '#ccc';
+                        variantsHtml += `<button class="color-btn ${activeClass}" style="background-color: ${colorHex};" onclick="changeVariant('${item.id}', ${idx})" title="${varObj.colorName || 'Колір'}"></button>`;
+                    });
+                    variantsHtml += '</div>';
+                }
+
+                // Зображення з Lightbox
+                let imgHtml = currentImage 
+                    ? `<img src="${currentImage}" onclick="openLightbox('${currentImage}')" title="${lang==='ua'?'Клікніть для збільшення':'Click to zoom'}">` 
+                    : `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#666;">No Image</div>`;
                 
                 let totalStock = 0;
-                if (typeof item.stock === 'object' && item.stock !== null) {
-                    totalStock = Object.values(item.stock).reduce((a, b) => a + parseInt(b || 0), 0);
+                if (typeof currentStockObj === 'object' && currentStockObj !== null) {
+                    totalStock = Object.values(currentStockObj).reduce((a, b) => a + parseInt(b || 0), 0);
                 } else {
-                    totalStock = parseInt(item.stock || 0);
+                    totalStock = parseInt(currentStockObj || 0);
                 }
 
                 let isOutOfStock = !item.isPreorder && totalStock <= 0;
                 
                 let stockBadge = '';
                 if (item.isPreorder) {
-                    stockBadge = `<div class="stock-badge" style="color:#777777; border-color:#777777; background:rgba(0,0,0,0.8);">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>`;
+                    stockBadge = `<div class="stock-badge" style="color:#00ffcc; border-color:#00ffcc; background:rgba(0,0,0,0.8);">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>`;
                 } else if (isOutOfStock) {
                     stockBadge = `<div class="stock-badge empty">${lang==='ua'?'Немає в наявності':'Out of stock'}</div>`;
                 }
@@ -634,26 +708,26 @@
                     : `<span class="merch-price">${item.price} ₴</span>`;
                 
                 let saleBadgeHtml = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
-                let descHtml = item.description ? `<div class="merch-desc">${item.description}</div>` : '';
+                let descHtml = currentDesc ? `<div class="merch-desc">${currentDesc}</div>` : '';
                 
                 let sizeSelectHtml = '';
                 let initialMaxStock = 0;
-                let isUniversalSize = !(item.sizes && item.sizes.length > 0);
+                let isUniversalSize = !(currentSizes && currentSizes.length > 0);
 
                 if(!isUniversalSize) {
-                    let firstSize = item.sizes[0];
-                    initialMaxStock = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[firstSize] || 0) : 0);
+                    let firstSize = currentSizes[0];
+                    initialMaxStock = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj[firstSize] || 0) : 0);
                     
                     sizeSelectHtml = `<select id="size-${item.id}" class="merch-select" onchange="updateQtyMax('${item.id}')">` + 
-                        item.sizes.map(s => {
-                            let sStock = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[s] || 0) : 0);
+                        currentSizes.map(s => {
+                            let sStock = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj[s] || 0) : 0);
                             let disabledAttr = (sStock <= 0 && !item.isPreorder) ? 'disabled' : '';
                             let outOfStockLabel = (sStock <= 0 && !item.isPreorder) ? (lang === 'ua' ? ' (Немає)' : ' (Out of stock)') : '';
                             return `<option value="${s}" ${disabledAttr}>${lang==='ua'?'Розмір:':'Size:'} ${s}${outOfStockLabel}</option>`;
                         }).join('') + 
                     `</select>`;
                 } else {
-                    initialMaxStock = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock["Універсальний"] || 0) : totalStock);
+                    initialMaxStock = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj["Універсальний"] || 0) : totalStock);
                     sizeSelectHtml = ''; 
                 }
 
@@ -661,7 +735,7 @@
                 if (isOutOfStock) {
                     buyBtnHtml = `<button class="buy-btn" disabled>${lang==='ua'?'Розпродано':'Sold out'}</button>`;
                 } else if (item.isPreorder) {
-                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')" style="border-color:#777777; color:#777777;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>`;
+                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')" style="border-color:#00ffcc; color:#00ffcc;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>`;
                 } else {
                     buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')">${lang==='ua'?'Додати в кошик 🛒':'Add to cart 🛒'}</button>`;
                 }
@@ -675,6 +749,7 @@
                         </div>
                         <div class="merch-details">
                             <div class="merch-title">${item.title}</div>
+                            ${variantsHtml}
                             <div class="price-wrapper">${priceHtml}</div>
                             ${descHtml}
                             <div class="merch-options">
@@ -695,11 +770,18 @@
             const item = globalMerchList.find(m => m.id === merchId);
             if(!item) return;
 
+            let isVariant = item.variants && item.variants.length > 0;
+            let activeVarIdx = window.selectedVariants[item.id] || 0;
+            
+            let currentStockObj = isVariant ? (item.variants[activeVarIdx].stock || item.stock) : item.stock;
+            let currentColorName = isVariant ? item.variants[activeVarIdx].colorName : null;
+            let currentImage = isVariant ? (item.variants[activeVarIdx].image || item.image) : item.image;
+
             let size = "Універсальний";
             let sizeSelect = document.getElementById(`size-${item.id}`);
             if(sizeSelect && sizeSelect.tagName === 'SELECT') { size = sizeSelect.value; }
 
-            let itemStockForSize = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[size] || 0) : parseInt(item.stock || 0));
+            let itemStockForSize = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj[size] || 0) : parseInt(currentStockObj || 0));
 
             let qtyValEl = document.getElementById(`qty-val-${item.id}`);
             let qty = parseInt(qtyValEl.innerText);
@@ -709,9 +791,16 @@
             }
 
             let actualPrice = (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price;
-            let existingItemIndex = shoppingCart.findIndex(cartItem => cartItem.merchId === item.id && cartItem.size === size);
+            
+            // Шукаємо такий самий товар (перевіряючи розмір І колір)
+            let existingItemIndex = shoppingCart.findIndex(cartItem => 
+                cartItem.merchId === item.id && 
+                cartItem.size === size && 
+                cartItem.color === currentColorName
+            );
             
             let finalTitle = item.isPreorder ? `[ПЕРЕДЗАМОВЛЕННЯ] ${item.title}` : item.title;
+            if(currentColorName) finalTitle += ` (${currentColorName})`;
 
             if (existingItemIndex > -1) {
                 if((shoppingCart[existingItemIndex].quantity + qty > itemStockForSize) && !item.isPreorder) {
@@ -724,9 +813,10 @@
                     cartId: Date.now().toString(), 
                     merchId: item.id,
                     merchTitle: finalTitle,
-                    image: item.image,
+                    image: currentImage,
                     price: actualPrice,
                     size: size,
+                    color: currentColorName, // Зберігаємо колір
                     quantity: qty,
                     totalPrice: actualPrice * qty,
                     isPreorder: item.isPreorder || false
@@ -808,7 +898,7 @@
                     let safeCodeName = doc.data().code || doc.id || "ПРОМОКОД";
                     
                     currentPromo = { code: safeCodeName, discount: doc.data().discount }; 
-                    msg.style.color = '#777777';
+                    msg.style.color = '#00ffcc';
                     msg.innerText = lang === 'ua' ? `Код застосовано! Знижка ${currentPromo.discount}%` : `Code applied! Discount ${currentPromo.discount}%`;
                     renderCartModalContent(); 
                 } else {
@@ -851,7 +941,7 @@
                 let sizeLabelMeta = item.size === 'Універсальний' ? '' : `${lang==='ua'?'Розмір':'Size'}: ${item.size} | `;
                 
                 let titleHtml = item.merchTitle.includes('[ПЕРЕДЗАМОВЛЕННЯ]') 
-                    ? item.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#777777;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
+                    ? item.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#00ffcc;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
                     : item.merchTitle;
 
                 container.innerHTML += `
@@ -955,7 +1045,21 @@
                     for(let obj of merchRefsAndData) {
                         // Якщо це НЕ передзамовлення, перевіряємо і віднімаємо сток
                         if (!obj.cartItem.isPreorder) {
-                            let currentStockObj = typeof obj.data.stock === 'object' ? { ...obj.data.stock } : {};
+                            // Якщо були варіації, треба знайти правильний stock об'єкт
+                            let isVariant = obj.data.variants && obj.data.variants.length > 0;
+                            let variantIndex = -1;
+                            
+                            if(isVariant && obj.cartItem.color) {
+                                variantIndex = obj.data.variants.findIndex(v => v.colorName === obj.cartItem.color);
+                            }
+
+                            let currentStockObj = {};
+                            if (isVariant && variantIndex > -1) {
+                                currentStockObj = typeof obj.data.variants[variantIndex].stock === 'object' ? { ...obj.data.variants[variantIndex].stock } : {};
+                            } else {
+                                currentStockObj = typeof obj.data.stock === 'object' ? { ...obj.data.stock } : {};
+                            }
+
                             let sizeKey = obj.cartItem.size;
                             let currentStockForSize = parseInt(currentStockObj[sizeKey] || 0);
                             
@@ -963,14 +1067,22 @@
                                 throw new Error(lang==='ua' ? `Недостатньо товару "${obj.cartItem.merchTitle}" на складі!` : `Not enough stock for ${obj.cartItem.merchTitle}!`);
                             }
                             currentStockObj[sizeKey] = currentStockForSize - obj.cartItem.quantity;
-                            obj.newStockObj = currentStockObj;
+                            
+                            // Зберігаємо змінений сток назад
+                            if (isVariant && variantIndex > -1) {
+                                obj.data.variants[variantIndex].stock = currentStockObj;
+                            } else {
+                                obj.data.stock = currentStockObj;
+                            }
                         }
                     }
 
                     for(let obj of merchRefsAndData) {
-                        // Оновлюємо склад тільки для тих товарів, що не є передзамовленням
                         if (!obj.cartItem.isPreorder) {
-                            transaction.update(obj.ref, { stock: obj.newStockObj });
+                            transaction.update(obj.ref, { 
+                                stock: obj.data.stock,
+                                variants: obj.data.variants || []
+                            });
                         }
                     }
 
@@ -1132,7 +1244,7 @@
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${msg.sender}`;
                 if(msg.type === 'image') {
-                    bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src=\\'${msg.text}\\'>')">`;
+                    bubble.innerHTML = `<img src="${msg.text}" onclick="openLightbox('${msg.text}')" style="cursor:zoom-in;">`;
                 } else { 
                     bubble.innerText = msg.text; 
                 }
