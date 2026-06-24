@@ -79,7 +79,6 @@
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
 
-        .admin-menu-item { padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 5px; }
         .menu-chat-btn { border: 2px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); margin-top: 5px; }
         .menu-chat-btn:hover { background: var(--theme-color) !important; color: #121212 !important; padding-left: 15px !important; }
 
@@ -190,9 +189,6 @@
                 <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
                 <li><a href="status.html"><span data-lang="ua">Статус замовлення</span><span data-lang="en">Order Status</span></a></li>
-                <li class="admin-menu-item">
-                    <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
-                </li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -287,7 +283,7 @@
     <div class="user-chat-modal" id="user-chat-window">
         <div class="chat-header">
             <span data-lang="ua">Анонімна розмова</span><span data-lang="en">Anonymous Chat</span>
-            <span style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('user-chat-window').style.display='none'">×</span>
+            <span style="cursor:pointer; font-size:1.2rem;" onclick="closeUserChat()">×</span>
         </div>
         <div class="chat-messages" id="user-chat-messages"></div>
         <div class="chat-input-area" id="user-chat-input-block">
@@ -402,7 +398,6 @@
             setLanguage(lang);
 
             try {
-                // 1. Відправка в Firebase (для Адмін-панелі)
                 await db.collection("volunteers").add({
                     name: name,
                     org: org,
@@ -414,7 +409,6 @@
                     time: new Date().toLocaleString('uk-UA')
                 });
 
-                // 2. Відправка в Telegram
                 const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; 
                 const chatId = '647245223';
                 
@@ -454,7 +448,7 @@
                 document.getElementById('volunteer-form').reset();
                 document.getElementById('vol-preview-element').style.display = 'none';
                 volunteerImgBase64 = "";
-                toggleVolunteerForm(); // Закрити форму після успішної відправки
+                toggleVolunteerForm();
 
             } catch (err) {
                 console.error("Помилка відправки анкети: ", err);
@@ -505,7 +499,7 @@
             }
         });
 
-        // --- ЖИВА СИНХРОНІЗАЦІЯ АНОНІМНОГО ЧАТУ (FIREBASE REALTIME) ---
+        // --- ЖИВА СИНХРОНІЗАЦІЯ АНОНІМНОГО ЧАТУ (ОНОВЛЕНО) ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
@@ -518,11 +512,17 @@
         }
 
         function openUserChat(e) {
-            e.preventDefault();
+            if(e) e.preventDefault();
             if(navMenu) navMenu.classList.remove('active');
             if(menuButton) menuButton.classList.remove('open');
             document.getElementById('user-chat-window').style.display = 'flex';
+            localStorage.setItem('svarogChatIsOpen', 'true');
             renderUserChat();
+        }
+
+        function closeUserChat() {
+            document.getElementById('user-chat-window').style.display = 'none';
+            localStorage.setItem('svarogChatIsOpen', 'false');
         }
 
         function startRealtimeChatListener() {
@@ -615,8 +615,13 @@
         
         window.addEventListener('DOMContentLoaded', () => { 
             setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
-            initReportsStream(); // Запуск відображення звітів
+            initReportsStream(); 
             initUserChat(); 
+            
+            // Відновлення стану чату при переході між сторінками
+            if (localStorage.getItem('svarogChatIsOpen') === 'true') {
+                openUserChat();
+            }
         });
     </script>
 </body>
