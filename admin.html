@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <script>
+        // Конфігурація вашого проєкту Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
             authDomain: "svarog-team.firebaseapp.com",
@@ -24,6 +25,7 @@
     </script>
 
     <style>
+        /* ГЛОБАЛЬНІ ЗМІННІ ДЛЯ НОВОГО КОЛЬОРУ */
         :root {
             --theme-color: #f0b48c;
             --theme-color-rgb: 240, 180, 140;
@@ -319,6 +321,11 @@
                         <div class="switch-wrapper">
                             <input type="checkbox" id="promo-single-use">
                             <label style="font-size:0.9rem; color:#bbb; cursor:pointer;" for="promo-single-use">Одноразовий промокод</label>
+                        </div>
+
+                        <div class="switch-wrapper">
+                            <input type="checkbox" id="promo-is-cert">
+                            <label style="font-size:0.9rem; color:#bbb; cursor:pointer;" for="promo-is-cert">🎁 Це подарунковий сертифікат</label>
                         </div>
 
                         <button class="btn" onclick="createPromoCode()">Зберегти промокод</button>
@@ -653,7 +660,7 @@
         }
 
         // ==========================================
-        // СИСТЕМА ЧАТІВ
+        // СИСТЕМА ЧАТІВ (РЕНДЕР ТА ВІДПРАВКА)
         // ==========================================
 
         function renderChatsList() {
@@ -815,13 +822,73 @@
                 globalFeedbackData.map(item => `<div class="msg-item"><div class="meta-line">Ім'я: ${item.name || 'Невідомо'} | Контакт: ${item.contact || 'Не вказано'}</div><div class="msg-text">${item.message || JSON.stringify(item)}</div></div>`).join('');
         }
 
+        // ==========================================
+        // ОНОВЛЕНА ЛОГІКА: ВІДОБРАЖЕННЯ АНКЕТ ВОЛОНТЕРІВ
+        // ==========================================
         function renderVolunteersList() {
             const box = document.getElementById('box-for-volunteers');
             if(!box) return;
-            box.innerHTML = globalVolunteersData.length === 0 ? '<div class="no-msg">Немає анкет волонтерів</div>' : 
-                globalVolunteersData.map(item => `<div class="msg-item"><div class="meta-line">Волонтер: ${item.name || 'Невідомо'}</div><div class="msg-text">${item.skills || JSON.stringify(item)}</div></div>`).join('');
+            if(globalVolunteersData.length === 0) {
+                box.innerHTML = '<div class="no-msg">Немає анкет волонтерів</div>';
+                return;
+            }
+            
+            let sortedVols = [...globalVolunteersData].sort((a, b) => {
+                let tA = a.timestamp ? a.timestamp.toMillis() : 0;
+                let tB = b.timestamp ? b.timestamp.toMillis() : 0;
+                return tB - tA;
+            });
+
+            let html = '';
+            sortedVols.forEach(item => {
+                let timeStr = item.time || (item.timestamp ? new Date(item.timestamp.toMillis()).toLocaleString('uk-UA') : 'Невідомо');
+                let detailsHtml = '';
+                
+                // Перебираємо всі поля анкети
+                for (const [key, value] of Object.entries(item)) {
+                    if(key === 'id' || key === 'timestamp' || key === 'time' || key === 'name') continue;
+                    
+                    let displayKey = key;
+                    if(key === 'phone') displayKey = '📞 Телефон';
+                    if(key === 'tg' || key === 'telegram') displayKey = '✈️ Telegram';
+                    if(key === 'skills') displayKey = '🛠 Навички';
+                    if(key === 'about') displayKey = '📝 Про себе';
+                    if(key === 'age') displayKey = '🎂 Вік';
+                    if(key === 'city') displayKey = '📍 Місто';
+
+                    detailsHtml += `<div style="margin-bottom:8px; font-size:0.9rem;">
+                        <span style="color:var(--theme-color); font-weight:bold;">${displayKey}:</span> 
+                        <span style="color:#eee; white-space: pre-wrap;">${value}</span>
+                    </div>`;
+                }
+
+                html += `
+                    <div class="msg-item" style="border-left: 4px solid #00bfff; position: relative;">
+                        <div class="meta-line" style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:10px;">
+                            <span style="font-size:1.1rem;">📋 <b>${item.name || 'Анонім'}</b></span>
+                            <span style="font-size:0.8rem; color:#aaa;">${timeStr}</span>
+                        </div>
+                        <div class="msg-text">
+                            ${detailsHtml}
+                        </div>
+                        <button class="delete-admin-btn" style="position:static; margin-top:10px; display:inline-block;" onclick="deleteVolunteer('${item.id}')">🗑 Видалити анкету</button>
+                    </div>`;
+            });
+            box.innerHTML = html;
         }
 
+        async function deleteVolunteer(id) {
+            if(confirm("Видалити цю анкету безповоротно?")) {
+                try {
+                    await db.collection("volunteers").doc(id).delete();
+                    logAdminAction('system', `Видалив анкету волонтера ${id}`);
+                } catch(e) { console.error(e); }
+            }
+        }
+
+        // ==========================================
+        // ОНОВЛЕНА ЛОГІКА: ЕКСПОРТ CSV БЕЗ "ІЄРОГЛІФІВ"
+        // ==========================================
         function exportToCSV(dataKey, filename) {
             let data = [];
             if(dataKey === 'siteFeedbackData') data = globalFeedbackData;
@@ -870,15 +937,19 @@
             }
         }
 
-        // ПРОМОКОДИ
+        // ==========================================
+        // ОНОВЛЕНА ЛОГІКА: ПРОМОКОДИ І СЕРТИФІКАТИ
+        // ==========================================
         async function createPromoCode() {
             const codeInput = document.getElementById('promo-code-input');
             const discountInput = document.getElementById('promo-discount-input');
             const singleUseCheckbox = document.getElementById('promo-single-use');
+            const certCheckbox = document.getElementById('promo-is-cert'); // ДОДАНО
             
             const code = codeInput.value.trim().toUpperCase();
             const discount = parseInt(discountInput.value.trim());
             const isSingleUse = singleUseCheckbox.checked;
+            const isCert = certCheckbox ? certCheckbox.checked : false; // ДОДАНО
 
             if (!code || isNaN(discount)) {
                 alert("Введіть код та відсоток знижки!");
@@ -890,11 +961,15 @@
                     discount: discount,
                     created: firebase.firestore.FieldValue.serverTimestamp(),
                     active: true,
-                    isSingleUse: isSingleUse
+                    isSingleUse: isSingleUse,
+                    isCertificate: isCert // ДОДАНО
                 });
-                alert("✓ Промокод успішно створено!");
-                logAdminAction('shop', `Створив промокод ${code} (-${discount}%)`);
-                codeInput.value = ""; discountInput.value = ""; singleUseCheckbox.checked = false;
+                alert(isCert ? "✓ Сертифікат успішно створено!" : "✓ Промокод успішно створено!");
+                logAdminAction('shop', `Створив ${isCert ? 'сертифікат' : 'промокод'} ${code} (-${discount}%)`);
+                
+                codeInput.value = ""; discountInput.value = ""; 
+                singleUseCheckbox.checked = false;
+                if(certCheckbox) certCheckbox.checked = false;
             } catch (error) { console.error("Помилка:", error); }
         }
 
@@ -908,12 +983,21 @@
             }
             globalPromocodes.forEach(promo => {
                 const codeName = promo.id; 
-                const singleUseBadge = promo.isSingleUse ? `<span style="background:#ffaa00; color:#000; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold;">Одноразовий</span>` : '';
+                const singleUseBadge = promo.isSingleUse ? `<span style="background:#ffaa00; color:#000; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">Одноразовий</span>` : '';
+                const certBadge = promo.isCertificate ? `<span style="background:#da70d6; color:#fff; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">🎁 Сертифікат</span>` : '';
+                
+                // Перевірка статусу використання
+                let statusBadge = promo.active 
+                    ? `<span style="color:#00ffcc; font-size:0.85rem; font-weight:bold;">✅ Активний</span>` 
+                    : `<span style="color:#ff4a4a; font-size:0.85rem; font-weight:bold;">🛑 Використаний / Неактивний</span>`;
+
                 box.innerHTML += `
-                    <div class="admin-user-card" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="admin-user-card" style="display: flex; justify-content: space-between; align-items: center; border-left: 4px solid ${promo.active ? '#00ffcc' : '#ff4a4a'}">
                         <div>
-                            <div style="font-weight:bold; font-size:1.1rem; color:var(--theme-color); letter-spacing: 1px;">${codeName} ${singleUseBadge}</div>
-                            <div style="font-size:0.85rem; color:#ccc; margin-top: 4px;">Знижка: <b style="color:#00ffcc">${promo.discount}%</b></div>
+                            <div style="font-weight:bold; font-size:1.1rem; color:var(--theme-color); letter-spacing: 1px;">
+                                ${codeName} ${singleUseBadge} ${certBadge}
+                            </div>
+                            <div style="font-size:0.85rem; color:#ccc; margin-top: 4px;">Знижка: <b style="color:#00ffcc">${promo.discount}%</b> | ${statusBadge}</div>
                         </div>
                         <button class="delete-admin-btn" style="position: static;" onclick="deletePromoCode('${codeName}')">Видалити</button>
                     </div>`;
@@ -921,10 +1005,10 @@
         }
 
         async function deletePromoCode(id) {
-            if(confirm(`Ви впевнені, що хочете видалити промокод ${id}?`)) {
+            if(confirm(`Ви впевнені, що хочете видалити цей код (${id})?`)) {
                 try { 
                     await db.collection("promocodes").doc(id).delete(); 
-                    logAdminAction('shop', `Видалив промокод ${id}`);
+                    logAdminAction('shop', `Видалив промокод/сертифікат ${id}`);
                 } catch(e) { console.error("Помилка видалення:", e); }
             }
         }
