@@ -25,7 +25,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Функція логування
+        // Функція логування піднята наверх, щоб уникнути помилок ReferenceError
         async function logAdminAction(actionCategory, actionDetails) {
             const user = firebase.auth().currentUser;
             if (!user) return; 
@@ -52,22 +52,16 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        /* ОПТИМІЗАЦІЯ ТІЛЬКИ ПІД ПК: Жорстка ширина, заборона стиснення */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-            position: relative; 
-            min-width: 1200px; /* Примусовий ПК-розмір */
-            overflow-x: auto;  /* Горизонтальний скрол на малих екранах */
+            position: relative; overflow-x: hidden;
             background-color: #121212;
             background-image: url('bg1.jpg'); background-attachment: fixed;
             background-position: center; background-repeat: no-repeat; background-size: cover;
         }
-        
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: -1; }
-        
-        .navbar { width: 100%; min-width: 1200px; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
+        .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
         .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .left-side { display: flex; align-items: center; gap: 20px; }
         .logo { color: #ffffff; text-decoration: none; font-weight: 900; letter-spacing: 1px; font-size: 1.1rem; }
@@ -189,6 +183,21 @@
         .footer-cert-text { margin-top: auto; font-size: 0.85rem; color: #aaa; width: 100%; border-top: 1px solid #333; padding-top: 15px; font-style: italic; line-height: 1.4; position: relative; z-index: 2; }
         
         [data-lang="en"] { display: none; }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 10px; }
+            .container { padding: 25px 15px; }
+            h1 { font-size: 1.4rem; }
+            .tabs-header { gap: 4px; padding-bottom: 10px; }
+            .tab-button { min-width: 65px; padding: 8px 2px; font-size: 0.65rem; }
+            .chat-admin-layout { position: relative; height: 430px; }
+            .chat-sessions-list { width: 100%; border-right: none; padding-right: 0; }
+            .chat-workspace { display: none; width: 100%; }
+            .superadmin-grid { flex-direction: column; }
+            .edit-news-btn { right: 85px; }
+            .merch-grid { grid-template-columns: 1fr; }
+            .cert-container-box { width: 100%; height: auto; padding: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -619,9 +628,77 @@
             console.log("Badges updated");
         }
         
-        // ЗАГЛУШКИ ДЛЯ КАТЕГОРІЙ МАГАЗИНУ
-        function renderCategoriesAdmin() {}
-        function populateCategorySelect() {}
+        // ФУНКЦІЇ ДЛЯ КАТЕГОРІЙ МАГАЗИНУ (ВИПРАВЛЕНО ТА ДОДАНО ЛОГІКУ)
+        function renderCategoriesAdmin() {
+            const list = document.getElementById('admin-category-list');
+            if (!list) return;
+            
+            list.innerHTML = '';
+            
+            if (globalCategories.length === 0) {
+                list.innerHTML = '<span style="color:#aaa; font-size:0.85rem;">Немає категорій</span>';
+                return;
+            }
+            
+            globalCategories.forEach((cat, index) => {
+                list.innerHTML += `
+                    <div class="cat-chip">
+                        ${cat} 
+                        <span class="cat-remove" onclick="deleteCategory(${index})">✖</span>
+                    </div>
+                `;
+            });
+        }
+
+        function populateCategorySelect() {
+            const select = document.getElementById('merch-category');
+            if (!select) return;
+            
+            select.innerHTML = '<option value="" disabled selected>Оберіть категорію...</option>';
+            
+            globalCategories.forEach(cat => {
+                select.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        async function addCategory() {
+            const input = document.getElementById('new-category-input');
+            const newCat = input.value.trim();
+            
+            if (!newCat) {
+                alert("Введіть назву категорії!");
+                return;
+            }
+            if (globalCategories.includes(newCat)) {
+                alert("Така категорія вже існує!");
+                return;
+            }
+
+            const updatedCategories = [...globalCategories, newCat];
+            
+            try {
+                await db.collection("config").doc("shop").set({ categories: updatedCategories }, { merge: true });
+                input.value = ''; 
+                logAdminAction('shop', `Додав категорію: ${newCat}`);
+            } catch (e) {
+                console.error("Помилка додавання категорії:", e);
+                alert("Помилка: " + e.message);
+            }
+        }
+
+        async function deleteCategory(index) {
+            const catToRemove = globalCategories[index];
+            if (confirm(`Видалити категорію "${catToRemove}"?`)) {
+                const updatedCategories = globalCategories.filter((_, i) => i !== index);
+                try {
+                    await db.collection("config").doc("shop").set({ categories: updatedCategories }, { merge: true });
+                    logAdminAction('shop', `Видалив категорію: ${catToRemove}`);
+                } catch (e) {
+                    console.error("Помилка видалення категорії:", e);
+                    alert("Помилка: " + e.message);
+                }
+            }
+        }
 
         let currentSelectedChatId = null;
         let isConfirmingStatus = false;
