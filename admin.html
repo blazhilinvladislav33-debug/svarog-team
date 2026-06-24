@@ -157,24 +157,12 @@
     <nav class="navbar">
         <div class="navbar-container">
             <div class="left-side">
-                <button class="menu-toggle" id="menu-button"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-                <a href="https://svarogteam.com/index.html" class="logo">SVAROG SUPPORT</a>
+                <a href="https://svarogteam.com/index.html" class="logo">SVAROG ADMIN</a>
             </div>
             <div class="lang-switcher">
                 <button class="lang-btn active" onclick="setLanguage('ua')">UA</button>
                 <button class="lang-btn" onclick="setLanguage('en')">EN</button>
             </div>
-            <ul class="nav-links" id="nav-menu">
-                <li><a href="https://svarogteam.com/index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a></li>
-                <li><a href="https://svarogteam.com/support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a></li>
-                <li><a href="https://svarogteam.com/shop.html"><span data-lang="ua">SVRG STORE</span><span data-lang="en">SVRG STORE</span></a></li>
-                <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
-                <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
-                <li><a href="status.html"><span data-lang="ua">Статус замовлення</span><span data-lang="en">Order Status</span></a></li>
-                <li style="margin-top: auto; padding-top: 15px;">
-                    <a href="https://svarogteam.com/admin.html" class="current-page" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
-                </li>
-            </ul>
         </div>
     </nav>
 
@@ -534,19 +522,10 @@
         let unsubscribeReports = null;
         let unsubscribeStats = null;
 
-        // Навігація
-        const menuButton = document.getElementById('menu-button');
-        const navMenu = document.getElementById('nav-menu');
-        if(menuButton && navMenu) {
-            menuButton.addEventListener('click', (e) => { e.stopPropagation(); navMenu.classList.toggle('active'); menuButton.classList.toggle('open'); });
-            document.addEventListener('click', (e) => { if (!navMenu.contains(e.target) && !menuButton.contains(e.target)) { navMenu.classList.remove('active'); menuButton.classList.remove('open'); } });
-        }
-
         // ==========================================
         // ЛОГІКА АВТОРИЗАЦІЇ FIREBASE AUTH + FIRESTORE
         // ==========================================
 
-        // Функція перевірки прав адміністратора в колекції 'admins'
         async function checkAdminAccess(userEmail) {
             if (!userEmail) return false;
             try {
@@ -568,7 +547,6 @@
             return false;
         }
 
-        // Відстеження стану сесії
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 const isAdmin = await checkAdminAccess(user.email);
@@ -580,7 +558,6 @@
                     await firebase.auth().signOut();
                 }
             } else {
-                // Користувач не залогінений
                 document.getElementById('login-card').style.display = 'block';
                 const dashboard = document.getElementById('admin-dashboard');
                 if(dashboard) {
@@ -590,7 +567,6 @@
             }
         });
 
-        // Обробка форми логіну
         async function handleLogin(event) {
             event.preventDefault();
             const emailInp = document.getElementById('user-email').value.trim();
@@ -666,10 +642,8 @@
             document.getElementById('news-date-field').valueAsDate = new Date();
         }
 
-        // --- БАЗОВІ ФУНКЦІЇ З ОРИГІНАЛЬНОГО КОДУ ---
-
         function renderAllDynamicData() {
-            renderChatsList(); // <--- ДОДАНО РЕНДЕР ЧАТІВ
+            renderChatsList();
             renderOrdersList();
             updateBadgesLogic();
             renderFeedbackList();
@@ -684,7 +658,6 @@
             const box = document.getElementById('active-sessions-box');
             if (!box) return;
 
-            // Фільтруємо тільки активні чати і сортуємо за часом (нові зверху)
             let activeChats = Object.keys(globalChatsData)
                 .filter(id => globalChatsData[id].status === 'active')
                 .map(id => ({ id, ...globalChatsData[id] }))
@@ -701,8 +674,13 @@
                 
                 let lastMsgText = 'Новий чат';
                 if (chat.messages && chat.messages.length > 0) {
-                    lastMsgText = chat.messages[chat.messages.length - 1].text;
-                    if(lastMsgText.length > 25) lastMsgText = lastMsgText.substring(0, 25) + '...';
+                    let lastMsg = chat.messages[chat.messages.length - 1];
+                    if (lastMsg.type === 'image') {
+                        lastMsgText = '📸 [Фотографію надіслано]';
+                    } else {
+                        lastMsgText = lastMsg.text;
+                        if(lastMsgText && lastMsgText.length > 25) lastMsgText = lastMsgText.substring(0, 25) + '...';
+                    }
                 }
 
                 html += `
@@ -719,7 +697,7 @@
 
         function openChat(chatId) {
             currentSelectedChatId = chatId;
-            renderChatsList(); // Оновлюємо список, щоб підсвітити активний
+            renderChatsList(); 
             renderChatWorkspace();
         }
 
@@ -743,11 +721,18 @@
                     const color = isAdmin ? 'var(--theme-color)' : '#fff';
                     const senderName = isAdmin ? 'SVAROG SUPPORT' : 'Користувач';
                     
+                    let msgContent = "";
+                    if(msg.type === 'image') {
+                        msgContent = `<img src="${msg.text}" style="max-width:100%; max-height:200px; border-radius:4px; cursor:pointer;" onclick="window.open().document.write('<img src=\\'${msg.text}\\'>')">`;
+                    } else {
+                        msgContent = `<div style="font-size:0.95rem; color:#eee; line-height:1.4; word-wrap:break-word;">${msg.text}</div>`;
+                    }
+
                     messagesHtml += `
                         <div style="text-align: ${align}; margin-bottom: 12px;">
                             <div style="display:inline-block; background:${bg}; padding: 8px 14px; border-radius: 8px; max-width:85%; text-align:left; border: 1px solid rgba(255,255,255,0.05);">
                                 <div style="font-size:0.7rem; color:${color}; font-weight:bold; margin-bottom:4px;">${senderName}</div>
-                                <div style="font-size:0.95rem; color:#eee; line-height:1.4; word-wrap:break-word;">${msg.text}</div>
+                                ${msgContent}
                             </div>
                         </div>
                     `;
@@ -789,9 +774,11 @@
                     messages: firebase.firestore.FieldValue.arrayUnion({
                         sender: 'admin',
                         text: text,
-                        timestamp: new Date().toISOString()
+                        type: 'text',
+                        time: Date.now()
                     }),
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    adminStatus: 'replied',
+                    lastUpdate: Date.now()
                 });
                 input.value = '';
             } catch(e) {
@@ -804,7 +791,9 @@
             if(confirm("Ти впевнений, що хочеш завершити цей чат? Він зникне з активних.")) {
                 try {
                     await db.collection('chats').doc(chatId).update({
-                        status: 'closed'
+                        status: 'closed',
+                        adminStatus: 'resolved',
+                        lastUpdate: Date.now()
                     });
                     if(currentSelectedChatId === chatId) {
                         currentSelectedChatId = null; 
@@ -1457,137 +1446,6 @@
             }
         }
 
-        async function savePaymentCredentials() {
-            const bankUrl = document.getElementById('new-donation-link-field').value.trim();
-            const cardNumber = document.getElementById('config-card-number').value.trim();
-            const cardName = document.getElementById('config-card-name').value.trim();
-
-            try {
-                await db.collection("config").doc("payment").set({
-                    bankUrl: bankUrl,
-                    cardNumber: cardNumber,
-                    cardName: cardName
-                }, { merge: true });
-                alert("✓ Платіжні дані успішно оновлено та синхронізовано!");
-            } catch(e) {
-                console.error(e); alert("Помилка збереження: " + e.message);
-            }
-        }
-
-        function setOrdersFilter(filterType) {
-            currentOrdersFilter = filterType;
-            document.querySelectorAll('.orders-sub-btn').forEach(btn => btn.classList.remove('active'));
-            if(filterType === 'active') document.getElementById('sub-btn-active').classList.add('active');
-            if(filterType === 'sent') document.getElementById('sub-btn-sent').classList.add('active');
-            if(filterType === 'archive') document.getElementById('sub-btn-archive').classList.add('active');
-            renderOrdersList();
-        }
-
-        function renderOrdersList() {
-            const ordersBox = document.getElementById('box-for-orders'); 
-            if(!ordersBox) return;
-            ordersBox.innerHTML = "";
-            
-            let filteredOrders = globalOrdersData.filter(ord => {
-                let status = ord.status || 'new';
-                if (currentOrdersFilter === 'active') {
-                    return status === 'new' || status === 'on_review' || status === 'accepted';
-                } else if (currentOrdersFilter === 'sent') {
-                    return status === 'sent' || status === 'delivered';
-                } else if (currentOrdersFilter === 'archive') {
-                    return status === 'archived' || status === 'cancelled';
-                }
-                return true;
-            });
-
-            if(filteredOrders.length === 0) { 
-                ordersBox.innerHTML = `<div class="no-msg">У цій підгрупі замовлень немає</div>`; 
-                return; 
-            }
-
-            filteredOrders.forEach(ord => {
-                let status = ord.status || 'new';
-                let sLabel = status === 'new' ? 'Нове' : 
-                             status === 'on_review' ? 'На перевірці ⏳' : 
-                             status === 'accepted' ? 'Прийнято ✓' : 
-                             status === 'sent' ? 'Відправлено 📦' : 
-                             status === 'delivered' ? 'Доставлено 🎉' : 
-                             status === 'cancelled' ? 'Скасовано ✖' : 'В архіві 📂';
-
-                let sClass = status === 'new' || status === 'on_review' ? 'on_review' : 
-                             status === 'accepted' ? 'accepted' : 
-                             status === 'sent' ? 'sent' : 
-                             status === 'delivered' ? 'delivered' : 
-                             status === 'cancelled' ? 'cancelled' : 'archived';
-                
-                let itemsListHtml = '';
-                if(ord.items && Array.isArray(ord.items)) {
-                    ord.items.forEach(it => {
-                        let sizeMeta = it.size === 'Універсальний' ? '' : ` [Розмір: ${it.size}]`;
-                        itemsListHtml += `
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem; padding-left:10px; border-left:2px solid var(--theme-color);">
-                            <span><b>${it.merchTitle}</b>${sizeMeta} x${it.quantity} шт</span>
-                            <span style="color:var(--theme-color); font-weight:bold;">${it.totalPrice} ₴</span>
-                        </div>`;
-                    });
-                } else if(ord.orderTextDetails) {
-                    itemsListHtml = `<pre style="font-family:inherit; font-size:0.9rem; margin-left:10px; color:#ccc;">${ord.orderTextDetails}</pre>`;
-                }
-
-                let promoHtml = (ord.promoCode && ord.promoCode !== "Не застосовано") ? `<div style="font-size:0.85rem; color:#00ffcc; margin-bottom:8px;">🎟️ Промокод: <b>${ord.promoCode}</b></div>` : '';
-                let paymentMethodHtml = ord.paymentMethod ? `<div style="font-size:0.9rem; color:#fff; margin-bottom:8px;">💳 <b>Оплата:</b> ${ord.paymentMethod}</div>` : '';
-                
-                let paymentProofHtml = ord.paymentProof ? `<button class="btn" style="margin-top:10px; padding:6px 12px; width:auto; border-color:#00ffcc; color:#00ffcc;" onclick="openFullImage('${ord.paymentProof}')">📸 Переглянути квитанцію</button>` : '';
-                let archiveHint = status === 'delivered' ? `<span style="font-size:0.75rem; color:#aaa; margin-left:10px;">(Можна в архів)</span>` : '';
-
-                ordersBox.innerHTML += `
-                    <div class='msg-item' style="border-left: 4px solid var(--theme-color);">
-                        <div class='meta-line' style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                            <span>🛒 Замовлення від ${ord.time || 'Не вказано'}</span>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <span style="font-size:0.85rem; color:#ccc;">Статус:</span>
-                                <select class="status-select ${sClass}" onchange="changeOrderStatus('${ord.id}', this.value)">
-                                    <option value="new" ${status === 'new' ? 'selected' : ''}>Нове</option>
-                                    <option value="on_review" ${status === 'on_review' ? 'selected' : ''}>На перевірці</option>
-                                    <option value="accepted" ${status === 'accepted' ? 'selected' : ''}>Прийнято</option>
-                                    <option value="sent" ${status === 'sent' ? 'selected' : ''}>Відправлено</option>
-                                    <option value="delivered" ${status === 'delivered' ? 'selected' : ''}>Доставлено</option>
-                                    <option value="cancelled" ${status === 'cancelled' ? 'selected' : ''}>Скасовано</option>
-                                    <option value="archived" ${status === 'archived' ? 'selected' : ''}>В архіві</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:15px; margin-bottom:15px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:15px; margin-top:15px;">
-                            <div>
-                                <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">📍 Дані доставки:</h4>
-                                <p class="msg-text">👤 <b>ПІБ:</b> ${ord.name}</p>
-                                <p class="msg-text">📞 <b>Тел:</b> ${ord.phone}</p>
-                                <p class="msg-text">📍 <b>Адреса:</b> ${ord.address}</p>
-                            </div>
-                            <div>
-                                <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">💰 Оплата та підтвердження:</h4>
-                                ${paymentMethodHtml}
-                                ${promoHtml}
-                                <p class="msg-text" style="font-size:1.05rem;"><b>До сплати:</b> <span style="color:var(--theme-color); font-weight:bold;">${ord.totalPrice} ₴</span></p>
-                                ${paymentProofHtml}
-                            </div>
-                        </div>
-
-                        <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:6px; margin-bottom:15px;">
-                            <div style="font-size:0.85rem; color:#aaa; margin-bottom:8px; font-weight:bold;">Склад замовлення:</div>
-                            ${itemsListHtml}
-                        </div>
-
-                        <div style="display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:10px; background:rgba(255,255,255,0.02); padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
-                            ${archiveHint}
-                            <button class="btn" style="padding:6px 12px; font-size:0.8rem; border-color:#da70d6; color:#da70d6; width:auto;" onclick="changeOrderStatus('${ord.id}', 'archived')">📥 Перенести в архів</button>
-                            <button class="delete-admin-btn" style="position:static; padding:6px 12px;" onclick="deleteOrderItem('${ord.id}')">Видалити запис</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
         async function toggleShopStatus() {
             const checkbox = document.getElementById('shop-active-checkbox');
             const newStatus = !checkbox.checked; 
@@ -1785,6 +1643,120 @@
                 try { await db.collection("merch").doc(id).delete(); } 
                 catch(e) { console.error("Помилка видалення товару:", e); }
             }
+        }
+
+        function setOrdersFilter(filterType) {
+            currentOrdersFilter = filterType;
+            document.querySelectorAll('.orders-sub-btn').forEach(btn => btn.classList.remove('active'));
+            if(filterType === 'active') document.getElementById('sub-btn-active').classList.add('active');
+            if(filterType === 'sent') document.getElementById('sub-btn-sent').classList.add('active');
+            if(filterType === 'archive') document.getElementById('sub-btn-archive').classList.add('active');
+            renderOrdersList();
+        }
+
+        function renderOrdersList() {
+            const ordersBox = document.getElementById('box-for-orders'); 
+            if(!ordersBox) return;
+            ordersBox.innerHTML = "";
+            
+            let filteredOrders = globalOrdersData.filter(ord => {
+                let status = ord.status || 'new';
+                if (currentOrdersFilter === 'active') {
+                    return status === 'new' || status === 'on_review' || status === 'accepted';
+                } else if (currentOrdersFilter === 'sent') {
+                    return status === 'sent' || status === 'delivered';
+                } else if (currentOrdersFilter === 'archive') {
+                    return status === 'archived' || status === 'cancelled';
+                }
+                return true;
+            });
+
+            if(filteredOrders.length === 0) { 
+                ordersBox.innerHTML = `<div class="no-msg">У цій підгрупі замовлень немає</div>`; 
+                return; 
+            }
+
+            filteredOrders.forEach(ord => {
+                let status = ord.status || 'new';
+                let sLabel = status === 'new' ? 'Нове' : 
+                             status === 'on_review' ? 'На перевірці ⏳' : 
+                             status === 'accepted' ? 'Прийнято ✓' : 
+                             status === 'sent' ? 'Відправлено 📦' : 
+                             status === 'delivered' ? 'Доставлено 🎉' : 
+                             status === 'cancelled' ? 'Скасовано ✖' : 'В архіві 📂';
+
+                let sClass = status === 'new' || status === 'on_review' ? 'on_review' : 
+                             status === 'accepted' ? 'accepted' : 
+                             status === 'sent' ? 'sent' : 
+                             status === 'delivered' ? 'delivered' : 
+                             status === 'cancelled' ? 'cancelled' : 'archived';
+                
+                let itemsListHtml = '';
+                if(ord.items && Array.isArray(ord.items)) {
+                    ord.items.forEach(it => {
+                        let sizeMeta = it.size === 'Універсальний' ? '' : ` [Розмір: ${it.size}]`;
+                        itemsListHtml += `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem; padding-left:10px; border-left:2px solid var(--theme-color);">
+                            <span><b>${it.merchTitle}</b>${sizeMeta} x${it.quantity} шт</span>
+                            <span style="color:var(--theme-color); font-weight:bold;">${it.totalPrice} ₴</span>
+                        </div>`;
+                    });
+                } else if(ord.orderTextDetails) {
+                    itemsListHtml = `<pre style="font-family:inherit; font-size:0.9rem; margin-left:10px; color:#ccc;">${ord.orderTextDetails}</pre>`;
+                }
+
+                let promoHtml = (ord.promoCode && ord.promoCode !== "Не застосовано") ? `<div style="font-size:0.85rem; color:#00ffcc; margin-bottom:8px;">🎟️ Промокод: <b>${ord.promoCode}</b></div>` : '';
+                let paymentMethodHtml = ord.paymentMethod ? `<div style="font-size:0.9rem; color:#fff; margin-bottom:8px;">💳 <b>Оплата:</b> ${ord.paymentMethod}</div>` : '';
+                
+                let paymentProofHtml = ord.paymentProof ? `<button class="btn" style="margin-top:10px; padding:6px 12px; width:auto; border-color:#00ffcc; color:#00ffcc;" onclick="openFullImage('${ord.paymentProof}')">📸 Переглянути квитанцію</button>` : '';
+                let archiveHint = status === 'delivered' ? `<span style="font-size:0.75rem; color:#aaa; margin-left:10px;">(Можна в архів)</span>` : '';
+
+                ordersBox.innerHTML += `
+                    <div class='msg-item' style="border-left: 4px solid var(--theme-color);">
+                        <div class='meta-line' style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                            <span>🛒 Замовлення від ${ord.time || 'Не вказано'}</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:0.85rem; color:#ccc;">Статус:</span>
+                                <select class="status-select ${sClass}" onchange="changeOrderStatus('${ord.id}', this.value)">
+                                    <option value="new" ${status === 'new' ? 'selected' : ''}>Нове</option>
+                                    <option value="on_review" ${status === 'on_review' ? 'selected' : ''}>На перевірці</option>
+                                    <option value="accepted" ${status === 'accepted' ? 'selected' : ''}>Прийнято</option>
+                                    <option value="sent" ${status === 'sent' ? 'selected' : ''}>Відправлено</option>
+                                    <option value="delivered" ${status === 'delivered' ? 'selected' : ''}>Доставлено</option>
+                                    <option value="cancelled" ${status === 'cancelled' ? 'selected' : ''}>Скасовано</option>
+                                    <option value="archived" ${status === 'archived' ? 'selected' : ''}>В архіві</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:15px; margin-bottom:15px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:15px; margin-top:15px;">
+                            <div>
+                                <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">📍 Дані доставки:</h4>
+                                <p class="msg-text">👤 <b>ПІБ:</b> ${ord.name}</p>
+                                <p class="msg-text">📞 <b>Тел:</b> ${ord.phone}</p>
+                                <p class="msg-text">📍 <b>Адреса:</b> ${ord.address}</p>
+                            </div>
+                            <div>
+                                <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">💰 Оплата та підтвердження:</h4>
+                                ${paymentMethodHtml}
+                                ${promoHtml}
+                                <p class="msg-text" style="font-size:1.05rem;"><b>До сплати:</b> <span style="color:var(--theme-color); font-weight:bold;">${ord.totalPrice} ₴</span></p>
+                                ${paymentProofHtml}
+                            </div>
+                        </div>
+
+                        <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:6px; margin-bottom:15px;">
+                            <div style="font-size:0.85rem; color:#aaa; margin-bottom:8px; font-weight:bold;">Склад замовлення:</div>
+                            ${itemsListHtml}
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:10px; background:rgba(255,255,255,0.02); padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
+                            ${archiveHint}
+                            <button class="btn" style="padding:6px 12px; font-size:0.8rem; border-color:#da70d6; color:#da70d6; width:auto;" onclick="changeOrderStatus('${ord.id}', 'archived')">📥 Перенести в архів</button>
+                            <button class="delete-admin-btn" style="position:static; padding:6px 12px;" onclick="deleteOrderItem('${ord.id}')">Видалити запис</button>
+                        </div>
+                    </div>`;
+            });
         }
 
         async function changeOrderStatus(id, newStatus) {
