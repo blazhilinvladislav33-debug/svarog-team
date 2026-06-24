@@ -781,6 +781,7 @@
                     lastUpdate: Date.now()
                 });
                 input.value = '';
+                logAdminAction('chat', `Відповів у чаті ${chatId}`); // ДОДАНО
             } catch(e) {
                 console.error('Помилка відправки:', e);
                 alert('Помилка відправки повідомлення: ' + e.message);
@@ -798,6 +799,7 @@
                     if(currentSelectedChatId === chatId) {
                         currentSelectedChatId = null; 
                     }
+                    logAdminAction('chat', `Завершив сесію чату ${chatId}`); // ДОДАНО
                 } catch(e) {
                     console.error("Помилка закриття чату:", e);
                 }
@@ -851,6 +853,7 @@
             if(confirm("Ви дійсно хочете безповоротно видалити це замовлення з бази?")) {
                 try {
                     await db.collection("orders").doc(id).delete();
+                    logAdminAction('orders', `Безповоротно видалив замовлення ${id}`); // ДОДАНО
                 } catch(e) { console.error(e); }
             }
         }
@@ -878,6 +881,7 @@
                     isSingleUse: isSingleUse
                 });
                 alert("✓ Промокод успішно створено!");
+                logAdminAction('shop', `Створив промокод ${code} (-${discount}%)`); // ДОДАНО
                 codeInput.value = ""; discountInput.value = ""; singleUseCheckbox.checked = false;
             } catch (error) { console.error("Помилка:", error); }
         }
@@ -906,8 +910,10 @@
 
         async function deletePromoCode(id) {
             if(confirm(`Ви впевнені, що хочете видалити промокод ${id}?`)) {
-                try { await db.collection("promocodes").doc(id).delete(); } 
-                catch(e) { console.error("Помилка видалення:", e); }
+                try { 
+                    await db.collection("promocodes").doc(id).delete(); 
+                    logAdminAction('shop', `Видалив промокод ${id}`); // ДОДАНО
+                } catch(e) { console.error("Помилка видалення:", e); }
             }
         }
 
@@ -969,62 +975,53 @@
         }
 
         function initFirebaseRealtimeStreams() {
-            // Чати
             unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
                 globalChatsData = {};
                 snapshot.forEach(doc => { globalChatsData[doc.id] = doc.data(); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
-            // Заявки
             unsubscribeFeedback = db.collection("feedback").onSnapshot(snapshot => {
                 globalFeedbackData = [];
                 snapshot.forEach(doc => { globalFeedbackData.push({ id: doc.id, ...doc.data() }); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
-            // Волонтери
             unsubscribeVolunteers = db.collection("volunteers").onSnapshot(snapshot => {
                 globalVolunteersData = [];
                 snapshot.forEach(doc => { globalVolunteersData.push({ id: doc.id, ...doc.data() }); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
-            // Соцмережі
             unsubscribeSocials = db.collection("config").doc("socials").onSnapshot(doc => {
                 globalSocialNetworks = (doc.exists && doc.data().list) ? doc.data().list : [];
                 renderAdminSocialList();
             }, e => console.error(e));
 
-            // Новини
             unsubscribeNews = db.collection("news").orderBy("date", "desc").onSnapshot(snapshot => {
                 globalNewsData = [];
                 snapshot.forEach(doc => { globalNewsData.push({ id: doc.id, ...doc.data(), isReport: false }); });
                 renderAdminNewsChronicle();
             }, e => console.error(e));
             
-            // Звіти
             unsubscribeReports = db.collection("reports").orderBy("timestamp", "desc").onSnapshot(snapshot => {
                 globalReportsData = [];
                 snapshot.forEach(doc => { globalReportsData.push({ id: doc.id, ...doc.data(), isReport: true }); });
                 renderAdminNewsChronicle(); 
             }, e => console.error(e));
 
-            // Замовлення
             unsubscribeOrders = db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
                 globalOrdersData = [];
                 snapshot.forEach(doc => { globalOrdersData.push({ id: doc.id, ...doc.data() }); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
-            // Товари
             unsubscribeMerch = db.collection("merch").orderBy("timestamp", "desc").onSnapshot(snapshot => {
                 globalMerchData = [];
                 snapshot.forEach(doc => { globalMerchData.push({ id: doc.id, ...doc.data() }); });
                 renderMerchList();
             }, e => console.error(e));
 
-            // Магазин (Налаштування)
             unsubscribeConfig = db.collection("config").doc("shop").onSnapshot(doc => {
                 const data = doc.exists ? doc.data() : {};
                 const isActive = data.active !== undefined ? data.active : true; 
@@ -1042,14 +1039,12 @@
                 renderCategoriesAdmin(); populateCategorySelect();
             }, e => console.error(e));
 
-            // Промокоди
             unsubscribePromos = db.collection("promocodes").orderBy("created", "desc").onSnapshot(snapshot => {
                 globalPromocodes = [];
                 snapshot.forEach(doc => { globalPromocodes.push({ id: doc.id, ...doc.data() }); });
                 renderPromocodes();
             }, e => console.error(e));
 
-            // Реквізити
             unsubscribePaymentConfig = db.collection("config").doc("payment").onSnapshot(doc => {
                 if (doc.exists) {
                     const data = doc.data();
@@ -1064,7 +1059,6 @@
                 }
             }, e => console.error(e));
             
-            // Статистика
             unsubscribeStats = db.collection("config").doc("statistics").onSnapshot(doc => {
                 if (doc.exists) {
                     const data = doc.data();
@@ -1085,6 +1079,7 @@
                     targets: targets, funds: funds, missions: missions
                 }, { merge: true });
                 alert("✓ Статистику успішно оновлено на головній сторінці!");
+                logAdminAction('payment', `Оновив статистику (Цілі: ${targets}, Донати: ${funds}, Вильоти: ${missions})`); // ДОДАНО
             } catch(e) {
                 console.error(e); alert("Помилка збереження: " + e.message);
             }
@@ -1269,6 +1264,7 @@
                 try {
                     await db.collection(collectionName).doc(id).delete();
                     if(document.getElementById('edit-news-id').value === id) cancelNewsEditing();
+                    logAdminAction('news', `Видалив ${isReport ? 'звіт' : 'новину'} (ID: ${id})`); // ДОДАНО
                 } catch(e) { console.error("Помилка видалення:", e); }
             }
         }
@@ -1321,6 +1317,7 @@
             try {
                 await db.collection("config").doc("socials").set({ list: updatedList });
                 cancelSocEditing();
+                logAdminAction('payment', `Оновив соцмережу: ${name}`); // ДОДАНО
             } catch(e) { console.error("Помилка соцмережі:", e); }
         }
 
@@ -1346,6 +1343,7 @@
                 try { 
                     await db.collection("config").doc("socials").set({ list: updatedList }); 
                     if(document.getElementById('edit-soc-id').value === id) cancelSocEditing();
+                    logAdminAction('payment', `Видалив соцмережу з ID: ${id}`); // ДОДАНО
                 } catch(e) { console.error(e); }
             }
         }
@@ -1408,6 +1406,7 @@
                     await db.collection(collectionName).add({ ...postObject, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
                     alert("✓ Успішно опубліковано!");
                 }
+                logAdminAction('news', `Опублікував/Оновив ${publishType === 'report' ? 'звіт' : 'новину'}: "${title || 'Без назви'}"`); // ДОДАНО
                 cancelNewsEditing();
             } catch(err) {
                 console.error(err); alert("Помилка бази даних: " + err.message);
@@ -1449,7 +1448,10 @@
         async function toggleShopStatus() {
             const checkbox = document.getElementById('shop-active-checkbox');
             const newStatus = !checkbox.checked; 
-            try { await db.collection("config").doc("shop").set({ active: newStatus }, { merge: true }); } 
+            try { 
+                await db.collection("config").doc("shop").set({ active: newStatus }, { merge: true }); 
+                logAdminAction('shop', `Змінив статус магазину на: ${newStatus ? 'Увімкнено' : 'Вимкнено'}`); // ДОДАНО
+            } 
             catch(e) { console.error("Помилка зміни статусу магазину:", e); }
         }
 
@@ -1476,6 +1478,7 @@
             const newCats = [...globalCategories, val];
             try { 
                 await db.collection("config").doc("shop").set({ categories: newCats }, { merge: true }); 
+                logAdminAction('shop', `Додав категорію: ${val}`); // ДОДАНО
                 input.value = "";
             } catch(e) { console.error(e); }
         }
@@ -1485,6 +1488,7 @@
                 let currentCategories = globalCategories.filter(c => c !== catName);
                 try { 
                     await db.collection("config").doc("shop").set({ categories: currentCategories }, { merge: true }); 
+                    logAdminAction('shop', `Видалив категорію: ${catName}`); // ДОДАНО
                 } catch(e) { 
                     console.error(e); alert("Помилка видалення: " + e.message); 
                 }
@@ -1584,6 +1588,7 @@
                     await db.collection("merch").add(merchObject);
                     alert("✓ Товар успішно додано до вітрини!");
                 }
+                logAdminAction('shop', `Оновив/Додав товар: "${title}"`); // ДОДАНО
                 cancelMerchEditing();
             } catch(err) { console.error(err); alert("Помилка: " + err.message); }
         }
@@ -1640,7 +1645,10 @@
 
         async function deleteMerchItem(id) {
             if(confirm("Видалити цей товар з магазину?")) {
-                try { await db.collection("merch").doc(id).delete(); } 
+                try { 
+                    await db.collection("merch").doc(id).delete(); 
+                    logAdminAction('shop', `Видалив товар з ID: ${id}`); // ДОДАНО
+                } 
                 catch(e) { console.error("Помилка видалення товару:", e); }
             }
         }
@@ -1761,9 +1769,56 @@
 
         async function changeOrderStatus(id, newStatus) {
             isConfirmingStatus = true;
-            try { await db.collection("orders").doc(id).update({ status: newStatus }); } 
+            try { 
+                await db.collection("orders").doc(id).update({ status: newStatus }); 
+                logAdminAction('orders', `Змінив статус замовлення ${id} на "${newStatus}"`); // ДОДАНО
+            } 
             catch(e) { console.error(e); }
             finally { isConfirmingStatus = false; renderAllDynamicData(); }
+        }
+
+        async function savePaymentCredentials() {
+            const bankUrl = document.getElementById('new-donation-link-field').value.trim();
+            const cardNumber = document.getElementById('config-card-number').value.trim();
+            const cardName = document.getElementById('config-card-name').value.trim();
+
+            try {
+                await db.collection("config").doc("payment").set({
+                    bankUrl: bankUrl,
+                    cardNumber: cardNumber,
+                    cardName: cardName
+                }, { merge: true });
+                alert("✓ Платіжні дані успішно оновлено та синхронізовано!");
+                logAdminAction('payment', `Оновив платіжні реквізити (Банка/Карта)`); // ДОДАНО
+            } catch(e) {
+                console.error(e); alert("Помилка збереження: " + e.message);
+            }
+        }
+
+        function setLanguage(lang) {
+            localStorage.setItem('selectedLang', lang);
+            document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
+            document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.innerText.toLowerCase() === lang));
+        }
+
+        // ==========================================
+        // ФУНКЦІЯ ДЛЯ ЗАПИСУ ЛОГІВ ДЛЯ SUPERADMIN
+        // ==========================================
+        async function logAdminAction(actionCategory, actionDetails) {
+            const user = firebase.auth().currentUser;
+            if (!user) return; 
+
+            try {
+                await db.collection("admin_logs").add({
+                    adminEmail: user.email,
+                    actionType: actionCategory,
+                    details: actionDetails,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (e) {
+                console.error("Помилка запису логу: ", e);
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); });
