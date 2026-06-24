@@ -94,7 +94,7 @@
         .merch-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
         .merch-card:hover .merch-img-box img { transform: scale(1.08); }
         
-        .stock-badge { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); color: var(--theme-color); font-size: 0.8rem; font-weight: bold; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(var(--theme-color-rgb), 0.3); z-index: 2; }
+        .stock-badge { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); color: #777777; font-size: 0.8rem; font-weight: bold; padding: 4px 10px; border-radius: 6px; border: 1px solid #777777; z-index: 2; }
         .stock-badge.empty { color: #ff4a4a; border-color: #ff4a4a; }
         .sale-badge { position: absolute; top: 12px; left: 12px; background: #ff4a4a; color: #fff; font-size: 0.85rem; font-weight: bold; padding: 4px 10px; border-radius: 6px; z-index: 2; box-shadow: 0 4px 10px rgba(255, 74, 74, 0.4); }
 
@@ -287,7 +287,7 @@
                 
                 <div id="promo-block" style="display:none; margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="promo-code-input" class="form-input" placeholder="Промокод (якщо є)" style="text-transform: uppercase; padding: 8px 12px; font-size: 0.9rem;">
+                        <input type="text" id="promo-code-input" class="form-input" placeholder="Промокод / Сертифікат" style="text-transform: uppercase; padding: 8px 12px; font-size: 0.9rem;">
                         <button type="button" class="btn" style="width: auto; padding: 8px 15px; font-size: 0.9rem;" onclick="applyPromo()">Застосувати</button>
                     </div>
                     <div id="promo-message" style="font-size: 0.85rem; margin-top: 8px; font-weight: bold;"></div>
@@ -296,7 +296,7 @@
                 <div class="cart-total-box" id="cart-total-section" style="display:none;">
                     <div><span data-lang="ua">Разом до сплати:</span><span data-lang="en">Total sum:</span></div>
                     <div style="text-align: right;">
-                        <div id="cart-discount-sum" style="font-size: 0.9rem; color: #00ffcc; margin-bottom: 4px; display: none;"></div>
+                        <div id="cart-discount-sum" style="font-size: 0.9rem; color: #777777; margin-bottom: 4px; display: none;"></div>
                         <div class="cart-total-price" id="cart-total-sum">0 ₴</div>
                     </div>
                 </div>
@@ -697,7 +697,7 @@
                 
                 let stockBadge = '';
                 if (item.isPreorder) {
-                    stockBadge = `<div class="stock-badge" style="color:#00ffcc; border-color:#00ffcc; background:rgba(0,0,0,0.8);">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>`;
+                    stockBadge = `<div class="stock-badge" style="color:#777777; border-color:#777777; background:rgba(0,0,0,0.8);">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>`;
                 } else if (isOutOfStock) {
                     stockBadge = `<div class="stock-badge empty">${lang==='ua'?'Немає в наявності':'Out of stock'}</div>`;
                 }
@@ -735,7 +735,7 @@
                 if (isOutOfStock) {
                     buyBtnHtml = `<button class="buy-btn" disabled>${lang==='ua'?'Розпродано':'Sold out'}</button>`;
                 } else if (item.isPreorder) {
-                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')" style="border-color:#00ffcc; color:#00ffcc;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>`;
+                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')" style="border-color:#777777; color:#777777;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>`;
                 } else {
                     buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')">${lang==='ua'?'Додати в кошик 🛒':'Add to cart 🛒'}</button>`;
                 }
@@ -895,11 +895,22 @@
             try {
                 const doc = await db.collection('promocodes').doc(code).get();
                 if(doc.exists && doc.data().active) {
-                    let safeCodeName = doc.data().code || doc.id || "ПРОМОКОД";
+                    let data = doc.data();
+                    let safeCodeName = data.code || doc.id || "ПРОМОКОД";
                     
-                    currentPromo = { code: safeCodeName, discount: doc.data().discount }; 
-                    msg.style.color = '#00ffcc';
-                    msg.innerText = lang === 'ua' ? `Код застосовано! Знижка ${currentPromo.discount}%` : `Code applied! Discount ${currentPromo.discount}%`;
+                    currentPromo = { 
+                        code: safeCodeName, 
+                        type: data.type || (data.isCertificate ? 'certificate' : 'promo'),
+                        discount: data.discount || 0,
+                        fiatValue: data.fiatValue || 0
+                    }; 
+                    msg.style.color = '#777777';
+                    
+                    if (currentPromo.type === 'certificate') {
+                        msg.innerText = lang === 'ua' ? `Сертифікат застосовано! Номінал ${currentPromo.fiatValue} ₴` : `Certificate applied! Value ${currentPromo.fiatValue} ₴`;
+                    } else {
+                        msg.innerText = lang === 'ua' ? `Код застосовано! Знижка ${currentPromo.discount}%` : `Code applied! Discount ${currentPromo.discount}%`;
+                    }
                     renderCartModalContent(); 
                 } else {
                     currentPromo = null;
@@ -941,7 +952,7 @@
                 let sizeLabelMeta = item.size === 'Універсальний' ? '' : `${lang==='ua'?'Розмір':'Size'}: ${item.size} | `;
                 
                 let titleHtml = item.merchTitle.includes('[ПЕРЕДЗАМОВЛЕННЯ]') 
-                    ? item.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#00ffcc;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
+                    ? item.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#777777;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
                     : item.merchTitle;
 
                 container.innerHTML += `
@@ -959,9 +970,18 @@
 
             let finalSum = baseTotalSum;
             if(currentPromo) {
-                let discountAmount = baseTotalSum * (currentPromo.discount / 100);
+                let discountAmount = 0;
+                if (currentPromo.type === 'certificate') {
+                    discountAmount = currentPromo.fiatValue;
+                    discountSumEl.innerText = `Сертифікат: -${discountAmount} ₴`;
+                } else {
+                    discountAmount = baseTotalSum * (currentPromo.discount / 100);
+                    discountSumEl.innerText = `Знижка (${currentPromo.discount}%): -${Math.round(discountAmount)} ₴`;
+                }
+                
                 finalSum = baseTotalSum - discountAmount;
-                discountSumEl.innerText = `Знижка (${currentPromo.discount}%): -${Math.round(discountAmount)} ₴`;
+                if (finalSum < 0) finalSum = 0; // Сума не може бути від'ємною
+                
                 discountSumEl.style.display = 'block';
             } else {
                 discountSumEl.style.display = 'none';
@@ -1006,7 +1026,12 @@
             let baseTotal = shoppingCart.reduce((sum, item) => sum + item.totalPrice, 0);
             let finalSum = baseTotal;
             if(currentPromo) {
-                finalSum = baseTotal - (baseTotal * (currentPromo.discount / 100));
+                if(currentPromo.type === 'certificate') {
+                    finalSum = baseTotal - currentPromo.fiatValue;
+                } else {
+                    finalSum = baseTotal - (baseTotal * (currentPromo.discount / 100));
+                }
+                if (finalSum < 0) finalSum = 0;
             }
             finalSum = Math.round(finalSum);
 
@@ -1037,7 +1062,7 @@
                         if (pDoc.exists) {
                             pDocData = pDoc.data();
                             if (pDocData.active === false) {
-                                throw new Error(lang === 'ua' ? "Цей промокод вже був використаний!" : "This promo code has already been used!");
+                                throw new Error(lang === 'ua' ? "Цей код вже був використаний!" : "This code has already been used!");
                             }
                         }
                     }
@@ -1120,7 +1145,15 @@
                 const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; 
                 const chatId = '647245223';
                 
-                let tgPromoText = currentPromo ? `🎟 <b>Промокод:</b> ${currentPromo.code} (-${currentPromo.discount}%)\n` : '';
+                let tgPromoText = '';
+                if(currentPromo) {
+                    if (currentPromo.type === 'certificate') {
+                        tgPromoText = `🎁 <b>Сертифікат:</b> ${currentPromo.code} (-${currentPromo.fiatValue} ₴)\n`;
+                    } else {
+                        tgPromoText = `🎟 <b>Промокод:</b> ${currentPromo.code} (-${currentPromo.discount}%)\n`;
+                    }
+                }
+
                 let itemsListFormatted = shoppingCart.map(i => `• ${i.merchTitle} [${i.size}] — ${i.quantity} шт. | ${i.totalPrice} ₴`).join('\n');
                 
                 let tgMessage = `📦 <b>НОВЕ ЗАМОВЛЕННЯ!</b>\n\n` +
