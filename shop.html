@@ -565,14 +565,16 @@
             if (!item) return;
             const sizeSelect = document.getElementById(`size-${itemId}`);
             let selectedSize = sizeSelect ? sizeSelect.value : "Універсальний";
-            let maxStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[selectedSize] || 0) : parseInt(item.stock || 0);
+            
+            // Якщо передзамовлення, запас не обмежений
+            let maxStock = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[selectedSize] || 0) : parseInt(item.stock || 0));
             
             const valEl = document.getElementById(`qty-val-${itemId}`);
             let current = parseInt(valEl.innerText) || 0;
             let newQty = current + amount;
             if (newQty < 1) newQty = 1;
             if (newQty > maxStock) newQty = maxStock;
-            if (maxStock <= 0) newQty = 0;
+            if (maxStock <= 0 && !item.isPreorder) newQty = 0;
             valEl.innerText = newQty;
         }
 
@@ -581,12 +583,14 @@
             if (!item) return;
             const sizeSelect = document.getElementById(`size-${itemId}`);
             let selectedSize = sizeSelect ? sizeSelect.value : "Універсальний";
-            let sStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[selectedSize] || 0) : 0;
+            
+            let sStock = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[selectedSize] || 0) : 0);
+            
             const qtyValEl = document.getElementById(`qty-val-${itemId}`);
             if (qtyValEl) {
                 let current = parseInt(qtyValEl.innerText);
-                if (sStock === 0) qtyValEl.innerText = 0;
-                else if (current > sStock || current === 0) qtyValEl.innerText = 1;
+                if (sStock === 0 && !item.isPreorder) qtyValEl.innerText = 0;
+                else if ((current > sStock || current === 0) && !item.isPreorder) qtyValEl.innerText = 1;
             }
         }
 
@@ -615,10 +619,14 @@
                     totalStock = parseInt(item.stock || 0);
                 }
 
-                let isOutOfStock = totalStock <= 0;
-                let stockBadge = isOutOfStock 
-                    ? `<div class="stock-badge empty">${lang==='ua'?'Немає в наявності':'Out of stock'}</div>` 
-                    : ``; 
+                let isOutOfStock = !item.isPreorder && totalStock <= 0;
+                
+                let stockBadge = '';
+                if (item.isPreorder) {
+                    stockBadge = `<div class="stock-badge" style="color:#00ffcc; border-color:#00ffcc; background:rgba(0,0,0,0.8);">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>`;
+                } else if (isOutOfStock) {
+                    stockBadge = `<div class="stock-badge empty">${lang==='ua'?'Немає в наявності':'Out of stock'}</div>`;
+                }
 
                 let hasDiscount = item.discountPrice && item.discountPrice < item.price;
                 let priceHtml = hasDiscount 
@@ -634,24 +642,29 @@
 
                 if(!isUniversalSize) {
                     let firstSize = item.sizes[0];
-                    initialMaxStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[firstSize] || 0) : 0;
+                    initialMaxStock = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[firstSize] || 0) : 0);
                     
                     sizeSelectHtml = `<select id="size-${item.id}" class="merch-select" onchange="updateQtyMax('${item.id}')">` + 
                         item.sizes.map(s => {
-                            let sStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[s] || 0) : 0;
-                            let disabledAttr = sStock <= 0 ? 'disabled' : '';
-                            let outOfStockLabel = sStock <= 0 ? (lang === 'ua' ? ' (Немає)' : ' (Out of stock)') : '';
+                            let sStock = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[s] || 0) : 0);
+                            let disabledAttr = (sStock <= 0 && !item.isPreorder) ? 'disabled' : '';
+                            let outOfStockLabel = (sStock <= 0 && !item.isPreorder) ? (lang === 'ua' ? ' (Немає)' : ' (Out of stock)') : '';
                             return `<option value="${s}" ${disabledAttr}>${lang==='ua'?'Розмір:':'Size:'} ${s}${outOfStockLabel}</option>`;
                         }).join('') + 
                     `</select>`;
                 } else {
-                    initialMaxStock = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock["Універсальний"] || 0) : totalStock;
+                    initialMaxStock = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock["Універсальний"] || 0) : totalStock);
                     sizeSelectHtml = ''; 
                 }
 
-                let buyBtnHtml = isOutOfStock 
-                    ? `<button class="buy-btn" disabled>${lang==='ua'?'Розпродано':'Sold out'}</button>`
-                    : `<button class="buy-btn" onclick="addToCart('${item.id}')">${lang==='ua'?'Додати в кошик 🛒':'Add to cart 🛒'}</button>`;
+                let buyBtnHtml = '';
+                if (isOutOfStock) {
+                    buyBtnHtml = `<button class="buy-btn" disabled>${lang==='ua'?'Розпродано':'Sold out'}</button>`;
+                } else if (item.isPreorder) {
+                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')" style="border-color:#00ffcc; color:#00ffcc;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>`;
+                } else {
+                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')">${lang==='ua'?'Додати в кошик 🛒':'Add to cart 🛒'}</button>`;
+                }
 
                 grid.innerHTML += `
                     <div class="merch-card">
@@ -668,7 +681,7 @@
                                 ${sizeSelectHtml}
                                 <div class="qty-container" id="qty-container-${item.id}" style="${isUniversalSize ? 'width: 100%;' : ''}">
                                     <button type="button" class="qty-btn" onclick="adjustGridQty('${item.id}', -1)">−</button>
-                                    <span class="qty-val" id="qty-val-${item.id}">${initialMaxStock > 0 ? 1 : 0}</span>
+                                    <span class="qty-val" id="qty-val-${item.id}">${initialMaxStock > 0 || item.isPreorder ? 1 : 0}</span>
                                     <button type="button" class="qty-btn" onclick="adjustGridQty('${item.id}', 1)">+</button>
                                 </div>
                             </div>
@@ -686,19 +699,22 @@
             let sizeSelect = document.getElementById(`size-${item.id}`);
             if(sizeSelect && sizeSelect.tagName === 'SELECT') { size = sizeSelect.value; }
 
-            let itemStockForSize = (typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[size] || 0) : parseInt(item.stock || 0);
+            let itemStockForSize = item.isPreorder ? 99 : ((typeof item.stock === 'object' && item.stock) ? parseInt(item.stock[size] || 0) : parseInt(item.stock || 0));
 
             let qtyValEl = document.getElementById(`qty-val-${item.id}`);
             let qty = parseInt(qtyValEl.innerText);
-            if(qty < 1 || qty > itemStockForSize || itemStockForSize <= 0) {
+            
+            if((qty < 1 || qty > itemStockForSize || itemStockForSize <= 0) && !item.isPreorder) {
                 showToast(localStorage.getItem('selectedLang') === 'en' ? "Incorrect quantity or out of stock!" : "Неправильна кількість або немає в наявності!"); return;
             }
 
             let actualPrice = (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price;
             let existingItemIndex = shoppingCart.findIndex(cartItem => cartItem.merchId === item.id && cartItem.size === size);
             
+            let finalTitle = item.isPreorder ? `[ПЕРЕДЗАМОВЛЕННЯ] ${item.title}` : item.title;
+
             if (existingItemIndex > -1) {
-                if(shoppingCart[existingItemIndex].quantity + qty > itemStockForSize) {
+                if((shoppingCart[existingItemIndex].quantity + qty > itemStockForSize) && !item.isPreorder) {
                     showToast(localStorage.getItem('selectedLang') === 'en' ? "Not enough stock!" : "Недостатньо товару на складі!"); return;
                 }
                 shoppingCart[existingItemIndex].quantity += qty;
@@ -707,12 +723,13 @@
                 shoppingCart.push({
                     cartId: Date.now().toString(), 
                     merchId: item.id,
-                    merchTitle: item.title,
+                    merchTitle: finalTitle,
                     image: item.image,
                     price: actualPrice,
                     size: size,
                     quantity: qty,
-                    totalPrice: actualPrice * qty
+                    totalPrice: actualPrice * qty,
+                    isPreorder: item.isPreorder || false
                 });
             }
 
@@ -832,12 +849,16 @@
                 let imgHtml = item.image ? `<img src="${item.image}" class="cart-item-img">` : `<div class="cart-item-img" style="display:flex; justify-content:center; align-items:center; font-size:0.7rem;">No IMG</div>`;
                 
                 let sizeLabelMeta = item.size === 'Універсальний' ? '' : `${lang==='ua'?'Розмір':'Size'}: ${item.size} | `;
+                
+                let titleHtml = item.merchTitle.includes('[ПЕРЕДЗАМОВЛЕННЯ]') 
+                    ? item.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#00ffcc;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
+                    : item.merchTitle;
 
                 container.innerHTML += `
                     <div class="cart-item">
                         ${imgHtml}
                         <div class="cart-item-info">
-                            <div class="cart-item-title">${item.merchTitle}</div>
+                            <div class="cart-item-title">${titleHtml}</div>
                             <div class="cart-item-meta">${sizeLabelMeta}${lang==='ua'?'К-сть':'Qty'}: ${item.quantity} шт</div>
                             <div class="cart-item-price">${item.totalPrice} ₴</div>
                         </div>
@@ -932,19 +953,25 @@
                     }
 
                     for(let obj of merchRefsAndData) {
-                        let currentStockObj = typeof obj.data.stock === 'object' ? { ...obj.data.stock } : {};
-                        let sizeKey = obj.cartItem.size;
-                        let currentStockForSize = parseInt(currentStockObj[sizeKey] || 0);
-                        
-                        if (currentStockForSize < obj.cartItem.quantity) {
-                            throw new Error(lang==='ua' ? `Недостатньо товару "${obj.cartItem.merchTitle}" (Розмір: ${sizeKey}) на складі!` : `Not enough stock for ${obj.cartItem.merchTitle} (Size: ${sizeKey})!`);
+                        // Якщо це НЕ передзамовлення, перевіряємо і віднімаємо сток
+                        if (!obj.cartItem.isPreorder) {
+                            let currentStockObj = typeof obj.data.stock === 'object' ? { ...obj.data.stock } : {};
+                            let sizeKey = obj.cartItem.size;
+                            let currentStockForSize = parseInt(currentStockObj[sizeKey] || 0);
+                            
+                            if (currentStockForSize < obj.cartItem.quantity) {
+                                throw new Error(lang==='ua' ? `Недостатньо товару "${obj.cartItem.merchTitle}" на складі!` : `Not enough stock for ${obj.cartItem.merchTitle}!`);
+                            }
+                            currentStockObj[sizeKey] = currentStockForSize - obj.cartItem.quantity;
+                            obj.newStockObj = currentStockObj;
                         }
-                        currentStockObj[sizeKey] = currentStockForSize - obj.cartItem.quantity;
-                        obj.newStockObj = currentStockObj;
                     }
 
                     for(let obj of merchRefsAndData) {
-                        transaction.update(obj.ref, { stock: obj.newStockObj });
+                        // Оновлюємо склад тільки для тих товарів, що не є передзамовленням
+                        if (!obj.cartItem.isPreorder) {
+                            transaction.update(obj.ref, { stock: obj.newStockObj });
+                        }
                     }
 
                     if (promoDocRef && pDocData && pDocData.isSingleUse === true) {
@@ -1044,9 +1071,6 @@
             }
         }
 
-        // ==========================================
-        // ОНОВЛЕНА ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE
-        // ==========================================
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
@@ -1058,7 +1082,6 @@
             startRealtimeChatListener();
         }
 
-        // Функція для відкриття чату та збереження його стану
         function openUserChat(e) {
             if(e) e.preventDefault();
             if(navMenu) navMenu.classList.remove('active');
@@ -1068,7 +1091,6 @@
             renderUserChat();
         }
 
-        // Функція для закриття чату
         function closeUserChat() {
             document.getElementById('user-chat-window').style.display = 'none';
             localStorage.setItem('svarogChatIsOpen', 'false');
@@ -1091,7 +1113,6 @@
             const lang = localStorage.getItem('selectedLang') || 'ua';
             let myChat = myChatData || { messages: [], status: 'active' };
 
-            // Перевірка на автовидалення закритого чату (5 хвилин)
             if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
                 const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
                 if (Date.now() > clearTime) {
@@ -1111,7 +1132,6 @@
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${msg.sender}`;
                 if(msg.type === 'image') {
-                    // Коректне відкриття зображення у новому вікні
                     bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src=\\'${msg.text}\\'>')">`;
                 } else { 
                     bubble.innerText = msg.text; 
@@ -1165,7 +1185,6 @@
             updateCartUI(); 
             listenToActiveOrderStatus();
             
-            // Якщо чат був відкритий на іншій сторінці, відкриваємо його і тут
             if (localStorage.getItem('svarogChatIsOpen') === 'true') {
                 openUserChat();
             }
