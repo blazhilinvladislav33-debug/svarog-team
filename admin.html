@@ -25,7 +25,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Функція логування піднята наверх, щоб уникнути помилок ReferenceError
+        // Функція логування
         async function logAdminAction(actionCategory, actionDetails) {
             const user = firebase.auth().currentUser;
             if (!user) return; 
@@ -52,16 +52,22 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* ОПТИМІЗАЦІЯ ТІЛЬКИ ПІД ПК: Жорстка ширина, заборона стиснення */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-            position: relative; overflow-x: hidden;
+            position: relative; 
+            min-width: 1200px; /* Примусовий ПК-розмір */
+            overflow-x: auto;  /* Горизонтальний скрол на малих екранах */
             background-color: #121212;
             background-image: url('bg1.jpg'); background-attachment: fixed;
             background-position: center; background-repeat: no-repeat; background-size: cover;
         }
+        
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: -1; }
-        .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
+        
+        .navbar { width: 100%; min-width: 1200px; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
         .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .left-side { display: flex; align-items: center; gap: 20px; }
         .logo { color: #ffffff; text-decoration: none; font-weight: 900; letter-spacing: 1px; font-size: 1.1rem; }
@@ -153,11 +159,9 @@
         .cat-chip { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
         .cat-remove { color: #ff4a4a; cursor: pointer; font-weight: bold; margin-left: 5px; }
 
-        /* Стилі для варіацій кольору */
         .variant-block { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; margin-bottom: 10px; position: relative; }
         .variant-remove-btn { position: absolute; top: 10px; right: 10px; color: #ff4a4a; background: none; border: none; cursor: pointer; font-weight: bold; }
 
-        /* ВІЗУАЛЬНИЙ СЕРТИФІКАТ (ОНОВЛЕНИЙ ДИЗАЙН) */
         .cert-generator-zone { display: none; margin-top: 20px; text-align: center; width: 100%; font-family: 'Montserrat', sans-serif; }
         .cert-container-box { 
             width: 800px; height: 450px; 
@@ -185,21 +189,6 @@
         .footer-cert-text { margin-top: auto; font-size: 0.85rem; color: #aaa; width: 100%; border-top: 1px solid #333; padding-top: 15px; font-style: italic; line-height: 1.4; position: relative; z-index: 2; }
         
         [data-lang="en"] { display: none; }
-
-        @media (max-width: 768px) {
-            .main-content { padding: 10px; }
-            .container { padding: 25px 15px; }
-            h1 { font-size: 1.4rem; }
-            .tabs-header { gap: 4px; padding-bottom: 10px; }
-            .tab-button { min-width: 65px; padding: 8px 2px; font-size: 0.65rem; }
-            .chat-admin-layout { position: relative; height: 430px; }
-            .chat-sessions-list { width: 100%; border-right: none; padding-right: 0; }
-            .chat-workspace { display: none; width: 100%; }
-            .superadmin-grid { flex-direction: column; }
-            .edit-news-btn { right: 85px; }
-            .merch-grid { grid-template-columns: 1fr; }
-            .cert-container-box { width: 100%; height: auto; padding: 20px; }
-        }
     </style>
 </head>
 <body>
@@ -590,6 +579,50 @@
     </div>
 
     <script>
+        // ФУНКЦІЯ ПЕРЕМИКАННЯ ВКЛАДОК (ДОДАНО ДЛЯ ПРАВИЛЬНОЇ РОБОТИ)
+        function switchTab(tabId, btnElement) {
+            // Приховуємо всі вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Знімаємо клас активності з усіх кнопок
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Активуємо обрану вкладку
+            document.getElementById(tabId).classList.add('active');
+            if(btnElement) btnElement.classList.add('active');
+            
+            currentTab = tabId;
+        }
+
+        // ЗАГЛУШКА ДЛЯ setLanguage (щоб не було помилок в консолі при старті)
+        function setLanguage(lang) {
+            localStorage.setItem('selectedLang', lang);
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            // Активувати правильну кнопку
+            if(lang === 'ua') {
+                document.querySelectorAll('.lang-btn')[0].classList.add('active');
+            } else {
+                document.querySelectorAll('.lang-btn')[1].classList.add('active');
+            }
+        }
+        
+        // ЗАГЛУШКА ДЛЯ initBadges 
+        function initBadges() {
+            console.log("Badges initialized");
+        }
+
+        // ЗАГЛУШКА ДЛЯ updateBadgesLogic 
+        function updateBadgesLogic() {
+            console.log("Badges updated");
+        }
+        
+        // ЗАГЛУШКИ ДЛЯ КАТЕГОРІЙ МАГАЗИНУ
+        function renderCategoriesAdmin() {}
+        function populateCategorySelect() {}
+
         let currentSelectedChatId = null;
         let isConfirmingStatus = false;
         let currentTab = 'active-chats-tab';
@@ -1092,8 +1125,8 @@
             
             html2canvas(element, {
                 backgroundColor: null, 
-                scale: 2,             
-                useCORS: true         
+                scale: 2,              
+                useCORS: true          
             }).then(canvas => {
                 const image = canvas.toDataURL("image/png");
                 const link = document.createElement('a');
