@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script>
         // Конфігурація вашого проєкту Firebase
@@ -25,6 +26,8 @@
     </script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;900&display=swap');
+
         /* ГЛОБАЛЬНІ ЗМІННІ ДЛЯ НОВОГО КОЛЬОРУ */
         :root {
             --theme-color: #f0b48c;
@@ -133,9 +136,34 @@
         .cat-chip { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
         .cat-remove { color: #ff4a4a; cursor: pointer; font-weight: bold; margin-left: 5px; }
 
-        /* Стилі для варіацій кольору (новий функціонал) */
+        /* Стилі для варіацій кольору */
         .variant-block { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; margin-bottom: 10px; position: relative; }
         .variant-remove-btn { position: absolute; top: 10px; right: 10px; color: #ff4a4a; background: none; border: none; cursor: pointer; font-weight: bold; }
+
+        /* ВІЗУАЛЬНИЙ СЕРТИФІКАТ / ПРОМОКОД */
+        .cert-generator-zone { display: none; margin-top: 20px; text-align: center; width: 100%; }
+        .cert-container-box { 
+            width: 800px; height: 450px; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%) !important;
+            color: #fff; padding: 30px; position: relative;
+            border: 2px solid var(--theme-color); border-radius: 15px;
+            box-shadow: inset 0 0 35px 5px rgba(240, 180, 140, 0.15), 0 15px 40px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            box-sizing: border-box; font-family: 'Montserrat', sans-serif;
+            margin: 0 auto 20px;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        .header-logos { display: flex; gap: 30px; margin-bottom: 20px; align-items: center; justify-content: center; }
+        .logo-main { width: 90px; height: auto; }
+        .logo-team { width: 180px; height: auto; }
+        .cert-container-box h2 { font-size: 2rem; color: var(--theme-color); text-transform: uppercase; margin: 5px 0; letter-spacing: 2px; font-weight: 900; }
+        .promo-wrapper-block { margin: 25px 0; display: flex; flex-direction: column; align-items: center; }
+        .code-label-text { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        .code-box-style { padding: 15px 40px; border: 2px solid var(--theme-color); border-radius: 8px; box-shadow: 0 0 10px 5px rgba(240, 180, 140, 0.15); background: rgba(0, 0, 0, 0.3); }
+        .code-val-text { font-size: 2.2rem; font-weight: 900; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.5);}
+        .cert-code { background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 8px; font-family: monospace; font-size: 1.2rem; color: #00ffcc; letter-spacing: 2px; border: 1px dashed rgba(255,255,255,0.2); display: inline-block; margin-bottom: 15px; }
+        .footer-cert-text { margin-top: auto; font-size: 0.85rem; color: #aaa; width: 100%; border-top: 1px solid #333; padding-top: 15px; font-style: italic; line-height: 1.4; }
 
         @media (max-width: 768px) {
             .main-content { padding: 10px; }
@@ -149,6 +177,7 @@
             .superadmin-grid { flex-direction: column; }
             .edit-news-btn { right: 85px; }
             .merch-grid { grid-template-columns: 1fr; }
+            .cert-container-box { width: 100%; height: auto; padding: 20px; }
         }
     </style>
 </head>
@@ -168,7 +197,7 @@
     <div class="main-content">
         <div class="container" id="login-card" style="display: none;">
             <h1 id="login-title-text" data-lang="ua">Вхід в панель</h1>
-            <h1 id="login-title-text-en" data-lang="en">Admin Login</h1>
+            <h1 id="login-title-text-en" data-lang="en" style="display:none;">Admin Login</h1>
             <form onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <input type="email" id="user-email" class="form-input" placeholder="Email адміністратора" required autocomplete="email">
@@ -339,8 +368,34 @@
                         <div class="form-group">
                             <input type="number" id="promo-value-input" class="form-input" placeholder="Знижка у % (напр: 10)">
                         </div>
-                        
+
                         <button class="btn" onclick="createPromoCode()">Створити купон</button>
+                        
+                        <div class="cert-generator-zone" id="cert-preview-box">
+                            <h3 style="margin:20px 0 10px; color:var(--theme-color); font-size:1rem; text-align:center;">Попередній перегляд:</h3>
+                            <div class="cert-container-box" id="certificate-card-element">
+                                <div class="header-logos">
+                                    <img src="logo.png" class="logo-main" alt="Logo">
+                                    <img src="SvarogTeam.png" class="logo-team" alt="SVAROG TEAM">
+                                </div>
+                                <h2 id="cert-display-title">Сертифікат підтримки</h2>
+                                <div class="promo-wrapper-block">
+                                    <div class="code-label-text" id="cert-display-label">ВАШ ПРОМОКОД</div>
+                                    <div class="code-box-style">
+                                        <div class="code-val-text" id="cert-display-value">0 ₴</div>
+                                    </div>
+                                </div>
+                                <div class="cert-code" id="cert-display-code">CODE</div>
+                                <div class="footer-cert-text">
+                                    Ми щиро дякуємо за вашу небайдужість та фінансову допомогу. Ваш внесок — це не просто цифри, це наші очі в небі, які наближають неминучу перемогу SVAROG TEAM над ворогом.
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:10px; justify-content:center;">
+                                <button class="btn" style="width: auto; border-color:#00ffcc; color:#00ffcc;" onclick="downloadCertificatePNG()">💾 Завантажити PNG</button>
+                                <button class="btn" style="width: auto; border-color:#ff4a4a; color:#ff4a4a;" onclick="document.getElementById('cert-preview-box').style.display='none'">Приховати</button>
+                            </div>
+                        </div>
+
                     </div>
                     
                     <div class="admin-accounts-list" style="flex: 2;">
@@ -515,6 +570,7 @@
         let currentTab = 'active-chats-tab';
         let currentOrdersFilter = 'active'; 
         let isSuperadminSession = false;
+        
         let newsPhotoBase64 = "";
         
         // Змінні для товарів магазину
@@ -824,7 +880,7 @@
                     lastUpdate: Date.now()
                 });
                 input.value = '';
-                logAdminAction('chat', `Відповів у чаті ${chatId}`); // ДОДАНО
+                logAdminAction('chat', `Відповів у чаті ${chatId}`); 
             } catch(e) {
                 console.error('Помилка відправки:', e);
                 alert('Помилка відправки повідомлення: ' + e.message);
@@ -842,7 +898,7 @@
                     if(currentSelectedChatId === chatId) {
                         currentSelectedChatId = null; 
                     }
-                    logAdminAction('chat', `Завершив сесію чату ${chatId}`); // ДОДАНО
+                    logAdminAction('chat', `Завершив сесію чату ${chatId}`); 
                 } catch(e) {
                     console.error("Помилка закриття чату:", e);
                 }
@@ -975,18 +1031,20 @@
         }
 
         // ==========================================
-        // ПРОМОКОДИ ТА СЕРТИФІКАТИ
+        // ПРОМОКОДИ ТА СЕРТИФІКАТИ (ОНОВЛЕНІ СТИЛІ КАРТКИ)
         // ==========================================
         function togglePromoType() {
             const type = document.getElementById('promo-type-select').value;
             const valInput = document.getElementById('promo-value-input');
             const codeInput = document.getElementById('promo-code-input');
-            if(type === 'discount') {
-                valInput.placeholder = "Знижка у % (напр: 10)";
-            } else {
+            const isCert = type === 'certificate';
+            
+            if(isCert) {
                 valInput.placeholder = "Сума сертифікату у ₴ (напр: 1000)";
                 // Автоматично генеруємо код, якщо поле пусте
                 if(!codeInput.value) codeInput.value = "CERT-" + Math.floor(1000 + Math.random() * 9000);
+            } else {
+                valInput.placeholder = "Знижка у % (напр: 10)";
             }
         }
 
@@ -1005,7 +1063,7 @@
 
             const isCert = typeSelect === 'certificate';
             // Сертифікати завжди одноразові. Промокоди можуть бути багаторазовими.
-            const isSingleUse = isCert ? true : false; // Якщо хочеш, можна додати чекбокс одноразовості для звичайних купонів
+            const isSingleUse = isCert ? true : false;
 
             try {
                 await db.collection("promocodes").doc(code).set({
@@ -1020,8 +1078,51 @@
                 alert(isCert ? "✓ Сертифікат успішно створено!" : "✓ Промокод успішно створено!");
                 logAdminAction('shop', `Створив ${isCert ? 'сертифікат' : 'промокод'} ${code} (${value}${isCert ? '₴' : '%'})`);
                 
+                showCertificatePreview(code, isCert ? 'certificate' : 'promo', value);
+                
                 codeInput.value = ""; valueInput.value = ""; 
             } catch (error) { console.error("Помилка:", error); }
+        }
+
+        function showCertificatePreview(code, type, value) {
+            const titleEl = document.getElementById('cert-display-title');
+            const labelEl = document.getElementById('cert-display-label');
+            const valueEl = document.getElementById('cert-display-value');
+            const codeEl = document.getElementById('cert-display-code');
+
+            if (type === 'certificate' || type === true) { 
+                titleEl.innerText = "Сертифікат підтримки";
+                labelEl.innerText = "СУМА СЕРТИФІКАТА";
+                valueEl.innerText = value + ' ₴';
+            } else {
+                titleEl.innerText = "Промокод на знижку";
+                labelEl.innerText = "ВАШ ПРОМОКОД";
+                valueEl.innerText = value + '%';
+            }
+
+            codeEl.innerText = code;
+            document.getElementById('cert-preview-box').style.display = 'block';
+            document.getElementById('promo-tab').scrollTop = 0;
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function downloadCertificatePNG() {
+            const element = document.getElementById('certificate-card-element');
+            const currentCode = document.getElementById('cert-display-code').innerText;
+            
+            html2canvas(element, {
+                backgroundColor: null, 
+                scale: 2,             
+                useCORS: true         
+            }).then(canvas => {
+                const image = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.download = `SVAROG_Card_${currentCode}.png`;
+                link.href = image;
+                link.click();
+            }).catch(err => {
+                console.error("Не вдалося сформувати фото картки:", err);
+            });
         }
 
         function renderPromocodes() {
@@ -1037,13 +1138,15 @@
                 const isCert = promo.type === 'certificate' || promo.isCertificate;
                 
                 const badgeHtml = isCert 
-                    ? `<span style="background:#da70d6; color:#fff; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">🎁 Сертифікат (Одноразовий)</span>`
-                    : (promo.isSingleUse ? `<span style="background:#ffaa00; color:#000; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">Одноразовий</span>` : `<span style="background:#00bfff; color:#000; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">Багаторазовий</span>`);
+                    ? `<span style="background:#da70d6; color:#fff; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">🎁 Сертифікат</span>`
+                    : (promo.isSingleUse ? `<span style="background:#ffaa00; color:#000; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">Одноразовий</span>` : `<span style="background:#777777; color:#fff; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">Багаторазовий</span>`);
                 
                 const valueText = isCert ? `<b style="color:#da70d6">${promo.fiatValue || promo.discount} ₴</b>` : `<b style="color:#00ffcc">${promo.discount}%</b>`;
                 const statusBadge = promo.active 
                     ? `<span style="color:#00ffcc; font-size:0.85rem; font-weight:bold;">✅ Активний</span>` 
                     : `<span style="color:#ff4a4a; font-size:0.85rem; font-weight:bold;">🛑 Використаний / Неактивний</span>`;
+
+                const showBtn = `<button class="export-btn" style="margin:0 5px 0 0; padding:4px 8px; font-size:0.75rem;" onclick="showCertificatePreview('${codeName}', '${isCert ? 'certificate' : 'promo'}', ${isCert ? (promo.fiatValue || promo.discount) : promo.discount})">Генерувати картку</button>`;
 
                 box.innerHTML += `
                     <div class="admin-user-card" style="display: flex; justify-content: space-between; align-items: center; border-left: 4px solid ${promo.active ? '#00ffcc' : '#ff4a4a'}">
@@ -1053,13 +1156,16 @@
                             </div>
                             <div style="font-size:0.85rem; color:#ccc; margin-top: 4px;">Номінал: ${valueText} | ${statusBadge}</div>
                         </div>
-                        <button class="delete-admin-btn" style="position: static;" onclick="deletePromoCode('${codeName}')">Видалити</button>
+                        <div style="display:flex; align-items:center;">
+                            ${showBtn}
+                            <button class="delete-admin-btn" style="position: static;" onclick="deletePromoCode('${codeName}')">Видалити</button>
+                        </div>
                     </div>`;
             });
         }
 
         async function deletePromoCode(id) {
-            if(confirm(`Ви впевнені, що хочете видалити купон/сертифікат ${id}?`)) {
+            if(confirm(`Ви впевнені, що хочете видалити цей код (${id})?`)) {
                 try { 
                     await db.collection("promocodes").doc(id).delete(); 
                     logAdminAction('shop', `Видалив промокод/сертифікат ${id}`); 
@@ -1110,7 +1216,7 @@
 
         function renderMerchVariantEditor() {
             const hasVariants = document.getElementById('merch-has-variants')?.checked;
-            if(!hasVariants) { generateSizeStockInputs(); return; }
+            if(!hasVariants) { generateSizeStockInputs(); return; } // Якщо режим звичайний - малюємо старі інпути
 
             const container = document.getElementById('variants-list-container');
             const sizesStr = document.getElementById('merch-sizes').value.trim();
@@ -1120,6 +1226,7 @@
             container.innerHTML = "";
 
             currentMerchVariants.forEach((variant, index) => {
+                // Генеруємо поля для розмірів КОЖНОГО варіанту
                 let stockInputsHtml = sizesArr.map(size => {
                     let baseVal = variant.stock ? (variant.stock[size] || 0) : 0;
                     let disabledStr = isPreorder ? 'disabled' : '';
@@ -1719,146 +1826,6 @@
                     if(document.getElementById('edit-soc-id').value === id) cancelSocEditing();
                     logAdminAction('payment', `Видалив соцмережу з ID: ${id}`);
                 } catch(e) { console.error(e); }
-            }
-        }
-
-        async function publishNewsItem() {
-            const publishType = document.getElementById('news-publish-type').value;
-            const mediaType = document.getElementById('news-media-type').value;
-            
-            const title = document.getElementById('news-title-field').value.trim();
-            const body = document.getElementById('news-body-field').value.trim();
-            const dateVal = document.getElementById('news-date-field').value || new Date().toISOString().split('T')[0];
-            const videoUrl = document.getElementById('news-video-url').value.trim();
-            
-            const hasBtn = document.getElementById('news-has-btn-checkbox').checked;
-            const editId = document.getElementById('edit-news-id').value;
-            
-            if(publishType === 'news' && !title) { alert("Заповніть заголовок новини!"); return; }
-            if(!body) { alert("Заповніть текст/опис!"); return; }
-            if(mediaType === 'video' && !videoUrl) { alert("Вставте посилання на відео!"); return; }
-
-            let btnText = ""; let btnUrl = "";
-            if(hasBtn) {
-                btnText = document.getElementById('news-btn-text-field').value.trim();
-                btnUrl = document.getElementById('news-btn-url-field').value.trim();
-                if(!btnText || !btnUrl) { alert("Заповніть налаштування кнопки дії або вимкніть її!"); return; }
-            }
-
-            let postObject = {};
-            let collectionName = "";
-
-            if (publishType === 'news') {
-                collectionName = "news";
-                postObject = {
-                    title: title, 
-                    body: body, 
-                    date: dateVal, 
-                    mediaType: mediaType,
-                    image: mediaType === 'image' ? (newsPhotoBase64 || null) : null,
-                    videoUrl: mediaType === 'video' ? videoUrl : null,
-                    hasButton: hasBtn, 
-                    btnText: btnText, 
-                    btnUrl: btnUrl
-                };
-            } else if (publishType === 'report') {
-                collectionName = "reports";
-                postObject = {
-                    description: body, 
-                    date: dateVal,
-                    mediaType: mediaType,
-                    image: mediaType === 'image' ? (newsPhotoBase64 || null) : null,
-                    videoUrl: mediaType === 'video' ? videoUrl : null,
-                };
-            }
-
-            try {
-                if(editId) {
-                    await db.collection(collectionName).doc(editId).set(postObject, { merge: true });
-                    alert("✓ Зміни успішно збережено в хмарі!");
-                } else {
-                    await db.collection(collectionName).add({ ...postObject, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-                    alert("✓ Успішно опубліковано!");
-                }
-                logAdminAction('news', `Опублікував/Оновив ${publishType === 'report' ? 'звіт' : 'новину'}: "${title || 'Без назви'}"`);
-                cancelNewsEditing();
-            } catch(err) {
-                console.error(err); alert("Помилка бази даних: " + err.message);
-            }
-        }
-
-        async function savePaymentCredentials() {
-            const bankUrl = document.getElementById('new-donation-link-field').value.trim();
-            const cardNumber = document.getElementById('config-card-number').value.trim();
-            const cardName = document.getElementById('config-card-name').value.trim();
-
-            try {
-                await db.collection("config").doc("payment").set({
-                    bankUrl: bankUrl,
-                    cardNumber: cardNumber,
-                    cardName: cardName
-                }, { merge: true });
-                alert("✓ Платіжні дані успішно оновлено та синхронізовано!");
-                logAdminAction('payment', `Оновив платіжні реквізити (Банка/Карта)`);
-            } catch(e) {
-                console.error(e); alert("Помилка збереження: " + e.message);
-            }
-        }
-
-        function setLanguage(lang) {
-            localStorage.setItem('selectedLang', lang);
-            document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
-            document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.innerText.toLowerCase() === lang));
-        }
-
-        function switchTab(tabId, button) {
-            currentTab = tabId;
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            
-            const targetTab = document.getElementById(tabId);
-            if(targetTab) targetTab.classList.add('active');
-            if(button) button.classList.add('active');
-
-            if(tabId === 'active-chats-tab') localStorage.setItem('viewed_chats', Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length);
-            if(tabId === 'feedback-tab') localStorage.setItem('viewed_feedback', globalFeedbackData.length);
-            if(tabId === 'volunteer-tab') localStorage.setItem('viewed_volunteers', globalVolunteersData.length);
-            if(tabId === 'orders-tab') localStorage.setItem('viewed_orders', globalOrdersData.length);
-            
-            renderAllDynamicData();
-        }
-
-        function initBadges() {
-            if(!localStorage.getItem('viewed_chats')) localStorage.setItem('viewed_chats', 0);
-            if(!localStorage.getItem('viewed_feedback')) localStorage.setItem('viewed_feedback', 0);
-            if(!localStorage.getItem('viewed_volunteers')) localStorage.setItem('viewed_volunteers', 0);
-            if(!localStorage.getItem('viewed_orders')) localStorage.setItem('viewed_orders', 0);
-        }
-
-        function updateBadgesLogic() {
-            let activeChatsCount = Object.keys(globalChatsData).filter(id => globalChatsData[id].status === 'active').length;
-            let newChats = activeChatsCount - (parseInt(localStorage.getItem('viewed_chats')) || 0);
-            let newFeedback = globalFeedbackData.length - (parseInt(localStorage.getItem('viewed_feedback')) || 0);
-            let newVolunteers = globalVolunteersData.length - (parseInt(localStorage.getItem('viewed_volunteers')) || 0);
-            let newOrders = globalOrdersData.length - (parseInt(localStorage.getItem('viewed_orders')) || 0);
-
-            if(currentTab === 'active-chats-tab') { newChats = 0; localStorage.setItem('viewed_chats', activeChatsCount); }
-            if(currentTab === 'feedback-tab') { newFeedback = 0; localStorage.setItem('viewed_feedback', globalFeedbackData.length); }
-            if(currentTab === 'volunteer-tab') { newVolunteers = 0; localStorage.setItem('viewed_volunteers', globalVolunteersData.length); }
-            if(currentTab === 'orders-tab') { newOrders = 0; localStorage.setItem('viewed_orders', globalOrdersData.length); }
-
-            showBadgeElement('badge-chats', newChats); 
-            showBadgeElement('badge-feedback', newFeedback); 
-            showBadgeElement('badge-volunteers', newVolunteers);
-            showBadgeElement('badge-orders', newOrders);
-        }
-
-        function showBadgeElement(id, count) { 
-            const el = document.getElementById(id); 
-            if(el) {
-                if(count > 0) { el.innerText = count; el.style.display = 'flex'; } 
-                else { el.style.display = 'none'; } 
             }
         }
 
