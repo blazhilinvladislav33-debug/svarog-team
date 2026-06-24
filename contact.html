@@ -80,7 +80,6 @@
         .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
         .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
 
-        .admin-menu-item { padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 5px; }
         .menu-chat-btn { border: 2px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); margin-top: 5px; }
         .menu-chat-btn:hover { background: var(--theme-color) !important; color: #121212 !important; padding-left: 15px !important; }
 
@@ -123,7 +122,7 @@
         .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
         .chat-input-area input:focus { border-color: rgba(var(--theme-color-rgb), 0.8); }
         
-        .chat-send-btn { width: 38px; height: 38px; background: var(--theme-color); border: none; color: #ffffff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); flex-shrink: 0; padding: 0; }
+        .chat-send-btn { width: 38px; height: 38px; background: var(--theme-color); border: none; color: #121212; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.3); flex-shrink: 0; padding: 0; }
         .chat-send-btn:hover { filter: brightness(1.1); box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.5); transform: scale(1.05); }
         .chat-send-btn:active { transform: scale(0.95); }
         .chat-send-btn svg { width: 18px; height: 18px; fill: #121212; margin-left: 2px; }
@@ -167,9 +166,6 @@
                 <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html" class="current-page"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
                 <li><a href="status.html"><span data-lang="ua">Статус замовлення</span><span data-lang="en">Order Status</span></a></li>
-                <li class="admin-menu-item">
-                    <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
-                </li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -201,7 +197,6 @@
             </form>
         </div>
         
-        <!-- БЛОК СОЦІАЛЬНИХ МЕРЕЖ ЯК НА INDEX -->
         <div class="home-socials-wrapper">
             <div class="home-socials" id="dynamic-user-social-container"></div>
         </div>
@@ -218,7 +213,7 @@
     <div class="user-chat-modal" id="user-chat-window">
         <div class="chat-header">
             <span data-lang="ua">Анонімна розмова</span><span data-lang="en">Anonymous Chat</span>
-            <span style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('user-chat-window').style.display='none'">×</span>
+            <span style="cursor:pointer; font-size:1.2rem;" onclick="closeUserChat()">×</span>
         </div>
         <div class="chat-messages" id="user-chat-messages"></div>
         <div class="chat-input-area" id="user-chat-input-block">
@@ -292,16 +287,10 @@
                 const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; 
                 const chatId = '647245223';
                 
-                let tgMessage = `📩 <b>НОВЕ ПОВІДОМЛЕННЯ!</b>
-
-` +
-                                `👤 <b>Ім'я:</b> ${name}
-` +
-                                `📞 <b>Контакт:</b> ${contact}
-
-` +
-                                `📝 <b>Текст:</b>
-${message}`;
+                let tgMessage = `📩 <b>НОВЕ ПОВІДОМЛЕННЯ!</b>\n\n` +
+                                `👤 <b>Ім'я:</b> ${name}\n` +
+                                `📞 <b>Контакт:</b> ${contact}\n\n` +
+                                `📝 <b>Текст:</b>\n${message}`;
 
                 await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                     method: 'POST',
@@ -338,7 +327,9 @@ ${message}`;
             }
         });
 
-        // --- ХМАРНИЙ ЧАТ FIREBASE ---
+        // ==========================================
+        // ОНОВЛЕНА ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE
+        // ==========================================
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
@@ -350,20 +341,31 @@ ${message}`;
             startRealtimeChatListener();
         }
 
+        // Функція для відкриття чату та збереження його стану
         function openUserChat(e) {
-            e.preventDefault();
+            if(e) e.preventDefault();
             if(navMenu) navMenu.classList.remove('active');
             if(menuButton) menuButton.classList.remove('open');
             document.getElementById('user-chat-window').style.display = 'flex';
+            localStorage.setItem('svarogChatIsOpen', 'true');
             renderUserChat();
+        }
+
+        // Функція для закриття чату
+        function closeUserChat() {
+            document.getElementById('user-chat-window').style.display = 'none';
+            localStorage.setItem('svarogChatIsOpen', 'false');
         }
 
         function startRealtimeChatListener() {
             if (unsubscribeUserChat) unsubscribeUserChat();
+
             unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(doc => {
                 let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' };
                 renderUserChat(myChat);
-            }, err => { console.error("Помилка чату: ", err); });
+            }, err => {
+                console.error("Помилка хмари: ", err);
+            });
         }
 
         function renderUserChat(myChatData) {
@@ -372,6 +374,7 @@ ${message}`;
             const lang = localStorage.getItem('selectedLang') || 'ua';
             let myChat = myChatData || { messages: [], status: 'active' };
 
+            // Перевірка на автовидалення закритого чату (5 хвилин)
             if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
                 const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
                 if (Date.now() > clearTime) {
@@ -391,7 +394,8 @@ ${message}`;
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${msg.sender}`;
                 if(msg.type === 'image') {
-                    bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src='${msg.text}'>')">`;
+                    // Коректне відкриття зображення у новому вікні
+                    bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src=\\'${msg.text}\\'>')">`;
                 } else { 
                     bubble.innerText = msg.text; 
                 }
@@ -410,6 +414,7 @@ ${message}`;
             } else { 
                 inputBlock.style.display = 'flex'; 
             }
+            
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }
 
@@ -420,6 +425,7 @@ ${message}`;
 
             const msgObject = { sender: 'user', text: text, type: 'text', time: Date.now() };
             input.value = "";
+
             try {
                 await db.collection("chats").doc(userChatSessionId).set({
                     id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
@@ -429,19 +435,8 @@ ${message}`;
         }
 
         function sendUserChatPhoto(input) {
-            if (!input.files || !input.files[0]) return;
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const msgObject = { sender: 'user', text: e.target.result, type: 'image', time: Date.now() };
-                try {
-                    await db.collection("chats").doc(userChatSessionId).set({
-                        id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
-                        messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
-                    }, { merge: true });
-                } catch(err) { console.error(err); }
-            };
-            reader.readAsDataURL(input.files[0]);
-            input.value = "";
+            console.warn("Функція sendUserChatPhoto викликана. Для роботи з photo потрібно налаштувати Firebase Storage.");
+            alert(localStorage.getItem('selectedLang') === 'en' ? "Photo transfer is in development." : "Надсилання фото знаходиться в розробці.");
         }
 
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
@@ -449,6 +444,11 @@ ${message}`;
         window.addEventListener('DOMContentLoaded', () => { 
             setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
             initUserChat(); 
+            
+            // Якщо чат був відкритий на іншій сторінці, відкриваємо його і тут
+            if (localStorage.getItem('svarogChatIsOpen') === 'true') {
+                openUserChat();
+            }
         });
     </script>
 </body>
