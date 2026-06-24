@@ -255,7 +255,6 @@
             </div>
         </div>
 
-        <!-- БЛОК СТАТИСТИКИ (ІМПАКТ) -->
         <div class="stats-wrapper" id="impact-stats-section">
             <div class="stat-card">
                 <div class="stat-number" id="stat-val-targets">0</div>
@@ -274,7 +273,6 @@
             </div>
         </div>
 
-        <!-- БЛОК СОЦІАЛЬНИХ МЕРЕЖ -->
         <div class="home-socials-wrapper">
             <div class="home-socials" id="dynamic-home-social-container"></div>
         </div>
@@ -292,7 +290,7 @@
     <div class="user-chat-modal" id="user-chat-window">
         <div class="chat-header">
             <span data-lang="ua">Анонімна розмова</span><span data-lang="en">Anonymous Chat</span>
-            <span style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('user-chat-window').style.display='none'">×</span>
+            <span style="cursor:pointer; font-size:1.2rem;" onclick="closeUserChat()">×</span>
         </div>
         <div class="chat-messages" id="user-chat-messages"></div>
         <div class="chat-input-area" id="user-chat-input-block">
@@ -337,30 +335,26 @@
             document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
         }
 
-        // --- ЛОГІКА СТАТИСТИКИ (Анімація чисел) ---
-        let statsAnimated = false;
+        // --- ОНОВЛЕНА ЛОГІКА СТАТИСТИКИ (Анімація при кожному показі) ---
+        let isAnimating = false;
         let currentStats = { targets: 0, funds: 0, missions: 0 };
 
         db.collection("config").doc("statistics").onSnapshot(doc => {
             if (doc.exists) {
                 currentStats = doc.data();
-                // Якщо вже проанімовано, оновлюємо одразу
-                if (statsAnimated) {
-                    document.getElementById('stat-val-targets').innerText = (parseInt(currentStats.targets) || 0).toLocaleString('uk-UA');
-                    document.getElementById('stat-val-funds').innerText = (parseInt(currentStats.funds) || 0).toLocaleString('uk-UA');
-                    document.getElementById('stat-val-missions').innerText = (parseInt(currentStats.missions) || 0).toLocaleString('uk-UA');
-                }
+                document.getElementById('stat-val-targets').innerText = (parseInt(currentStats.targets) || 0).toLocaleString('uk-UA');
+                document.getElementById('stat-val-funds').innerText = (parseInt(currentStats.funds) || 0).toLocaleString('uk-UA');
+                document.getElementById('stat-val-missions').innerText = (parseInt(currentStats.missions) || 0).toLocaleString('uk-UA');
             }
         });
 
         function animateValue(id, start, end, duration) {
-            if (start === end) return;
+            if (start === end) {
+                document.getElementById(id).innerText = end.toLocaleString('uk-UA');
+                return;
+            }
             let range = end - start;
-            let current = start;
-            let increment = end > start ? 1 : -1;
             let stepTime = Math.abs(Math.floor(duration / range));
-            
-            // Якщо цифра дуже велика (наприклад, гроші), рахуємо швидше
             if(stepTime < 10) stepTime = 10; 
 
             let obj = document.getElementById(id);
@@ -374,6 +368,8 @@
                 obj.innerText = value.toLocaleString('uk-UA');
                 if(value !== end) {
                     requestAnimationFrame(step);
+                } else {
+                    obj.innerText = end.toLocaleString('uk-UA');
                 }
             }
             step();
@@ -382,12 +378,19 @@
         function initStatsAnimation() {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting && !statsAnimated) {
-                        statsAnimated = true;
-                        animateValue("stat-val-targets", 0, parseInt(currentStats.targets) || 0, 2000);
-                        animateValue("stat-val-funds", 0, parseInt(currentStats.funds) || 0, 2500);
-                        animateValue("stat-val-missions", 0, parseInt(currentStats.missions) || 0, 2000);
-                        observer.unobserve(entry.target);
+                    if (entry.isIntersecting) {
+                        if (!isAnimating) {
+                            isAnimating = true;
+                            animateValue("stat-val-targets", 0, parseInt(currentStats.targets) || 0, 2000);
+                            animateValue("stat-val-funds", 0, parseInt(currentStats.funds) || 0, 2500);
+                            animateValue("stat-val-missions", 0, parseInt(currentStats.missions) || 0, 2000);
+                        }
+                    } else {
+                        // Скидаємо, коли ховається за екран
+                        isAnimating = false;
+                        document.getElementById('stat-val-targets').innerText = "0";
+                        document.getElementById('stat-val-funds').innerText = "0";
+                        document.getElementById('stat-val-missions').innerText = "0";
                     }
                 });
             }, { threshold: 0.1 });
@@ -409,7 +412,7 @@
             }
         });
 
-        // --- ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE ---
+        // --- ОНОВЛЕНА ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
@@ -421,17 +424,26 @@
             startRealtimeChatListener();
         }
 
+        // Функція для відкриття чату та збереження його стану
         function openUserChat(e) {
-            e.preventDefault();
+            if(e) e.preventDefault();
             if(navMenu) navMenu.classList.remove('active');
             if(menuButton) menuButton.classList.remove('open');
             document.getElementById('user-chat-window').style.display = 'flex';
+            localStorage.setItem('svarogChatIsOpen', 'true');
             renderUserChat();
+        }
+
+        // Функція для закриття чату
+        function closeUserChat() {
+            document.getElementById('user-chat-window').style.display = 'none';
+            localStorage.setItem('svarogChatIsOpen', 'false');
         }
 
         function startRealtimeChatListener() {
             if (unsubscribeUserChat) unsubscribeUserChat();
 
+            // Firebase onSnapshot вже гарантує, що сторінку оновлювати не треба при нових СМС
             unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(doc => {
                 let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' };
                 renderUserChat(myChat);
@@ -515,6 +527,11 @@
             setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
             initUserChat(); 
             initStatsAnimation(); 
+            
+            // Якщо чат був відкритий на іншій сторінці, відкриваємо його і тут
+            if (localStorage.getItem('svarogChatIsOpen') === 'true') {
+                openUserChat();
+            }
         });
     </script>
 </body>
