@@ -133,6 +133,8 @@
         
         .cat-tag { display: inline-block; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-bottom: 8px; width: fit-content; }
         .sale-badge { position: absolute; top: 10px; left: 10px; background: #ff4a4a; color: #fff; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; }
+        /* ДОДАНО: бейдж передзамовлення */
+        .preorder-badge { position: absolute; top: 10px; right: 10px; background: #00ffcc; color: #000; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; }
 
         .category-list { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
         .cat-chip { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
@@ -280,6 +282,14 @@
 
                         <div class="form-group" style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.1);">
                             <label style="font-size:0.85rem; color: var(--theme-color); display:block; margin-bottom:8px; font-weight: bold;">Кількість на складі під кожен розмір:</label>
+                            
+                            <div class="switch-wrapper" style="margin-bottom: 10px;">
+                                <input type="checkbox" id="merch-is-preorder">
+                                <label style="font-size:0.9rem; color:#00ffcc; font-weight:bold; cursor:pointer;" for="merch-is-preorder">
+                                    ⏳ Це товар за передзамовленням (ігнорує залишки)
+                                </label>
+                            </div>
+
                             <div id="size-stock-fields-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px;"></div>
                         </div>
                         
@@ -975,53 +985,62 @@
         }
 
         function initFirebaseRealtimeStreams() {
+            // Чати
             unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
                 globalChatsData = {};
                 snapshot.forEach(doc => { globalChatsData[doc.id] = doc.data(); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
+            // Заявки
             unsubscribeFeedback = db.collection("feedback").onSnapshot(snapshot => {
                 globalFeedbackData = [];
                 snapshot.forEach(doc => { globalFeedbackData.push({ id: doc.id, ...doc.data() }); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
+            // Волонтери
             unsubscribeVolunteers = db.collection("volunteers").onSnapshot(snapshot => {
                 globalVolunteersData = [];
                 snapshot.forEach(doc => { globalVolunteersData.push({ id: doc.id, ...doc.data() }); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
+            // Соцмережі
             unsubscribeSocials = db.collection("config").doc("socials").onSnapshot(doc => {
                 globalSocialNetworks = (doc.exists && doc.data().list) ? doc.data().list : [];
                 renderAdminSocialList();
             }, e => console.error(e));
 
+            // Новини
             unsubscribeNews = db.collection("news").orderBy("date", "desc").onSnapshot(snapshot => {
                 globalNewsData = [];
                 snapshot.forEach(doc => { globalNewsData.push({ id: doc.id, ...doc.data(), isReport: false }); });
                 renderAdminNewsChronicle();
             }, e => console.error(e));
             
+            // Звіти
             unsubscribeReports = db.collection("reports").orderBy("timestamp", "desc").onSnapshot(snapshot => {
                 globalReportsData = [];
                 snapshot.forEach(doc => { globalReportsData.push({ id: doc.id, ...doc.data(), isReport: true }); });
                 renderAdminNewsChronicle(); 
             }, e => console.error(e));
 
+            // Замовлення
             unsubscribeOrders = db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
                 globalOrdersData = [];
                 snapshot.forEach(doc => { globalOrdersData.push({ id: doc.id, ...doc.data() }); });
                 renderAllDynamicData();
             }, e => console.error(e));
 
+            // Товари
             unsubscribeMerch = db.collection("merch").orderBy("timestamp", "desc").onSnapshot(snapshot => {
                 globalMerchData = [];
                 snapshot.forEach(doc => { globalMerchData.push({ id: doc.id, ...doc.data() }); });
                 renderMerchList();
             }, e => console.error(e));
 
+            // Магазин (Налаштування)
             unsubscribeConfig = db.collection("config").doc("shop").onSnapshot(doc => {
                 const data = doc.exists ? doc.data() : {};
                 const isActive = data.active !== undefined ? data.active : true; 
@@ -1039,12 +1058,14 @@
                 renderCategoriesAdmin(); populateCategorySelect();
             }, e => console.error(e));
 
+            // Промокоди
             unsubscribePromos = db.collection("promocodes").orderBy("created", "desc").onSnapshot(snapshot => {
                 globalPromocodes = [];
                 snapshot.forEach(doc => { globalPromocodes.push({ id: doc.id, ...doc.data() }); });
                 renderPromocodes();
             }, e => console.error(e));
 
+            // Реквізити
             unsubscribePaymentConfig = db.collection("config").doc("payment").onSnapshot(doc => {
                 if (doc.exists) {
                     const data = doc.data();
@@ -1059,6 +1080,7 @@
                 }
             }, e => console.error(e));
             
+            // Статистика
             unsubscribeStats = db.collection("config").doc("statistics").onSnapshot(doc => {
                 if (doc.exists) {
                     const data = doc.data();
@@ -1417,6 +1439,9 @@
             const container = document.getElementById('size-stock-fields-container');
             if(!container) return;
             const sizesStr = document.getElementById('merch-sizes').value.trim();
+            
+            const isPreorder = document.getElementById('merch-is-preorder')?.checked; // Перевірка чекбокса передзамовлення
+            
             container.innerHTML = "";
             const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : [];
 
@@ -1425,10 +1450,11 @@
                 if(existingStockObj) {
                     baseVal = typeof existingStockObj === 'object' ? (existingStockObj["Універсальний"] || 0) : existingStockObj;
                 }
+                let disabledStr = isPreorder ? 'disabled' : '';
                 container.innerHTML = `
                     <div style="display:flex; flex-direction:column; gap:3px;">
                         <span style="font-size:0.75rem; color:#aaa; text-align:center;">Універс.</span>
-                        <input type="number" data-size-key="Універсальний" class="form-input size-stock-value-input" style="padding: 6px; text-align:center; font-size:0.9rem;" value="${baseVal}" min="0">
+                        <input type="number" data-size-key="Універсальний" class="form-input size-stock-value-input" style="padding: 6px; text-align:center; font-size:0.9rem;" value="${isPreorder ? 99 : baseVal}" min="0" ${disabledStr}>
                     </div>`;
             } else {
                 sizesArr.forEach(size => {
@@ -1436,14 +1462,18 @@
                     if(existingStockObj && typeof existingStockObj === 'object') {
                         baseVal = existingStockObj[size] || 0;
                     }
+                    let disabledStr = isPreorder ? 'disabled' : '';
                     container.innerHTML += `
                         <div style="display:flex; flex-direction:column; gap:3px;">
                             <span style="font-size:0.75rem; color:var(--theme-color); text-align:center; font-weight:bold;">${size}</span>
-                            <input type="number" data-size-key="${size}" class="form-input size-stock-value-input" style="padding: 6px; text-align:center; font-size:0.9rem;" value="${baseVal}" min="0">
+                            <input type="number" data-size-key="${size}" class="form-input size-stock-value-input" style="padding: 6px; text-align:center; font-size:0.9rem;" value="${isPreorder ? 99 : baseVal}" min="0" ${disabledStr}>
                         </div>`;
                 });
             }
         }
+
+        // Обробник зміни чекбоксу передзамовлення (щоб оновити поля кількості)
+        document.getElementById('merch-is-preorder')?.addEventListener('change', () => generateSizeStockInputs());
 
         async function toggleShopStatus() {
             const checkbox = document.getElementById('shop-active-checkbox');
@@ -1517,6 +1547,10 @@
             document.getElementById('merch-discount-price').value = item.discountPrice || "";
             document.getElementById('merch-sizes').value = item.sizes ? item.sizes.join(', ') : "";
             document.getElementById('merch-description').value = item.description || "";
+            
+            // ДОДАНО: встановлення статусу передзамовлення
+            const preorderCheckbox = document.getElementById('merch-is-preorder');
+            if(preorderCheckbox) preorderCheckbox.checked = item.isPreorder || false;
 
             generateSizeStockInputs(item.stock);
 
@@ -1544,6 +1578,11 @@
             document.getElementById('merch-sizes').value = "";
             document.getElementById('merch-description').value = "";
             document.getElementById('merch-photo-file').value = "";
+            
+            // ДОДАНО: скидання передзамовлення
+            const preorderCheckbox = document.getElementById('merch-is-preorder');
+            if(preorderCheckbox) preorderCheckbox.checked = false;
+
             const previewImg = document.getElementById('merch-preview-element');
             if(previewImg) previewImg.style.display = 'none';
             merchPhotoBase64 = "";
@@ -1561,6 +1600,7 @@
             const discountPrice = document.getElementById('merch-discount-price').value.trim();
             const sizesStr = document.getElementById('merch-sizes').value.trim();
             const description = document.getElementById('merch-description').value.trim();
+            const isPreorder = document.getElementById('merch-is-preorder')?.checked || false; // ДОДАНО
             
             if(!title || !price || !category) { alert("Заповніть назву, категорію та ціну товару!"); return; }
 
@@ -1569,14 +1609,15 @@
             const stockInputs = document.querySelectorAll('.size-stock-value-input');
             stockInputs.forEach(inp => {
                 const key = inp.getAttribute('data-size-key');
-                stockObj[key] = parseInt(inp.value) || 0;
+                stockObj[key] = isPreorder ? 99 : (parseInt(inp.value) || 0); // ДОДАНО: якщо передзамовлення, запас = 99
             });
 
             const merchObject = {
                 title: title, category: category, price: parseFloat(price),
                 discountPrice: discountPrice ? parseFloat(discountPrice) : null,
                 stock: stockObj, sizes: sizesArr, description: description,
-                image: merchPhotoBase64 || null
+                image: merchPhotoBase64 || null,
+                isPreorder: isPreorder // ДОДАНО
             };
 
             try {
@@ -1609,10 +1650,16 @@
                     : `<span class="merch-price">${item.price} ₴</span>`;
                 
                 let saleBadge = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
+                
+                // ДОДАНО: бейдж передзамовлення для адмінки
+                let preorderBadge = item.isPreorder ? `<div class="preorder-badge">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>` : ``;
+
                 let descHtml = item.description ? `<div class="merch-desc">${item.description}</div>` : '';
 
                 let stockLine = "";
-                if(typeof item.stock === 'object' && item.stock !== null) {
+                if(item.isPreorder) {
+                    stockLine = `<span style="color:#00ffcc">Не обмежено (Передзамовлення)</span>`;
+                } else if(typeof item.stock === 'object' && item.stock !== null) {
                     stockLine = Object.entries(item.stock).map(([sz, q]) => {
                         let color = q === 0 ? '#ff4a4a' : (q < 5 ? '#ffaa00' : '#00ffcc');
                         return `<b>${sz}</b>:<span style="color:${color}">${q}шт</span>`;
@@ -1627,6 +1674,7 @@
                     <div class="merch-card">
                         ${imgHtml}
                         ${saleBadge}
+                        ${preorderBadge}
                         <div class="merch-card-body">
                             <div class="cat-tag">${item.category || 'Без категорії'}</div>
                             <div class="merch-title">${item.title}</div>
@@ -1703,9 +1751,15 @@
                 if(ord.items && Array.isArray(ord.items)) {
                     ord.items.forEach(it => {
                         let sizeMeta = it.size === 'Універсальний' ? '' : ` [Розмір: ${it.size}]`;
+                        
+                        // ДОДАНО: підсвічування тегу ПЕРЕДЗАМОВЛЕННЯ в адмінці
+                        let titleHtml = it.merchTitle.includes('[ПЕРЕДЗАМОВЛЕННЯ]') 
+                            ? it.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#00ffcc;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
+                            : it.merchTitle;
+
                         itemsListHtml += `
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem; padding-left:10px; border-left:2px solid var(--theme-color);">
-                            <span><b>${it.merchTitle}</b>${sizeMeta} x${it.quantity} шт</span>
+                            <span><b>${titleHtml}</b>${sizeMeta} x${it.quantity} шт</span>
                             <span style="color:var(--theme-color); font-weight:bold;">${it.totalPrice} ₴</span>
                         </div>`;
                     });
@@ -1775,50 +1829,6 @@
             } 
             catch(e) { console.error(e); }
             finally { isConfirmingStatus = false; renderAllDynamicData(); }
-        }
-
-        async function savePaymentCredentials() {
-            const bankUrl = document.getElementById('new-donation-link-field').value.trim();
-            const cardNumber = document.getElementById('config-card-number').value.trim();
-            const cardName = document.getElementById('config-card-name').value.trim();
-
-            try {
-                await db.collection("config").doc("payment").set({
-                    bankUrl: bankUrl,
-                    cardNumber: cardNumber,
-                    cardName: cardName
-                }, { merge: true });
-                alert("✓ Платіжні дані успішно оновлено та синхронізовано!");
-                logAdminAction('payment', `Оновив платіжні реквізити (Банка/Карта)`); // ДОДАНО
-            } catch(e) {
-                console.error(e); alert("Помилка збереження: " + e.message);
-            }
-        }
-
-        function setLanguage(lang) {
-            localStorage.setItem('selectedLang', lang);
-            document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
-            document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.innerText.toLowerCase() === lang));
-        }
-
-        // ==========================================
-        // ФУНКЦІЯ ДЛЯ ЗАПИСУ ЛОГІВ ДЛЯ SUPERADMIN
-        // ==========================================
-        async function logAdminAction(actionCategory, actionDetails) {
-            const user = firebase.auth().currentUser;
-            if (!user) return; 
-
-            try {
-                await db.collection("admin_logs").add({
-                    adminEmail: user.email,
-                    actionType: actionCategory,
-                    details: actionDetails,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch (e) {
-                console.error("Помилка запису логу: ", e);
-            }
         }
 
         window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); });
