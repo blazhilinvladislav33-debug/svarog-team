@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script>
@@ -92,7 +93,7 @@
         
         .status-select { background: #1a1a1a; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 5px 8px; border-radius: 4px; font-size: 0.8rem; outline: none; cursor: pointer; }
         .status-select.on_review, .status-select.processing, .status-select.new { border-color: #ffaa00; color: #ffaa00; }
-        .status-select.accepted { border-color: #00bfff; color: #00bfff; }
+        .status-select.accepted { border-color: #777777; color: #777777; }
         .status-select.sent { border-color: #da70d6; color: #da70d6; }
         .status-select.delivered, .status-select.success { border-color: #777777; color: #777777; }
         .status-select.unresolved, .status-select.cancelled { border-color: #ff4a4a; color: #ff4a4a; }
@@ -102,7 +103,7 @@
         .export-btn:hover { background: var(--theme-color); color: #121212; }
 
         .msg-list { width: 100%; max-height: 550px; overflow-y: auto; padding-right: 5px; margin-top: 10px; }
-        .msg-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 15px; margin-bottom: 15px; position: relative;}
+        .msg-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 15px; margin-bottom: 15px; }
         .meta-line { font-weight: bold; color: var(--theme-color); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 8px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
         .msg-text { font-size: 0.95rem; color: #e0e0e0; line-height: 1.5; word-wrap: break-word; }
         .no-msg { text-align: center; color: #666; font-style: italic; margin-top: 40px; width: 100%; font-size: 0.9rem; }
@@ -136,11 +137,11 @@
         .cat-chip { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
         .cat-remove { color: #ff4a4a; cursor: pointer; font-weight: bold; margin-left: 5px; }
 
-        /* Стилі для варіацій кольору (новий функціонал) */
+        /* Стилі для варіацій кольору */
         .variant-block { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; margin-bottom: 10px; position: relative; }
         .variant-remove-btn { position: absolute; top: 10px; right: 10px; color: #ff4a4a; background: none; border: none; cursor: pointer; font-weight: bold; }
 
-        /* ВІЗУАЛЬНИЙ СЕРТИФІКАТ / ПРОМОКОД */
+        /* ВІЗУАЛЬНИЙ СЕРТИФІКАТ */
         .cert-generator-zone { display: none; margin-top: 20px; text-align: center; width: 100%; }
         .cert-container-box { 
             width: 800px; height: 450px; 
@@ -151,19 +152,20 @@
             display: flex; flex-direction: column; align-items: center; text-align: center;
             box-sizing: border-box; font-family: 'Montserrat', sans-serif;
             margin: 0 auto 20px;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
         }
         .header-logos { display: flex; gap: 30px; margin-bottom: 20px; align-items: center; justify-content: center; }
-        .logo-main { width: 90px; height: auto; }
-        .logo-team { width: 180px; height: auto; }
-        .cert-container-box h2 { font-size: 2rem; color: var(--theme-color); text-transform: uppercase; margin: 5px 0; letter-spacing: 2px; font-weight: 900; }
-        .promo-wrapper-block { margin: 25px 0; display: flex; flex-direction: column; align-items: center; }
+        .logo-main { width: 75px; height: auto; }
+        .logo-team { width: 150px; height: auto; }
+        .cert-container-box h2 { font-size: 1.8rem; color: var(--theme-color); text-transform: uppercase; margin: 5px 0; letter-spacing: 2px; font-weight: 700; }
+        .promo-wrapper-block { margin: 20px 0; display: flex; flex-direction: column; align-items: center; }
         .code-label-text { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
-        .code-box-style { padding: 15px 40px; border: 2px solid var(--theme-color); border-radius: 8px; box-shadow: 0 0 10px 5px rgba(240, 180, 140, 0.15); background: rgba(0, 0, 0, 0.3); }
-        .code-val-text { font-size: 2.2rem; font-weight: 900; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.5);}
+        .code-box-style { padding: 12px 35px; border: 2px solid var(--theme-color); border-radius: 8px; box-shadow: 0 0 10px 5px rgba(240, 180, 140, 0.15); background: rgba(0, 0, 0, 0.3); }
+        .code-val-text { font-size: 2rem; font-weight: 900; color: #fff; }
         .cert-code { background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 8px; font-family: monospace; font-size: 1.2rem; color: #777777; letter-spacing: 2px; border: 1px dashed rgba(255,255,255,0.2); display: inline-block; margin-bottom: 15px; }
-        .footer-cert-text { margin-top: auto; font-size: 0.85rem; color: #aaa; width: 100%; border-top: 1px solid #333; padding-top: 15px; font-style: italic; line-height: 1.4; }
+        .footer-cert-text { margin-top: auto; font-size: 0.8rem; color: #aaa; width: 100%; border-top: 1px solid #333; padding-top: 15px; font-style: italic; line-height: 1.4; }
+
+        /* ВАЖЛИВО: Ховаємо англійську мову за замовчуванням, щоб не було накладання кнопок */
+        [data-lang="en"] { display: none; }
 
         @media (max-width: 768px) {
             .main-content { padding: 10px; }
@@ -197,11 +199,17 @@
     <div class="main-content">
         <div class="container" id="login-card" style="display: none;">
             <h1 id="login-title-text" data-lang="ua">Вхід в панель</h1>
-            <h1 id="login-title-text-en" data-lang="en" style="display:none;">Admin Login</h1>
+            <h1 id="login-title-text-en" data-lang="en">Admin Login</h1>
             <form onsubmit="handleLogin(event)">
-                <div class="form-group"><input type="email" id="user-email" class="form-input" placeholder="Email адміністратора" required autocomplete="email"></div>
-                <div class="form-group"><input type="password" id="user-password" class="form-input" placeholder="Пароль / Password" required></div>
-                <button type="submit" class="btn" id="login-btn-submit"><span data-lang="ua">Увійти</span><span data-lang="en">Login</span></button>
+                <div class="form-group">
+                    <input type="email" id="user-email" class="form-input" placeholder="Email адміністратора" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="user-password" class="form-input" placeholder="Пароль / Password" required>
+                </div>
+                <button type="submit" class="btn" id="login-btn-submit">
+                    <span data-lang="ua">Увійти</span><span data-lang="en">Login</span>
+                </button>
                 <div class="error-msg" id="error-block"></div>
             </form>
         </div>
@@ -363,7 +371,7 @@
                             <input type="number" id="promo-value-input" class="form-input" placeholder="Знижка у % (напр: 10)">
                         </div>
 
-                        <button class="btn" onclick="createPromoCode()">Зберегти купон</button>
+                        <button class="btn" onclick="createPromoCode()">Створити купон</button>
                         
                         <div class="cert-generator-zone" id="cert-preview-box">
                             <h3 style="margin:20px 0 10px; color:var(--theme-color); font-size:1rem; text-align:center;">Попередній перегляд:</h3>
@@ -411,6 +419,7 @@
                                 <option value="report">Звіт (Донати)</option>
                             </select>
                         </div>
+                        
                         <div class="form-group">
                             <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Тип медіа:</label>
                             <select id="news-media-type" class="form-select" onchange="toggleMediaInput()">
@@ -418,17 +427,24 @@
                                 <option value="video">Відео (YouTube/Shorts посилання)</option>
                             </select>
                         </div>
+
                         <div class="form-group" id="news-photo-zone">
                             <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Фото:</label>
                             <input type="file" id="news-photo-file" accept="image/*" class="form-input" onchange="previewNewsPhoto(this)">
                             <img id="news-preview-element" class="news-img-preview" src="">
                         </div>
+                        
                         <div class="form-group" id="news-video-zone" style="display:none;">
                             <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Посилання на відео (YouTube):</label>
                             <input type="url" id="news-video-url" class="form-input" placeholder="https://www.youtube.com/watch?v=...">
                         </div>
-                        <div class="form-group"><input type="text" id="news-title-field" class="form-input" placeholder="Заголовок" autocomplete="off"></div>
-                        <div class="form-group"><textarea id="news-body-field" class="form-input" placeholder="Повний текст / Опис..." style="min-height: 120px;"></textarea></div>
+
+                        <div class="form-group">
+                            <input type="text" id="news-title-field" class="form-input" placeholder="Заголовок" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <textarea id="news-body-field" class="form-input" placeholder="Повний текст / Опис..." style="min-height: 120px;"></textarea>
+                        </div>
                         <div class="form-group">
                             <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Дата публікації:</label>
                             <input type="date" id="news-date-field" class="form-input">
@@ -438,8 +454,12 @@
                             <label style="font-size:0.9rem; color:#bbb; cursor:pointer;">Додати кнопку дії (посилання)</label>
                         </div>
                         <div id="news-button-config-box" style="display: none; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
-                            <div class="form-group"><input type="text" id="news-btn-text-field" class="form-input" placeholder="Текст на кнопці (напр: Читати в TG)"></div>
-                            <div class="form-group"><input type="url" id="news-btn-url-field" class="form-input" placeholder="Посилання (https://...)"></div>
+                            <div class="form-group">
+                                <input type="text" id="news-btn-text-field" class="form-input" placeholder="Текст на кнопці (напр: Читати в TG)">
+                            </div>
+                            <div class="form-group">
+                                <input type="url" id="news-btn-url-field" class="form-input" placeholder="Посилання (https://...)">
+                            </div>
                         </div>
                         <div style="display:flex; gap:10px;">
                             <button id="news-submit-btn" class="btn" onclick="publishNewsItem()" style="flex:2;">Опублікувати</button>
@@ -567,7 +587,6 @@
         let globalPromocodes = []; 
         let globalReportsData = [];
 
-        // Підписки Firebase
         let unsubscribeChats = null;
         let unsubscribeFeedback = null;
         let unsubscribeVolunteers = null;
@@ -600,9 +619,7 @@
                         return true;
                     }
                 }
-            } catch (error) {
-                console.error("Помилка доступу до бази:", error);
-            }
+            } catch (error) { console.error("Помилка доступу до бази:", error); }
             return false;
         }
 
@@ -930,6 +947,7 @@
                 let timeStr = item.time || (item.timestamp ? new Date(item.timestamp.toMillis()).toLocaleString('uk-UA') : 'Невідомо');
                 let detailsHtml = '';
                 
+                // Перебираємо всі поля анкети
                 for (const [key, value] of Object.entries(item)) {
                     if(key === 'id' || key === 'timestamp' || key === 'time' || key === 'name') continue;
                     
@@ -948,7 +966,7 @@
                 }
 
                 html += `
-                    <div class="msg-item" style="border-left: 4px solid #00bfff; position: relative;">
+                    <div class="msg-item" style="border-left: 4px solid var(--theme-color); position: relative;">
                         <div class="meta-line" style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:10px;">
                             <span style="font-size:1.1rem;">📋 <b>${item.name || 'Анонім'}</b></span>
                             <span style="font-size:0.8rem; color:#aaa;">${timeStr}</span>
@@ -982,6 +1000,7 @@
             
             if(data.length === 0) { alert("Немає даних для експорту!"); return; }
             
+            // Додаємо \uFEFF (BOM), щоб Excel правильно розумів українську мову
             let csvContent = "\uFEFF"; 
             let headers = Object.keys(data[0]).join(",");
             csvContent += headers + "\r\n";
@@ -1021,17 +1040,19 @@
         }
 
         // ==========================================
-        // ПРОМОКОДИ ТА СЕРТИФІКАТИ
+        // ПРОМОКОДИ ТА СЕРТИФІКАТИ (ОНОВЛЕНІ СТИЛІ КАРТКИ)
         // ==========================================
         function togglePromoType() {
             const type = document.getElementById('promo-type-select').value;
             const valInput = document.getElementById('promo-value-input');
             const codeInput = document.getElementById('promo-code-input');
-            if(type === 'discount') {
-                valInput.placeholder = "Знижка у % (напр: 10)";
-            } else {
+            const isCert = type === 'certificate';
+            
+            if(isCert) {
                 valInput.placeholder = "Сума сертифікату у ₴ (напр: 1000)";
                 if(!codeInput.value) codeInput.value = "CERT-" + Math.floor(1000 + Math.random() * 9000);
+            } else {
+                valInput.placeholder = "Знижка у % (напр: 10)";
             }
         }
 
@@ -1127,7 +1148,7 @@
                     ? `<span style="background:#da70d6; color:#fff; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">🎁 Сертифікат</span>`
                     : (promo.isSingleUse ? `<span style="background:#ffaa00; color:#000; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">Одноразовий</span>` : `<span style="background:#777777; color:#fff; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">Багаторазовий</span>`);
                 
-                const valueText = isCert ? `<b style="color:#da70d6">${promo.fiatValue || promo.discount} ₴</b>` : `<b style="color:#00ffcc">${promo.discount}%</b>`;
+                const valueText = isCert ? `<b style="color:#da70d6">${promo.fiatValue || promo.discount} ₴</b>` : `<b style="color:#777777">${promo.discount}%</b>`;
                 const statusBadge = promo.active 
                     ? `<span style="color:#00ffcc; font-size:0.85rem; font-weight:bold;">✅ Активний</span>` 
                     : `<span style="color:#ff4a4a; font-size:0.85rem; font-weight:bold;">🛑 Використаний / Неактивний</span>`;
@@ -1444,12 +1465,12 @@
                         stockLine = `<span style="color:#777777">Не обмежено (Передзамовлення)</span>`;
                     } else if(typeof item.stock === 'object' && item.stock !== null) {
                         stockLine = Object.entries(item.stock).map(([sz, q]) => {
-                            let color = q === 0 ? '#ff4a4a' : (q < 5 ? '#ffaa00' : '#00ffcc');
+                            let color = q === 0 ? '#ff4a4a' : (q < 5 ? '#ffaa00' : '#777777');
                             return `<b>${sz}</b>:<span style="color:${color}">${q}шт</span>`;
                         }).join(' | ');
                     } else {
                         let q = item.stock || 0;
-                        let color = q === 0 ? '#ff4a4a' : (q < 5 ? '#ffaa00' : '#00ffcc');
+                        let color = q === 0 ? '#ff4a4a' : (q < 5 ? '#ffaa00' : '#777777');
                         stockLine = `<span style="color:${color}">${q} шт</span>`;
                     }
                 }
@@ -1498,7 +1519,7 @@
         }
 
         // ==========================================
-        // ІНШІ ФУНКЦІЇ АДМІНКИ
+        // ІНШІ ФУНКЦІЇ АДМІНКИ (Замовлення тощо)
         // ==========================================
         
         async function toggleShopStatus() {
@@ -1867,7 +1888,7 @@
                         let colorMeta = it.color ? ` (Колір: ${it.color})` : '';
                         
                         let titleHtml = it.merchTitle.includes('[ПЕРЕДЗАМОВЛЕННЯ]') 
-                            ? it.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#00ffcc;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
+                            ? it.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#777777;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
                             : it.merchTitle;
 
                         itemsListHtml += `
@@ -1880,10 +1901,10 @@
                     itemsListHtml = `<pre style="font-family:inherit; font-size:0.9rem; margin-left:10px; color:#ccc;">${ord.orderTextDetails}</pre>`;
                 }
 
-                let promoHtml = (ord.promoCode && ord.promoCode !== "Не застосовано") ? `<div style="font-size:0.85rem; color:#00ffcc; margin-bottom:8px;">🎟️ Промокод / Сертифікат: <b>${ord.promoCode}</b></div>` : '';
+                let promoHtml = (ord.promoCode && ord.promoCode !== "Не застосовано") ? `<div style="font-size:0.85rem; color:#777777; margin-bottom:8px;">🎟️ Промокод / Сертифікат: <b>${ord.promoCode}</b></div>` : '';
                 let paymentMethodHtml = ord.paymentMethod ? `<div style="font-size:0.9rem; color:#fff; margin-bottom:8px;">💳 <b>Оплата:</b> ${ord.paymentMethod}</div>` : '';
                 
-                let paymentProofHtml = ord.paymentProof ? `<button class="btn" style="margin-top:10px; padding:6px 12px; width:auto; border-color:#00ffcc; color:#00ffcc;" onclick="openFullImage('${ord.paymentProof}')">📸 Переглянути квитанцію</button>` : '';
+                let paymentProofHtml = ord.paymentProof ? `<button class="btn" style="margin-top:10px; padding:6px 12px; width:auto; border-color:#777777; color:#777777;" onclick="openFullImage('${ord.paymentProof}')">📸 Переглянути квитанцію</button>` : '';
                 let archiveHint = status === 'delivered' ? `<span style="font-size:0.75rem; color:#aaa; margin-left:10px;">(Можна в архів)</span>` : '';
 
                 ordersBox.innerHTML += `
