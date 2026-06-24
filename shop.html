@@ -278,7 +278,7 @@
                 <div class="cart-total-box" id="cart-total-section" style="display:none;">
                     <div><span data-lang="ua">Разом до сплати:</span><span data-lang="en">Total sum:</span></div>
                     <div style="text-align: right;">
-                        <div id="cart-discount-sum" style="font-size: 0.9rem; color: #00ffcc; margin-bottom: 4px; display: none;"></div>
+                        <div id="cart-discount-sum" style="font-size: 0.9rem; color: #777777; margin-bottom: 4px; display: none;"></div>
                         <div class="cart-total-price" id="cart-total-sum">0 ₴</div>
                     </div>
                 </div>
@@ -623,7 +623,7 @@
                 
                 let stockBadge = '';
                 if (item.isPreorder) {
-                    stockBadge = `<div class="stock-badge" style="color:#00ffcc; border-color:#00ffcc; background:rgba(0,0,0,0.8);">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>`;
+                    stockBadge = `<div class="stock-badge" style="color:#777777; border-color:#777777; background:rgba(0,0,0,0.8);">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>`;
                 } else if (isOutOfStock) {
                     stockBadge = `<div class="stock-badge empty">${lang==='ua'?'Немає в наявності':'Out of stock'}</div>`;
                 }
@@ -661,7 +661,7 @@
                 if (isOutOfStock) {
                     buyBtnHtml = `<button class="buy-btn" disabled>${lang==='ua'?'Розпродано':'Sold out'}</button>`;
                 } else if (item.isPreorder) {
-                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')" style="border-color:#00ffcc; color:#00ffcc;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>`;
+                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')" style="border-color:#777777; color:#777777;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>`;
                 } else {
                     buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')">${lang==='ua'?'Додати в кошик 🛒':'Add to cart 🛒'}</button>`;
                 }
@@ -808,7 +808,7 @@
                     let safeCodeName = doc.data().code || doc.id || "ПРОМОКОД";
                     
                     currentPromo = { code: safeCodeName, discount: doc.data().discount }; 
-                    msg.style.color = '#00ffcc';
+                    msg.style.color = '#777777';
                     msg.innerText = lang === 'ua' ? `Код застосовано! Знижка ${currentPromo.discount}%` : `Code applied! Discount ${currentPromo.discount}%`;
                     renderCartModalContent(); 
                 } else {
@@ -851,7 +851,7 @@
                 let sizeLabelMeta = item.size === 'Універсальний' ? '' : `${lang==='ua'?'Розмір':'Size'}: ${item.size} | `;
                 
                 let titleHtml = item.merchTitle.includes('[ПЕРЕДЗАМОВЛЕННЯ]') 
-                    ? item.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#00ffcc;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
+                    ? item.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#777777;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
                     : item.merchTitle;
 
                 container.innerHTML += `
