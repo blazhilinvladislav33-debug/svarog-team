@@ -193,9 +193,6 @@
                 <li><a href="https://svarogteam.com/about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a></li>
                 <li><a href="https://svarogteam.com/contact.html"><span data-lang="ua">Зв'язок з нами</span><span data-lang="en">Contact us</span></a></li>
                 <li><a href="status.html"><span data-lang="ua">Статус замовлення</span><span data-lang="en">Order Status</span></a></li>
-                <li class="admin-menu-item">
-                    <a href="https://svarogteam.com/admin.html" style="font-size: 0.85rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">Admin</a>
-                </li>
                 <li><a href="#" class="menu-chat-btn" onclick="openUserChat(event)"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a></li>
             </ul>
         </div>
@@ -477,7 +474,7 @@
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${msg.sender}`;
                 if(msg.type === 'image') {
-                    bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src=\'${msg.text}\'>')">`;
+                    bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src='${msg.text}'>')">`;
                 } else { 
                     bubble.innerText = msg.text; 
                 }
