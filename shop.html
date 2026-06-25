@@ -337,7 +337,7 @@
                     </div>
                     
                     <div id="bank-payment-info" style="display: none; margin-bottom: 15px; padding: 12px; background: rgba(240, 180, 140, 0.1); border: 1px solid rgba(240, 180, 140, 0.3); border-radius: 6px; font-size: 0.9rem;">
-                        </div>
+                    </div>
 
                     <button type="submit" class="confirm-btn" id="confirm-order-btn">
                         <span data-lang="ua">Оформити замовлення</span>
@@ -446,14 +446,17 @@
             if (method === 'bank') {
                 document.getElementById('tile-bank').classList.add('active');
                 bankInfo.style.display = 'block';
+                updatePaymentDetailsUI();
             } else if (method === 'card') {
                 document.getElementById('tile-card').classList.add('active');
                 bankInfo.style.display = 'block';
+                updatePaymentDetailsUI();
             } else if (method === 'cod') {
                 document.getElementById('tile-cod').classList.add('active');
                 bankInfo.style.display = 'none';
+                // ВАЖЛИВО: Очищаємо HTML, щоб видалити прихований required input
+                bankInfo.innerHTML = ''; 
             }
-            updatePaymentDetailsUI();
         }
 
         function updatePaymentDetailsUI() {
@@ -518,8 +521,14 @@
                     const data = doc.data();
                     let status = data.status || 'new';
 
-                    if (status === 'archived' || status === 'cancelled') {
+                    if (status === 'archived') {
                         box.style.display = 'none'; return;
+                    }
+                    
+                    if (status === 'cancelled') {
+                        box.style.display = 'block'; 
+                        info.innerHTML = `<span style="color: #ff4a4a;"><b>Замовлення скасовано адміністратором ✖</b><br>Будь ласка, зверніться в чат підтримки для уточнення деталей.</span>`;
+                        return;
                     }
 
                     box.style.display = 'block';
