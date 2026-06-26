@@ -454,7 +454,6 @@
             } else if (method === 'cod') {
                 document.getElementById('tile-cod').classList.add('active');
                 bankInfo.style.display = 'none';
-                // ВАЖЛИВО: Очищаємо HTML, щоб видалити прихований required input
                 bankInfo.innerHTML = ''; 
             }
         }
@@ -501,7 +500,6 @@
         let currentPromo = null; 
         let activeOrderUnsubscribe = null;
         
-        // Зберігаємо обрані варіанти для кожного товару { 'itemId': variantIndex }
         window.selectedVariants = {}; 
 
         function listenToActiveOrderStatus() {
@@ -577,13 +575,29 @@
             }
         });
 
-        db.collection("merch").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        // --- ДОДАНА ЛОГІКА СОРТУВАННЯ (Точно як в адмінці) ---
+        db.collection("merch").onSnapshot(snapshot => {
             globalMerchList = [];
             snapshot.forEach(doc => { globalMerchList.push({ id: doc.id, ...doc.data() }); });
+            
+            // Сортування за порядковим номером (order), а якщо його немає - за часом
+            globalMerchList.sort((a, b) => {
+                let orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER;
+                let orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER;
+                
+                if (orderA === orderB) {
+                    let timeA = a.timestamp ? a.timestamp.toMillis() : 0;
+                    let timeB = b.timestamp ? b.timestamp.toMillis() : 0;
+                    return timeB - timeA; 
+                }
+                return orderA - orderB;
+            });
+
             checkCartExpiry();
             renderShopGrid();
             updateCartUI(); 
         }, err => console.error("Помилка завантаження товарів:", err));
+        // -----------------------------------------------------
 
         function renderCategoryBar() {
             const bar = document.getElementById('category-bar');
@@ -601,10 +615,9 @@
             });
         }
 
-        // Функція для зміни варіанту
         window.changeVariant = function(itemId, variantIndex) {
             window.selectedVariants[itemId] = variantIndex;
-            renderShopGrid(); // Перерендеримо сітку для оновлення фото/опису
+            renderShopGrid();
         }
 
         function adjustGridQty(itemId, amount) {
@@ -666,7 +679,6 @@
             }
 
             filteredList.forEach(item => {
-                // Перевірка наявності кольорових варіацій
                 let isVariant = item.variants && item.variants.length > 0;
                 if(isVariant && window.selectedVariants[item.id] === undefined) {
                     window.selectedVariants[item.id] = 0;
@@ -678,7 +690,6 @@
                 let currentSizes = isVariant ? (item.variants[activeVarIdx].sizes || item.sizes) : item.sizes;
                 let currentStockObj = isVariant ? (item.variants[activeVarIdx].stock || item.stock) : item.stock;
 
-                // Кнопки кольорів
                 let variantsHtml = '';
                 if (isVariant) {
                     variantsHtml = '<div class="color-options">';
@@ -690,7 +701,6 @@
                     variantsHtml += '</div>';
                 }
 
-                // Зображення з Lightbox
                 let imgHtml = currentImage 
                     ? `<img src="${currentImage}" onclick="openLightbox('${currentImage}')" title="${lang==='ua'?'Клікніть для збільшення':'Click to zoom'}">` 
                     : `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#666;">No Image</div>`;
@@ -801,7 +811,6 @@
 
             let actualPrice = (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price;
             
-            // Шукаємо такий самий товар (перевіряючи розмір І колір)
             let existingItemIndex = shoppingCart.findIndex(cartItem => 
                 cartItem.merchId === item.id && 
                 cartItem.size === size && 
@@ -825,7 +834,7 @@
                     image: currentImage,
                     price: actualPrice,
                     size: size,
-                    color: currentColorName, // Зберігаємо колір
+                    color: currentColorName,
                     quantity: qty,
                     totalPrice: actualPrice * qty,
                     isPreorder: item.isPreorder || false
@@ -989,7 +998,7 @@
                 }
                 
                 finalSum = baseTotalSum - discountAmount;
-                if (finalSum < 0) finalSum = 0; // Сума не може бути від'ємною
+                if (finalSum < 0) finalSum = 0; 
                 
                 discountSumEl.style.display = 'block';
             } else {
@@ -1077,9 +1086,7 @@
                     }
 
                     for(let obj of merchRefsAndData) {
-                        // Якщо це НЕ передзамовлення, перевіряємо і віднімаємо сток
                         if (!obj.cartItem.isPreorder) {
-                            // Якщо були варіації, треба знайти правильний stock об'єкт
                             let isVariant = obj.data.variants && obj.data.variants.length > 0;
                             let variantIndex = -1;
                             
@@ -1102,7 +1109,6 @@
                             }
                             currentStockObj[sizeKey] = currentStockForSize - obj.cartItem.quantity;
                             
-                            // Зберігаємо змінений сток назад
                             if (isVariant && variantIndex > -1) {
                                 obj.data.variants[variantIndex].stock = currentStockObj;
                             } else {
