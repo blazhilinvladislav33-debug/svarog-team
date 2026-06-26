@@ -1828,8 +1828,14 @@
                     renderMerchList();
                 }, e => console.error(e));
 
+                // === ЗМІНЕНИЙ БЛОК ДІАГНОСТИКИ ===
                 unsubscribeConfig = db.collection("config").doc("shop").onSnapshot(doc => {
+                    console.log("=== ДІАГНОСТИКА КАТЕГОРІЙ ===");
+                    console.log("Документ 'shop' існує в базі?", doc.exists);
+                    
                     const data = doc.exists ? doc.data() : {};
+                    console.log("Отримані дані з Firebase:", data);
+                    
                     const isActive = data.active !== undefined ? data.active : true; 
                     const checkbox = document.getElementById('shop-active-checkbox');
                     const label = document.getElementById('shop-status-label');
@@ -1843,16 +1849,20 @@
                         }
                     }
                     
-                    // Більш надійне привласнення категорій
                     if (data.categories && Array.isArray(data.categories)) {
                         globalCategories = data.categories;
+                        console.log("Масив категорій знайдено:", globalCategories);
                     } else {
                         globalCategories = ['Одяг', 'Шеврони'];
+                        console.log("Категорій в базі немає, ставимо дефолтні:", globalCategories);
                     }
                     
                     renderCategoriesAdmin(); 
                     populateCategorySelect();
-                }, e => console.error(e));
+                }, e => {
+                    console.error("Помилка читання конфігу магазину:", e);
+                });
+                // ==================================
 
                 unsubscribePromos = db.collection("promocodes").orderBy("created", "desc").onSnapshot(snapshot => {
                     globalPromocodes = [];
