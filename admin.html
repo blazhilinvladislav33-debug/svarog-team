@@ -25,7 +25,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Функція логування піднята наверх, щоб уникнути помилок ReferenceError
         async function logAdminAction(actionCategory, actionDetails) {
             const user = firebase.auth().currentUser;
             if (!user) return; 
@@ -588,29 +587,23 @@
     </div>
 
     <script>
-        // ФУНКЦІЯ ПЕРЕМИКАННЯ ВКЛАДОК (ДОДАНО ДЛЯ ПРАВИЛЬНОЇ РОБОТИ)
         function switchTab(tabId, btnElement) {
-            // Приховуємо всі вкладки
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
-            // Знімаємо клас активності з усіх кнопок
             document.querySelectorAll('.tab-button').forEach(btn => {
                 btn.classList.remove('active');
             });
 
-            // Активуємо обрану вкладку
             document.getElementById(tabId).classList.add('active');
             if(btnElement) btnElement.classList.add('active');
             
             currentTab = tabId;
         }
 
-        // ЗАГЛУШКА ДЛЯ setLanguage (щоб не було помилок в консолі при старті)
         function setLanguage(lang) {
             localStorage.setItem('selectedLang', lang);
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            // Активувати правильну кнопку
             if(lang === 'ua') {
                 document.querySelectorAll('.lang-btn')[0].classList.add('active');
             } else {
@@ -618,24 +611,21 @@
             }
         }
         
-        // ЗАГЛУШКА ДЛЯ initBadges 
         function initBadges() {
             console.log("Badges initialized");
         }
 
-        // ЗАГЛУШКА ДЛЯ updateBadgesLogic 
         function updateBadgesLogic() {
             console.log("Badges updated");
         }
         
-        // ФУНКЦІЇ ДЛЯ КАТЕГОРІЙ МАГАЗИНУ (ВИПРАВЛЕНО ТА ДОДАНО ЛОГІКУ)
         function renderCategoriesAdmin() {
             const list = document.getElementById('admin-category-list');
             if (!list) return;
             
             list.innerHTML = '';
             
-            if (globalCategories.length === 0) {
+            if (!globalCategories || globalCategories.length === 0) {
                 list.innerHTML = '<span style="color:#aaa; font-size:0.85rem;">Немає категорій</span>';
                 return;
             }
@@ -656,9 +646,11 @@
             
             select.innerHTML = '<option value="" disabled selected>Оберіть категорію...</option>';
             
-            globalCategories.forEach(cat => {
-                select.innerHTML += `<option value="${cat}">${cat}</option>`;
-            });
+            if(globalCategories) {
+                globalCategories.forEach(cat => {
+                    select.innerHTML += `<option value="${cat}">${cat}</option>`;
+                });
+            }
         }
 
         async function addCategory() {
@@ -1728,6 +1720,65 @@
             finally { isConfirmingStatus = false; renderAllDynamicData(); }
         }
 
+        // --- ВЖИВЛЕНІ ФУНКЦІЇ ДЛЯ УСУНЕННЯ ПОМИЛОК ---
+
+        function previewMerchPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    merchPhotoBase64 = e.target.result;
+                    const previewImg = document.getElementById('merch-preview-element');
+                    if(previewImg) {
+                        previewImg.src = merchPhotoBase64;
+                        previewImg.style.display = 'block';
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function toggleShopStatus() {
+            setTimeout(async () => {
+                const checkbox = document.getElementById('shop-active-checkbox');
+                if(!checkbox) return;
+                try {
+                    await db.collection("config").doc("shop").set({ active: checkbox.checked }, { merge: true });
+                    logAdminAction('shop', `Змінив статус магазину на: ${checkbox.checked ? 'Увімкнено' : 'Вимкнено'}`);
+                } catch(e) { console.error("Помилка статусу магазину:", e); }
+            }, 50);
+        }
+
+        async function savePaymentCredentials() {
+            const bankUrl = document.getElementById('new-donation-link-field').value.trim();
+            const cardNumber = document.getElementById('config-card-number').value.trim();
+            const cardName = document.getElementById('config-card-name').value.trim();
+            try {
+                await db.collection("config").doc("payment").set({
+                    bankUrl: bankUrl,
+                    cardNumber: cardNumber,
+                    cardName: cardName
+                }, { merge: true });
+                alert("✓ Платіжні реквізити успішно збережено!");
+                logAdminAction('payment', 'Оновив платіжні реквізити');
+            } catch(e) {
+                console.error(e);
+                alert("Помилка: " + e.message);
+            }
+        }
+
+        async function deleteOrderItem(id) {
+            if(confirm("Ви впевнені, що хочете остаточно видалити це замовлення з бази?")) {
+                try {
+                    await db.collection("orders").doc(id).delete();
+                    logAdminAction('orders', `Видалив замовлення ID: ${id}`);
+                } catch(e) {
+                    console.error("Помилка:", e);
+                }
+            }
+        }
+        
+        // ----------------------------------------------
+
         function initFirebaseRealtimeStreams() {
             try {
                 unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
@@ -1782,6 +1833,7 @@
                     const isActive = data.active !== undefined ? data.active : true; 
                     const checkbox = document.getElementById('shop-active-checkbox');
                     const label = document.getElementById('shop-status-label');
+                    
                     if(checkbox) checkbox.checked = isActive;
                     if(label) {
                         if(isActive) {
@@ -1790,8 +1842,16 @@
                             label.innerText = "Магазин вимкнено (Технічні роботи)"; label.style.color = "#ff4a4a";
                         }
                     }
-                    globalCategories = data.categories || ['Одяг', 'Шеврони'];
-                    renderCategoriesAdmin(); populateCategorySelect();
+                    
+                    // Більш надійне привласнення категорій
+                    if (data.categories && Array.isArray(data.categories)) {
+                        globalCategories = data.categories;
+                    } else {
+                        globalCategories = ['Одяг', 'Шеврони'];
+                    }
+                    
+                    renderCategoriesAdmin(); 
+                    populateCategorySelect();
                 }, e => console.error(e));
 
                 unsubscribePromos = db.collection("promocodes").orderBy("created", "desc").onSnapshot(snapshot => {
