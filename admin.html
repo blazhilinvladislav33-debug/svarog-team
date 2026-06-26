@@ -1425,6 +1425,10 @@
                 variants: hasVariants ? currentMerchVariants : []
             };
 
+            // --- Додаємо порядковий номер для сортування нових товарів ---
+            if (!editId) { merchObject.order = globalMerchData.length; }
+            // -----------------------------------------------------------
+
             try {
                 if(editId) {
                     await db.collection("merch").doc(editId).set(merchObject, { merge: true });
@@ -1571,9 +1575,17 @@
                             ${descHtml}
                             <div class="merch-sizes" style="border-top:1px solid rgba(255,255,255,0.05); padding-top:5px;">${sizesHtml}</div>
                             <div class="merch-sizes" style="color:#aaa; font-size:0.85rem; margin-bottom:12px; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px;">Залишки: ${stockLine}</div>
-                            <div class="merch-actions">
-                                <button class="edit-news-btn" style="position:relative; right:auto; top:auto;" onclick="startEditMerch('${item.id}')">Редагувати</button>
-                                <button class="delete-admin-btn" style="position:relative; right:auto; top:auto;" onclick="deleteMerchItem('${item.id}')">Видалити</button>
+                            <div class="merch-actions" style="justify-content: space-between; flex-direction:column; gap:10px;">
+                                <div style="display:flex; justify-content:center; align-items:center; gap:5px; background:rgba(0,0,0,0.2); padding:5px; border-radius:6px; flex-wrap:wrap;">
+                                    <button class="export-btn" style="padding:4px 8px; margin:0; border-color:#888; color:#ccc;" onclick="moveMerchItem('${item.id}', 'up')" title="На самий початок">⬆️</button>
+                                    <button class="export-btn" style="padding:4px 8px; margin:0; border-color:#888; color:#ccc;" onclick="moveMerchItem('${item.id}', 'left')" title="Посунути на 1 позицію назад">⬅️</button>
+                                    <button class="export-btn" style="padding:4px 8px; margin:0; border-color:#888; color:#ccc;" onclick="moveMerchItem('${item.id}', 'right')" title="Посунути на 1 позицію вперед">➡️</button>
+                                    <button class="export-btn" style="padding:4px 8px; margin:0; border-color:#888; color:#ccc;" onclick="moveMerchItem('${item.id}', 'down')" title="В самий кінець">⬇️</button>
+                                </div>
+                                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                                    <button class="edit-news-btn" style="position:relative; right:auto; top:auto;" onclick="startEditMerch('${item.id}')">Редагувати</button>
+                                    <button class="delete-admin-btn" style="position:relative; right:auto; top:auto;" onclick="deleteMerchItem('${item.id}')">Видалити</button>
+                                </div>
                             </div>
                         </div>
                     </div>`;
@@ -1589,6 +1601,50 @@
                 catch(e) { console.error("Помилка видалення товару:", e); }
             }
         }
+
+        // --- НОВА ФУНКЦІЯ ДЛЯ СОРТУВАННЯ ТОВАРІВ ---
+        async function moveMerchItem(id, action) {
+            const index = globalMerchData.findIndex(m => m.id === id);
+            if (index < 0) return;
+
+            let newArray = [...globalMerchData];
+
+            if (action === 'up') {
+                if (index > 0) {
+                    const item = newArray.splice(index, 1)[0];
+                    newArray.unshift(item);
+                }
+            } else if (action === 'down') {
+                if (index < newArray.length - 1) {
+                    const item = newArray.splice(index, 1)[0];
+                    newArray.push(item);
+                }
+            } else if (action === 'left') {
+                if (index > 0) {
+                    const temp = newArray[index];
+                    newArray[index] = newArray[index - 1];
+                    newArray[index - 1] = temp;
+                }
+            } else if (action === 'right') {
+                if (index < newArray.length - 1) {
+                    const temp = newArray[index];
+                    newArray[index] = newArray[index + 1];
+                    newArray[index + 1] = temp;
+                }
+            }
+
+            try {
+                const batch = db.batch();
+                newArray.forEach((itm, i) => {
+                    batch.update(db.collection("merch").doc(itm.id), { order: i });
+                });
+                await batch.commit();
+                logAdminAction('shop', `Змінив порядок товару у каталозі`);
+            } catch(e) {
+                console.error("Помилка сортування:", e);
+            }
+        }
+        // -------------------------------------------
 
         function setOrdersFilter(filterType) {
             currentOrdersFilter = filterType;
@@ -1720,8 +1776,6 @@
             finally { isConfirmingStatus = false; renderAllDynamicData(); }
         }
 
-        // --- ВЖИВЛЕНІ ФУНКЦІЇ ДЛЯ УСУНЕННЯ ПОМИЛОК ---
-
         function previewMerchPhoto(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -1777,8 +1831,6 @@
             }
         }
         
-        // ----------------------------------------------
-
         function initFirebaseRealtimeStreams() {
             try {
                 unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
@@ -1822,13 +1874,27 @@
                     renderAllDynamicData();
                 }, e => console.error(e));
 
-                unsubscribeMerch = db.collection("merch").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+                // --- ЗМІНЕНО: СОРТУВАННЯ ТОВАРІВ ЗА ПОРЯДКОМ ---
+                unsubscribeMerch = db.collection("merch").onSnapshot(snapshot => {
                     globalMerchData = [];
                     snapshot.forEach(doc => { globalMerchData.push({ id: doc.id, ...doc.data() }); });
+                    
+                    globalMerchData.sort((a, b) => {
+                        let orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER;
+                        let orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER;
+                        
+                        if (orderA === orderB) {
+                            let timeA = a.timestamp ? a.timestamp.toMillis() : 0;
+                            let timeB = b.timestamp ? b.timestamp.toMillis() : 0;
+                            return timeB - timeA; 
+                        }
+                        return orderA - orderB;
+                    });
+
                     renderMerchList();
                 }, e => console.error(e));
+                // ---------------------------------------------
 
-                // === ЗМІНЕНИЙ БЛОК ДІАГНОСТИКИ ===
                 unsubscribeConfig = db.collection("config").doc("shop").onSnapshot(doc => {
                     console.log("=== ДІАГНОСТИКА КАТЕГОРІЙ ===");
                     console.log("Документ 'shop' існує в базі?", doc.exists);
@@ -1862,7 +1928,6 @@
                 }, e => {
                     console.error("Помилка читання конфігу магазину:", e);
                 });
-                // ==================================
 
                 unsubscribePromos = db.collection("promocodes").orderBy("created", "desc").onSnapshot(snapshot => {
                     globalPromocodes = [];
