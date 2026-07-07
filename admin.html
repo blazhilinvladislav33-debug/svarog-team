@@ -401,7 +401,7 @@
                                 <h2 id="cert-display-title" contenteditable="true" style="outline:none;">Сертифікат підтримки</h2>
                                 
                                 <div class="promo-wrapper-block">
-                                    <div class="code-label-text" id="cert-display-label" contenteditable="true" style="outline:none;">СУМА СЕРТИФІКАТА</div>
+                                    <div class="cert-display-label" id="cert-display-label" contenteditable="true" style="outline:none;">СУМА СЕРТИФІКАТА</div>
                                     <div class="code-box-style">
                                         <div class="code-val-text" id="cert-display-value" contenteditable="true" style="outline:none;">0 ₴</div>
                                     </div>
@@ -945,7 +945,7 @@
                 </div>
                 <div style="padding: 10px; background:rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.1); display:flex; gap:10px;">
                     <input type="text" id="admin-chat-input" class="form-input" placeholder="Напишіть відповідь..." onkeypress="if(event.key === 'Enter') sendAdminMessage('${chat.id}')" autocomplete="off">
-                    <button class="btn" style="width:auto; padding: 0 20px;" onclick="sendAdminMessage('${chat.id}')">Відправити</button>
+                    <button class="btn" style="width:auto; padding: 0 20px;" onclick="sendAdminMessage('${chat.id}')">Відпустити</button>
                 </div>
             `;
             
@@ -1425,9 +1425,7 @@
                 variants: hasVariants ? currentMerchVariants : []
             };
 
-            // --- Додаємо порядковий номер для сортування нових товарів ---
             if (!editId) { merchObject.order = globalMerchData.length; }
-            // -----------------------------------------------------------
 
             try {
                 if(editId) {
@@ -1602,7 +1600,6 @@
             }
         }
 
-        // --- НОВА ФУНКЦІЯ ДЛЯ СОРТУВАННЯ ТОВАРІВ ---
         async function moveMerchItem(id, action) {
             const index = globalMerchData.findIndex(m => m.id === id);
             if (index < 0) return;
@@ -1644,7 +1641,6 @@
                 console.error("Помилка сортування:", e);
             }
         }
-        // -------------------------------------------
 
         function setOrdersFilter(filterType) {
             currentOrdersFilter = filterType;
@@ -1653,6 +1649,17 @@
             if(filterType === 'sent') document.getElementById('sub-btn-sent').classList.add('active');
             if(filterType === 'archive') document.getElementById('sub-btn-archive').classList.add('active');
             renderOrdersList();
+        }
+
+        // --- ФУНКЦІЯ ДЛЯ ВІДКРИТТЯ ЧЕКІВ / КВИТАНЦІЙ ОПЛАТИ НА ВЕСЬ ЕКРАН ---
+        function openFullImage(imgSrc) {
+            if (!imgSrc) return;
+            const newWin = window.open();
+            if (newWin) {
+                newWin.document.write(`<body style="margin:0; background:#121212; display:flex; justify-content:center; align-items:center; min-height:100vh;"><img src="${imgSrc}" style="max-width:100%; max-height:100vh; object-fit:contain; box-shadow:0 0 30px rgba(0,0,0,0.8);"></body>`);
+            } else {
+                alert("Браузер заблокував відкриття нового вікна. Будь ласка, дозвольте спливаючі вікна для цього сайту в налаштуваннях браузера.");
+            }
         }
 
         function renderOrdersList() {
@@ -1715,7 +1722,7 @@
                 let promoHtml = (ord.promoCode && ord.promoCode !== "Не застосовано") ? `<div style="font-size:0.85rem; color:#777777; margin-bottom:8px;">🎟️ Промокод / Сертифікат: <b>${ord.promoCode}</b></div>` : '';
                 let paymentMethodHtml = ord.paymentMethod ? `<div style="font-size:0.9rem; color:#fff; margin-bottom:8px;">💳 <b>Оплата:</b> ${ord.paymentMethod}</div>` : '';
                 
-                let paymentProofHtml = ord.paymentProof ? `<button class="btn" style="margin-top:10px; padding:6px 12px; width:auto; border-color:#777777; color:#777777;" onclick="openFullImage('${ord.paymentProof}')">📸 Переглянути квитанцію</button>` : '';
+                let paymentProofHtml = ord.paymentProof ? `<button class="btn" style="margin-top:10px; padding:6px 12px; width:auto; border-color:var(--theme-color); color:var(--theme-color);" onclick="openFullImage('${ord.paymentProof}')">📸 Переглянути квитанцію</button>` : '';
                 let archiveHint = status === 'delivered' ? `<span style="font-size:0.75rem; color:#aaa; margin-left:10px;">(Можна в архів)</span>` : '';
 
                 ordersBox.innerHTML += `
@@ -1826,7 +1833,7 @@
                     await db.collection("orders").doc(id).delete();
                     logAdminAction('orders', `Видалив замовлення ID: ${id}`);
                 } catch(e) {
-                    console.error("Помилка:", e);
+                    document.error("Помилка:", e);
                 }
             }
         }
@@ -1874,7 +1881,6 @@
                     renderAllDynamicData();
                 }, e => console.error(e));
 
-                // --- ЗМІНЕНО: СОРТУВАННЯ ТОВАРІВ ЗА ПОРЯДКОМ ---
                 unsubscribeMerch = db.collection("merch").onSnapshot(snapshot => {
                     globalMerchData = [];
                     snapshot.forEach(doc => { globalMerchData.push({ id: doc.id, ...doc.data() }); });
@@ -1893,15 +1899,9 @@
 
                     renderMerchList();
                 }, e => console.error(e));
-                // ---------------------------------------------
 
                 unsubscribeConfig = db.collection("config").doc("shop").onSnapshot(doc => {
-                    console.log("=== ДІАГНОСТИКА КАТЕГОРІЙ ===");
-                    console.log("Документ 'shop' існує в базі?", doc.exists);
-                    
                     const data = doc.exists ? doc.data() : {};
-                    console.log("Отримані дані з Firebase:", data);
-                    
                     const isActive = data.active !== undefined ? data.active : true; 
                     const checkbox = document.getElementById('shop-active-checkbox');
                     const label = document.getElementById('shop-status-label');
@@ -1917,10 +1917,8 @@
                     
                     if (data.categories && Array.isArray(data.categories)) {
                         globalCategories = data.categories;
-                        console.log("Масив категорій знайдено:", globalCategories);
                     } else {
                         globalCategories = ['Одяг', 'Шеврони'];
-                        console.log("Категорій в базі немає, ставимо дефолтні:", globalCategories);
                     }
                     
                     renderCategoriesAdmin(); 
@@ -2004,6 +2002,70 @@
                 const checked = checkbox.checked;
                 const box = document.getElementById('news-button-config-box');
                 if(box) box.style.display = checked ? 'block' : 'none';
+            }
+        }
+
+        // --- ЖИВА ФУНКЦІЯ ПУБЛІКАЦІЇ НОВИН ТА ЗВІТІВ (ВИПРАВЛЕНО ТА НАЛАШТОВАНО) ---
+        async function publishNewsItem() {
+            const editId = document.getElementById('edit-news-id').value;
+            const publishType = document.getElementById('news-publish-type').value; // 'news' або 'report'
+            const mediaType = document.getElementById('news-media-type').value; // 'image' або 'video'
+            const title = document.getElementById('news-title-field').value.trim();
+            const bodyText = document.getElementById('news-body-field').value.trim();
+            const date = document.getElementById('news-date-field').value;
+            
+            const hasButton = document.getElementById('news-has-btn-checkbox')?.checked || false;
+            const btnText = document.getElementById('news-btn-text-field').value.trim();
+            const btnUrl = document.getElementById('news-btn-url-field').value.trim();
+
+            if (publishType === 'news' && !title) { alert("Введіть заголовок новини!"); return; }
+            if (!bodyText) { alert("Введіть повний текст або опис публікації!"); return; }
+            if (mediaType === 'video' && !document.getElementById('news-video-url').value.trim()) { alert("Введіть лінк на YouTube відео!"); return; }
+            if (mediaType === 'image' && !newsPhotoBase64 && !editId) { alert("Завантажте фото публікації!"); return; }
+
+            const videoUrl = document.getElementById('news-video-url').value.trim();
+            let dataObj = {};
+            let collectionName = "";
+
+            // Розподіляємо по структурі колекцій Firebase
+            if (publishType === 'report') {
+                collectionName = "reports";
+                dataObj = {
+                    description: bodyText,
+                    mediaType: mediaType,
+                    videoUrl: mediaType === 'video' ? videoUrl : null,
+                    image: mediaType === 'image' ? (newsPhotoBase64 || null) : null,
+                    date: date
+                };
+            } else {
+                collectionName = "news";
+                dataObj = {
+                    title: title,
+                    body: bodyText,
+                    mediaType: mediaType,
+                    videoUrl: mediaType === 'video' ? videoUrl : null,
+                    image: mediaType === 'image' ? (newsPhotoBase64 || null) : null,
+                    date: date,
+                    hasButton: hasButton,
+                    btnText: hasButton ? btnText : null,
+                    btnUrl: hasButton ? btnUrl : null
+                };
+            }
+
+            try {
+                if (editId) {
+                    await db.collection(collectionName).doc(editId).set(dataObj, { merge: true });
+                    alert("✓ Зміни успішно збережено в базі!");
+                } else {
+                    dataObj.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection(collectionName).add(dataObj);
+                    alert("✓ Опубліковано успішно! Дані вже синхронізовані із сайтом.");
+                }
+                logAdminAction('news', `Створив/Оновив ${publishType}: "${title || 'Фінансовий звіт'}"`);
+                cancelNewsEditing();
+            } catch (err) {
+                console.error("Помилка при збереженні запису: ", err);
+                alert("Помилка бази даних: " + err.message);
             }
         }
 
