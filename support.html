@@ -118,8 +118,9 @@
         .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; width: 100%; }
         .report-card { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); transition: transform 0.3s ease, border-color 0.3s; }
         .report-card:hover { transform: translateY(-5px); border-color: rgba(var(--theme-color-rgb), 0.5); }
-        .report-img { width: 100%; height: 220px; background: rgba(0,0,0,0.5); }
+        .report-img { width: 100%; height: 220px; background: rgba(0,0,0,0.5); position: relative; overflow: hidden; }
         .report-img img { width: 100%; height: 100%; object-fit: cover; }
+        .report-img iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         .report-desc { padding: 15px; font-size: 0.95rem; color: #ccc; line-height: 1.5; white-space: pre-wrap; flex-grow: 1; }
 
         /* СОЦІАЛЬНІ МЕРЕЖІ (З INDEX) */
@@ -195,7 +196,6 @@
     </nav>
 
     <div class="main-content">
-        <!-- БЛОК 1: ФІНАНСОВА ПІДТРИМКА -->
         <div class="container">
             <div class="page-title-box">
                 <h1 data-lang="ua">Фінансова підтримка</h1>
@@ -214,7 +214,6 @@
             </div>
         </div>
 
-        <!-- БЛОК 2: АНКЕТА ВОЛОНТЕРА (СХОВАНА ПІД КНОПКОЮ) -->
         <div class="container" style="padding-top: 25px; padding-bottom: 25px;">
             <div class="volunteer-accordion-header" onclick="toggleVolunteerForm()">
                 <h2 data-lang="ua">📋 Анкета волонтера</h2>
@@ -255,7 +254,6 @@
             </div>
         </div>
 
-        <!-- БЛОК 3: ЗВІТИ ПО ДОНАТАХ -->
         <div class="reports-wrapper">
             <h2>
                 <span data-lang="ua">Звіти по донатах</span>
@@ -266,7 +264,6 @@
             </div>
         </div>
 
-        <!-- БЛОК 4: СОЦІАЛЬНІ МЕРЕЖІ -->
         <div class="home-socials-wrapper">
             <div class="home-socials" id="dynamic-user-social-container"></div>
         </div>
@@ -451,7 +448,7 @@
                 toggleVolunteerForm();
 
             } catch (err) {
-                console.error("Помилка відправки анкети: ", err);
+                console.error("Помилка відправки анкету: ", err);
                 alert(lang === 'ua' ? 'Помилка: ' + err.message : 'Error: ' + err.message);
             } finally {
                 btn.disabled = false;
@@ -460,7 +457,15 @@
             }
         }
 
-        // --- ЛОГІКА ЗВІТІВ (REPORTS) ---
+        // --- ДОПОМІЖНА ФУНКЦІЯ ДЛЯ ПЕРЕТВОРЕННЯ ПОСИЛАННЯ YOUTUBE В EMBED ФОРМАТ ---
+        function getYouTubeEmbedUrl(url) {
+            if (!url) return '';
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=|shorts\/)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : url;
+        }
+
+        // --- ЛОГІКА ЗВІТІВ (REPORTS) З ПІДТРИМКОЮ ФОТО ТА ВІДЕО ---
         function initReportsStream() {
             db.collection("reports").orderBy("timestamp", "desc").onSnapshot(snapshot => {
                 const grid = document.getElementById('dynamic-reports-grid');
@@ -475,10 +480,19 @@
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    let imgHtml = data.image ? `<div class="report-img"><img src="${data.image}"></div>` : '';
+                    let mediaHtml = '';
+                    
+                    // Перевірка: якщо тип медіа відео, генеруємо плеєр iframe, інакше стандартне фото
+                    if (data.mediaType === 'video' && data.videoUrl) {
+                        const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
+                        mediaHtml = `<div class="report-img"><iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+                    } else if (data.image) {
+                        mediaHtml = `<div class="report-img"><img src="${data.image}" alt="Report Image"></div>`;
+                    }
+                    
                     grid.innerHTML += `
                         <div class="report-card">
-                            ${imgHtml}
+                            ${mediaHtml}
                             <div class="report-desc">${data.description}</div>
                         </div>
                     `;
@@ -499,7 +513,7 @@
             }
         });
 
-        // --- ЖИВА СИНХРОНІЗАЦІЯ АНОНІМНОГО ЧАТУ (ОНОВЛЕНО) ---
+        // --- ЖИВА СИНХРОНІЗАЦІЯ АНОНІМНОГО ЧАТУ ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
@@ -618,7 +632,6 @@
             initReportsStream(); 
             initUserChat(); 
             
-            // Відновлення стану чату при переході між сторінками
             if (localStorage.getItem('svarogChatIsOpen') === 'true') {
                 openUserChat();
             }
