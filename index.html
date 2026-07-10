@@ -23,6 +23,14 @@
     </script>
 
     <style>
+        /* КРОК 1: Підключаємо твій особистий шрифт */
+        @font-face {
+            font-family: 'SvarogTeamCustom';
+            src: url('SvarogTeam-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         :root {
             --theme-color: #f0b48c;
             --theme-color-rgb: 240, 180, 140;
@@ -56,7 +64,16 @@
 
         .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-text-group { display: flex; flex-direction: column; line-height: 1.1; }
-        .logo-main { font-size: 1.1rem; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; }
+        
+        /* КРОК 2: Застосовуємо новий шрифт для головного логотипу */
+        .logo-main { 
+            font-family: 'SvarogTeamCustom', sans-serif; 
+            font-size: 1.3rem; /* Можна збільшити/зменшити розмір за потреби */
+            font-weight: normal; 
+            color: #ffffff; 
+            letter-spacing: 0.5px; 
+        }
+        
         .logo-sub { font-size: 0.7rem; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 1px; }
         .logo-img { height: 40px; width: auto; display: block; }
 
@@ -114,6 +131,11 @@
 
         /* ФУТЕР ТА ЧАТ */
         .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
+        
+        /* КРОК 3 (ОПЦІОНАЛЬНО): Застосовуємо шрифт також для тексту у футері */
+        .footer span { font-family: 'Segoe UI', sans-serif; }
+        .footer span strong { font-family: 'SvarogTeamCustom', sans-serif; font-weight: normal; }
+
         .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
@@ -280,8 +302,8 @@
         <div style="margin-bottom: 10px;">
             <a href="status.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.3);">Перевірити статус замовлення</a>
         </div>
-        <span data-lang="ua">SVAROG TEAM © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
-        <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
+        <span data-lang="ua"><strong>SVAROG TEAM</strong> © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
+        <span data-lang="en"><strong>SVAROG TEAM</strong> © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
     </footer>
 
     <div class="user-chat-modal" id="user-chat-window">
@@ -332,7 +354,7 @@
             document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
         }
 
-        // --- ОНОВЛЕНА ЛОГІКА СТАТИСТИКИ (Анімація при кожному показі) ---
+        // --- ЛОГІКА СТАТИСТИКИ ---
         let isAnimating = false;
         let currentStats = { targets: 0, funds: 0, missions: 0 };
 
@@ -383,7 +405,6 @@
                             animateValue("stat-val-missions", 0, parseInt(currentStats.missions) || 0, 2000);
                         }
                     } else {
-                        // Скидаємо, коли ховається за екран
                         isAnimating = false;
                         document.getElementById('stat-val-targets').innerText = "0";
                         document.getElementById('stat-val-funds').innerText = "0";
@@ -409,7 +430,7 @@
             }
         });
 
-        // --- ОНОВЛЕНА ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE ---
+        // --- ЛОГІКА ХМАРНОГО ЧАТУ FIREBASE ---
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
@@ -421,7 +442,6 @@
             startRealtimeChatListener();
         }
 
-        // Функція для відкриття чату та збереження його стану
         function openUserChat(e) {
             if(e) e.preventDefault();
             if(navMenu) navMenu.classList.remove('active');
@@ -431,7 +451,6 @@
             renderUserChat();
         }
 
-        // Функція для закриття чату
         function closeUserChat() {
             document.getElementById('user-chat-window').style.display = 'none';
             localStorage.setItem('svarogChatIsOpen', 'false');
@@ -440,7 +459,6 @@
         function startRealtimeChatListener() {
             if (unsubscribeUserChat) unsubscribeUserChat();
 
-            // Firebase onSnapshot вже гарантує, що сторінку оновлювати не треба при нових СМС
             unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(doc => {
                 let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' };
                 renderUserChat(myChat);
@@ -525,7 +543,6 @@
             initUserChat(); 
             initStatsAnimation(); 
             
-            // Якщо чат був відкритий на іншій сторінці, відкриваємо його і тут
             if (localStorage.getItem('svarogChatIsOpen') === 'true') {
                 openUserChat();
             }
