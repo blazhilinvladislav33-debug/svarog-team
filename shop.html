@@ -23,193 +23,224 @@
     </script>
 
     <style>
+        /* ГЛОБАЛЬНІ СТИЛІ ТА ПРЕМІАЛЬНА НЕОНОВА ПАЛІТРА */
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
         :root {
-            --theme-color: #f0b48c;
-            --theme-color-rgb: 240, 180, 140;
+            --theme-color: #8F3BFF; /* Електричний фіолетовий як на референсі */
+            --theme-color-rgb: 143, 59, 255;
+            --bg-dark: #0a0a0c;
+            --card-bg: rgba(20, 20, 25, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { width: 100%; min-height: 100%; } 
+        html, body { width: 100%; min-height: 100%; background-color: var(--bg-dark); } 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; color: var(--text-main);
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             position: relative; overflow-x: hidden;
             --bg-image: url('bg1.jpg'); 
         }
         
+        /* Градієнтні неонові відблиски на фоні */
         body::before { 
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), var(--bg-image);
-            background-position: center; background-repeat: no-repeat; background-size: cover; z-index: -1; 
+            background-image: linear-gradient(rgba(10, 10, 12, 0.85), rgba(10, 10, 12, 0.95)), var(--bg-image);
+            background-position: center; background-repeat: no-repeat; background-size: cover; z-index: -2; 
+        }
+
+        body::after {
+            content: ""; position: fixed; top: -200px; right: -200px; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(var(--theme-color-rgb), 0.15) 0%, transparent 70%);
+            z-index: -1; pointer-events: none; filter: blur(80px);
         }
         
-        .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
-        .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        /* НАВІГАЦІЯ */
+        .navbar { width: 100%; background-color: rgba(10, 10, 12, 0.75); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); position: fixed; top: 0; left: 0; z-index: 1000; }
+        .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; }
         .left-side { display: flex; align-items: center; gap: 20px; }
-        .menu-toggle { display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .menu-toggle .bar { width: 22px; height: 3px; background-color: #ffffff; border-radius: 2px; }
-        .menu-toggle:hover { transform: scale(1.05); background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); }
+        .menu-toggle { display: flex; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 6px; transform: scale(0.85); transition: all 0.3s ease; }
+        .menu-toggle .bar { width: 22px; height: 2px; background-color: #ffffff; border-radius: 2px; }
+        .menu-toggle:hover { background-color: rgba(255, 255, 255, 0.05); }
         .menu-toggle.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
         .menu-toggle.open .bar:nth-child(2) { opacity: 0; transform: translateX(-10px); }
         .menu-toggle.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
         .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-text-group { display: flex; flex-direction: column; line-height: 1.1; }
-        .logo-main { font-size: 1.1rem; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; }
-        .logo-sub { font-size: 0.7rem; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 1px; }
-        .logo-img { height: 40px; width: auto; display: block; }
+        .logo-main { font-size: 1.1rem; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; }
+        .logo-sub { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .logo-img { height: 35px; width: auto; display: block; filter: drop-shadow(0 0 8px rgba(var(--theme-color-rgb), 0.3)); }
 
-        .lang-switcher { display: flex; gap: 4px; background: rgba(0, 0, 0, 0.3); padding: 2px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .lang-btn { background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; font-weight: bold; padding: 4px 8px; cursor: pointer; border-radius: 3px; transition: all 0.3s ease; }
-        .lang-btn:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.1); }
-        .lang-btn.active { color: #121212; background-color: #ffffff; box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2); }
+        .lang-switcher { display: flex; gap: 4px; background: rgba(255, 255, 255, 0.05); padding: 3px; border-radius: 30px; border: 1px solid var(--border-color); }
+        .lang-btn { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 6px 12px; cursor: pointer; border-radius: 30px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .lang-btn:hover { color: #ffffff; }
+        .lang-btn.active { color: #fff; background-color: var(--theme-color); box-shadow: 0 4px 12px rgba(var(--theme-color-rgb), 0.3); }
         
-        .nav-links { list-style: none; display: flex; flex-direction: column; width: 260px; background-color: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); position: fixed; top: 65px; left: -280px; height: calc(100vh - 65px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); gap: 10px; box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5); transition: left 0.4s cubic-bezier(0.075, 0.82, 0.165, 1); }
+        .nav-links { list-style: none; display: flex; flex-direction: column; width: 280px; background-color: rgba(10, 10, 12, 0.98); backdrop-filter: blur(20px); position: fixed; top: 68px; left: -300px; height: calc(100vh - 68px); padding: 30px 20px; border-right: 1px solid var(--border-color); gap: 10px; box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5); transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .nav-links.active { left: 0; }
-        .nav-links a { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 1.1rem; font-weight: 500; display: block; padding: 12px 15px; border-radius: 6px; transition: all 0.2s ease; }
-        .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); padding-left: 22px; }
-        .nav-links a.current-page { color: #ffffff; background-color: rgba(255, 255, 255, 0.12); font-weight: bold; border-left: 4px solid #ffffff; padding-left: 18px; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 1rem; font-weight: 500; display: block; padding: 14px 18px; border-radius: 10px; transition: all 0.2s ease; }
+        .nav-links a:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.05); padding-left: 24px; }
+        .nav-links a.current-page { color: #ffffff; background-color: rgba(var(--theme-color-rgb), 0.1); font-weight: 700; border-left: 4px solid var(--theme-color); padding-left: 18px; }
 
-        .menu-chat-btn { border: 2px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.2); margin-top: 5px; }
-        .menu-chat-btn:hover { background: var(--theme-color) !important; color: #121212 !important; padding-left: 15px !important; }
+        .menu-chat-btn { border: 1px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: 700 !important; margin-top: 15px; }
+        .menu-chat-btn:hover { background: var(--theme-color) !important; color: #fff !important; }
 
-        .main-content { margin-top: 100px; padding: 20px; display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; max-width: 1200px; }
-        .page-title-box { text-align: center; margin-bottom: 30px; }
-        .page-title-box h1 { font-size: 2.2rem; color: #ffffff; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .page-title-box p { color: #ccc; font-size: 1.05rem; }
-
-        .categories-nav { display: flex; gap: 10px; overflow-x: auto; width: 100%; justify-content: center; padding-bottom: 15px; margin-bottom: 20px; }
-        .categories-nav::-webkit-scrollbar { height: 4px; }
-        .categories-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-        .category-btn { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.95rem; white-space: nowrap; transition: all 0.3s; }
-        .category-btn:hover { border-color: rgba(var(--theme-color-rgb), 0.6); }
-        .category-btn.active { background: var(--theme-color); color: #121212; border-color: var(--theme-color); font-weight: bold; box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.4); }
-
-        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; margin-bottom: 50px; }
-        .merch-card { background: rgba(25, 25, 25, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .merch-card:hover { transform: translateY(-8px); border-color: rgba(var(--theme-color-rgb), 0.4); box-shadow: 0 15px 40px rgba(var(--theme-color-rgb), 0.15); }
+        /* ВЕЛИКИЙ БАНЕР / ГЕРОЙ ШАПКА */
+        .hero-banner { width: 100%; max-width: 1200px; margin-top: 100px; padding: 40px 30px; background: linear-gradient(135deg, rgba(20, 20, 25, 0.4) 0%, rgba(10, 10, 12, 0.6) 100%); border: 1px solid var(--border-color); border-radius: 24px; display: flex; align-items: center; justify-content: space-between; gap: 30px; position: relative; overflow: hidden; backdrop-filter: blur(10px); }
+        .hero-banner::before { content: ""; position: absolute; bottom: -100px; left: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(var(--theme-color-rgb), 0.1) 0%, transparent 70%); filter: blur(50px); pointer-events: none; }
+        .hero-info { max-width: 550px; z-index: 2; }
+        .hero-info h1 { font-size: 2.8rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .hero-info p { color: var(--text-muted); font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px; }
+        .hero-btn { display: inline-block; padding: 14px 28px; background: var(--theme-color); color: #fff; font-weight: 700; text-decoration: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(var(--theme-color-rgb), 0.3); transition: all 0.3s; }
+        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(var(--theme-color-rgb), 0.5); }
         
-        /* Збільшення фото (Lightbox) */
-        .merch-img-box { width: 100%; height: 260px; background: rgba(0,0,0,0.5); overflow: hidden; position: relative; cursor: zoom-in; }
-        .merch-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-        .merch-card:hover .merch-img-box img { transform: scale(1.08); }
-        
-        .stock-badge { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); color: #777777; font-size: 0.8rem; font-weight: bold; padding: 4px 10px; border-radius: 6px; border: 1px solid #777777; z-index: 2; }
-        .stock-badge.empty { color: #ff4a4a; border-color: #ff4a4a; }
-        .sale-badge { position: absolute; top: 12px; left: 12px; background: #ff4a4a; color: #fff; font-size: 0.85rem; font-weight: bold; padding: 4px 10px; border-radius: 6px; z-index: 2; box-shadow: 0 4px 10px rgba(255, 74, 74, 0.4); }
+        .hero-showcase-img { height: 200px; width: auto; object-fit: contain; z-index: 2; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
 
-        .merch-details { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
-        .merch-title { font-size: 1.25rem; font-weight: bold; color: #fff; margin-bottom: 8px; line-height: 1.3; }
-        
-        /* Кольорові варіанти */
-        .color-options { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-        .color-btn { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; transition: 0.2s; padding: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .color-btn:hover { transform: scale(1.1); }
-        .color-btn.active { border-color: var(--theme-color); transform: scale(1.2); box-shadow: 0 0 8px rgba(var(--theme-color-rgb), 0.8); }
+        /* ОСНОВНИЙ КОНТЕНТ */
+        .main-content { padding: 40px 20px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1200px; }
 
-        .merch-desc { font-size: 0.85rem; color: #bbb; margin-bottom: 15px; line-height: 1.45; white-space: pre-wrap; flex-grow: 1; }
+        /* НАВІГАЦІЯ ПО КАТЕГОРІЯХ (ПІЛЛИ ЯК НА МАКЕТІ) */
+        .categories-nav { display: flex; gap: 12px; overflow-x: auto; width: 100%; justify-content: center; padding-bottom: 15px; margin-bottom: 35px; scrollbar-width: none; }
+        .categories-nav::-webkit-scrollbar { display: none; }
+        .category-btn { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); color: var(--text-muted); padding: 10px 24px; border-radius: 30px; cursor: pointer; font-size: 0.95rem; font-weight: 600; white-space: nowrap; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .category-btn:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
+        .category-btn.active { background: var(--theme-color); color: #ffffff; border-color: var(--theme-color); box-shadow: 0 8px 20px rgba(var(--theme-color-rgb), 0.3); }
+
+        /* КАТАЛОГ ТОВАРІВ */
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; width: 100%; margin-bottom: 60px; }
+        .merch-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .merch-card:hover { transform: translateY(-6px); border-color: rgba(var(--theme-color-rgb), 0.4); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(var(--theme-color-rgb), 0.05); }
         
-        .price-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-        .merch-price { font-size: 1.4rem; font-weight: 900; color: var(--theme-color); }
-        .old-price { font-size: 1rem; color: #888; text-decoration: line-through; }
+        .merch-img-box { width: 100%; height: 320px; background: rgba(0,0,0,0.2); overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; cursor: zoom-in; }
+        .merch-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .merch-card:hover .merch-img-box img { transform: scale(1.05); }
         
-        .merch-options { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
-        .merch-select { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 10px; border-radius: 6px; outline: none; font-size: 0.9rem; cursor: pointer; transition: 0.3s; height: 38px; }
+        .stock-badge { position: absolute; top: 16px; right: 16px; background: rgba(10, 10, 12, 0.75); backdrop-filter: blur(10px); color: #8e8e93; font-size: 0.75rem; font-weight: 700; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color); z-index: 2; }
+        .stock-badge.empty { color: #ff4a4a; border-color: rgba(255, 74, 74, 0.3); background: rgba(255, 74, 74, 0.1); }
+        .sale-badge { position: absolute; top: 16px; left: 16px; background: #ff4a4a; color: #fff; font-size: 0.8rem; font-weight: 800; padding: 6px 14px; border-radius: 8px; z-index: 2; box-shadow: 0 4px 12px rgba(255, 74, 74, 0.3); }
+
+        .merch-details { padding: 24px; display: flex; flex-direction: column; flex-grow: 1; }
+        .merch-title { font-size: 1.35rem; font-weight: 700; color: #fff; margin-bottom: 12px; line-height: 1.3; }
+        
+        /* Кольорові селектори варіантів */
+        .color-options { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .color-btn { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; transition: all 0.2s; padding: 0; position: relative; }
+        .color-btn.active { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 12px rgba(255, 255, 255, 0.4); }
+
+        .merch-desc { font-size: 0.9rem; color: #a1a1a6; margin-bottom: 20px; line-height: 1.5; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .price-wrapper { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
+        .merch-price { font-size: 1.6rem; font-weight: 800; color: #fff; }
+        .old-price { font-size: 1.1rem; color: var(--text-muted); text-decoration: line-through; }
+        
+        .merch-options { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
+        .merch-select { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); color: #fff; padding: 0 15px; border-radius: 10px; outline: none; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.3s; height: 44px; }
         .merch-select:focus { border-color: var(--theme-color); }
-        .merch-select option { background: #1a1a1a; color: #fff; }
-        .merch-select option:disabled { color: #555; text-decoration: line-through; }
+        .merch-select option { background: #121214; color: #fff; }
 
-        .qty-container { display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; overflow: hidden; width: 100px; height: 38px; justify-content: space-between; }
-        .qty-btn { background: none; border: none; color: #fff; width: 32px; height: 100%; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
-        .qty-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); color: var(--theme-color); }
+        /* Лічильник кількості */
+        .qty-container { display: flex; align-items: center; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; width: 110px; height: 44px; justify-content: space-between; }
+        .qty-btn { background: none; border: none; color: #fff; width: 36px; height: 100%; cursor: pointer; font-size: 1.2rem; font-weight: bold; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover:not(:disabled) { background: rgba(255,255,255,0.05); color: var(--theme-color); }
         .qty-btn:disabled { color: #444; cursor: not-allowed; }
-        .qty-val { flex: 1; text-align: center; font-weight: bold; font-size: 0.95rem; user-select: none; }
+        .qty-val { flex: 1; text-align: center; font-weight: 700; font-size: 1rem; user-select: none; }
         
-        .payment-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        .payment-tile { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: bold; }
-        .payment-tile:hover { border-color: rgba(var(--theme-color-rgb), 0.5); }
-        .payment-tile.active { border-color: var(--theme-color); background: rgba(var(--theme-color-rgb), 0.12); box-shadow: 0 0 10px rgba(var(--theme-color-rgb), 0.25); }
-        .payment-tile svg { width: 22px; height: 22px; fill: rgba(255,255,255,0.6); transition: fill 0.3s; }
-        .payment-tile.active svg { fill: var(--theme-color); }
+        /* Кнопка купити (Як URBAN CORE) */
+        .buy-btn { width: 100%; padding: 14px; background: var(--theme-color); color: #ffffff; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; margin-top: auto; box-shadow: 0 6px 20px rgba(var(--theme-color-rgb), 0.2); }
+        .buy-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(var(--theme-color-rgb), 0.4); filter: brightness(1.1); }
+        .buy-btn:disabled { background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); color: #444; cursor: not-allowed; box-shadow: none; }
 
-        .copy-btn { background: var(--theme-color); color: #121212; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; cursor: pointer; margin-left: 8px; transition: opacity 0.2s; display: inline-block; vertical-align: middle; }
-        .copy-btn:hover { opacity: 0.9; }
+        /* ОНОВЛЕНИЙ ЧАТ ТА КОШИК ПІД URBAN STYLE */
+        .cart-fab { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1500; }
+        .cart-fab:hover { transform: scale(1.08) rotate(-5deg); }
+        .cart-fab svg { width: 26px; height: 28px; fill: #000; }
+        .cart-badge { position: absolute; top: -2px; right: -2px; background: var(--theme-color); color: #fff; font-size: 0.75rem; font-weight: 800; width: 24px; height: 24px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 3px solid #fff; }
 
-        .buy-btn { width: 100%; padding: 12px; background: transparent; color: var(--theme-color); border: 2px solid var(--theme-color); border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: all 0.3s; margin-top: auto; }
-        .buy-btn:hover:not(:disabled) { background: var(--theme-color); color: #121212; }
-        .buy-btn:disabled { border-color: #555; color: #555; cursor: not-allowed; background: transparent; }
-
-        .cart-fab { position: fixed; bottom: 25px; left: 25px; width: 60px; height: 60px; background: var(--theme-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 25px rgba(var(--theme-color-rgb), 0.4); transition: transform 0.3s, background 0.3s; z-index: 1500; }
-        .cart-fab:hover { transform: scale(1.1); filter: brightness(1.1); }
-        .cart-fab svg { width: 28px; height: 28px; fill: #121212; }
-        .cart-badge { position: absolute; top: -5px; right: -5px; background: #ff4a4a; color: #fff; font-size: 0.75rem; font-weight: bold; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid #1a1a1a; }
-
-        .order-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
-        .order-modal { background: linear-gradient(180deg, rgba(30, 30, 30, 0.98) 0%, rgba(20, 20, 20, 0.95) 100%); border: 1px solid rgba(var(--theme-color-rgb), 0.3); border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
-        .modal-header { padding: 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .modal-title { font-size: 1.4rem; color: var(--theme-color); font-weight: bold; }
-        .close-modal { font-size: 1.8rem; color: #888; cursor: pointer; transition: color 0.2s; line-height: 1; }
+        /* ВСПЛИВАЮЧІ ВІКНА КОШИКА */
+        .order-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
+        .order-modal { background: #121215; border: 1px solid var(--border-color); border-radius: 24px; width: 100%; max-width: 540px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 30px 70px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
+        .modal-header { padding: 24px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 1.5rem; color: #fff; font-weight: 800; }
+        .close-modal { font-size: 2rem; color: var(--text-muted); cursor: pointer; transition: color 0.2s; line-height: 1; }
         .close-modal:hover { color: #fff; }
         
-        .modal-body { padding: 20px 25px; overflow-y: auto; flex: 1; }
+        .modal-body { padding: 24px 30px; overflow-y: auto; flex: 1; scrollbar-width: none; }
+        .modal-body::-webkit-scrollbar { display: none; }
         
-        .cart-items-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
-        .cart-item { display: flex; gap: 15px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); align-items: center; }
-        .cart-item-img { width: 60px; height: 60px; border-radius: 6px; object-fit: cover; background: #000; }
+        .cart-items-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+        .cart-item { display: flex; gap: 16px; background: rgba(255,255,255,0.03); padding: 16px; border-radius: 16px; border: 1px solid var(--border-color); align-items: center; }
+        .cart-item-img { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; background: #000; }
         .cart-item-info { flex: 1; }
-        .cart-item-title { font-size: 0.95rem; font-weight: bold; color: #fff; line-height: 1.2; margin-bottom: 4px; }
-        .cart-item-meta { font-size: 0.8rem; color: #aaa; margin-bottom: 5px; }
-        .cart-item-price { font-size: 1rem; color: var(--theme-color); font-weight: bold; }
-        .cart-item-remove { background: none; border: none; color: #ff4a4a; font-size: 1.2rem; cursor: pointer; padding: 5px; }
+        .cart-item-title { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 4px; }
+        .cart-item-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+        .cart-item-price { font-size: 1.1rem; color: #fff; font-weight: 800; }
+        .cart-item-remove { background: none; border: none; color: #ff4a4a; font-size: 1.3rem; cursor: pointer; padding: 5px; opacity: 0.6; transition: 0.2s; }
+        .cart-item-remove:hover { opacity: 1; }
         
-        .cart-total-box { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-top: 1px dashed rgba(255,255,255,0.2); border-bottom: 1px dashed rgba(255,255,255,0.2); margin-bottom: 20px; font-size: 1.1rem; }
-        .cart-total-price { font-size: 1.5rem; font-weight: 900; color: var(--theme-color); }
+        .cart-total-box { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-top: 1px dashed var(--border-color); border-bottom: 1px dashed var(--border-color); margin-bottom: 24px; font-size: 1.1rem; font-weight: 600; }
+        .cart-total-price { font-size: 1.8rem; font-weight: 800; color: var(--theme-color); }
 
-        .form-group { margin-bottom: 15px; }
-        .form-input { width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; outline: none; font-size: 1rem; transition: border-color 0.3s; }
-        .form-input:focus { border-color: var(--theme-color); box-shadow: 0 0 8px rgba(var(--theme-color-rgb), 0.2); }
+        .form-group { margin-bottom: 16px; }
+        .form-input { width: 100%; height: 48px; padding: 0 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; border-radius: 12px; outline: none; font-size: 1rem; transition: all 0.3s; }
+        .form-input:focus { border-color: var(--theme-color); background: rgba(255,255,255,0.05); }
         
-        .confirm-btn { width: 100%; padding: 14px; background: var(--theme-color); color: #121212; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(var(--theme-color-rgb), 0.3); }
-        .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-2px); }
-        .confirm-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; box-shadow: none; }
+        /* Плитки вибору платіжної системи */
+        .payment-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .payment-tile { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 10px; text-align: center; cursor: pointer; transition: all 0.25s ease; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
+        .payment-tile:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
+        .payment-tile.active { border-color: var(--theme-color); background: rgba(var(--theme-color-rgb), 0.08); color: #fff; }
+        .payment-tile svg { width: 24px; height: 24px; fill: rgba(255,255,255,0.4); transition: fill 0.3s; }
+        .payment-tile.active svg { fill: var(--theme-color); }
 
-        .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(20, 20, 20, 0.98); backdrop-filter: blur(12px); border: 2px solid var(--theme-color); color: #fff; padding: 15px 25px; border-radius: 12px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 4000; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 12px; max-width: 90vw; width: max-content; text-align: center; line-height: 1.4; }
+        .copy-btn { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-left: 8px; }
+        
+        .confirm-btn { width: 100%; padding: 16px; background: var(--theme-color); color: #ffffff; border: none; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 24px rgba(var(--theme-color-rgb), 0.3); }
+        .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+
+        /* СПОВІЩЕННЯ ТА ТОАСТИ */
+        .toast-notification { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(120px); background: #121215; border: 1px solid var(--theme-color); color: #fff; padding: 16px 28px; border-radius: 14px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 4000; opacity: 0; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 12px; }
         .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast-icon { width: 22px; height: 22px; fill: var(--theme-color); flex-shrink: 0; }
+        .toast-icon { width: 20px; height: 24px; fill: var(--theme-color); }
 
-        /* Стилі для Lightbox (Збільшення фото) */
-        .lightbox-overlay { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center; cursor: zoom-out; }
-        .lightbox-content { max-width: 90%; max-height: 90vh; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.8); object-fit: contain; border: 1px solid rgba(255,255,255,0.1); }
-        .lightbox-close { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
-        .lightbox-close:hover { color: var(--theme-color); }
+        /* ЛАЙТБОКС (Збільшення фото) */
+        .lightbox-overlay { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(5,5,7,0.9); backdrop-filter: blur(20px); justify-content: center; align-items: center; cursor: zoom-out; }
+        .lightbox-content { max-width: 85%; max-height: 85vh; border-radius: 16px; object-fit: contain; border: 1px solid var(--border-color); box-shadow: 0 30px 60px rgba(0,0,0,0.7); }
+        .lightbox-close { position: absolute; top: 25px; right: 35px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; opacity: 0.6; }
+        .lightbox-close:hover { color: var(--theme-color); opacity: 1; }
 
-        .footer { width: 100%; padding: 20px 12px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 0.82rem; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 10, 0.65); backdrop-filter: blur(8px); }
+        .footer { width: 100%; padding: 30px 12px; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: auto; border-top: 1px solid var(--border-color); background: rgba(10, 10, 12, 0.6); backdrop-filter: blur(10px); }
 
-        .user-chat-modal { display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 3000; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .chat-header { background: rgba(255,255,255,0.05); padding: 14px 16px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffffff; }
-        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
-        .chat-bubble { padding: 8px 12px; border-radius: 8px; max-width: 80%; word-wrap: break-word; line-height: 1.4; }
-        .chat-bubble.user { background: rgba(255, 255, 255, 0.1); align-self: flex-end; border-bottom-right-radius: 2px; color: #ffffff; }
-        .chat-bubble.admin { background: rgba(var(--theme-color-rgb), 0.15); border: 1px solid rgba(var(--theme-color-rgb), 0.3); align-self: flex-start; border-bottom-left-radius: 2px; color: #ffffff; }
-        .chat-bubble img { max-width: 100%; max-height: 140px; border-radius: 4px; display: block; cursor: pointer; margin-top: 3px; }
-        .chat-bubble.system { background: rgba(255, 74, 74, 0.1); border: 1px solid rgba(255, 74, 74, 0.2); align-self: center; text-align: center; font-size: 0.8rem; max-width: 95%; color: #ff4a4a; border-radius: 6px; }
+        /* ЧАТ ПІД URBAN STYLE */
+        .user-chat-modal { display: none; position: fixed; bottom: 30px; left: 30px; width: 340px; height: 450px; background: #121215; border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); z-index: 3000; flex-direction: column; overflow: hidden; }
+        .chat-header { background: rgba(255,255,255,0.02); padding: 16px 20px; font-size: 1rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; scrollbar-width: none; }
+        .chat-bubble { padding: 10px 14px; border-radius: 14px; max-width: 80%; word-wrap: break-word; line-height: 1.45; }
+        .chat-bubble.user { background: var(--theme-color); align-self: flex-end; border-bottom-right-radius: 2px; color: #ffffff; }
+        .chat-bubble.admin { background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 2px; color: #ffffff; }
+        .chat-bubble img { max-width: 100%; max-height: 150px; border-radius: 8px; display: block; margin-top: 4px; }
         
-        .chat-input-area { padding: 12px; display: flex; gap: 8px; background: rgba(0,0,0,0.25); align-items: center; }
-        .chat-input-area input { flex: 1; height: 38px; padding: 0 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; color: #ffffff; outline: none; font-size: 0.88rem; transition: border-color 0.2s; }
-        .chat-input-area input:focus { border-color: rgba(var(--theme-color-rgb), 0.8); }
-        .chat-send-btn { width: 38px; height: 38px; background: var(--theme-color); border: none; color: #121212; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
-        .chat-send-btn svg { width: 18px; height: 18px; fill: #121212; margin-left: 2px; }
-        .user-clip-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
-        .user-clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.75); }
-        
-        [data-lang="en"] { display: none; }
+        .chat-input-area { padding: 16px; display: flex; gap: 10px; background: rgba(0,0,0,0.1); align-items: center; border-top: 1px solid var(--border-color); }
+        .chat-input-area input { flex: 1; height: 42px; padding: 0 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 30px; color: #ffffff; outline: none; font-size: 0.9rem; }
+        .chat-input-area input:focus { border-color: rgba(var(--theme-color-rgb), 0.5); }
+        .chat-send-btn { width: 42px; height: 42px; background: #fff; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .chat-send-btn svg { width: 18px; height: 18px; fill: #000; margin-left: 2px; }
+        .user-clip-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); color: #fff; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
         @media (max-width: 768px) { 
-            .nav-links { width: 280px; } 
-            .page-title-box h1 { font-size: 1.8rem; }
-            .shop-grid { grid-template-columns: 1fr; gap: 20px; }
-            .user-chat-modal { width: calc(100% - 40px); left: 20px; bottom: 20px; height: 350px; border-radius: 16px; } 
-            .cart-fab { bottom: 20px; left: 20px; width: 55px; height: 55px; }
-            .categories-nav { justify-content: flex-start; padding: 0 5px 15px; }
+            .navbar-container { padding: 12px 15px; }
+            .hero-banner { flex-direction: column; text-align: center; padding: 30px 20px; margin-top: 90px; }
+            .hero-info h1 { font-size: 2rem; }
+            .hero-showcase-img { height: 140px; margin-top: 10px; }
+            .shop-grid { grid-template-columns: 1fr; gap: 24px; }
+            .user-chat-modal { width: calc(100% - 32px); left: 16px; bottom: 16px; height: 400px; } 
+            .cart-fab { bottom: 20px; right: 20px; width: 58px; height: 55px; }
+            .categories-nav { justify-content: flex-start; padding-left: 15px; padding-right: 15px; }
+            .order-modal { max-height: 95vh; border-radius: 20px; }
+            .modal-body { padding: 16px 20px; }
         }
     </style>
 </head>
@@ -242,14 +273,18 @@
         </div>
     </nav>
 
-    <div class="main-content">
-        <div class="page-title-box">
-            <h1 data-lang="ua">SVAROG SHOP</h1>
-            <h1 data-lang="en">SVAROG SHOP</h1>
-            <p data-lang="ua">Купуючи наш мерч, ви безпосередньо підтримуєте роботу підрозділу SVAROG TEAM.</p>
-            <p data-lang="en">By purchasing our merch, you directly support the operations of the SVAROG TEAM.</p>
+    <div class="hero-banner">
+        <div class="hero-info">
+            <h1 data-lang="ua">СТИЛЬНИЙ ОДЯГ ДЛЯ ТВОГО РИТМУ</h1>
+            <h1 data-lang="en">STYLISH GEAR FOR YOUR PACE</h1>
+            <p data-lang="ua">Сучасний мілітарі дизайн. Преміум якість. Купуючи наш мерч, ви напряму підтримуєте бойову роботу спецпідрозділу SVAROG TEAM.</p>
+            <p data-lang="en">Modern military design. Premium quality. By purchasing our gear, you directly fund and support SVAROG TEAM special unit missions.</p>
+            <a href="#category-bar" class="hero-btn"><span data-lang="ua">Переглянути каталог</span><span data-lang="en">View Catalog</span></a>
         </div>
+        <img src="SvarogTeam.png" alt="Showcase" class="hero-showcase-img">
+    </div>
 
+    <div class="main-content">
         <div class="categories-nav" id="category-bar"></div>
 
         <div class="shop-grid" id="dynamic-shop-grid">
@@ -325,8 +360,8 @@
                                 <span data-lang="ua">На Банку</span><span data-lang="en">To Jar</span>
                             </div>
                             <div class="payment-tile" id="tile-card" onclick="selectPaymentTile('card')">
-                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
-                                <span data-lang="ua">На Карту</span><span data-lang="en">To Card</span>
+                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2H4c-1.11 0-2 .9-2 2zzm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                                <span data-lang="ua">На Картку</span><span data-lang="en">To Card</span>
                             </div>
                             <div class="payment-tile" id="tile-cod" onclick="selectPaymentTile('cod')">
                                 <svg viewBox="0 0 24 24"><path d="M20 8H4V6h16v2zm-2 5H6v-2h12v2zm-2 5H8v-2h8v2zM2 4v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2z"/></svg>
@@ -399,7 +434,6 @@
             setTimeout(() => { toast.classList.remove('show'); }, duration);
         }
 
-        // Функції для Lightbox (Збільшення фото)
         function openLightbox(src) {
             if(!src) return;
             document.getElementById('lightbox-img').src = src;
@@ -475,7 +509,7 @@
             } else if (method === 'card') {
                 bankInfo.innerHTML = `
                     <div style="line-height:1.5;">
-                        💳 <b>Картка для переказу:</b> <span style="color: var(--theme-color); font-weight: bold; letter-spacing: 0.5px;">${dynamicCardNumber}</span>
+                        CN <b>Картка для переказу:</b> <span style="color: var(--theme-color); font-weight: bold; letter-spacing: 0.5px;">${dynamicCardNumber}</span>
                         <button type="button" class="copy-btn" onclick="copyToClipboard('${dynamicCardNumber}')">Скопіювати</button><br>
                         👤 <b>Отримувач:</b> ${dynamicCardName}<br>
                         Будь ласка, зробіть переказ на карту та прикріпіть скріншот чека:
@@ -569,18 +603,16 @@
                 if(doc.data().categories && doc.data().categories.length > 0) {
                     globalCategories = ['Всі товари', ...doc.data().categories];
                 } else {
-                    globalCategories = ['Всі товари', 'Футболки', 'Шеврони', 'Різне']; 
+                    globalCategories = ['Всі товары', 'Футболки', 'Шеврони', 'Різне']; 
                 }
                 renderCategoryBar();
             }
         });
 
-        // --- ДОДАНА ЛОГІКА СОРТУВАННЯ (Точно як в адмінці) ---
         db.collection("merch").onSnapshot(snapshot => {
             globalMerchList = [];
             snapshot.forEach(doc => { globalMerchList.push({ id: doc.id, ...doc.data() }); });
             
-            // Сортування за порядковим номером (order), а якщо його немає - за часом
             globalMerchList.sort((a, b) => {
                 let orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER;
                 let orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER;
@@ -597,7 +629,6 @@
             renderShopGrid();
             updateCartUI(); 
         }, err => console.error("Помилка завантаження товарів:", err));
-        // -----------------------------------------------------
 
         function renderCategoryBar() {
             const bar = document.getElementById('category-bar');
@@ -653,7 +684,7 @@
             const sizeSelect = document.getElementById(`size-${item.id}`);
             let selectedSize = sizeSelect ? sizeSelect.value : "Універсальний";
             
-            let sStock = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj[selectedSize] || 0) : 0);
+            let sStock = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj[s] || 0) : 0);
             
             const qtyValEl = document.getElementById(`qty-val-${itemId}`);
             if (qtyValEl) {
@@ -716,7 +747,7 @@
                 
                 let stockBadge = '';
                 if (item.isPreorder) {
-                    stockBadge = `<div class="stock-badge" style="color:#777777; border-color:#777777; background:rgba(0,0,0,0.8);">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>`;
+                    stockBadge = `<div class="stock-badge">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>`;
                 } else if (isOutOfStock) {
                     stockBadge = `<div class="stock-badge empty">${lang==='ua'?'Немає в наявності':'Out of stock'}</div>`;
                 }
@@ -754,7 +785,7 @@
                 if (isOutOfStock) {
                     buyBtnHtml = `<button class="buy-btn" disabled>${lang==='ua'?'Розпродано':'Sold out'}</button>`;
                 } else if (item.isPreorder) {
-                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')" style="border-color:#777777; color:#777777;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>`;
+                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')" style="background:#555; color:#fff; box-shadow:none;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>`;
                 } else {
                     buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')">${lang==='ua'?'Додати в кошик 🛒':'Add to cart 🛒'}</button>`;
                 }
@@ -1157,6 +1188,7 @@
 
                 localStorage.setItem('svarog_active_order_id', newlyCreatedOrderId);
 
+                // ЗАМІНІТЬ НА СВІЙ ТОКЕН ТА CHAT ID ЯКЩО НЕОБХІДНО
                 const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; 
                 const chatId = '647245223';
                 
@@ -1175,7 +1207,7 @@
                                 `👤 <b>Клієнт:</b> ${name}\n` +
                                 `📞 <b>Телефон:</b> ${phone}\n` +
                                 `📍 <b>Адреса:</b> ${address}\n` +
-                                `💳 <b>Метод оплати:</b> ${paymentMethodText}\n` +
+                                `CN <b>Метод оплати:</b> ${paymentMethodText}\n` +
                                 `⏳ <b>Статус:</b> Нове замовлення\n` +
                                 tgPromoText +
                                 `\n🛒 <b>Склад замовлення:</b>\n${itemsListFormatted}\n\n` +
