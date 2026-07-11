@@ -30,7 +30,7 @@
             if (!user) return; 
             try {
                 await db.collection("admin_logs").add({
-                    adminEmail: user.email,
+                    adminEmail: user.email.toLowerCase(),
                     actionType: actionCategory,
                     details: actionDetails,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -728,8 +728,10 @@
 
         async function checkAdminAccess(userEmail) {
             if (!userEmail) return false;
+            // ВИПРАВЛЕНО: примусове переведення пошти в нижній регістр для Firestore
+            const emailClean = userEmail.trim().toLowerCase();
             try {
-                const adminDoc = await db.collection("admins").doc(userEmail).get();
+                const adminDoc = await db.collection("admins").doc(emailClean).get();
                 if (adminDoc.exists) {
                     const role = adminDoc.data().role;
                     if (role === "admin" || role === "superadmin") {
@@ -751,7 +753,7 @@
                 if (isAdmin) {
                     enterDashboard();
                 } else {
-                    document.getElementById('error-block').innerText = "У вас немає прав доступу до панелі (відсутній в колекції admins)";
+                    document.getElementById('error-block').innerText = "У вас немає прав доступу до панелі (відсутній в колекції admins або невірний регістр літер)";
                     document.getElementById('error-block').style.display = 'block';
                     await firebase.auth().signOut();
                 }
@@ -767,7 +769,8 @@
 
         async function handleLogin(event) {
             event.preventDefault();
-            const emailInp = document.getElementById('user-email').value.trim();
+            // ВИПРАВЛЕНО: автоматичний захист від випадкових великих літер при введенні
+            const emailInp = document.getElementById('user-email').value.trim().toLowerCase();
             const passInp = document.getElementById('user-password').value.trim();
             const errorBlock = document.getElementById('error-block');
             const submitBtn = document.getElementById('login-btn-submit');
@@ -787,7 +790,7 @@
                 }
             } catch (error) {
                 errorBlock.style.display = 'block';
-                // Виправлено: додано перевірку на сучасний код помилки 'auth/invalid-login-credentials'
+                console.error("Помилка Firebase Auth:", error.code, error.message);
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
                     errorBlock.innerText = "Невірний Email або пароль. Перевірте дані.";
                 } else if (error.code === 'auth/wrong-password') {
@@ -1833,7 +1836,6 @@
                     await db.collection("orders").doc(id).delete();
                     logAdminAction('orders', `Видалив замовлення ID: ${id}`);
                 } catch(e) {
-                    // Виправлено: змінено document.error на console.error
                     console.error("Помилка:", e);
                 }
             }
@@ -2197,7 +2199,7 @@
                     ? `<span style="background:#00ffcc; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold; margin-right:5px;">ЗВІТ</span>` 
                     : `<span style="background:var(--theme-color); color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold; margin-right:5px;">НОВИНА</span>`;
 
-                let title = item.isReport ? "Финансовий звіт" : item.title;
+                let title = item.isReport ? "Нинансовий звіт" : item.title;
                 let bodyText = item.isReport ? item.description : item.body;
 
                 box.innerHTML += `
