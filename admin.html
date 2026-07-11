@@ -8,11 +8,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script>
-        // Конфігурація вашого проєкту Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
             authDomain: "svarog-team.firebaseapp.com",
@@ -42,12 +40,18 @@
     </script>
 
     <style>
+        @font-face {
+            font-family: 'SvarogTeamCustom';
+            src: url('SvarogTeam-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;900&display=swap');
 
-        /* ГЛОБАЛЬНІ ЗМІННІ ДЛЯ НОВОГО КОЛЬОРУ */
         :root {
-            --theme-color: #f0b48c;
-            --theme-color-rgb: 240, 180, 140;
+            --theme-color: #798554;
+            --theme-color-rgb: 121, 133, 84;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -63,11 +67,15 @@
         .navbar { width: 100%; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; z-index: 1000; }
         .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .left-side { display: flex; align-items: center; gap: 20px; }
-        .logo { color: #ffffff; text-decoration: none; font-weight: 900; letter-spacing: 1px; font-size: 1.1rem; }
+        
+        .logo-text-group { display: flex; flex-direction: column; line-height: 1.1; text-decoration: none; }
+        .logo-main { font-family: 'SvarogTeamCustom', sans-serif; font-size: 1.3rem; font-weight: normal; color: #ffffff; letter-spacing: 0.5px; }
+        .logo-sub { font-size: 0.7rem; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 1px; font-weight: bold; font-family: 'Segoe UI', sans-serif; }
+
         .lang-switcher { display: flex; gap: 4px; background: rgba(0, 0, 0, 0.3); padding: 2px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); }
         .lang-btn { background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; font-weight: bold; padding: 4px 8px; cursor: pointer; border-radius: 3px; transition: all 0.3s ease; }
         .lang-btn:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.1); }
-        .lang-btn.active { color: #121212; background-color: #ffffff; box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2); }
+        .lang-btn.active { color: #ffffff; background-color: var(--theme-color); box-shadow: 0 2px 4px rgba(var(--theme-color-rgb), 0.4); }
 
         .main-content { margin-top: 80px; display: flex; justify-content: center; align-items: center; flex-grow: 1; width: 100%; padding: 15px; }
         .container { padding: 30px 20px; border-radius: 12px; background: rgba(30, 30, 30, 0.65); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); max-width: 400px; width: 100%; transition: all 0.3s ease; }
@@ -86,7 +94,7 @@
 
         .tabs-header { display: flex; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         .tab-button { flex: 1; min-width: 90px; padding: 10px 5px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; text-align: center; position: relative; display: flex; justify-content: center; align-items: center; gap: 5px; }
-        .tab-button.active { color: #121212; background: var(--theme-color); border-color: var(--theme-color); }
+        .tab-button.active { color: #ffffff; background: var(--theme-color); border-color: var(--theme-color); }
         .tab-badge { display: none; background: #ff4a4a; color: #ffffff; font-size: 0.75rem; font-weight: bold; min-width: 18px; height: 18px; border-radius: 5px; padding: 0 4px; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.2); }
 
         .tab-content { display: none; text-align: left; }
@@ -124,6 +132,8 @@
         .no-msg { text-align: center; color: #666; font-style: italic; margin-top: 40px; width: 100%; font-size: 0.9rem; }
 
         .news-img-preview { max-width: 100%; max-height: 120px; border-radius: 6px; margin-top: 8px; display: none; border: 1px dashed rgba(255,255,255,0.3); object-fit: contain; }
+        .multi-images-preview-container { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .multi-images-preview-container img { width: 55px; height: 55px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); }
 
         .switch-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
         .switch-wrapper input { cursor: pointer; width: 16px; height: 16px; accent-color: var(--theme-color); }
@@ -147,9 +157,11 @@
         .cat-tag { display: inline-block; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-bottom: 8px; width: fit-content; }
         .sale-badge { position: absolute; top: 10px; left: 10px; background: #ff4a4a; color: #fff; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; }
         .preorder-badge { position: absolute; top: 10px; right: 10px; background: #00ffcc; color: #000; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; }
+        .new-badge { position: absolute; top: 38px; left: 10px; background: var(--theme-color); color: #fff; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; }
 
         .category-list { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-        .cat-chip { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
+        .cat-chip { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .cat-chip img { width: 16px; height: 16px; object-fit: contain; }
         .cat-remove { color: #ff4a4a; cursor: pointer; font-weight: bold; margin-left: 5px; }
 
         .variant-block { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; margin-bottom: 10px; position: relative; }
@@ -161,7 +173,7 @@
             background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%) !important;
             color: #fff; padding: 30px; position: relative;
             border: 2px solid var(--theme-color); border-radius: 15px;
-            box-shadow: inset 0 0 35px 5px rgba(240, 180, 140, 0.15), 0 15px 40px rgba(0,0,0,0.6);
+            box-shadow: inset 0 0 35px 5px rgba(var(--theme-color-rgb), 0.15), 0 15px 40px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
             box-sizing: border-box; margin: 0 auto 20px;
         }
@@ -171,12 +183,12 @@
             z-index: 1; pointer-events: none;
         }
         .header-logos { display: flex; gap: 30px; margin-bottom: 20px; align-items: center; justify-content: center; position: relative; z-index: 2; }
-        .logo-main { width: 90px; height: auto; }
+        .logo-main-cert { width: 90px; height: auto; }
         .logo-team { width: 180px; height: auto; }
         .cert-container-box h2 { font-size: 2rem; color: var(--theme-color); text-transform: uppercase; margin: 5px 0; letter-spacing: 2px; font-weight: 900; position: relative; z-index: 2; }
         .promo-wrapper-block { margin: 25px 0; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; }
         .code-label-text { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
-        .code-box-style { padding: 15px 40px; border: 2px solid var(--theme-color); border-radius: 8px; box-shadow: 0 0 10px 5px rgba(240, 180, 140, 0.15); background: rgba(0, 0, 0, 0.3); }
+        .code-box-style { padding: 15px 40px; border: 2px solid var(--theme-color); border-radius: 8px; box-shadow: 0 0 10px 5px rgba(var(--theme-color-rgb), 0.15); background: rgba(0, 0, 0, 0.3); }
         .code-val-text { font-size: 2.2rem; font-weight: 900; color: #fff; }
         .cert-code { background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 8px; font-family: monospace; font-size: 1.2rem; color: #777777; letter-spacing: 2px; border: 1px dashed rgba(255,255,255,0.2); display: inline-block; margin-bottom: 15px; position: relative; z-index: 2; }
         .footer-cert-text { margin-top: auto; font-size: 0.85rem; color: #aaa; width: 100%; border-top: 1px solid #333; padding-top: 15px; font-style: italic; line-height: 1.4; position: relative; z-index: 2; }
@@ -203,7 +215,13 @@
     <nav class="navbar">
         <div class="navbar-container">
             <div class="left-side">
-                <a href="https://svarogteam.com/index.html" class="logo">SVAROG ADMIN</a>
+                <a href="https://svarogteam.com/index.html" class="logo-text-group">
+                    <span class="logo-main">SVAROG ADMIN</span>
+                    <span class="logo-sub">
+                        <span data-lang="ua">35-й Полк НГУ</span>
+                        <span data-lang="en">35th Regiment of the NGU</span>
+                    </span>
+                </a>
             </div>
             <div class="lang-switcher">
                 <button class="lang-btn active" onclick="setLanguage('ua')">UA</button>
@@ -223,6 +241,7 @@
                 <div class="form-group">
                     <input type="password" id="user-password" class="form-input" placeholder="Пароль / Password" required>
                 </div>
+                <div style="margin-bottom:15px; text-align:center;"><small style="color:#aaa;">Будь ласка, переконайтеся, що ви запускаєте файл через локальний або веб-сервер (не через double-click на файл).</small></div>
                 <button type="submit" class="btn" id="login-btn-submit">
                     <span data-lang="ua">Увійти</span><span data-lang="en">Login</span>
                 </button>
@@ -281,7 +300,6 @@
 
             <div id="shop-management-tab" class="tab-content">
                 <div class="superadmin-grid">
-                    
                     <div style="flex: 1; display:flex; flex-direction:column; gap:20px; min-width: 320px;">
                         <div class="admin-creator-form" style="border-color: var(--theme-color);">
                             <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">Налаштування Магазину</h3>
@@ -295,9 +313,13 @@
                         <div class="admin-creator-form">
                             <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00ffcc;" data-lang="ua">Категорії каталогу</h3>
                             <div class="category-list" id="admin-category-list"></div>
-                            <div style="display:flex; gap:10px;">
+                            <div style="display:flex; flex-direction:column; gap:10px;">
                                 <input type="text" id="new-category-input" class="form-input" placeholder="Нова категорія (напр: Шеврони)">
-                                <button class="btn" style="width:auto; border-color:#00ffcc; color:#00ffcc;" onclick="addCategory()">Додати</button>
+                                <div style="display:flex; flex-direction:column; gap:4px;">
+                                    <label style="font-size:0.8rem; color:#aaa;">Іконка для категорії:</label>
+                                    <input type="file" id="new-category-icon-file" accept="image/*" class="form-input" style="padding:6px; font-size:0.85rem;">
+                                </div>
+                                <button class="btn" style="width:100%; border-color:#00ffcc; color:#00ffcc;" onclick="addCategory()">Додати категорію</button>
                             </div>
                         </div>
                     </div>
@@ -319,9 +341,14 @@
                             <input type="number" id="merch-discount-price" class="form-input" placeholder="Акційна ціна (₴) (необов'язково)">
                         </div>
 
-                        <div class="switch-wrapper" style="margin-bottom: 15px;">
+                        <div class="switch-wrapper" style="margin-bottom: 8px;">
                             <input type="checkbox" id="merch-is-preorder" onchange="renderMerchVariantEditor()">
                             <label style="font-size:0.9rem; color:#00ffcc; font-weight:bold; cursor:pointer;" for="merch-is-preorder">⏳ Це товар за передзамовленням (ігнорує залишки)</label>
+                        </div>
+
+                        <div class="switch-wrapper" style="margin-bottom: 15px;">
+                            <input type="checkbox" id="merch-is-new">
+                            <label style="font-size:0.9rem; color:#ff4a4a; font-weight:bold; cursor:pointer;" for="merch-is-new">🔥 Виставити як Новинку (Буде відображатись у блоці Новинки)</label>
                         </div>
 
                         <div class="form-group">
@@ -343,9 +370,9 @@
                                 <textarea id="merch-description" class="form-input" placeholder="Опис товару (необов'язково)" style="min-height: 80px;"></textarea>
                             </div>
                             <div class="form-group">
-                                <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Фото товару:</label>
-                                <input type="file" id="merch-photo-file" accept="image/*" class="form-input" onchange="previewMerchPhoto(this)">
-                                <img id="merch-preview-element" class="news-img-preview" src="">
+                                <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Фото товару (можна обрати декілька штук для галереї):</label>
+                                <input type="file" id="merch-photo-file" accept="image/*" class="form-input" multiple onchange="previewMerchPhotos(this)">
+                                <div class="multi-images-preview-container" id="merch-images-preview-box"></div>
                             </div>
                         </div>
 
@@ -366,7 +393,6 @@
                 <h3 style="margin:25px 0 15px; font-size:1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:5px;" data-lang="ua">Вітрина товарів:</h3>
                 <div class="merch-grid" id="box-for-merch-items"></div>
             </div>
-
             <div id="promo-tab" class="tab-content">
                 <div class="superadmin-grid">
                     <div class="admin-creator-form" style="flex: 1; min-width: 320px;">
@@ -395,7 +421,7 @@
                             
                             <div class="cert-container-box" id="certificate-card-element">
                                 <div class="header-logos">
-                                    <img src="logo.png" class="logo-main" alt="Logo">
+                                    <img src="logo.png" class="logo-main-cert" alt="Logo">
                                     <img src="SvarogTeam.png" class="logo-team" alt="SVAROG TEAM">
                                 </div>
                                 <h2 id="cert-display-title" contenteditable="true" style="outline:none;">Сертифікат підтримки</h2>
@@ -418,7 +444,6 @@
                                 <button class="btn" style="width: auto; border-color:#ff4a4a; color:#ff4a4a;" onclick="document.getElementById('cert-preview-box').style.display='none'">Приховати</button>
                             </div>
                         </div>
-
                     </div>
                     
                     <div class="admin-accounts-list" style="flex: 2;">
@@ -521,6 +546,16 @@
                                 <button id="soc-cancel-edit-btn" class="btn" onclick="cancelSocEditing()" style="border-color:#ff4a4a; color:#ff4a4a; display:none; flex:1;">Скасувати</button>
                             </div>
                         </div>
+
+                        <div class="admin-creator-form" style="border-color: #00bfff;">
+                            <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00bfff;" data-lang="ua">🖼️ Головний банер магазину</h3>
+                            <div class="form-group">
+                                <label style="font-size:0.8rem; color:#aaa; display:block; margin-bottom:4px;">Фото для банера (shop.html):</label>
+                                <input type="file" id="shop-hero-file" accept="image/*" class="form-input" onchange="previewShopHero(this)">
+                                <img id="shop-hero-preview-element" class="news-img-preview" src="">
+                            </div>
+                            <button class="btn" style="border-color:#00bfff; color:#00bfff;" onclick="saveShopHeroImage()">Оновити банер</button>
+                        </div>
                     </div>
 
                     <div class="admin-accounts-list" style="width:100%; max-height:none;">
@@ -609,6 +644,8 @@
             } else {
                 document.querySelectorAll('.lang-btn')[1].classList.add('active');
             }
+            document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? 'inline' : 'none');
+            document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
         }
         
         function initBadges() {
@@ -631,64 +668,73 @@
             }
             
             globalCategories.forEach((cat, index) => {
+                let name = typeof cat === 'object' ? cat.name : cat;
+                let iconImg = (typeof cat === 'object' && cat.icon) ? `<img src="${cat.icon}">` : '';
                 list.innerHTML += `
                     <div class="cat-chip">
-                        ${cat} 
+                        ${iconImg} <span>${name}</span> 
                         <span class="cat-remove" onclick="deleteCategory(${index})">✖</span>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
         function populateCategorySelect() {
             const select = document.getElementById('merch-category');
             if (!select) return;
-            
             select.innerHTML = '<option value="" disabled selected>Оберіть категорію...</option>';
             
             if(globalCategories) {
                 globalCategories.forEach(cat => {
-                    select.innerHTML += `<option value="${cat}">${cat}</option>`;
+                    let name = typeof cat === 'object' ? cat.name : cat;
+                    select.innerHTML += `<option value="${name}">${name}</option>`;
                 });
             }
         }
 
+        // Додавання категорії з підтримкою іконок
         async function addCategory() {
             const input = document.getElementById('new-category-input');
+            const fileInp = document.getElementById('new-category-icon-file');
             const newCat = input.value.trim();
             
-            if (!newCat) {
-                alert("Введіть назву категорії!");
-                return;
-            }
-            if (globalCategories.includes(newCat)) {
-                alert("Така категорія вже існує!");
+            if (!newCat) { alert("Введіть назву категорії!"); return; }
+            
+            const exists = globalCategories.some(c => (typeof c === 'object' ? c.name : c) === newCat);
+            if (exists) { alert("Така категорія вже існує!"); return; }
+
+            let iconBase64 = null;
+            if(fileInp && fileInp.files && fileInp.files[0]) {
+                const reader = new FileReader();
+                reader.readAsDataURL(fileInp.files[0]);
+                reader.onload = async () => {
+                    iconBase64 = reader.result;
+                    const updatedCategories = [...globalCategories, { name: newCat, icon: iconBase64 }];
+                    try {
+                        await db.collection("config").doc("shop").set({ categories: updatedCategories }, { merge: true });
+                        input.value = ''; fileInp.value = '';
+                        logAdminAction('shop', `Додав категорію з іконкою: ${newCat}`);
+                    } catch (e) { alert("Помилка: " + e.message); }
+                };
                 return;
             }
 
-            const updatedCategories = [...globalCategories, newCat];
-            
+            const updatedCategories = [...globalCategories, { name: newCat, icon: null }];
             try {
                 await db.collection("config").doc("shop").set({ categories: updatedCategories }, { merge: true });
                 input.value = ''; 
                 logAdminAction('shop', `Додав категорію: ${newCat}`);
-            } catch (e) {
-                console.error("Помилка додавання категорії:", e);
-                alert("Помилка: " + e.message);
-            }
+            } catch (e) { alert("Помилка: " + e.message); }
         }
 
         async function deleteCategory(index) {
-            const catToRemove = globalCategories[index];
-            if (confirm(`Видалити категорію "${catToRemove}"?`)) {
+            let catObj = globalCategories[index];
+            let catName = typeof catObj === 'object' ? catObj.name : catObj;
+            if (confirm(`Видалити категорію "${catName}"?`)) {
                 const updatedCategories = globalCategories.filter((_, i) => i !== index);
                 try {
                     await db.collection("config").doc("shop").set({ categories: updatedCategories }, { merge: true });
-                    logAdminAction('shop', `Видалив категорію: ${catToRemove}`);
-                } catch (e) {
-                    console.error("Помилка видалення категорії:", e);
-                    alert("Помилка: " + e.message);
-                }
+                    logAdminAction('shop', `Видалив категорію: ${catName}`);
+                } catch (e) { console.error(e); alert("Помилка: " + e.message); }
             }
         }
 
@@ -698,8 +744,9 @@
         let currentOrdersFilter = 'active'; 
         let isSuperadminSession = false;
         let newsPhotoBase64 = "";
+        let shopHeroBase64 = "";
         
-        let merchPhotoBase64 = "";
+        let merchImagesArray = []; /* Масив під галерею фото */
         let currentMerchVariants = []; 
         
         let globalChatsData = {}; 
@@ -725,6 +772,15 @@
         let unsubscribePaymentConfig = null;
         let unsubscribeReports = null;
         let unsubscribeStats = null;
+
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
 
         async function checkAdminAccess(userEmail) {
             if (!userEmail) return false;
@@ -766,7 +822,6 @@
             }
         });
 
-        // --- ОНОВЛЕНА ФУНКЦІЯ ВХОДУ З ГЛИБОКОЮ ДІАГНОСТИКОЮ ---
         async function handleLogin(event) {
             event.preventDefault();
             const emailInp = document.getElementById('user-email').value.trim().toLowerCase();
@@ -779,10 +834,7 @@
             submitBtn.disabled = true;
 
             try {
-                console.log("Надсилання запиту до Google Auth для:", emailInp);
                 const userCredential = await firebase.auth().signInWithEmailAndPassword(emailInp, passInp);
-                
-                console.log("Google Auth пустив! Перевіряємо роль в Firestore...");
                 const isAdmin = await checkAdminAccess(userCredential.user.email);
                 
                 if (!isAdmin) {
@@ -794,7 +846,6 @@
                 errorBlock.style.display = 'block';
                 console.error("Критична помилка Firebase:", error);
                 
-                // Виводимо спливаюче вікно з повним технічним описом помилки від Google
                 alert("⚠️ ВІДПОВІДЬ ВІД СЕРВЕРА GOOGLE:\n\n" + 
                       "Код помилки: " + error.code + "\n" + 
                       "Повідомлення: " + error.message + "\n\n" +
@@ -821,7 +872,6 @@
         async function handleLogout() {
             try {
                 await firebase.auth().signOut();
-                
                 if(unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; }
                 if(unsubscribeFeedback) { unsubscribeFeedback(); unsubscribeFeedback = null; }
                 if(unsubscribeVolunteers) { unsubscribeVolunteers(); unsubscribeVolunteers = null; }
@@ -877,8 +927,7 @@
 
             let html = '';
             activeChats.forEach(chat => {
-                const isSelected = chat.id === currentSelectedChatId ? 'background:rgba(240,180,140,0.2); border-color:var(--theme-color);' : '';
-                
+                const isSelected = chat.id === currentSelectedChatId ? 'background:rgba(121,133,84,0.2); border-color:var(--theme-color);' : '';
                 let lastMsgText = 'Новий чат';
                 if (chat.messages && chat.messages.length > 0) {
                     let lastMsg = chat.messages[chat.messages.length - 1];
@@ -894,11 +943,9 @@
                     <div class="admin-user-card" style="cursor:pointer; padding: 10px; margin-bottom: 8px; transition: 0.2s; ${isSelected}" onclick="openChat('${chat.id}')">
                         <div style="font-weight:bold; color:var(--theme-color); font-size:0.9rem;">Чат: ${chat.id.substring(0,8)}...</div>
                         <div style="font-size:0.8rem; color:#ccc; margin-top:4px; overflow:hidden;">${lastMsgText}</div>
-                    </div>
-                `;
+                    </div>`;
             });
             box.innerHTML = html;
-            
             if(currentSelectedChatId) renderChatWorkspace();
         }
 
@@ -913,7 +960,7 @@
             if (!workspace) return;
 
             if (!currentSelectedChatId || !globalChatsData[currentSelectedChatId]) {
-                workspace.innerHTML = '<div style="flex: 1; display: flex;"><div style="text-align:center; margin:auto; color:#666;">Оберіть чат зі спилку ліворуч</div></div>';
+                workspace.innerHTML = '<div style="flex: 1; display: flex;"><div style="text-align:center; margin:auto; color:#666;">Оберіть чат зі списку ліворуч</div></div>';
                 return;
             }
 
@@ -924,7 +971,7 @@
                 chat.messages.forEach(msg => {
                     const isAdmin = msg.sender === 'admin';
                     const align = isAdmin ? 'right' : 'left';
-                    const bg = isAdmin ? 'rgba(240,180,140,0.15)' : 'rgba(0,0,0,0.4)';
+                    const bg = isAdmin ? 'rgba(121,133,84,0.15)' : 'rgba(0,0,0,0.4)';
                     const color = isAdmin ? 'var(--theme-color)' : '#fff';
                     const senderName = isAdmin ? 'SVAROG SUPPORT' : 'Користувач';
                     
@@ -941,8 +988,7 @@
                                 <div style="font-size:0.7rem; color:${color}; font-weight:bold; margin-bottom:4px;">${senderName}</div>
                                 ${msgContent}
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
             } else {
                 messagesHtml = '<div style="text-align:center; color:#666; margin-top: 40px;">Повідомлень поки немає</div>';
@@ -959,8 +1005,7 @@
                 <div style="padding: 10px; background:rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.1); display:flex; gap:10px;">
                     <input type="text" id="admin-chat-input" class="form-input" placeholder="Напишіть відповідь..." onkeypress="if(event.key === 'Enter') sendAdminMessage('${chat.id}')" autocomplete="off">
                     <button class="btn" style="width:auto; padding: 0 20px;" onclick="sendAdminMessage('${chat.id}')">Відпустити</button>
-                </div>
-            `;
+                </div>`;
             
             setTimeout(() => {
                 const container = document.getElementById('chat-messages-container');
@@ -975,7 +1020,6 @@
             if(!text) return;
 
             const chatRef = db.collection('chats').doc(chatId);
-            
             try {
                 await chatRef.update({
                     messages: firebase.firestore.FieldValue.arrayUnion({
@@ -1007,9 +1051,7 @@
                         currentSelectedChatId = null; 
                     }
                     logAdminAction('chat', `Завершив сесію чату ${chatId}`); 
-                } catch(e) {
-                    console.error("Помилка закриття чату:", e);
-                }
+                } catch(e) { console.error("Помилка закриття чату:", e); }
             }
         }
 
@@ -1017,8 +1059,7 @@
             const box = document.getElementById('box-for-feedback');
             if(!box) return;
             if(globalFeedbackData.length === 0) {
-                box.innerHTML = '<div class="no-msg">Немає нових заявок</div>';
-                return;
+                box.innerHTML = '<div class="no-msg">Немає нових заявок</div>'; return;
             }
             box.innerHTML = globalFeedbackData.map(item => `
                 <div class="msg-item" style="position:relative;">
@@ -1041,8 +1082,7 @@
             const box = document.getElementById('box-for-volunteers');
             if(!box) return;
             if(globalVolunteersData.length === 0) {
-                box.innerHTML = '<div class="no-msg">Немає анкет волонтерів</div>';
-                return;
+                box.innerHTML = '<div class="no-msg">Немає анкет волонтерів</div>'; return;
             }
             
             let sortedVols = [...globalVolunteersData].sort((a, b) => {
@@ -1055,33 +1095,21 @@
             sortedVols.forEach(item => {
                 let timeStr = item.time || (item.timestamp ? new Date(item.timestamp.toMillis()).toLocaleString('uk-UA') : 'Невідомо');
                 let detailsHtml = '';
-                
                 for (const [key, value] of Object.entries(item)) {
                     if(key === 'id' || key === 'timestamp' || key === 'time' || key === 'name') continue;
-                    
-                    let displayKey = key;
-                    if(key === 'phone') displayKey = '📞 Телефон';
-                    if(key === 'tg' || key === 'telegram') displayKey = '✈️ Telegram';
-                    if(key === 'skills') displayKey = '🛠 Навички';
-                    if(key === 'about') displayKey = '📝 Про себе';
-                    if(key === 'age') displayKey = '🎂 Вік';
-                    if(key === 'city') displayKey = '📍 Місто';
-
+                    let displayKey = key === 'phone' ? '📞 Телефон' : key === 'tg' || key === 'telegram' ? '✈️ Telegram' : key === 'skills' ? '🛠 Навички' : key === 'about' ? '📝 Про себе' : key === 'age' ? '🎂 Вік' : key === 'city' ? '📍 Місто' : key;
                     detailsHtml += `<div style="margin-bottom:8px; font-size:0.9rem;">
                         <span style="color:var(--theme-color); font-weight:bold;">${displayKey}:</span> 
                         <span style="color:#eee; white-space: pre-wrap;">${value}</span>
                     </div>`;
                 }
-
                 html += `
                     <div class="msg-item" style="border-left: 4px solid #00bfff; position: relative;">
                         <div class="meta-line" style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:10px;">
                             <span style="font-size:1.1rem;">📋 <b>${item.name || 'Анонім'}</b></span>
                             <span style="font-size:0.8rem; color:#aaa;">${timeStr}</span>
                         </div>
-                        <div class="msg-text">
-                            ${detailsHtml}
-                        </div>
+                        <div class="msg-text">${detailsHtml}</div>
                         <button class="delete-admin-btn" style="position:static; margin-top:10px; display:inline-block;" onclick="deleteVolunteer('${item.id}')">🗑 Видалити анкету</button>
                     </div>`;
             });
@@ -1098,162 +1126,84 @@
         }
 
         function exportToCSV(dataKey, filename) {
-            let data = [];
-            if(dataKey === 'siteFeedbackData') data = globalFeedbackData;
-            if(dataKey === 'siteVolunteerData') data = globalVolunteersData;
-            if(dataKey === 'shopOrdersData') data = globalOrdersData;
-            
+            let data = dataKey === 'siteFeedbackData' ? globalFeedbackData : dataKey === 'siteVolunteerData' ? globalVolunteersData : globalOrdersData;
             if(data.length === 0) { alert("Немає даних для експорту!"); return; }
-            
             let csvContent = "\uFEFF"; 
-            let headers = Object.keys(data[0]).join(",");
-            csvContent += headers + "\r\n";
-            
+            csvContent += Object.keys(data[0]).join(",") + "\r\n";
             data.forEach(row => {
-                let values = Object.values(row).map(val => {
-                    let strVal = String(val !== null && val !== undefined ? val : "");
-                    return `"${strVal.replace(/"/g, '""')}"`;
-                });
+                let values = Object.values(row).map(val => `"${String(val !== null && val !== undefined ? val : "").replace(/"/g, '""')}"`);
                 csvContent += values.join(",") + "\r\n";
             });
-            
             let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             let link = document.createElement("a");
-            let url = URL.createObjectURL(blob);
-            
-            link.setAttribute("href", url);
+            link.href = URL.createObjectURL(blob);
             link.setAttribute("download", filename + ".csv");
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
         function togglePromoType() {
             const type = document.getElementById('promo-type-select').value;
             const valInput = document.getElementById('promo-value-input');
             const codeInput = document.getElementById('promo-code-input');
-            const isCert = type === 'certificate';
-            
-            if(isCert) {
+            if(type === 'certificate') {
                 valInput.placeholder = "Сума сертифікату у ₴ (напр: 1000)";
                 if(!codeInput.value) codeInput.value = "CERT-" + Math.floor(1000 + Math.random() * 9000);
-            } else {
-                valInput.placeholder = "Знижка у % (напр: 10)";
-            }
+            } else { valInput.placeholder = "Знижка у % (напр: 10)"; }
         }
 
         async function createPromoCode() {
             const codeInput = document.getElementById('promo-code-input');
             const valueInput = document.getElementById('promo-value-input');
             const typeSelect = document.getElementById('promo-type-select').value;
-            
             const code = codeInput.value.trim().toUpperCase();
             const value = parseInt(valueInput.value.trim());
-
-            if (!code || isNaN(value)) {
-                alert("Введіть код та значення!");
-                return;
-            }
-
+            if (!code || isNaN(value)) { alert("Введіть код та значення!"); return; }
             const isCert = typeSelect === 'certificate';
-            const isSingleUse = isCert ? true : false;
-
             try {
                 await db.collection("promocodes").doc(code).set({
                     type: isCert ? 'certificate' : 'promo',
                     discount: isCert ? 0 : value,
                     fiatValue: isCert ? value : 0,
                     created: firebase.firestore.FieldValue.serverTimestamp(),
-                    active: true,
-                    isSingleUse: isSingleUse,
-                    isCertificate: isCert
+                    active: true, isSingleUse: isCert, isCertificate: isCert
                 });
-                alert(isCert ? "✓ Сертифікат успішно створено!" : "✓ Промокод успішно створено!");
-                logAdminAction('shop', `Створив ${isCert ? 'сертифікат' : 'промокод'} ${code} (${value}${isCert ? '₴' : '%'})`);
-                
-                showCertificatePreview(code, isCert ? 'certificate' : 'promo', value);
-                
+                alert("✓ Створено успішно!");
+                logAdminAction('shop', `Створив купон/сертифікат ${code}`);
+                showCertificatePreview(code, isCert, value);
                 codeInput.value = ""; valueInput.value = ""; 
-            } catch (error) { console.error("Помилка:", error); }
+            } catch (error) { console.error(error); }
         }
 
         function showCertificatePreview(code, type, value) {
-            const titleEl = document.getElementById('cert-display-title');
-            const labelEl = document.getElementById('cert-display-label');
-            const valueEl = document.getElementById('cert-display-value');
-            const codeEl = document.getElementById('cert-display-code');
-
-            if (type === 'certificate' || type === true) { 
-                titleEl.innerText = "Сертифікат підтримки";
-                labelEl.innerText = "СУМА СЕРТИФІКАТА";
-                valueEl.innerText = value + ' ₴';
-            } else {
-                titleEl.innerText = "Промокод на знижку";
-                labelEl.innerText = "ВАШ ПРОМОКОД";
-                valueEl.innerText = value + '%';
-            }
-
-            codeEl.innerText = code;
+            const isCert = type === 'certificate' || type === true;
+            document.getElementById('cert-display-title').innerText = isCert ? "Сертифікат підтримки" : "Промокод на знижку";
+            document.getElementById('cert-display-label').innerText = isCert ? "СУМА СЕРТИФІКАТА" : "ВАШ ПРОМОКОД";
+            document.getElementById('cert-display-value').innerText = value + (isCert ? ' ₴' : '%');
+            document.getElementById('cert-display-code').innerText = code;
             document.getElementById('cert-preview-box').style.display = 'block';
-            document.getElementById('promo-tab').scrollTop = 0;
-            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function downloadCertificatePNG() {
-            const element = document.getElementById('certificate-card-element');
-            const currentCode = document.getElementById('cert-display-code').innerText;
-            
-            html2canvas(element, {
-                backgroundColor: null, 
-                scale: 2,              
-                useCORS: true          
-            }).then(canvas => {
-                const image = canvas.toDataURL("image/png");
-                const link = document.createElement('a');
-                link.download = `SVAROG_Card_${currentCode}.png`;
-                link.href = image;
-                link.click();
-            }).catch(err => {
-                console.error("Не вдалося сформувати фото картки:", err);
+            html2canvas(document.getElementById('certificate-card-element'), { backgroundColor: null, scale: 2, useCORS: true }).then(canvas => {
+                let link = document.createElement('a');
+                link.download = `SVAROG_Card.png`; link.href = canvas.toDataURL("image/png"); link.click();
             });
         }
 
         function renderPromocodes() {
-            const box = document.getElementById('box-for-promocodes');
-            if (!box) return;
-            box.innerHTML = "";
-            if (globalPromocodes.length === 0) {
-                box.innerHTML = `<div class="no-msg">Немає активних промокодів</div>`;
-                return;
-            }
+            const box = document.getElementById('box-for-promocodes'); if (!box) return;
+            box.innerHTML = globalPromocodes.length === 0 ? `<div class="no-msg">Немає активних промокодів</div>` : "";
             globalPromocodes.forEach(promo => {
-                const codeName = promo.id; 
                 const isCert = promo.type === 'certificate' || promo.isCertificate;
-                
-                const badgeHtml = isCert 
-                    ? `<span style="background:#da70d6; color:#fff; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">🎁 Сертифікат</span>`
-                    : (promo.isSingleUse ? `<span style="background:#ffaa00; color:#000; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">Одноразовий</span>` : `<span style="background:#777777; color:#fff; font-size:0.7rem; padding:2px 5px; border-radius:4px; font-weight:bold; margin-left:5px;">Багаторазовий</span>`);
-                
-                const valueText = isCert ? `<b style="color:#da70d6">${promo.fiatValue || promo.discount} ₴</b>` : `<b style="color:#777777">${promo.discount}%</b>`;
-                const statusBadge = promo.active 
-                    ? `<span style="color:#00ffcc; font-size:0.85rem; font-weight:bold;">✅  Активний</span>` 
-                    : `<span style="color:#ff4a4a; font-size:0.85rem; font-weight:bold;">🛑 Використаний / Неактивний</span>`;
-
-                const showBtn = `<button class="export-btn" style="margin:0 5px 0 0; padding:4px 8px; font-size:0.75rem;" onclick="showCertificatePreview('${codeName}', '${isCert ? 'certificate' : 'promo'}', ${isCert ? (promo.fiatValue || promo.discount) : promo.discount})">Генерувати картку</button>`;
-
                 box.innerHTML += `
-                    <div class="admin-user-card" style="display: flex; justify-content: space-between; align-items: center; border-left: 4px solid ${promo.active ? '#00ffcc' : '#ff4a4a'}">
+                    <div class="admin-user-card" style="display:flex; justify-content:space-between; align-items:center; border-left:4px solid ${promo.active?'#00ffcc':'#ff4a4a'}">
                         <div>
-                            <div style="font-weight:bold; font-size:1.1rem; color:var(--theme-color); letter-spacing: 1px;">
-                                ${codeName} ${badgeHtml}
-                            </div>
-                            <div style="font-size:0.85rem; color:#ccc; margin-top: 4px;">Номінал: ${valueText} | ${statusBadge}</div>
+                            <div style="font-weight:bold; font-size:1.1rem; color:var(--theme-color);">${promo.id} ${isCert?'🎁 Сертифікат':promo.isSingleUse?'(Однораз.)':'(Багатораз.)'}</div>
+                            <div style="font-size:0.85rem; color:#ccc; margin-top:4px;">Номінал: ${isCert?promo.fiatValue+' ₴':promo.discount+'%'} | ${promo.active?'✅ Активний':'🛑 Неактивний'}</div>
                         </div>
-                        <div style="display:flex; align-items:center;">
-                            ${showBtn}
-                            <button class="delete-admin-btn" style="position: static;" onclick="deletePromoCode('${codeName}')">Видалити</button>
+                        <div>
+                            <button class="export-btn" style="padding:4px 8px; font-size:0.75rem;" onclick="showCertificatePreview('${promo.id}', ${isCert}, ${isCert?promo.fiatValue:promo.discount})">Перегляд</button>
+                            <button class="delete-admin-btn" style="position:static;" onclick="deletePromoCode('${promo.id}')">Видалити</button>
                         </div>
                     </div>`;
             });
@@ -1261,10 +1211,7 @@
 
         async function deletePromoCode(id) {
             if(confirm(`Ви впевнені, що хочете видалити цей код (${id})?`)) {
-                try { 
-                    await db.collection("promocodes").doc(id).delete(); 
-                    logAdminAction('shop', `Видалив купон/сертифікат ${id}`); 
-                } catch(e) { console.error("Помилка видалення:", e); }
+                try { await db.collection("promocodes").doc(id).delete(); logAdminAction('shop', `Видалив купон/сертифікат ${id}`); } catch(e) { console.error("Помилка видалення:", e); }
             }
         }
 
@@ -1277,13 +1224,12 @@
         }
 
         function addVariantBlock() {
-            currentMerchVariants.push({ colorName: "", colorHex: "#ffffff", image: "", stock: {} });
+            currentMerchVariants.push({ colorName: "", colorHex: "#ffffff", image: "", images: [], stock: {} });
             renderMerchVariantEditor();
         }
 
         function removeVariantBlock(index) {
-            currentMerchVariants.splice(index, 1);
-            renderMerchVariantEditor();
+            currentMerchVariants.splice(index, 1); renderMerchVariantEditor();
         }
 
         function handleVariantUpdate(index, field, value) {
@@ -1295,106 +1241,106 @@
             currentMerchVariants[variantIndex].stock[size] = parseInt(value) || 0;
         }
 
-        function handleVariantImageUpload(input, index) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentMerchVariants[index].image = e.target.result;
-                    renderMerchVariantEditor(); 
-                };
-                reader.readAsDataURL(input.files[0]);
+        // Мультизавантаження зображень для конкретного кольору (Варіанта)
+        async function handleVariantImageUpload(input, index) {
+            if (input.files && input.files.length > 0) {
+                currentMerchVariants[index].images = [];
+                for(let file of input.files) {
+                    let base64 = await getBase64(file);
+                    currentMerchVariants[index].images.push(base64);
+                }
+                // Перше фото дублюємо в головне поле варіанта для зворотної сумісності
+                currentMerchVariants[index].image = currentMerchVariants[index].images[0] || "";
+                renderMerchVariantEditor();
             }
         }
 
         function renderMerchVariantEditor() {
             const hasVariants = document.getElementById('merch-has-variants')?.checked;
             if(!hasVariants) { generateSizeStockInputs(); return; } 
-
             const container = document.getElementById('variants-list-container');
             const sizesStr = document.getElementById('merch-sizes').value.trim();
             const isPreorder = document.getElementById('merch-is-preorder')?.checked;
             const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : ["Універсальний"];
-            
             container.innerHTML = "";
 
             currentMerchVariants.forEach((variant, index) => {
                 let stockInputsHtml = sizesArr.map(size => {
-                    let baseVal = variant.stock ? (variant.stock[size] || 0) : 0;
-                    let disabledStr = isPreorder ? 'disabled' : '';
-                    return `
-                        <div style="display:flex; flex-direction:column; gap:3px; flex:1; min-width:60px;">
-                            <span style="font-size:0.7rem; color:var(--theme-color); text-align:center;">${size}</span>
-                            <input type="number" class="form-input" style="padding:4px; text-align:center;" value="${isPreorder ? 99 : baseVal}" min="0" ${disabledStr} onchange="handleVariantStockUpdate(${index}, '${size}', this.value)">
-                        </div>`;
+                    let baseVal = variant.stock?.[size] || 0;
+                    return `<div style="display:flex; flex-direction:column; gap:3px; flex:1; min-width:60px;">
+                        <span style="font-size:0.7rem; color:var(--theme-color); text-align:center;">${size}</span>
+                        <input type="number" class="form-input" style="padding:4px; text-align:center;" value="${isPreorder ? 99 : baseVal}" ${isPreorder?'disabled':''} onchange="handleVariantStockUpdate(${index}, '${size}', this.value)">
+                    </div>`;
                 }).join('');
 
-                let imgPreviewHtml = variant.image ? `<img src="${variant.image}" style="max-width:80px; max-height:80px; border-radius:4px; object-fit:cover; margin-top:5px;">` : '';
+                let imgPreviews = '';
+                let imgsArray = variant.images || (variant.image ? [variant.image] : []);
+                imgsArray.forEach(src => {
+                    imgPreviews += `<img src="${src}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; margin-right:4px;">`;
+                });
 
                 container.innerHTML += `
                     <div class="variant-block">
                         <button class="variant-remove-btn" onclick="removeVariantBlock(${index})">✖</button>
-                        <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
-                            <div style="flex:2; min-width:150px;">
-                                <label style="font-size:0.75rem; color:#aaa;">Назва кольору (напр. Мультикам):</label>
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                            <div style="flex:2;">
+                                <label style="font-size:0.75rem; color:#aaa;">Назва кольору:</label>
                                 <input type="text" class="form-input" style="padding:6px;" value="${variant.colorName}" onchange="handleVariantUpdate(${index}, 'colorName', this.value)">
                             </div>
-                            <div style="flex:1; min-width:80px;">
-                                <label style="font-size:0.75rem; color:#aaa;">Відтінок (для кнопки):</label>
-                                <input type="color" style="width:100%; height:32px; border:none; background:none; cursor:pointer;" value="${variant.colorHex}" onchange="handleVariantUpdate(${index}, 'colorHex', this.value)">
+                            <div style="flex:1;">
+                                <label style="font-size:0.75rem; color:#aaa;">Кнопка кольору:</label>
+                                <input type="color" style="width:100%; height:32px; border:none; cursor:pointer;" value="${variant.colorHex || '#ffffff'}" onchange="handleVariantUpdate(${index}, 'colorHex', this.value)">
                             </div>
                         </div>
-                        <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px; flex-wrap:wrap;">
-                            <div style="flex:1; min-width:150px;">
-                                <label style="font-size:0.75rem; color:#aaa;">Фото для цього кольору:</label>
-                                <input type="file" accept="image/*" class="form-input" style="padding:6px; font-size:0.8rem;" onchange="handleVariantImageUpload(this, ${index})">
-                            </div>
-                            ${imgPreviewHtml}
+                        <div style="margin-bottom:10px;">
+                            <label style="font-size:0.75rem; color:#aaa; display:block;">Фото варіанта (можна декілька):</label>
+                            <input type="file" accept="image/*" class="form-input" multiple style="padding:6px; font-size:0.8rem;" onchange="handleVariantImageUpload(this, ${index})">
+                            <div class="multi-images-container">${imgPreviews}</div>
                         </div>
-                        <label style="font-size:0.75rem; color:#aaa; margin-bottom:5px; display:block;">Залишки на складі для цього кольору:</label>
-                        <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                            ${stockInputsHtml}
-                        </div>
+                        <div style="display:flex; gap:5px; flex-wrap:wrap;">${stockInputsHtml}</div>
                     </div>`;
             });
         }
 
         function generateSizeStockInputs(existingStockObj = null) {
-            const container = document.getElementById('size-stock-fields-container');
-            if(!container) return;
+            const container = document.getElementById('size-stock-fields-container'); if(!container) return;
             const sizesStr = document.getElementById('merch-sizes').value.trim();
             const isPreorder = document.getElementById('merch-is-preorder')?.checked;
-            
             container.innerHTML = "";
             const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : [];
 
             if (sizesArr.length === 0) {
-                let baseVal = 0;
-                if(existingStockObj) {
-                    baseVal = typeof existingStockObj === 'object' ? (existingStockObj["Універсальний"] || 0) : existingStockObj;
-                }
-                let disabledStr = isPreorder ? 'disabled' : '';
+                let baseVal = existingStockObj ? (typeof existingStockObj === 'object' ? (existingStockObj["Універсальний"] || 0) : existingStockObj) : 0;
                 container.innerHTML = `
                     <div style="display:flex; flex-direction:column; gap:3px;">
                         <span style="font-size:0.75rem; color:#aaa; text-align:center;">Універс.</span>
-                        <input type="number" data-size-key="Універсальний" class="form-input size-stock-value-input" style="padding: 6px; text-align:center; font-size:0.9rem;" value="${isPreorder ? 99 : baseVal}" min="0" ${disabledStr}>
+                        <input type="number" data-size-key="Універсальний" class="form-input size-stock-value-input" style="padding: 6px; text-align:center;" value="${isPreorder ? 99 : baseVal}" ${isPreorder?'disabled':''}>
                     </div>`;
             } else {
                 sizesArr.forEach(size => {
-                    let baseVal = 0;
-                    if(existingStockObj && typeof existingStockObj === 'object') {
-                        baseVal = existingStockObj[size] || 0;
-                    }
-                    let disabledStr = isPreorder ? 'disabled' : '';
+                    let baseVal = (existingStockObj && typeof existingStockObj === 'object') ? (existingStockObj[size] || 0) : 0;
                     container.innerHTML += `
                         <div style="display:flex; flex-direction:column; gap:3px;">
                             <span style="font-size:0.75rem; color:var(--theme-color); text-align:center; font-weight:bold;">${size}</span>
-                            <input type="number" data-size-key="${size}" class="form-input size-stock-value-input" style="padding: 6px; text-align:center; font-size:0.9rem;" value="${isPreorder ? 99 : baseVal}" min="0" ${disabledStr}>
+                            <input type="number" data-size-key="${size}" class="form-input size-stock-value-input" style="padding: 6px; text-align:center;" value="${isPreorder ? 99 : baseVal}" ${isPreorder?'disabled':''}>
                         </div>`;
                 });
             }
         }
 
-        document.getElementById('merch-is-preorder')?.addEventListener('change', () => renderMerchVariantEditor());
+        // Мультизавантаження фото для простого (не варіативного) товару
+        async function previewMerchPhotos(input) {
+            if (input.files && input.files.length > 0) {
+                merchImagesArray = [];
+                const previewContainer = document.getElementById('merch-images-preview-box');
+                previewContainer.innerHTML = '';
+                for(let file of input.files) {
+                    let base64 = await getBase64(file);
+                    merchImagesArray.push(base64);
+                    previewContainer.innerHTML += `<img src="${base64}" style="width:60px; height:60px; object-fit:contain; border:1px dashed rgba(255,255,255,0.3); border-radius:4px;">`;
+                }
+            }
+        }
 
         async function publishMerchItem() {
             const editId = document.getElementById('edit-merch-id').value;
@@ -1405,18 +1351,16 @@
             const sizesStr = document.getElementById('merch-sizes').value.trim();
             const description = document.getElementById('merch-description').value.trim();
             const isPreorder = document.getElementById('merch-is-preorder')?.checked || false;
+            const isNew = document.getElementById('merch-is-new')?.checked || false; 
             const hasVariants = document.getElementById('merch-has-variants')?.checked || false;
             
-            if(!title || !price || !category) { alert("Заповніть назву, категорію та ціну товару!"); return; }
-
+            if(!title || !price || !category) { alert("Заповніть форму!"); return; }
             const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : [];
             let stockObj = {};
             
             if(!hasVariants) {
-                const stockInputs = document.querySelectorAll('.size-stock-value-input');
-                stockInputs.forEach(inp => {
-                    const key = inp.getAttribute('data-size-key');
-                    stockObj[key] = isPreorder ? 99 : (parseInt(inp.value) || 0);
+                document.querySelectorAll('.size-stock-value-input').forEach(inp => {
+                    stockObj[inp.getAttribute('data-size-key')] = isPreorder ? 99 : (parseInt(inp.value) || 0);
                 });
             } else {
                 currentMerchVariants.forEach(v => {
@@ -1431,32 +1375,30 @@
                 title: title, category: category, price: parseFloat(price),
                 discountPrice: discountPrice ? parseFloat(discountPrice) : null,
                 sizes: sizesArr, description: description,
-                isPreorder: isPreorder,
-                hasVariants: hasVariants,
+                isPreorder: isPreorder, isNew: isNew, hasVariants: hasVariants,
                 stock: hasVariants ? null : stockObj,
-                image: hasVariants ? null : (merchPhotoBase64 || null),
+                image: hasVariants ? null : (merchImagesArray[0] || null), 
+                images: hasVariants ? null : merchImagesArray, 
                 variants: hasVariants ? currentMerchVariants : []
             };
-
-            if (!editId) { merchObject.order = globalMerchData.length; }
 
             try {
                 if(editId) {
                     await db.collection("merch").doc(editId).set(merchObject, { merge: true });
                     alert("✓ Зміни товару успішно збережено!");
                 } else {
+                    merchObject.order = globalMerchData.length;
                     merchObject.timestamp = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection("merch").add(merchObject);
                     alert("✓ Товар успішно додано до вітрини!");
                 }
                 logAdminAction('shop', `Оновив/Додав товар: "${title}"`);
                 cancelMerchEditing();
-            } catch(err) { console.error(err); alert("Помилка: " + err.message); }
+            } catch(err) { alert("Помилка: " + err.message); }
         }
 
         function startEditMerch(id) {
-            const item = globalMerchData.find(m => m.id === id);
-            if(!item) return;
+            const item = globalMerchData.find(m => m.id === id); if(!item) return;
             document.getElementById('edit-merch-id').value = item.id;
             document.getElementById('merch-title').value = item.title;
             document.getElementById('merch-category').value = item.category;
@@ -1464,29 +1406,23 @@
             document.getElementById('merch-discount-price').value = item.discountPrice || "";
             document.getElementById('merch-sizes').value = item.sizes ? item.sizes.join(', ') : "";
             document.getElementById('merch-description').value = item.description || "";
-            
-            const preorderCheckbox = document.getElementById('merch-is-preorder');
-            if(preorderCheckbox) preorderCheckbox.checked = item.isPreorder || false;
+            document.getElementById('merch-is-preorder').checked = item.isPreorder || false;
+            document.getElementById('merch-is-new').checked = item.isNew || false; 
 
             const hasVariantsCheckbox = document.getElementById('merch-has-variants');
-            if(hasVariantsCheckbox) {
-                hasVariantsCheckbox.checked = item.hasVariants || false;
-                currentMerchVariants = item.variants ? JSON.parse(JSON.stringify(item.variants)) : []; 
-                toggleMerchVariantMode(); 
-            }
+            hasVariantsCheckbox.checked = item.hasVariants || false;
+            currentMerchVariants = item.variants ? JSON.parse(JSON.stringify(item.variants)) : [];
+            toggleMerchVariantMode();
 
             if(!item.hasVariants) {
                 generateSizeStockInputs(item.stock);
-                const previewImg = document.getElementById('merch-preview-element');
-                if(item.image) {
-                    merchPhotoBase64 = item.image;
-                    if(previewImg) { previewImg.src = item.image; previewImg.style.display = 'block'; }
-                } else {
-                    if(previewImg) previewImg.style.display = 'none';
-                    merchPhotoBase64 = "";
-                }
+                merchImagesArray = item.images || (item.image ? [item.image] : []);
+                const box = document.getElementById('merch-images-preview-box');
+                box.innerHTML = "";
+                merchImagesArray.forEach(src => {
+                    box.innerHTML += `<img src="${src}" style="width:60px; height:60px; object-fit:contain; border:1px solid #555;">`;
+                });
             }
-
             document.getElementById('merch-form-title').innerText = "📝 Редагування товару";
             document.getElementById('merch-submit-btn').innerText = "Зберегти зміни";
             document.getElementById('merch-duplicate-btn').style.display = 'inline-block';
@@ -1496,7 +1432,7 @@
         }
 
         function duplicateMerchItem() {
-            document.getElementById('edit-merch-id').value = ""; 
+            document.getElementById('edit-merch-id').value = "";
             document.getElementById('merch-form-title').innerText = "✨ Створення копії товару";
             document.getElementById('merch-submit-btn').innerText = "Додати як новий товар";
             document.getElementById('merch-duplicate-btn').style.display = 'none';
@@ -1511,22 +1447,12 @@
             document.getElementById('merch-sizes').value = "";
             document.getElementById('merch-description').value = "";
             document.getElementById('merch-photo-file').value = "";
-            
-            const preorderCheckbox = document.getElementById('merch-is-preorder');
-            if(preorderCheckbox) preorderCheckbox.checked = false;
-
-            const hasVariantsCheckbox = document.getElementById('merch-has-variants');
-            if(hasVariantsCheckbox) { 
-                hasVariantsCheckbox.checked = false; 
-                currentMerchVariants = []; 
-                toggleMerchVariantMode(); 
-            }
-
-            const previewImg = document.getElementById('merch-preview-element');
-            if(previewImg) previewImg.style.display = 'none';
-            merchPhotoBase64 = "";
-            generateSizeStockInputs();
-            
+            document.getElementById('merch-is-preorder').checked = false;
+            document.getElementById('merch-is-new').checked = false;
+            document.getElementById('merch-has-variants').checked = false;
+            document.getElementById('merch-images-preview-box').innerHTML = '';
+            merchImagesArray = []; currentMerchVariants = [];
+            toggleMerchVariantMode(); 
             document.getElementById('merch-form-title').innerText = "Додати новий товар (Мерч)";
             document.getElementById('merch-submit-btn').innerText = "Зберегти товар у базу";
             document.getElementById('merch-duplicate-btn').style.display = 'none';
@@ -1534,788 +1460,168 @@
         }
 
         function renderMerchList() {
-            const box = document.getElementById('box-for-merch-items'); 
-            if(!box) return;
-            box.innerHTML = "";
-            if(globalMerchData.length === 0) { box.innerHTML = `<div class="no-msg">Вітрина порожня</div>`; return; }
-
+            const box = document.getElementById('box-for-merch-items'); if(!box) return;
+            box.innerHTML = globalMerchData.length === 0 ? `<div class="no-msg">Вітрина порожня</div>` : "";
             globalMerchData.forEach(item => {
-                let imgHtml = "";
-                let stockLine = "";
-                
-                if (item.hasVariants && item.variants && item.variants.length > 0) {
-                    imgHtml = item.variants[0].image ? `<img src="${item.variants[0].image}" class="merch-card-img">` : `<div class="merch-card-img" style="display:flex; justify-content:center; align-items:center; color:#666;">Немає фото</div>`;
-                    stockLine = `<span style="color:var(--theme-color)">🎨 Варіативний товар (${item.variants.length} кольорів)</span>`;
-                } else {
-                    imgHtml = item.image ? `<img src="${item.image}" class="merch-card-img">` : `<div class="merch-card-img" style="display:flex; justify-content:center; align-items:center; color:#666;">Немає фото</div>`;
-                    if(item.isPreorder) {
-                        stockLine = `<span style="color:#777777">Не обмежено (Передзамовлення)</span>`;
-                    } else if(typeof item.stock === 'object' && item.stock !== null) {
-                        stockLine = Object.entries(item.stock).map(([sz, q]) => {
-                            let color = q === 0 ? '#ff4a4a' : (q < 5 ? '#ffaa00' : '#777777');
-                            return `<b>${sz}</b>:<span style="color:${color}">${q}шт</span>`;
-                        }).join(' | ');
-                    } else {
-                        let q = item.stock || 0;
-                        let color = q === 0 ? '#ff4a4a' : (q < 5 ? '#ffaa00' : '#777777');
-                        stockLine = `<span style="color:${color}">${q} шт</span>`;
-                    }
-                }
-
-                let sizesHtml = item.sizes && item.sizes.length > 0 ? `Розміри: ${item.sizes.join(', ')}` : 'Універсальний розмір';
-                
-                let hasDiscount = item.discountPrice && item.discountPrice < item.price;
-                let priceHtml = hasDiscount 
-                    ? `<span class="old-price">${item.price} ₴</span> <span class="merch-price">${item.discountPrice} ₴</span>`
-                    : `<span class="merch-price">${item.price} ₴</span>`;
-                
-                let saleBadge = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
-                let preorderBadge = item.isPreorder ? `<div class="preorder-badge">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>` : ``;
-
-                let descHtml = item.description ? `<div class="merch-desc">${item.description}</div>` : '';
+                let imgs = item.images || (item.image ? [item.image] : []);
+                let activeVar = item.hasVariants && item.variants?.[0];
+                let src = activeVar ? (activeVar.images?.[0] || activeVar.image) : (imgs[0] || "");
+                let imgHtml = src ? `<img src="${src}" class="merch-card-img">` : `<div class="merch-card-img" style="display:flex;align-items:center;justify-content:center;color:#666;">Нічого</div>`;
+                let stockLine = item.hasVariants ? `🎨 Варіанти (${item.variants.length})` : (item.isPreorder ? '⏳ Передзамовлення' : JSON.stringify(item.stock || {}));
+                let newBadge = item.isNew ? `<div class="new-badge">🔥 НОВИНКА</div>` : '';
 
                 box.innerHTML += `
                     <div class="merch-card">
                         ${imgHtml}
-                        ${saleBadge}
-                        ${preorderBadge}
+                        <div class="sale-badge" style="display:${item.discountPrice?'block':'none'}">SALE</div>
+                        <div class="preorder-badge" style="display:${item.isPreorder?'block':'none'}">⏳ PRE</div>
+                        ${newBadge}
                         <div class="merch-card-body">
-                            <div class="cat-tag">${item.category || 'Без категорії'}</div>
+                            <div class="cat-tag">${item.category}</div>
                             <div class="merch-title">${item.title}</div>
-                            <div style="margin-bottom:10px;">${priceHtml}</div>
-                            ${descHtml}
-                            <div class="merch-sizes" style="border-top:1px solid rgba(255,255,255,0.05); padding-top:5px;">${sizesHtml}</div>
-                            <div class="merch-sizes" style="color:#aaa; font-size:0.85rem; margin-bottom:12px; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px;">Залишки: ${stockLine}</div>
-                            <div class="merch-actions" style="justify-content: space-between; flex-direction:column; gap:10px;">
-                                <div style="display:flex; justify-content:center; align-items:center; gap:5px; background:rgba(0,0,0,0.2); padding:5px; border-radius:6px; flex-wrap:wrap;">
-                                    <button class="export-btn" style="padding:4px 8px; margin:0; border-color:#888; color:#ccc;" onclick="moveMerchItem('${item.id}', 'up')" title="На самий початок">⬆️</button>
-                                    <button class="export-btn" style="padding:4px 8px; margin:0; border-color:#888; color:#ccc;" onclick="moveMerchItem('${item.id}', 'left')" title="Посунути на 1 позицію назад">⬅️</button>
-                                    <button class="export-btn" style="padding:4px 8px; margin:0; border-color:#888; color:#ccc;" onclick="moveMerchItem('${item.id}', 'right')" title="Посунути на 1 позицію вперед">➡️</button>
-                                    <button class="export-btn" style="padding:4px 8px; margin:0; border-color:#888; color:#ccc;" onclick="moveMerchItem('${item.id}', 'down')" title="В самий кінець">⬇️</button>
-                                </div>
-                                <div style="display:flex; justify-content:flex-end; gap:10px;">
-                                    <button class="edit-news-btn" style="position:relative; right:auto; top:auto;" onclick="startEditMerch('${item.id}')">Редагувати</button>
-                                    <button class="delete-admin-btn" style="position:relative; right:auto; top:auto;" onclick="deleteMerchItem('${item.id}')">Видалити</button>
-                                </div>
+                            <div class="merch-price">${item.discountPrice || item.price} ₴</div>
+                            <div class="merch-sizes" style="font-size:0.75rem; color:#aaa; margin-top:5px;">Залишки: ${stockLine}</div>
+                            <div class="merch-actions">
+                                <button class="export-btn" style="padding:4px;" onclick="moveMerchItem('${item.id}', 'left')">⬅️</button>
+                                <button class="export-btn" style="padding:4px;" onclick="moveMerchItem('${item.id}', 'right')">➡️</button>
+                                <button class="edit-news-btn" style="position:static;" onclick="startEditMerch('${item.id}')">Ред.</button>
+                                <button class="delete-admin-btn" style="position:static;" onclick="deleteMerchItem('${item.id}')">Х</button>
                             </div>
                         </div>
                     </div>`;
             });
         }
 
-        async function deleteMerchItem(id) {
-            if(confirm("Видалити цей товар з магазину?")) {
-                try { 
-                    await db.collection("merch").doc(id).delete(); 
-                    logAdminAction('shop', `Видалив товар з ID: ${id}`);
-                } 
-                catch(e) { console.error("Помилка видалення товару:", e); }
-            }
-        }
-
         async function moveMerchItem(id, action) {
-            const index = globalMerchData.findIndex(m => m.id === id);
-            if (index < 0) return;
-
-            let newArray = [...globalMerchData];
-
-            if (action === 'up') {
-                if (index > 0) {
-                    const item = newArray.splice(index, 1)[0];
-                    newArray.unshift(item);
-                }
-            } else if (action === 'down') {
-                if (index < newArray.length - 1) {
-                    const item = newArray.splice(index, 1)[0];
-                    newArray.push(item);
-                }
-            } else if (action === 'left') {
-                if (index > 0) {
-                    const temp = newArray[index];
-                    newArray[index] = newArray[index - 1];
-                    newArray[index - 1] = temp;
-                }
-            } else if (action === 'right') {
-                if (index < newArray.length - 1) {
-                    const temp = newArray[index];
-                    newArray[index] = newArray[index + 1];
-                    newArray[index + 1] = temp;
-                }
-            }
-
+            const index = globalMerchData.findIndex(m => m.id === id); if (index < 0) return;
+            let arr = [...globalMerchData];
+            if (action === 'left' && index > 0) { arr[index] = arr[index-1]; arr[index-1] = globalMerchData[index]; }
+            if (action === 'right' && index < arr.length - 1) { arr[index] = arr[index+1]; arr[index+1] = globalMerchData[index]; }
             try {
-                const batch = db.batch();
-                newArray.forEach((itm, i) => {
-                    batch.update(db.collection("merch").doc(itm.id), { order: i });
-                });
+                let batch = db.batch();
+                arr.forEach((x, i) => batch.update(db.collection("merch").doc(x.id), { order: i }));
                 await batch.commit();
-                logAdminAction('shop', `Змінив порядок товару у каталозі`);
-            } catch(e) {
-                console.error("Помилка сортування:", e);
-            }
+            } catch(e) { console.error(e); }
         }
 
-        function setOrdersFilter(filterType) {
-            currentOrdersFilter = filterType;
-            document.querySelectorAll('.orders-sub-btn').forEach(btn => btn.classList.remove('active'));
-            if(filterType === 'active') document.getElementById('sub-btn-active').classList.add('active');
-            if(filterType === 'sent') document.getElementById('sub-btn-sent').classList.add('active');
-            if(filterType === 'archive') document.getElementById('sub-btn-archive').classList.add('active');
-            renderOrdersList();
-        }
-
-        function openFullImage(imgSrc) {
-            if (!imgSrc) return;
-            const newWin = window.open();
-            if (newWin) {
-                newWin.document.write(`<body style="margin:0; background:#121212; display:flex; justify-content:center; align-items:center; min-height:100vh;"><img src="${imgSrc}" style="max-width:100%; max-height:100vh; object-fit:contain; box-shadow:0 0 30px rgba(0,0,0,0.8);"></body>`);
-            } else {
-                alert("Браузер заблокував відкриття нового вікна. Будь ласка, дозвольте спливаючі вікна для цього сайту в налаштуваннях браузера.");
-            }
-        }
+        function setOrdersFilter(f) { currentOrdersFilter = f; document.querySelectorAll('.orders-sub-btn').forEach(x => x.classList.remove('active')); document.getElementById('sub-btn-'+f).classList.add('active'); renderOrdersList(); }
 
         function renderOrdersList() {
-            const ordersBox = document.getElementById('box-for-orders'); 
-            if(!ordersBox) return;
-            ordersBox.innerHTML = "";
-            
-            let filteredOrders = globalOrdersData.filter(ord => {
-                let status = ord.status || 'new';
-                if (currentOrdersFilter === 'active') {
-                    return status === 'new' || status === 'on_review' || status === 'accepted';
-                } else if (currentOrdersFilter === 'sent') {
-                    return status === 'sent' || status === 'delivered';
-                } else if (currentOrdersFilter === 'archive') {
-                    return status === 'archived' || status === 'cancelled';
-                }
-                return true;
+            const container = document.getElementById('box-for-orders'); if(!container) return;
+            container.innerHTML = "";
+            let filtered = globalOrdersData.filter(ord => {
+                let s = ord.status || 'new';
+                if(currentOrdersFilter === 'active') return s==='new' || s==='on_review' || s==='accepted';
+                if(currentOrdersFilter === 'sent') return s==='sent' || s==='delivered';
+                return s==='archived' || s==='cancelled';
             });
-
-            if(filteredOrders.length === 0) { 
-                ordersBox.innerHTML = `<div class="no-msg">У цій підгрупі замовлень немає</div>`; 
-                return; 
-            }
-
-            filteredOrders.forEach(ord => {
-                let status = ord.status || 'new';
-                let sLabel = status === 'new' ? 'Нове' : 
-                             status === 'on_review' ? 'На перевірці ⏳' : 
-                             status === 'accepted' ? 'Прийнято ✓' : 
-                             status === 'sent' ? 'Відправлено 📦' : 
-                             status === 'delivered' ? 'Доставлено 🎉' : 
-                             status === 'cancelled' ? 'Скасовано ✖' : 'В архіві 📂';
-
-                let sClass = status === 'new' || status === 'on_review' ? 'on_review' : 
-                             status === 'accepted' ? 'accepted' : 
-                             status === 'sent' ? 'sent' : 
-                             status === 'delivered' ? 'delivered' : 
-                             status === 'cancelled' ? 'cancelled' : 'archived';
-                
-                let itemsListHtml = '';
-                if(ord.items && Array.isArray(ord.items)) {
-                    ord.items.forEach(it => {
-                        let sizeMeta = it.size === 'Універсальний' ? '' : ` [Розмір: ${it.size}]`;
-                        let colorMeta = it.color ? ` (Колір: ${it.color})` : '';
-                        
-                        let titleHtml = it.merchTitle.includes('[ПЕРЕДЗАМОВЛЕННЯ]') 
-                            ? it.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#777777;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
-                            : it.merchTitle;
-
-                        itemsListHtml += `
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem; padding-left:10px; border-left:2px solid var(--theme-color);">
-                            <span><b>${titleHtml}</b>${colorMeta}${sizeMeta} x${it.quantity} шт</span>
-                            <span style="color:var(--theme-color); font-weight:bold;">${it.totalPrice} ₴</span>
-                        </div>`;
-                    });
-                } else if(ord.orderTextDetails) {
-                    itemsListHtml = `<pre style="font-family:inherit; font-size:0.9rem; margin-left:10px; color:#ccc;">${ord.orderTextDetails}</pre>`;
-                }
-
-                let promoHtml = (ord.promoCode && ord.promoCode !== "Не застосовано") ? `<div style="font-size:0.85rem; color:#777777; margin-bottom:8px;">🎟️ Промокод / Сертифікат: <b>${ord.promoCode}</b></div>` : '';
-                let paymentMethodHtml = ord.paymentMethod ? `<div style="font-size:0.9rem; color:#fff; margin-bottom:8px;">💳 <b>Оплата:</b> ${ord.paymentMethod}</div>` : '';
-                
-                let paymentProofHtml = ord.paymentProof ? `<button class="btn" style="margin-top:10px; padding:6px 12px; width:auto; border-color:var(--theme-color); color:var(--theme-color);" onclick="openFullImage('${ord.paymentProof}')">📸 Переглянути квитанцію</button>` : '';
-                let archiveHint = status === 'delivered' ? `<span style="font-size:0.75rem; color:#aaa; margin-left:10px;">(Можна в архів)</span>` : '';
-
-                ordersBox.innerHTML += `
-                    <div class='msg-item' style="border-left: 4px solid var(--theme-color);">
-                        <div class='meta-line' style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                            <span>🛒 Замовлення від ${ord.time || 'Не вказано'}</span>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <span style="font-size:0.85rem; color:#ccc;">Статус:</span>
-                                <select class="status-select ${sClass}" onchange="changeOrderStatus('${ord.id}', this.value)">
-                                    <option value="new" ${status === 'new' ? 'selected' : ''}>Нове</option>
-                                    <option value="on_review" ${status === 'on_review' ? 'selected' : ''}>На перевірці</option>
-                                    <option value="accepted" ${status === 'accepted' ? 'selected' : ''}>Прийнято</option>
-                                    <option value="sent" ${status === 'sent' ? 'selected' : ''}>Відправлено</option>
-                                    <option value="delivered" ${status === 'delivered' ? 'selected' : ''}>Доставлено</option>
-                                    <option value="cancelled" ${status === 'cancelled' ? 'selected' : ''}>Скасовано</option>
-                                    <option value="archived" ${status === 'archived' ? 'selected' : ''}>В архіві</option>
-                                </select>
-                            </div>
+            if(filtered.length === 0) { container.innerHTML = `<div class="no-msg">Порожній список</div>`; return; }
+            filtered.forEach(ord => {
+                let s = ord.status || 'new';
+                let sClass = s === 'new' || s === 'on_review' ? 'on_review' : s === 'accepted' ? 'accepted' : s === 'sent' ? 'sent' : s === 'delivered' ? 'delivered' : s === 'cancelled' ? 'cancelled' : 'archived';
+                let itemsHtml = ord.items ? ord.items.map(it => `• ${it.merchTitle} [${it.size||'U'}] x${it.quantity}`).join('<br>') : ord.orderTextDetails || '';
+                let viewReceipt = ord.paymentProof ? `<button class="btn" style="width:auto; padding:4px 10px; margin-top:5px;" onclick="openFullImage('${ord.paymentProof}')">📸 Переглянути чек</button>` : '';
+                container.innerHTML += `
+                    <div class="msg-item" style="border-left:4px solid var(--theme-color);">
+                        <div class="meta-line">
+                            <span>🛒 Замовлення від ${ord.time || 'Невідомо'}</span>
+                            <select class="status-select ${sClass}" onchange="changeOrderStatus('${ord.id}', this.value)">
+                                <option value="new" ${s==='new'?'selected':''}>Нове</option>
+                                <option value="on_review" ${s==='on_review'?'selected':''}>На перевірці</option>
+                                <option value="accepted" ${s==='accepted'?'selected':''}>Прийнято</option>
+                                <option value="sent" ${s==='sent'?'selected':''}>Відправлено</option>
+                                <option value="delivered" ${s==='delivered'?'selected':''}>Доставлено</option>
+                                <option value="cancelled" ${s==='cancelled'?'selected':''}>Скасовано</option>
+                                <option value="archived" ${s==='archived'?'selected':''}>В архіві</option>
+                            </select>
                         </div>
-                        
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:15px; margin-bottom:15px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:15px; margin-top:15px;">
-                            <div>
-                                <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">📍 Дані доставки:</h4>
-                                <p class="msg-text">👤 <b>ПІБ:</b> ${ord.name}</p>
-                                <p class="msg-text">📞 <b>Тел:</b> ${ord.phone}</p>
-                                <p class="msg-text">📍 <b>Адреса:</b> ${ord.address}</p>
-                            </div>
-                            <div>
-                                <h4 style="color:var(--theme-color); margin-bottom:6px; font-size:0.95rem;">💰 Оплата та підтвердження:</h4>
-                                ${paymentMethodHtml}
-                                ${promoHtml}
-                                <p class="msg-text" style="font-size:1.05rem;"><b>До сплати:</b> <span style="color:var(--theme-color); font-weight:bold;">${ord.totalPrice} ₴</span></p>
-                                ${paymentProofHtml}
-                            </div>
+                        <div style="margin:10px 0; font-size:0.9rem;">
+                            <b>Отримувач:</b> ${ord.name} (${ord.phone})<br>
+                            <b>Адреса:</b> ${ord.address}<br>
+                            <b>Сума:</b> ${ord.totalPrice} ₴ | Спосіб: ${ord.paymentMethod || 'Картка'}<br>
+                            <b>Купон:</b> ${ord.promoCode || 'Ні'}
+                            ${viewReceipt}
                         </div>
-
-                        <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:6px; margin-bottom:15px;">
-                            <div style="font-size:0.85rem; color:#aaa; margin-bottom:8px; font-weight:bold;">Склад замовлення:</div>
-                            ${itemsListHtml}
-                        </div>
-
-                        <div style="display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:10px; background:rgba(255,255,255,0.02); padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
-                            ${archiveHint}
-                            <button class="btn" style="padding:6px 12px; font-size:0.8rem; border-color:#da70d6; color:#da70d6; width:auto;" onclick="changeOrderStatus('${ord.id}', 'archived')">📥 Перенести в архів</button>
-                            <button class="delete-admin-btn" style="position:static; padding:6px 12px;" onclick="deleteOrderItem('${ord.id}')">Видалити запис</button>
+                        <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:6px; font-size:0.85rem;">${itemsHtml}</div>
+                        <div style="margin-top:10px; text-align:right;">
+                            <button class="delete-admin-btn" style="position:static;" onclick="deleteOrderItem('${ord.id}')">Видалити запис</button>
                         </div>
                     </div>`;
             });
         }
 
         async function changeOrderStatus(id, newStatus) {
-            isConfirmingStatus = true;
-            try { 
-                await db.collection("orders").doc(id).update({ status: newStatus }); 
-                logAdminAction('orders', `Змінив статус замовлення ${id} на "${newStatus}"`);
-            } 
-            catch(e) { console.error(e); }
-            finally { isConfirmingStatus = false; renderAllDynamicData(); }
-        }
-
-        function previewMerchPhoto(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    merchPhotoBase64 = e.target.result;
-                    const previewImg = document.getElementById('merch-preview-element');
-                    if(previewImg) {
-                        previewImg.src = merchPhotoBase64;
-                        previewImg.style.display = 'block';
-                    }
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function toggleShopStatus() {
-            setTimeout(async () => {
-                const checkbox = document.getElementById('shop-active-checkbox');
-                if(!checkbox) return;
-                try {
-                    await db.collection("config").doc("shop").set({ active: checkbox.checked }, { merge: true });
-                    logAdminAction('shop', `Змінив статус магазину на: ${checkbox.checked ? 'Увімкнено' : 'Вимкнено'}`);
-                } catch(e) { console.error("Помилка статусу магазину:", e); }
-            }, 50);
-        }
-
-        async function savePaymentCredentials() {
-            const bankUrl = document.getElementById('new-donation-link-field').value.trim();
-            const cardNumber = document.getElementById('config-card-number').value.trim();
-            const cardName = document.getElementById('config-card-name').value.trim();
-            try {
-                await db.collection("config").doc("payment").set({
-                    bankUrl: bankUrl,
-                    cardNumber: cardNumber,
-                    cardName: cardName
-                }, { merge: true });
-                alert("✓  Платіжні реквізити успішно збережено!");
-                logAdminAction('payment', 'Оновив платіжні реквізити');
-            } catch(e) {
-                console.error(e);
-                alert("Помилка: " + e.message);
-            }
+            try { await db.collection("orders").doc(id).update({ status: newStatus }); } catch(e) { console.error(e); }
         }
 
         async function deleteOrderItem(id) {
-            if(confirm("Ви впевнені, що хочете остаточно видалити це замовлення з бази?")) {
-                try {
-                    await db.collection("orders").doc(id).delete();
-                    logAdminAction('orders', `Видалив замовлення ID: ${id}`);
-                } catch(e) {
-                    console.error("Помилка:", e);
-                }
+            if(confirm("Остаточно видалити замовлення з бази?")) {
+                try { await db.collection("orders").doc(id).delete(); } catch(e) { console.error(e); }
             }
         }
-        
+
         function initFirebaseRealtimeStreams() {
             try {
-                unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
-                    globalChatsData = {};
-                    snapshot.forEach(doc => { globalChatsData[doc.id] = doc.data(); });
-                    renderAllDynamicData();
-                }, e => console.error(e));
-
-                unsubscribeFeedback = db.collection("feedback").onSnapshot(snapshot => {
-                    globalFeedbackData = [];
-                    snapshot.forEach(doc => { globalFeedbackData.push({ id: doc.id, ...doc.data() }); });
-                    renderAllDynamicData();
-                }, e => console.error(e));
-
-                unsubscribeVolunteers = db.collection("volunteers").onSnapshot(snapshot => {
-                    globalVolunteersData = [];
-                    snapshot.forEach(doc => { globalVolunteersData.push({ id: doc.id, ...doc.data() }); });
-                    renderAllDynamicData();
-                }, e => console.error(e));
-
-                unsubscribeSocials = db.collection("config").doc("socials").onSnapshot(doc => {
-                    globalSocialNetworks = (doc.exists && doc.data().list) ? doc.data().list : [];
-                    renderAdminSocialList();
-                }, e => console.error(e));
-
-                unsubscribeNews = db.collection("news").orderBy("date", "desc").onSnapshot(snapshot => {
-                    globalNewsData = [];
-                    snapshot.forEach(doc => { globalNewsData.push({ id: doc.id, ...doc.data(), isReport: false }); });
-                    renderAdminNewsChronicle();
-                }, e => console.error(e));
-                
-                unsubscribeReports = db.collection("reports").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-                    globalReportsData = [];
-                    snapshot.forEach(doc => { globalReportsData.push({ id: doc.id, ...doc.data(), isReport: true }); });
-                    renderAdminNewsChronicle(); 
-                }, e => console.error(e));
-
-                unsubscribeOrders = db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-                    globalOrdersData = [];
-                    snapshot.forEach(doc => { globalOrdersData.push({ id: doc.id, ...doc.data() }); });
-                    renderAllDynamicData();
-                }, e => console.error(e));
-
-                unsubscribeMerch = db.collection("merch").onSnapshot(snapshot => {
-                    globalMerchData = [];
-                    snapshot.forEach(doc => { globalMerchData.push({ id: doc.id, ...doc.data() }); });
-                    
-                    globalMerchData.sort((a, b) => {
-                        let orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER;
-                        let orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER;
-                        
-                        if (orderA === orderB) {
-                            let timeA = a.timestamp ? a.timestamp.toMillis() : 0;
-                            let timeB = b.timestamp ? b.timestamp.toMillis() : 0;
-                            return timeB - timeA; 
-                        }
-                        return orderA - orderB;
-                    });
-
-                    renderMerchList();
-                }, e => console.error(e));
-
-                unsubscribeConfig = db.collection("config").doc("shop").onSnapshot(doc => {
-                    const data = doc.exists ? doc.data() : {};
-                    const isActive = data.active !== undefined ? data.active : true; 
-                    const checkbox = document.getElementById('shop-active-checkbox');
-                    const label = document.getElementById('shop-status-label');
-                    
-                    if(checkbox) checkbox.checked = isActive;
-                    if(label) {
-                        if(isActive) {
-                            label.innerText = "Магазин увімкнено (Доступний)"; label.style.color = "var(--theme-color)";
-                        } else {
-                            label.innerText = "Магазин вимкнено (Технічні роботи)"; label.style.color = "#ff4a4a";
-                        }
-                    }
-                    
-                    if (data.categories && Array.isArray(data.categories)) {
-                        globalCategories = data.categories;
-                    } else {
-                        globalCategories = ['Одяг', 'Шеврони'];
-                    }
-                    
-                    renderCategoriesAdmin(); 
-                    populateCategorySelect();
-                }, e => {
-                    console.error("Помилка читання конфігу магазину:", e);
+                db.collection("chats").onSnapshot(snapshot => {
+                    globalChatsData = {}; snapshot.forEach(doc => globalChatsData[doc.id] = doc.data()); renderAllDynamicData();
                 });
-
-                unsubscribePromos = db.collection("promocodes").orderBy("created", "desc").onSnapshot(snapshot => {
-                    globalPromocodes = [];
-                    snapshot.forEach(doc => { globalPromocodes.push({ id: doc.id, ...doc.data() }); });
-                    renderPromocodes();
-                }, e => console.error(e));
-
-                unsubscribePaymentConfig = db.collection("config").doc("payment").onSnapshot(doc => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        const bankInp = document.getElementById('new-donation-link-field');
-                        if(data.bankUrl && bankInp) bankInp.value = data.bankUrl;
-                        
-                        const cardNumInp = document.getElementById('config-card-number');
-                        if(data.cardNumber && cardNumInp) cardNumInp.value = data.cardNumber;
-
-                        const cardNameInp = document.getElementById('config-card-name');
-                        if(data.cardName && cardNameInp) cardNameInp.value = data.cardName;
+                db.collection("feedback").onSnapshot(snapshot => {
+                    globalFeedbackData = []; snapshot.forEach(doc => globalFeedbackData.push({ id: doc.id, ...doc.data() })); renderAllDynamicData();
+                });
+                db.collection("volunteers").onSnapshot(snapshot => {
+                    globalVolunteersData = []; snapshot.forEach(doc => globalVolunteersData.push({ id: doc.id, ...doc.data() })); renderAllDynamicData();
+                });
+                db.collection("config").doc("socials").onSnapshot(doc => {
+                    globalSocialNetworks = doc.exists ? doc.data().list || [] : []; renderAdminSocialList();
+                });
+                db.collection("news").orderBy("date", "desc").onSnapshot(snapshot => {
+                    globalNewsData = []; snapshot.forEach(doc => globalNewsData.push({ id: doc.id, ...doc.data(), isReport: false })); renderAdminNewsChronicle();
+                });
+                db.collection("reports").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+                    globalReportsData = []; snapshot.forEach(doc => globalReportsData.push({ id: doc.id, ...doc.data(), isReport: true })); renderAdminNewsChronicle();
+                });
+                db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+                    globalOrdersData = []; snapshot.forEach(doc => globalOrdersData.push({ id: doc.id, ...doc.data() })); renderAllDynamicData();
+                });
+                db.collection("merch").onSnapshot(snapshot => {
+                    globalMerchData = []; snapshot.forEach(doc => globalMerchData.push({ id: doc.id, ...doc.data() }));
+                    globalMerchData.sort((a,b) => (a.order ?? 999) - (b.order ?? 999)); renderMerchList();
+                });
+                db.collection("config").doc("shop").onSnapshot(doc => {
+                    const data = doc.exists ? doc.data() : {};
+                    document.getElementById('shop-active-checkbox').checked = data.active !== false;
+                    globalCategories = data.categories || [];
+                    
+                    if(data.heroImage) {
+                        shopHeroBase64 = data.heroImage;
+                        const heroPreview = document.getElementById('shop-hero-preview-element');
+                        if(heroPreview) { heroPreview.src = data.heroImage; heroPreview.style.display = 'block'; }
                     }
-                }, e => console.error(e));
-                
-                unsubscribeStats = db.collection("config").doc("statistics").onSnapshot(doc => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        if(document.getElementById('stat-targets')) document.getElementById('stat-targets').value = data.targets || 0;
-                        if(document.getElementById('stat-funds')) document.getElementById('stat-funds').value = data.funds || 0;
-                        if(document.getElementById('stat-missions')) document.getElementById('stat-missions').value = data.missions || 0;
+                    renderCategoriesAdmin(); populateCategorySelect();
+                });
+                db.collection("promocodes").onSnapshot(snapshot => {
+                    globalPromocodes = []; snapshot.forEach(doc => globalPromocodes.push({ id: doc.id, ...doc.data() })); renderPromocodes();
+                });
+                db.collection("config").doc("payment").onSnapshot(doc => {
+                    if(doc.exists) {
+                        let d = doc.data();
+                        if(d.bankUrl) document.getElementById('new-donation-link-field').value = d.bankUrl;
+                        if(d.cardNumber) document.getElementById('config-card-number').value = d.cardNumber;
+                        if(d.cardName) document.getElementById('config-card-name').value = d.cardName;
                     }
-                }, e => console.error(e));
-            } catch (globalError) {
-                console.error("Критична помилка при завантаженні бази даних:", globalError);
-            }
+                });
+                db.collection("config").doc("statistics").onSnapshot(doc => {
+                    if(doc.exists) {
+                        let d = doc.data();
+                        document.getElementById('stat-targets').value = d.targets || 0;
+                        document.getElementById('stat-funds').value = d.funds || 0;
+                        document.getElementById('stat-missions').value = d.missions || 0;
+                    }
+                });
+            } catch (err) { console.error(err); }
         }
 
-        async function saveStatistics() {
-            const targets = parseInt(document.getElementById('stat-targets').value) || 0;
-            const funds = parseInt(document.getElementById('stat-funds').value) || 0;
-            const missions = parseInt(document.getElementById('stat-missions').value) || 0;
-            
-            try {
-                await db.collection("config").doc("statistics").set({
-                    targets: targets, funds: funds, missions: missions
-                }, { merge: true });
-                alert("✓  Статистику успішно оновлено на головній сторінці!");
-                logAdminAction('payment', `Оновив статистику (Цілі: ${targets}, Донати: ${funds}, Вильоти: ${missions})`);
-            } catch(e) {
-                console.error(e); alert("Помилка збереження: " + e.message);
-            }
-        }
-
-        function toggleMediaInput() {
-            const type = document.getElementById('news-media-type').value;
-            const photoZone = document.getElementById('news-photo-zone');
-            const videoZone = document.getElementById('news-video-zone');
-            if(photoZone) photoZone.style.display = type === 'image' ? 'block' : 'none';
-            if(videoZone) videoZone.style.display = type === 'video' ? 'block' : 'none';
-        }
-
-        function previewNewsPhoto(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    newsPhotoBase64 = e.target.result;
-                    const previewImg = document.getElementById('news-preview-element');
-                    if(previewImg) { previewImg.src = newsPhotoBase64; previewImg.style.display = 'block'; }
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function toggleNewsButtonFields() {
-            const checkbox = document.getElementById('news-has-btn-checkbox');
-            if(checkbox) {
-                const checked = checkbox.checked;
-                const box = document.getElementById('news-button-config-box');
-                if(box) box.style.display = checked ? 'block' : 'none';
-            }
-        }
-
-        async function publishNewsItem() {
-            const editId = document.getElementById('edit-news-id').value;
-            const publishType = document.getElementById('news-publish-type').value; 
-            const mediaType = document.getElementById('news-media-type').value; 
-            const title = document.getElementById('news-title-field').value.trim();
-            const bodyText = document.getElementById('news-body-field').value.trim();
-            const date = document.getElementById('news-date-field').value;
-            
-            const hasButton = document.getElementById('news-has-btn-checkbox')?.checked || false;
-            const btnText = document.getElementById('news-btn-text-field').value.trim();
-            const btnUrl = document.getElementById('news-btn-url-field').value.trim();
-
-            if (publishType === 'news' && !title) { alert("Введіть заголовок новини!"); return; }
-            if (!bodyText) { alert("Введіть повний текст або опис публікації!"); return; }
-            if (mediaType === 'video' && !document.getElementById('news-video-url').value.trim()) { alert("Введіть лінк на YouTube відео!"); return; }
-            if (mediaType === 'image' && !newsPhotoBase64 && !editId) { alert("Завантажте фото публікації!"); return; }
-
-            const videoUrl = document.getElementById('news-video-url').value.trim();
-            let dataObj = {};
-            let collectionName = "";
-
-            if (publishType === 'report') {
-                collectionName = "reports";
-                dataObj = {
-                    description: bodyText,
-                    mediaType: mediaType,
-                    videoUrl: mediaType === 'video' ? videoUrl : null,
-                    image: mediaType === 'image' ? (newsPhotoBase64 || null) : null,
-                    date: date
-                };
-            } else {
-                collectionName = "news";
-                dataObj = {
-                    title: title,
-                    body: bodyText,
-                    mediaType: mediaType,
-                    videoUrl: mediaType === 'video' ? videoUrl : null,
-                    image: mediaType === 'image' ? (newsPhotoBase64 || null) : null,
-                    date: date,
-                    hasButton: hasButton,
-                    btnText: hasButton ? btnText : null,
-                    btnUrl: hasButton ? btnUrl : null
-                };
-            }
-
-            try {
-                if (editId) {
-                    await db.collection(collectionName).doc(editId).set(dataObj, { merge: true });
-                    alert("✓  Зміни успішно збережено в базі!");
-                } else {
-                    dataObj.timestamp = firebase.firestore.FieldValue.serverTimestamp();
-                    await db.collection(collectionName).add(dataObj);
-                    alert("✓  Опубліковано успішно! Дані вже синхронізовані із сайтом.");
-                }
-                logAdminAction('news', `Створив/Оновив ${publishType}: "${title || 'Фінансовий звіт'}"`);
-                cancelNewsEditing();
-            } catch (err) {
-                console.error("Помилка при збереженні запису: ", err);
-                alert("Помилка бази даних: " + err.message);
-            }
-        }
-
-        function startEditNews(id, isReport) {
-            const dataSet = isReport ? globalReportsData : globalNewsData;
-            const item = dataSet.find(n => n.id === id);
-            if(!item) return;
-            
-            document.getElementById('edit-news-id').value = item.id;
-            
-            const publishTypeSelect = document.getElementById('news-publish-type');
-            if(publishTypeSelect) {
-                publishTypeSelect.value = isReport ? 'report' : 'news';
-                publishTypeSelect.disabled = true; 
-            }
-            
-            document.getElementById('news-title-field').value = isReport ? "Звіт по донатах" : (item.title || "");
-            if(isReport && document.getElementById('news-title-field')) document.getElementById('news-title-field').parentElement.style.display = 'none';
-            else if(!isReport && document.getElementById('news-title-field')) document.getElementById('news-title-field').parentElement.style.display = 'block';
-            
-            document.getElementById('news-body-field').value = isReport ? item.description : item.body;
-            document.getElementById('news-date-field').value = item.date || "";
-            
-            const mediaTypeSelect = document.getElementById('news-media-type');
-            if(mediaTypeSelect) {
-                mediaTypeSelect.value = item.mediaType || 'image';
-                toggleMediaInput();
-            }
-
-            const previewImg = document.getElementById('news-preview-element');
-            if(item.mediaType === 'image' || !item.mediaType) {
-                if(item.image) {
-                    newsPhotoBase64 = item.image;
-                    if(previewImg) { previewImg.src = item.image; previewImg.style.display = 'block'; }
-                } else {
-                    if(previewImg) previewImg.style.display = 'none';
-                    newsPhotoBase64 = "";
-                }
-                document.getElementById('news-video-url').value = "";
-            } else if (item.mediaType === 'video') {
-                document.getElementById('news-video-url').value = item.videoUrl || "";
-                if(previewImg) previewImg.style.display = 'none';
-                newsPhotoBase64 = "";
-            }
-
-            const hasBtnCheckbox = document.getElementById('news-has-btn-checkbox');
-            if(hasBtnCheckbox) hasBtnCheckbox.checked = item.hasButton || false;
-            const btnConfigBox = document.getElementById('news-button-config-box');
-            if(item.hasButton) {
-                if(btnConfigBox) btnConfigBox.style.display = 'block';
-                document.getElementById('news-btn-text-field').value = item.btnText || "";
-                document.getElementById('news-btn-url-field').value = item.btnUrl || "";
-            } else {
-                if(btnConfigBox) btnConfigBox.style.display = 'none';
-            }
-
-            document.getElementById('news-form-title').innerText = isReport ? "📝 Редагування звіту" : "📝 Редагування новини";
-            document.getElementById('news-submit-btn').innerText = "Зберегти зміни";
-            const cancelBtn = document.getElementById('news-cancel-edit-btn');
-            if(cancelBtn) cancelBtn.style.display = 'inline-block';
-            document.getElementById('link-management-tab').scrollTop = 0;
-        }
-
-        function cancelNewsEditing() {
-            document.getElementById('edit-news-id').value = "";
-            
-            const publishTypeSelect = document.getElementById('news-publish-type');
-            if(publishTypeSelect) {
-                publishTypeSelect.value = 'news';
-                publishTypeSelect.disabled = false; 
-            }
-            if(document.getElementById('news-title-field')) {
-                document.getElementById('news-title-field').value = "";
-                document.getElementById('news-title-field').parentElement.style.display = 'block';
-            }
-            
-            document.getElementById('news-body-field').value = "";
-            
-            const mediaTypeSelect = document.getElementById('news-media-type');
-            if(mediaTypeSelect) mediaTypeSelect.value = 'image';
-            toggleMediaInput();
-            
-            const photoFile = document.getElementById('news-photo-file');
-            if(photoFile) photoFile.value = "";
-            const previewImg = document.getElementById('news-preview-element');
-            if(previewImg) previewImg.style.display = 'none';
-            document.getElementById('news-video-url').value = "";
-            
-            const hasBtnCheckbox = document.getElementById('news-has-btn-checkbox');
-            if(hasBtnCheckbox) hasBtnCheckbox.checked = false;
-            const btnConfigBox = document.getElementById('news-button-config-box');
-            if(btnConfigBox) btnConfigBox.style.display = 'none';
-            document.getElementById('news-btn-text-field').value = "";
-            document.getElementById('news-btn-url-field').value = "";
-            newsPhotoBase64 = "";
-
-            document.getElementById('news-form-title').innerText = "📰 Публікація новини / звіту";
-            document.getElementById('news-submit-btn').innerText = "Опублікувати";
-            const cancelBtn = document.getElementById('news-cancel-edit-btn');
-            if(cancelBtn) cancelBtn.style.display = 'none';
-            document.getElementById('news-date-field').valueAsDate = new Date();
-        }
-
-        function renderAdminNewsChronicle() {
-            const box = document.getElementById('box-for-published-news'); 
-            if(!box) return;
-            box.innerHTML = "";
-            
-            let combinedData = [...globalNewsData, ...globalReportsData];
-            
-            combinedData.sort((a, b) => {
-                let timeA = a.date ? new Date(a.date).getTime() : (a.timestamp ? a.timestamp.toMillis() : 0);
-                let timeB = b.date ? new Date(b.date).getTime() : (b.timestamp ? b.timestamp.toMillis() : 0);
-                return timeB - timeA;
-            });
-
-            if(combinedData.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:10px;">Немає публікацій</div>`; return; }
-            
-            combinedData.forEach(item => {
-                let imgHtml = "";
-                if(item.mediaType === 'video' && item.videoUrl) {
-                    imgHtml = `<div style="font-size:0.8rem; color:#aaa; margin-top:5px;">🎥 Відео: ${item.videoUrl}</div>`;
-                } else if (item.image) {
-                    imgHtml = `<img src="${item.image}" style="max-height:60px; border-radius:4px; margin-top:5px; display:block;">`;
-                }
-
-                let btnHtml = item.hasButton ? `<span style="background:rgba(240,180,140,0.1); color:var(--theme-color); font-size:0.75rem; padding:2px 6px; border-radius:4px; margin-top:5px; display:inline-block;">Кнопка: ${item.btnText}</span>` : '';
-                
-                let typeBadge = item.isReport 
-                    ? `<span style="background:#00ffcc; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold; margin-right:5px;">ЗВІТ</span>` 
-                    : `<span style="background:var(--theme-color); color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold; margin-right:5px;">НОВИНА</span>`;
-
-                let title = item.isReport ? "Финансовий звіт" : item.title;
-                let bodyText = item.isReport ? item.description : item.body;
-
-                box.innerHTML += `
-                    <div class="admin-user-card" style="padding: 12px 15px;">
-                        <div style="font-size:0.8rem; color:var(--theme-color); font-weight:bold; margin-bottom:5px;">${typeBadge} 📅 ${item.date || new Date(item.timestamp?.toMillis() || Date.now()).toLocaleDateString('uk-UA')}</div>
-                        <div style="font-weight:bold; margin:4px 0; font-size:1rem; padding-right:180px;">${title}</div>
-                        <div style="font-size:0.85rem; color:#ccc; max-height:45px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${bodyText}</div>
-                        ${imgHtml} ${btnHtml}
-                        <button class="edit-news-btn" onclick="startEditNews('${item.id}', ${item.isReport})">Редагувати</button>
-                        <button class="delete-admin-btn" onclick="deleteNewsItem('${item.id}', ${item.isReport})">Видалити</button>
-                    </div>`;
-            });
-        }
-
-        async function deleteNewsItem(id, isReport) {
-            let collectionName = isReport ? "reports" : "news";
-            if(confirm(`Видалити цей запис безповоротно?`)) {
-                try {
-                    await db.collection(collectionName).doc(id).delete();
-                    if(document.getElementById('edit-news-id').value === id) cancelNewsEditing();
-                    logAdminAction('news', `Видалив ${isReport ? 'звіт' : 'новину'} (ID: ${id})`);
-                } catch(e) { console.error("Помилка видалення:", e); }
-            }
-        }
-
-        function startEditSocialNetwork(id) {
-            const net = globalSocialNetworks.find(n => n.id === id);
-            if(!net) return;
-            document.getElementById('edit-soc-id').value = net.id;
-            document.getElementById('soc-name').value = net.name;
-            document.getElementById('soc-url').value = net.url;
-            document.getElementById('soc-color').value = net.color;
-            
-            document.getElementById('soc-submit-btn').innerText = "Зберегти зміни";
-            document.getElementById('soc-cancel-edit-btn').style.display = 'inline-block';
-        }
-
-        function cancelSocEditing() {
-            document.getElementById('edit-soc-id').value = "";
-            document.getElementById('soc-name').value = "";
-            document.getElementById('soc-url').value = "";
-            document.getElementById('soc-color').value = "#f0b48c";
-            
-            document.getElementById('soc-submit-btn').innerText = "Зберегти мережу";
-            document.getElementById('soc-cancel-edit-btn').style.display = 'none';
-        }
-
-        async function addNewSocialNetwork() {
-            const editId = document.getElementById('edit-soc-id').value;
-            const nameField = document.getElementById('soc-name'); 
-            const urlField = document.getElementById('soc-url'); 
-            const colorField = document.getElementById('soc-color');
-            
-            const name = nameField.value.trim(); 
-            const url = urlField.value.trim(); 
-            const color = colorField.value;
-            
-            if(!name || !url) { alert("Заповніть назву та посилання!"); return; }
-            
-            let updatedList = [...globalSocialNetworks];
-            
-            if(editId) {
-                let index = updatedList.findIndex(n => n.id === editId);
-                if(index > -1) {
-                    updatedList[index] = { id: editId, name, url, color };
-                }
-            } else {
-                updatedList.push({ id: 'soc_' + Date.now(), name, url, color });
-            }
-
-            try {
-                await db.collection("config").doc("socials").set({ list: updatedList });
-                cancelSocEditing();
-                logAdminAction('payment', `Оновив соцмережу: ${name}`);
-            } catch(e) { console.error("Помилка соцмережі:", e); }
-        }
-
-        function renderAdminSocialList() {
-            const box = document.getElementById('box-for-social-list'); 
-            if(!box) return;
-            box.innerHTML = "";
-            if(globalSocialNetworks.length === 0) { box.innerHTML = `<div class="no-msg">Мереж немає</div>`; return; }
-            globalSocialNetworks.forEach(net => {
-                box.innerHTML += `
-                    <div class="admin-user-card" style="border-left: 4px solid ${net.color}; padding: 10px 15px;">
-                        <span style="font-weight:bold; color:${net.color};">${net.name}</span>
-                        <div style="font-size:0.8rem; color:#aaa; margin-top:4px; word-break:break-all;">${net.url}</div>
-                        <button class="edit-news-btn" onclick="startEditSocialNetwork('${net.id}')">Редагувати</button>
-                        <button class="delete-admin-btn" style="top:8px;" onclick="deleteSocialNetwork('${net.id}')">Видалити</button>
-                    </div>`;
-            });
-        }
-
-        async function deleteSocialNetwork(id) {
-            if(confirm("Видалити цю соцмережу?")) {
-                let updatedList = globalSocialNetworks.filter(net => net.id !== id);
-                try { 
-                    await db.collection("config").doc("socials").set({ list: updatedList }); 
-                    if(document.getElementById('edit-soc-id').value === id) cancelSocEditing();
-                    logAdminAction('payment', `Видалив соцмережу з ID: ${id}`);
-                } catch(e) { console.error(e); }
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', () => { 
-            setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
-        });
+        window.addEventListener('DOMContentLoaded', () => setLanguage(localStorage.getItem('selectedLang') || 'ua'));
     </script>
 </body>
 </html>
