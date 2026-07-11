@@ -12,7 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script>
-        // Конфігурація вашого проєкту Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
             authDomain: "svarog-team.firebaseapp.com",
@@ -42,7 +41,6 @@
     </script>
 
     <style>
-        /* Підключення кастомного шрифту */
         @font-face {
             font-family: 'SvarogTeamCustom';
             src: url('SvarogTeam-Regular.woff') format('woff');
@@ -52,7 +50,6 @@
 
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;900&display=swap');
 
-        /* ГЛОБАЛЬНІ ЗМІННІ ДЛЯ ОЛИВКОВОГО КОЛЬОРУ */
         :root {
             --theme-color: #798554;
             --theme-color-rgb: 121, 133, 84;
@@ -165,7 +162,7 @@
         .new-badge { position: absolute; top: 38px; left: 10px; background: var(--theme-color); color: #fff; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; }
 
         .category-list { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-        .cat-chip { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
+        .cat-chip { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
         .cat-chip img { width: 16px; height: 16px; object-fit: contain; }
         .cat-remove { color: #ff4a4a; cursor: pointer; font-weight: bold; margin-left: 5px; }
 
@@ -246,7 +243,6 @@
                 <div class="form-group">
                     <input type="password" id="user-password" class="form-input" placeholder="Пароль / Password" required>
                 </div>
-                <div style="margin-bottom:15px; text-align:center;"><small style="color:#aaa;">Будь ласка, переконайтеся, що ви запускаєте файл через локальний або веб-сервер (не через double-click на файл).</small></div>
                 <button type="submit" class="btn" id="login-btn-submit">
                     <span data-lang="ua">Увійти</span><span data-lang="en">Login</span>
                 </button>
@@ -313,7 +309,6 @@
                                 <input type="checkbox" id="shop-active-checkbox">
                                 <label style="font-size:1rem; font-weight:bold; cursor:pointer;" id="shop-status-label">Магазин увімкнено</label>
                             </div>
-                            <p style="font-size:0.85rem; color:#aaa; margin-top:10px;">Якщо вимкнути, всі користувачі при переході в магазин будуть перенаправлені на головну сторінку.</p>
                         </div>
 
                         <div class="admin-creator-form">
@@ -555,7 +550,6 @@
                             </div>
                         </div>
 
-                        <!-- БЛОК УПРАВЛІННЯ ГОЛОВНИМ БАНЕРОМ МАГАЗИНУ -->
                         <div class="admin-creator-form" style="border-color: #00bfff;">
                             <h3 style="margin-bottom:15px; font-size:1.1rem; color:#00bfff;" data-lang="ua">🖼️ Головний банер магазину</h3>
                             <div class="form-group">
@@ -577,23 +571,47 @@
             </div>
 
             <div id="stats-tab" class="tab-content">
-                <div class="admin-creator-form" style="max-width: 600px; margin: 0 auto;">
-                    <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--theme-color);" data-lang="ua">📊 Жива статистика на головній</h3>
-                    <p style="font-size:0.85rem; color:#aaa; margin-bottom:15px;">Ці числа відображатимуться з красивою анімацією на головній сторінці сайту (index.html).</p>
+                <div class="admin-creator-form" style="max-width: 1000px; margin: 0 auto; border-color: var(--theme-color);">
+                    <h3 style="margin-bottom:15px; font-size:1.3rem; color:var(--theme-color); text-align:center;" data-lang="ua">🦅 Глобальна статистика та Бойовий Звіт</h3>
+                    <p style="font-size:0.85rem; color:#aaa; margin-bottom:20px; text-align:center;">
+                        Дані автоматично сумуються і відправляються на <b>Головну сторінку</b> та в <b>Бойовий звіт (ФЕНІКС)</b>.
+                    </p>
                     
-                    <div class="form-group">
-                        <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Знищено цілей:</label>
-                        <input type="number" id="stat-targets" class="form-input" placeholder="Напр: 142">
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:15px; margin-bottom:25px; background: rgba(0,0,0,0.3); padding:15px; border-radius:10px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="flex:1; min-width:150px;">
+                            <label style="font-size:0.85rem; color:#00ffcc; font-weight:bold; display:block; margin-bottom:5px;">💰 Зібрано на дрони (₴):</label>
+                            <input type="number" id="cr-funds" class="form-input" placeholder="Напр: 500000" oninput="calculateTotals()">
+                        </div>
+                        <div style="flex:1; min-width:150px;">
+                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">✈️ Ударних вильотів:</label>
+                            <input type="number" id="cr-strike" class="form-input" placeholder="0" oninput="calculateTotals()">
+                        </div>
+                        <div style="flex:1; min-width:150px;">
+                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">👁 Розвідувальних вильотів:</label>
+                            <input type="number" id="cr-recon" class="form-input" placeholder="0" oninput="calculateTotals()">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Зібрано на дрони (₴):</label>
-                        <input type="number" id="stat-funds" class="form-input" placeholder="Напр: 500000">
+
+                    <div style="display:flex; justify-content:space-around; background: rgba(121,133,84,0.15); border: 1px solid var(--theme-color); padding: 15px; border-radius:10px; margin-bottom:25px; text-align:center;">
+                        <div>
+                            <div style="font-size:0.8rem; color:#ccc; text-transform:uppercase;">Авто-сума: Уражено</div>
+                            <div id="display-total-hit" style="font-size:1.8rem; font-weight:bold; color:#fff;">0</div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.8rem; color:var(--theme-color); text-transform:uppercase;">Авто-сума: Знищено (на Головну)</div>
+                            <div id="display-total-dest" style="font-size:1.8rem; font-weight:bold; color:var(--theme-color);">0</div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.8rem; color:#00ffcc; text-transform:uppercase;">Авто-сума: Всі вильоти (на Головну)</div>
+                            <div id="display-total-missions" style="font-size:1.8rem; font-weight:bold; color:#00ffcc;">0</div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;">Бойових вильотів:</label>
-                        <input type="number" id="stat-missions" class="form-input" placeholder="Напр: 830">
-                    </div>
-                    <button class="btn" onclick="saveStatistics()">Зберегти статистику</button>
+
+                    <h4 style="margin-bottom:15px; color:#fff; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">Деталізація цілей (ФЕНІКС):</h4>
+                    <div id="cr-details-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px; margin-bottom:20px;">
+                        </div>
+
+                    <button class="btn" onclick="saveCombatReportAndStats()">Зберегти та Опублікувати</button>
                 </div>
             </div>
 
@@ -677,11 +695,11 @@
             
             globalCategories.forEach((cat, index) => {
                 let name = typeof cat === 'object' ? cat.name : cat;
-                let iconImg = (typeof cat === 'object' && cat.icon) ? `<img src="${cat.icon}">` : '';
+                let iconImg = (typeof cat === 'object' && cat.icon) ? `<img src="${cat.icon}" style="width:16px;height:16px;object-fit:contain;"> ` : '';
                 list.innerHTML += `
-                    <div class="cat-chip">
+                    <div class="cat-chip" style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.2); padding:5px 12px; border-radius:15px; font-size:0.85rem; display:flex; align-items:center; gap:8px;">
                         ${iconImg} <span>${name}</span> 
-                        <span class="cat-remove" onclick="deleteCategory(${index})">✖</span>
+                        <span class="cat-remove" style="color:#ff4a4a;cursor:pointer;font-weight:bold;margin-left:5px;" onclick="deleteCategory(${index})">✖</span>
                     </div>
                 `;
             });
@@ -690,7 +708,6 @@
         function populateCategorySelect() {
             const select = document.getElementById('merch-category');
             if (!select) return;
-            
             select.innerHTML = '<option value="" disabled selected>Оберіть категорію...</option>';
             
             if(globalCategories) {
@@ -790,12 +807,118 @@
         let unsubscribePaymentConfig = null;
         let unsubscribeReports = null;
         let unsubscribeStats = null;
+        let unsubscribeStatsReal = null;
+
+        // --- ЛОГІКА БОЙОВОГО ЗВІТУ В АДМІНЦІ ---
+        const combatCategories = [
+            { id: "os_rov", ua: "ОС РОВ (Особовий склад)" }, { id: "drone_points", ua: "Точки вильоту дронів" },
+            { id: "antennas", ua: "Антени" }, { id: "air_defense", ua: "ЗРК, ЗГРК" },
+            { id: "aviation", ua: "Літаки та гелікоптери" }, { id: "fleet", ua: "Флот" },
+            { id: "radar_complex", ua: "РЛС, РЕР та зв'язок (комплекси)" }, { id: "radar_port", ua: "РЛС (портативні)" },
+            { id: "ew_complex", ua: "РЕБ (комплекс)" }, { id: "ew_auto", ua: "РЕБ (авто + портативні)" },
+            { id: "enemy_wings", ua: "Ворожі крила" }, { id: "shaheds", ua: "Шахеди та Гербери" },
+            { id: "tanks", ua: "Танки" }, { id: "apc", ua: "ББМ, БМП, БТР" },
+            { id: "artillery", ua: "Гармати, гаубиці" }, { id: "spg", ua: "САУ" },
+            { id: "mortars", ua: "Міномети" }, { id: "mlrs", ua: "РСЗВ" },
+            { id: "vehicles", ua: "ЛАТ, ВАТ, спец. та інж. техніка" }, { id: "moto", ua: "Мотоцикли та баггі" },
+            { id: "depots", ua: "Склади" }, { id: "strat_infra", ua: "Стратегічна інфраструктура (SECRET)" },
+            { id: "tact_infra", ua: "Тактична інфраструктура" }, { id: "trenches", ua: "Укриття та бліндажі" },
+            { id: "network", ua: "Мережеве обладнання та камери" }, { id: "enemy_copters", ua: "Ворожі коптери" },
+            { id: "other", ua: "Інше" }
+        ];
+
+        function renderCombatReportAdminGrid() {
+            const crGrid = document.getElementById('cr-details-grid');
+            if(!crGrid) return;
+            crGrid.innerHTML = "";
+            combatCategories.forEach(cat => {
+                crGrid.innerHTML += `
+                    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size:0.85rem; margin-bottom:8px; color:var(--theme-color); font-weight:bold;">${cat.ua}</div>
+                        <div style="display:flex; gap:10px;">
+                            <input type="number" id="cr_${cat.id}_hit" class="form-input" style="padding:8px;" placeholder="Уражено" oninput="calculateTotals()">
+                            <input type="number" id="cr_${cat.id}_dest" class="form-input" style="padding:8px;" placeholder="Знищено" oninput="calculateTotals()">
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function calculateTotals() {
+            let totalHit = 0;
+            let totalDest = 0;
+            combatCategories.forEach(cat => {
+                totalHit += parseInt(document.getElementById(`cr_${cat.id}_hit`)?.value) || 0;
+                totalDest += parseInt(document.getElementById(`cr_${cat.id}_dest`)?.value) || 0;
+            });
+
+            const strike = parseInt(document.getElementById('cr-strike')?.value) || 0;
+            const recon = parseInt(document.getElementById('cr-recon')?.value) || 0;
+            const totalMissions = strike + recon;
+
+            const hitEl = document.getElementById('display-total-hit');
+            const destEl = document.getElementById('display-total-dest');
+            const misEl = document.getElementById('display-total-missions');
+            
+            if(hitEl) hitEl.innerText = totalHit;
+            if(destEl) destEl.innerText = totalDest;
+            if(misEl) misEl.innerText = totalMissions;
+
+            return { totalHit, totalDest, totalMissions, strike, recon };
+        }
+
+        async function saveCombatReportAndStats() {
+            let detailsObj = {};
+            let osRovHit = 0, osRovDest = 0;
+
+            combatCategories.forEach(cat => {
+                let hit = parseInt(document.getElementById(`cr_${cat.id}_hit`).value) || 0;
+                let dest = parseInt(document.getElementById(`cr_${cat.id}_dest`).value) || 0;
+                detailsObj[`${cat.id}_hit`] = hit;
+                detailsObj[`${cat.id}_dest`] = dest;
+                
+                if(cat.id === 'os_rov') {
+                    osRovHit = hit;
+                    osRovDest = dest;
+                }
+            });
+
+            const totals = calculateTotals();
+            const funds = parseInt(document.getElementById('cr-funds').value) || 0;
+
+            const reportData = {
+                totalHit: totals.totalHit,
+                totalDest: totals.totalDest,
+                strikeSorties: totals.strike,
+                reconSorties: totals.recon,
+                persHit: osRovHit,
+                persKill: osRovDest,
+                persWound: osRovHit - osRovDest > 0 ? osRovHit - osRovDest : 0, 
+                details: detailsObj,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            const simpleStatsData = {
+                targets: totals.totalDest,
+                funds: funds,
+                missions: totals.totalMissions
+            };
+
+            try {
+                const batch = db.batch();
+                batch.set(db.collection("config").doc("combat_report"), reportData, { merge: true });
+                batch.set(db.collection("config").doc("statistics"), simpleStatsData, { merge: true });
+                await batch.commit();
+                alert("✓ Статистику та Бойовий звіт успішно оновлено!");
+                logAdminAction('stats', `Оновив глобальну статистику (Цілей: ${totals.totalDest}, Донати: ${funds}, Вильоти: ${totals.totalMissions})`);
+            } catch(e) {
+                console.error(e); alert("Помилка збереження: " + e.message);
+            }
+        }
 
         async function checkAdminAccess(userEmail) {
             if (!userEmail) return false;
             const emailClean = userEmail.trim().toLowerCase();
             
-            // ЗАЛІЗОБЕТОННИЙ ДОСТУП ДЛЯ ВЛАСНИКА 
             if (emailClean === 'svarogteam35@gmail.com') {
                 isSuperadminSession = true;
                 const superadminTabBtn = document.getElementById('superadmin-only-tab-btn');
@@ -824,17 +947,14 @@
                 if (isAdmin) {
                     enterDashboard();
                 } else {
-                    document.getElementById('error-block').innerText = "У вас немає прав доступу до панелі (відсутній в колекції admins)";
+                    document.getElementById('error-block').innerText = "У вас немає прав доступу до панелі.";
                     document.getElementById('error-block').style.display = 'block';
                     await firebase.auth().signOut();
                 }
             } else {
                 document.getElementById('login-card').style.display = 'block';
                 const dashboard = document.getElementById('admin-dashboard');
-                if(dashboard) {
-                    dashboard.style.display = 'none';
-                    dashboard.classList.remove('dashboard-mode');
-                }
+                if(dashboard) { dashboard.style.display = 'none'; dashboard.classList.remove('dashboard-mode'); }
             }
         });
 
@@ -853,20 +973,11 @@
                 await firebase.auth().signInWithEmailAndPassword(emailInp, passInp);
             } catch (error) {
                 errorBlock.style.display = 'block';
-                console.error("Критична помилка Firebase:", error);
                 
-                alert("⚠️ ВІДПОВІДЬ ВІД СЕРВЕРА GOOGLE:\n\n" + 
-                      "Код помилки: " + error.code + "\n" + 
-                      "Повідомлення: " + error.message);
-
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
                     errorBlock.innerText = "Невірний Email або пароль. Перевірте дані.";
                 } else if (error.code === 'auth/wrong-password') {
                     errorBlock.innerText = "Невірний пароль.";
-                } else if (error.code === 'auth/invalid-email') {
-                    errorBlock.innerText = "Некоректний формат Email.";
-                } else if (error.code === 'auth/too-many-requests') {
-                    errorBlock.innerText = "Забагато спроб входу. Спробуйте пізніше.";
                 } else {
                     errorBlock.innerText = "Помилка входу: " + error.message;
                 }
@@ -892,20 +1003,20 @@
                 if(unsubscribePromos) { unsubscribePromos(); unsubscribePromos = null; }
                 if(unsubscribePaymentConfig) { unsubscribePaymentConfig(); unsubscribePaymentConfig = null; }
                 if(unsubscribeStats) { unsubscribeStats(); unsubscribeStats = null; }
+                if(unsubscribeStatsReal) { unsubscribeStatsReal(); unsubscribeStatsReal = null; }
                 if(unsubscribeReports) { unsubscribeReports(); unsubscribeReports = null; }
                 
                 isSuperadminSession = false; 
                 document.getElementById('user-email').value = ""; 
                 document.getElementById('user-password').value = ""; 
-            } catch (error) {
-                console.error("Помилка при виході:", error);
-            }
+            } catch (error) { console.error("Помилка при виході:", error); }
         }
 
         function enterDashboard() {
             document.getElementById('login-card').style.display = 'none';
             const dashboard = document.getElementById('admin-dashboard');
             dashboard.style.display = 'block'; dashboard.classList.add('dashboard-mode');
+            renderCombatReportAdminGrid();
             initFirebaseRealtimeStreams();
             initBadges();
             generateSizeStockInputs(); 
@@ -1034,7 +1145,6 @@
             if(!text) return;
 
             const chatRef = db.collection('chats').doc(chatId);
-            
             try {
                 await chatRef.update({
                     messages: firebase.firestore.FieldValue.arrayUnion({
@@ -1354,7 +1464,6 @@
             currentMerchVariants[variantIndex].stock[size] = parseInt(value) || 0;
         }
 
-        // Мультизавантаження зображень для конкретного кольору (Варіанта)
         async function handleVariantImageUpload(input, index) {
             if (input.files && input.files.length > 0) {
                 currentMerchVariants[index].images = [];
@@ -1362,7 +1471,6 @@
                     let base64 = await getBase64(file);
                     currentMerchVariants[index].images.push(base64);
                 }
-                // Перше фото дублюємо в головне поле варіанта для зворотної сумісності
                 currentMerchVariants[index].image = currentMerchVariants[index].images[0] || "";
                 renderMerchVariantEditor();
             }
@@ -1422,16 +1530,51 @@
             });
         }
 
-        // Мультизавантаження фото для простого товару
+        function generateSizeStockInputs(existingStockObj = null) {
+            const container = document.getElementById('size-stock-fields-container');
+            if(!container) return;
+            const sizesStr = document.getElementById('merch-sizes').value.trim();
+            const isPreorder = document.getElementById('merch-is-preorder')?.checked;
+            
+            container.innerHTML = "";
+            const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : [];
+
+            if (sizesArr.length === 0) {
+                let baseVal = 0;
+                if(existingStockObj) {
+                    baseVal = typeof existingStockObj === 'object' ? (existingStockObj["Універсальний"] || 0) : existingStockObj;
+                }
+                let disabledStr = isPreorder ? 'disabled' : '';
+                container.innerHTML = `
+                    <div style="display:flex; flex-direction:column; gap:3px;">
+                        <span style="font-size:0.75rem; color:#aaa; text-align:center;">Універс.</span>
+                        <input type="number" data-size-key="Універсальний" class="form-input size-stock-value-input" style="padding: 6px; text-align:center; font-size:0.9rem;" value="${isPreorder ? 99 : baseVal}" min="0" ${disabledStr}>
+                    </div>`;
+            } else {
+                sizesArr.forEach(size => {
+                    let baseVal = 0;
+                    if(existingStockObj && typeof existingStockObj === 'object') {
+                        baseVal = existingStockObj[size] || 0;
+                    }
+                    let disabledStr = isPreorder ? 'disabled' : '';
+                    container.innerHTML += `
+                        <div style="display:flex; flex-direction:column; gap:3px;">
+                            <span style="font-size:0.75rem; color:var(--theme-color); text-align:center; font-weight:bold;">${size}</span>
+                            <input type="number" data-size-key="${size}" class="form-input size-stock-value-input" style="padding: 6px; text-align:center; font-size:0.9rem;" value="${isPreorder ? 99 : baseVal}" min="0" ${disabledStr}>
+                        </div>`;
+                });
+            }
+        }
+
         async function previewMerchPhotos(input) {
             if (input.files && input.files.length > 0) {
                 merchImagesArray = [];
-                const box = document.getElementById('merch-images-preview-box');
-                box.innerHTML = "";
-                for (let file of input.files) {
+                const previewContainer = document.getElementById('merch-images-preview-box');
+                previewContainer.innerHTML = '';
+                for(let file of input.files) {
                     let base64 = await getBase64(file);
                     merchImagesArray.push(base64);
-                    box.innerHTML += `<img src="${base64}">`;
+                    previewContainer.innerHTML += `<img src="${base64}" style="width:60px; height:60px; object-fit:contain; border:1px dashed rgba(255,255,255,0.3); border-radius:4px;">`;
                 }
             }
         }
@@ -1445,19 +1588,16 @@
             const sizesStr = document.getElementById('merch-sizes').value.trim();
             const description = document.getElementById('merch-description').value.trim();
             const isPreorder = document.getElementById('merch-is-preorder')?.checked || false;
-            const isNew = document.getElementById('merch-is-new')?.checked || false; // Новинка
+            const isNew = document.getElementById('merch-is-new')?.checked || false;
             const hasVariants = document.getElementById('merch-has-variants')?.checked || false;
             
-            if(!title || !price || !category) { alert("Заповніть назву, категорію та ціну товару!"); return; }
-
+            if(!title || !price || !category) { alert("Заповніть форму!"); return; }
             const sizesArr = sizesStr ? sizesStr.split(',').map(s => s.trim().toUpperCase()).filter(s => s) : [];
             let stockObj = {};
             
             if(!hasVariants) {
-                const stockInputs = document.querySelectorAll('.size-stock-value-input');
-                stockInputs.forEach(inp => {
-                    const key = inp.getAttribute('data-size-key');
-                    stockObj[key] = isPreorder ? 99 : (parseInt(inp.value) || 0);
+                document.querySelectorAll('.size-stock-value-input').forEach(inp => {
+                    stockObj[inp.getAttribute('data-size-key')] = isPreorder ? 99 : (parseInt(inp.value) || 0);
                 });
             } else {
                 currentMerchVariants.forEach(v => {
@@ -1472,29 +1612,23 @@
                 title: title, category: category, price: parseFloat(price),
                 discountPrice: discountPrice ? parseFloat(discountPrice) : null,
                 sizes: sizesArr, description: description,
-                isPreorder: isPreorder,
-                isNew: isNew, // Запис прапорця новинки
-                hasVariants: hasVariants,
+                isPreorder: isPreorder, isNew: isNew, hasVariants: hasVariants,
                 stock: hasVariants ? null : stockObj,
                 image: hasVariants ? null : (merchImagesArray[0] || null),
-                images: hasVariants ? null : merchImagesArray, // Збереження масиву фото галереї
+                images: hasVariants ? null : merchImagesArray,
                 variants: hasVariants ? currentMerchVariants : []
             };
-
-            if (!editId) { merchObject.order = globalMerchData.length; }
 
             try {
                 if(editId) {
                     await db.collection("merch").doc(editId).set(merchObject, { merge: true });
-                    alert("✓ Зміни товару успішно збережено!");
                 } else {
+                    merchObject.order = globalMerchData.length;
                     merchObject.timestamp = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection("merch").add(merchObject);
-                    alert("✓ Товар успішно додано до вітрини!");
                 }
-                logAdminAction('shop', `Оновив/Додав товар: "${title}"`);
-                cancelMerchEditing();
-            } catch(err) { console.error(err); alert("Помилка: " + err.message); }
+                alert("✓ Збережено успішно!"); cancelMerchEditing();
+            } catch(err) { alert("Помилка: " + err.message); }
         }
 
         function startEditMerch(id) {
@@ -1524,10 +1658,10 @@
             if(!item.hasVariants) {
                 generateSizeStockInputs(item.stock);
                 merchImagesArray = item.images || (item.image ? [item.image] : []);
-                const box = document.getElementById('merch-images-preview-box');
-                box.innerHTML = "";
+                const previewContainer = document.getElementById('merch-images-preview-box');
+                previewContainer.innerHTML = '';
                 merchImagesArray.forEach(src => {
-                    box.innerHTML += `<img src="${src}" style="width:60px; height:60px; object-fit:contain; border:1px solid #555;">`;
+                    previewContainer.innerHTML += `<img src="${src}" style="width:60px; height:60px; object-fit:contain; border:1px solid rgba(255,255,255,0.3); border-radius:4px;">`;
                 });
             }
 
@@ -1817,28 +1951,6 @@
             finally { isConfirmingStatus = false; renderAllDynamicData(); }
         }
 
-        // Керування головним зображенням банера
-        function previewShopHero(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    shopHeroBase64 = e.target.result;
-                    const previewImg = document.getElementById('shop-hero-preview-element');
-                    if(previewImg) { previewImg.src = shopHeroBase64; previewImg.style.display = 'block'; }
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        async function saveShopHeroImage() {
-            if(!shopHeroBase64) { alert("Оберіть файл банера!"); return; }
-            try {
-                await db.collection("config").doc("shop").set({ heroImage: shopHeroBase64 }, { merge: true });
-                alert("✓ Головний банер магазину успішно оновлено!");
-                logAdminAction('shop', 'Оновив фото банера магазину');
-            } catch(e) { console.error(e); alert("Помилка: " + e.message); }
-        }
-
         function toggleMediaInput() {
             const type = document.getElementById('news-media-type').value;
             const photoZone = document.getElementById('news-photo-zone');
@@ -2030,185 +2142,6 @@
             document.getElementById('news-date-field').valueAsDate = new Date();
         }
 
-        async function addNewSocialNetwork() {
-            const editId = document.getElementById('edit-soc-id').value;
-            const nameField = document.getElementById('soc-name'); 
-            const urlField = document.getElementById('soc-url'); 
-            const colorField = document.getElementById('soc-color');
-            
-            const name = nameField.value.trim(); 
-            const url = urlField.value.trim(); 
-            const color = colorField.value;
-            
-            if(!name || !url) { alert("Заповніть назву та посилання!"); return; }
-            
-            let updatedList = [...globalSocialNetworks];
-            
-            if(editId) {
-                let index = updatedList.findIndex(n => n.id === editId);
-                if(index > -1) {
-                    updatedList[index] = { id: editId, name, url, color };
-                }
-            } else {
-                updatedList.push({ id: 'soc_' + Date.now(), name, url, color });
-            }
-
-            try {
-                await db.collection("config").doc("socials").set({ list: updatedList });
-                cancelSocEditing();
-                logAdminAction('payment', `Оновив соцмережу: ${name}`);
-            } catch(e) { console.error("Помилка соцмережі:", e); }
-        }
-
-        function startEditSocialNetwork(id) {
-            const net = globalSocialNetworks.find(n => n.id === id);
-            if(!net) return;
-            document.getElementById('edit-soc-id').value = net.id;
-            document.getElementById('soc-name').value = net.name;
-            document.getElementById('soc-url').value = net.url;
-            document.getElementById('soc-color').value = net.color;
-            
-            document.getElementById('soc-submit-btn').innerText = "Зберегти зміни";
-            document.getElementById('soc-cancel-edit-btn').style.display = 'inline-block';
-        }
-
-        function cancelSocEditing() {
-            document.getElementById('edit-soc-id').value = "";
-            document.getElementById('soc-name').value = "";
-            document.getElementById('soc-url').value = "";
-            document.getElementById('soc-color').value = "#f0b48c";
-            
-            document.getElementById('soc-submit-btn').innerText = "Зберегти мережу";
-            document.getElementById('soc-cancel-edit-btn').style.display = 'none';
-        }
-
-        async function deleteSocialNetwork(id) {
-            if(confirm("Видалити цю соцмережу?")) {
-                let updatedList = globalSocialNetworks.filter(net => net.id !== id);
-                try { 
-                    await db.collection("config").doc("socials").set({ list: updatedList }); 
-                    if(document.getElementById('edit-soc-id').value === id) cancelSocEditing();
-                    logAdminAction('payment', `Видалив соцмережу з ID: ${id}`);
-                } catch(e) { console.error(e); }
-            }
-        }
-        
-        function renderAdminSocialList() {
-            const box = document.getElementById('box-for-social-list'); 
-            if(!box) return;
-            box.innerHTML = "";
-            if(globalSocialNetworks.length === 0) { box.innerHTML = `<div class="no-msg">Мереж немає</div>`; return; }
-            globalSocialNetworks.forEach(net => {
-                box.innerHTML += `
-                    <div class="admin-user-card" style="border-left: 4px solid ${net.color}; padding: 10px 15px;">
-                        <span style="font-weight:bold; color:${net.color};">${net.name}</span>
-                        <div style="font-size:0.8rem; color:#aaa; margin-top:4px; word-break:break-all;">${net.url}</div>
-                        <button class="edit-news-btn" onclick="startEditSocialNetwork('${net.id}')">Редагувати</button>
-                        <button class="delete-admin-btn" style="top:8px;" onclick="deleteSocialNetwork('${net.id}')">Видалити</button>
-                    </div>`;
-            });
-        }
-
-        function renderAdminNewsChronicle() {
-            const box = document.getElementById('box-for-published-news'); 
-            if(!box) return;
-            box.innerHTML = "";
-            
-            let combinedData = [...globalNewsData, ...globalReportsData];
-            
-            combinedData.sort((a, b) => {
-                let timeA = a.date ? new Date(a.date).getTime() : (a.timestamp ? a.timestamp.toMillis() : 0);
-                let timeB = b.date ? new Date(b.date).getTime() : (b.timestamp ? b.timestamp.toMillis() : 0);
-                return timeB - timeA;
-            });
-
-            if(combinedData.length === 0) { box.innerHTML = `<div class="no-msg" style="margin-top:10px;">Немає публікацій</div>`; return; }
-            
-            combinedData.forEach(item => {
-                let imgHtml = "";
-                if(item.mediaType === 'video' && item.videoUrl) {
-                    imgHtml = `<div style="font-size:0.8rem; color:#aaa; margin-top:5px;">🎥 Відео: ${item.videoUrl}</div>`;
-                } else if (item.image) {
-                    imgHtml = `<img src="${item.image}" style="max-height:60px; border-radius:4px; margin-top:5px; display:block;">`;
-                }
-
-                let btnHtml = item.hasButton ? `<span style="background:rgba(240,180,140,0.1); color:var(--theme-color); font-size:0.75rem; padding:2px 6px; border-radius:4px; margin-top:5px; display:inline-block;">Кнопка: ${item.btnText}</span>` : '';
-                
-                let typeBadge = item.isReport 
-                    ? `<span style="background:#00ffcc; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold; margin-right:5px;">ЗВІТ</span>` 
-                    : `<span style="background:var(--theme-color); color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold; margin-right:5px;">НОВИНА</span>`;
-
-                let title = item.isReport ? "Финансовий звіт" : item.title;
-                let bodyText = item.isReport ? item.description : item.body;
-
-                box.innerHTML += `
-                    <div class="admin-user-card" style="padding: 12px 15px;">
-                        <div style="font-size:0.8rem; color:var(--theme-color); font-weight:bold; margin-bottom:5px;">${typeBadge} 📅 ${item.date || new Date(item.timestamp?.toMillis() || Date.now()).toLocaleDateString('uk-UA')}</div>
-                        <div style="font-weight:bold; margin:4px 0; font-size:1rem; padding-right:180px;">${title}</div>
-                        <div style="font-size:0.85rem; color:#ccc; max-height:45px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${bodyText}</div>
-                        ${imgHtml} ${btnHtml}
-                        <button class="edit-news-btn" onclick="startEditNews('${item.id}', ${item.isReport})">Редагувати</button>
-                        <button class="delete-admin-btn" onclick="deleteNewsItem('${item.id}', ${item.isReport})">Видалити</button>
-                    </div>`;
-            });
-        }
-
-        async function deleteNewsItem(id, isReport) {
-            let collectionName = isReport ? "reports" : "news";
-            if(confirm(`Видалити цей запис безповоротно?`)) {
-                try {
-                    await db.collection(collectionName).doc(id).delete();
-                    if(document.getElementById('edit-news-id').value === id) cancelNewsEditing();
-                    logAdminAction('news', `Видалив ${isReport ? 'звіт' : 'новину'} (ID: ${id})`);
-                } catch(e) { console.error("Помилка видалення:", e); }
-            }
-        }
-
-        async function savePaymentCredentials() {
-            const bankUrl = document.getElementById('new-donation-link-field').value.trim();
-            const cardNumber = document.getElementById('config-card-number').value.trim();
-            const cardName = document.getElementById('config-card-name').value.trim();
-            try {
-                await db.collection("config").doc("payment").set({
-                    bankUrl: bankUrl,
-                    cardNumber: cardNumber,
-                    cardName: cardName
-                }, { merge: true });
-                alert("✓  Платіжні реквізити успішно збережено!");
-                logAdminAction('payment', 'Оновив платіжні реквізити');
-            } catch(e) {
-                console.error(e);
-                alert("Помилка: " + e.message);
-            }
-        }
-
-        function toggleShopStatus() {
-            setTimeout(async () => {
-                const checkbox = document.getElementById('shop-active-checkbox');
-                if(!checkbox) return;
-                try {
-                    await db.collection("config").doc("shop").set({ active: checkbox.checked }, { merge: true });
-                    logAdminAction('shop', `Змінив статус магазину на: ${checkbox.checked ? 'Увімкнено' : 'Вимкнено'}`);
-                } catch(e) { console.error("Помилка статусу магазину:", e); }
-            }, 50);
-        }
-
-        async function saveStatistics() {
-            const targets = parseInt(document.getElementById('stat-targets').value) || 0;
-            const funds = parseInt(document.getElementById('stat-funds').value) || 0;
-            const missions = parseInt(document.getElementById('stat-missions').value) || 0;
-            
-            try {
-                await db.collection("config").doc("statistics").set({
-                    targets: targets, funds: funds, missions: missions
-                }, { merge: true });
-                alert("✓  Статистику успішно оновлено на головній сторінці!");
-                logAdminAction('payment', `Оновив статистику (Цілі: ${targets}, Донати: ${funds}, Вильоти: ${missions})`);
-            } catch(e) {
-                console.error(e); alert("Помилка збереження: " + e.message);
-            }
-        }
-
         function initFirebaseRealtimeStreams() {
             try {
                 unsubscribeChats = db.collection("chats").onSnapshot(snapshot => {
@@ -2320,14 +2253,34 @@
                     }
                 }, e => console.error(e));
                 
-                unsubscribeStats = db.collection("config").doc("statistics").onSnapshot(doc => {
+                // ВАЖЛИВО: ОНОВЛЕНЕ ЗЧИТУВАННЯ ДЛЯ БОЙОВОГО ЗВІТУ
+                unsubscribeStats = db.collection("config").doc("combat_report").onSnapshot(doc => {
                     if (doc.exists) {
                         const data = doc.data();
-                        if(document.getElementById('stat-targets')) document.getElementById('stat-targets').value = data.targets || 0;
-                        if(document.getElementById('stat-funds')) document.getElementById('stat-funds').value = data.funds || 0;
-                        if(document.getElementById('stat-missions')) document.getElementById('stat-missions').value = data.missions || 0;
+                        const details = data.details || {};
+                        
+                        if(document.getElementById('cr-strike')) document.getElementById('cr-strike').value = data.strikeSorties || 0;
+                        if(document.getElementById('cr-recon')) document.getElementById('cr-recon').value = data.reconSorties || 0;
+                        if(document.getElementById('cr-pers-hit')) document.getElementById('cr-pers-hit').value = data.persHit || 0;
+                        if(document.getElementById('cr-pers-kill')) document.getElementById('cr-pers-kill').value = data.persKill || 0;
+                        if(document.getElementById('cr-pers-wound')) document.getElementById('cr-pers-wound').value = data.persWound || 0;
+
+                        combatCategories.forEach(cat => {
+                            const hitInp = document.getElementById(`cr_${cat.id}_hit`);
+                            const destInp = document.getElementById(`cr_${cat.id}_dest`);
+                            if(hitInp) hitInp.value = details[`${cat.id}_hit`] || 0;
+                            if(destInp) destInp.value = details[`${cat.id}_dest`] || 0;
+                        });
+                        calculateTotals();
                     }
                 }, e => console.error(e));
+
+                unsubscribeStatsReal = db.collection("config").doc("statistics").onSnapshot(doc => {
+                    if(doc.exists) {
+                        if(document.getElementById('cr-funds')) document.getElementById('cr-funds').value = doc.data().funds || 0;
+                    }
+                });
+
             } catch (globalError) {
                 console.error("Критична помилка при завантаженні бази даних:", globalError);
             }
