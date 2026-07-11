@@ -28,7 +28,7 @@
         :root {
             --theme-color: #798554;
             --theme-color-rgb: 121, 133, 84;
-            --accent-blue: #4db8ff; /* Блакитний колір для заголовків таблиці */
+            --accent-blue: #4db8ff; /* Колір для заголовків таблиці */
             --bg-dark: #0a0a0c;
             --card-bg: rgba(20, 20, 25, 0.65);
             --border-color: rgba(255, 255, 255, 0.08);
@@ -63,11 +63,13 @@
         .btn-back:hover { background: var(--theme-color); color: #121212; border-color: var(--theme-color); }
 
         /* ДАШБОРД */
-        .dashboard-container { width: 100%; max-width: 1400px; margin-top: 80px; padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .dashboard-container { width: 100%; max-width: 1400px; margin-top: 80px; padding: 20px; flex-grow: 1; }
         
         /* Хедер дашборду */
         .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .dash-title-group { display: flex; flex-direction: column; }
         .dash-title { font-size: 2rem; font-weight: 800; color: var(--theme-color); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 10px rgba(121, 133, 84, 0.3); }
+        .dash-subtitle { font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; margin-left: 42px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         .dash-clock { font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; color: var(--theme-color); background: rgba(255,255,255,0.03); padding: 8px 16px; border: 1px solid var(--theme-color); border-radius: 8px; }
 
         /* Топ статистика */
@@ -116,6 +118,7 @@
             .details-wrapper { grid-template-columns: 1fr; gap: 10px; padding: 0; background: transparent; border: none; box-shadow: none; backdrop-filter: none; }
             .top-stats-grid { grid-template-columns: repeat(2, 1fr); }
             .dash-header { flex-direction: column; align-items: center; text-align: center; }
+            .dash-subtitle { margin-left: 0; }
         }
 
         @media (max-width: 600px) {
@@ -163,12 +166,17 @@
     </nav>
     <div class="dashboard-container">
         <div class="dash-header">
-            <div class="dash-title">
-                <!-- Око/Приціл іконка -->
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--theme-color)">
-                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                </svg>
-                <span data-lang="ua">ЗВІТ SVAROG TEAM</span><span data-lang="en">SVAROG TEAM REPORT</span>
+            <div class="dash-title-group">
+                <div class="dash-title">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--theme-color)">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                    <span data-lang="ua">ЗВІТ SVAROG TEAM</span><span data-lang="en">SVAROG TEAM REPORT</span>
+                </div>
+                <div class="dash-subtitle">
+                    <span data-lang="ua">Дані синхронізовано з 01.07.2026р.</span>
+                    <span data-lang="en">Data synchronized since 01.07.2026</span>
+                </div>
             </div>
             <div class="dash-clock" id="live-clock">--:--:-- --.--.----</div>
         </div>
@@ -199,11 +207,9 @@
 
         <div class="details-wrapper">
             <div class="details-col" id="col-1">
-                <!-- Ліва колонка генерується через JS -->
-            </div>
+                </div>
             <div class="details-col" id="col-2">
-                <!-- Права колонка генерується через JS -->
-            </div>
+                </div>
         </div>
 
         <div class="disclaimer">
@@ -225,7 +231,7 @@
     </footer>
 
     <script>
-        // Схема категорій та іконки (максимально наближено до військового стилю)
+        // Схема категорій та іконки
         const statCategories = [
             { id: "os_rov", icon: "🪖", ua: "ОС РОВ", en: "Enemy Personnel", secret: false },
             { id: "drone_points", icon: "🚁", ua: "Точки вильоту дронів", en: "UAV Launch Points", secret: false },
@@ -256,7 +262,7 @@
             { id: "other", icon: "📌", ua: "Інше", en: "Other", secret: false }
         ];
 
-        // Годинник у стилі мілітарі
+        // Годинник
         function updateClock() {
             const now = new Date();
             const time = now.toLocaleTimeString('uk-UA', { hour12: false });
@@ -268,7 +274,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // --- ДИНАМІЧНИЙ ПЕРЕКЛАДАЧ ---
+        // Автоперекладач для соцмереж
         async function autoTranslateText(text, targetLang) {
             if (!text || text.trim() === '') return text;
             if (targetLang === 'ua') return text; 
@@ -397,10 +403,8 @@
                     valuesHtml = `<div class="val-hit">${hit}</div><div class="val-dest">${dest}</div>`;
                 }
 
-                const bgStyle = cat.id === 'os_rov' ? 'background: rgba(121, 133, 84, 0.15);' : '';
-
                 targetCol.innerHTML += `
-                    <div class="list-row" style="${bgStyle}">
+                    <div class="list-row">
                         <div class="row-name"><span class="row-icon">${cat.icon}</span> <span>${name}</span></div>
                         <div class="row-values">${valuesHtml}</div>
                     </div>`;
