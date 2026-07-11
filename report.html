@@ -28,7 +28,7 @@
         :root {
             --theme-color: #798554;
             --theme-color-rgb: 121, 133, 84;
-            --accent-blue: #4db8ff; /* Колір для заголовків таблиці зі скріншоту */
+            --accent-blue: #4db8ff; /* Блакитний колір для заголовків таблиці */
             --bg-dark: #0a0a0c;
             --card-bg: rgba(20, 20, 25, 0.65);
             --border-color: rgba(255, 255, 255, 0.08);
@@ -63,11 +63,11 @@
         .btn-back:hover { background: var(--theme-color); color: #121212; border-color: var(--theme-color); }
 
         /* ДАШБОРД */
-        .dashboard-container { width: 100%; max-width: 1400px; margin-top: 80px; padding: 20px; flex-grow: 1; }
+        .dashboard-container { width: 100%; max-width: 1400px; margin-top: 80px; padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
         
         /* Хедер дашборду */
         .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .dash-title { font-size: 2rem; font-weight: 800; color: var(--theme-color); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .dash-title { font-size: 2rem; font-weight: 800; color: var(--theme-color); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 10px rgba(121, 133, 84, 0.3); }
         .dash-clock { font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; color: var(--theme-color); background: rgba(255,255,255,0.03); padding: 8px 16px; border: 1px solid var(--theme-color); border-radius: 8px; }
 
         /* Топ статистика */
@@ -78,7 +78,7 @@
         .ts-label { font-size: 0.85rem; color: var(--theme-color); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         .ts-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 6px;}
 
-        /* Детальна таблиця (СПИСКИ ЯК НА СКРІНШОТІ) */
+        /* Детальна таблиця */
         .details-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; backdrop-filter: blur(10px); }
         .details-col { display: flex; flex-direction: column; }
         
@@ -100,11 +100,18 @@
 
         .disclaimer { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 30px; font-style: italic; }
 
+        /* СОЦІАЛЬНІ МЕРЕЖІ ТА ФУТЕР */
+        .home-socials-wrapper { width: 100%; max-width: 1400px; margin: 40px auto 20px; }
+        .home-socials { display: flex; gap: 15px; justify-content: center; width: 100%; flex-wrap: wrap; }
+        .home-social-btn { flex: 1; min-width: 180px; padding: 14px 20px; border: 1px solid var(--border-color); border-radius: 12px; color: #fff; text-align: center; text-decoration: none; font-weight: 600; background: var(--card-bg); transition: all 0.3s ease; backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; }
+        .home-social-btn:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(0,0,0,0.8); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(121, 133, 84, 0.15); }
+
+        .footer { width: 100%; padding: 30px 12px; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: auto; border-top: 1px solid var(--border-color); background: rgba(10, 10, 12, 0.6); backdrop-filter: blur(10px); }
+        .footer span strong { font-family: 'SvarogTeamCustom', sans-serif; font-weight: normal; color: #fff; }
+
         [data-lang="en"] { display: none; }
 
-        /* =======================================
-           ІДЕАЛЬНА МОБІЛЬНА АДАПТАЦІЯ
-           ======================================= */
+        /* МОБІЛЬНА АДАПТАЦІЯ */
         @media (max-width: 900px) {
             .details-wrapper { grid-template-columns: 1fr; gap: 10px; padding: 0; background: transparent; border: none; box-shadow: none; backdrop-filter: none; }
             .top-stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -118,7 +125,6 @@
             .ts-val { font-size: 2rem; }
             .ts-label { font-size: 0.75rem; }
             
-            /* Ширина колонок цифр на мобілці (щоб ідеально влазило) */
             .lh-values, .row-values { width: 110px; gap: 5px; }
             .lh-title { width: 50px; font-size: 0.65rem; }
             .val-hit, .val-dest { width: 50px; font-size: 1.1rem; }
@@ -128,6 +134,9 @@
             .list-row { padding: 12px 5px; }
             .list-header { padding-bottom: 10px; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.15); }
             .top-secret { width: 110px; font-size: 0.65rem; padding: 2px; }
+
+            .home-socials { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 10px; }
+            .home-social-btn { min-width: 0; padding: 12px; font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -155,8 +164,11 @@
     <div class="dashboard-container">
         <div class="dash-header">
             <div class="dash-title">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--theme-color)"><path d="M12 2L2 12h3v8h14v-8h3L12 2zm0 2.83l7 7V20H5v-8.17l7-7zM12 11a3 3 0 100 6 3 3 0 000-6z"/></svg>
-                <span data-lang="ua">ЗВІТ ФЕНІКС</span><span data-lang="en">PHOENIX REPORT</span>
+                <!-- Око/Приціл іконка -->
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--theme-color)">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <span data-lang="ua">ЗВІТ SVAROG TEAM</span><span data-lang="en">SVAROG TEAM REPORT</span>
             </div>
             <div class="dash-clock" id="live-clock">--:--:-- --.--.----</div>
         </div>
@@ -187,16 +199,30 @@
 
         <div class="details-wrapper">
             <div class="details-col" id="col-1">
-                </div>
+                <!-- Ліва колонка генерується через JS -->
+            </div>
             <div class="details-col" id="col-2">
-                </div>
+                <!-- Права колонка генерується через JS -->
+            </div>
         </div>
 
         <div class="disclaimer">
             <span data-lang="ua">Дані на сторінці коригуються за результатами здійснення дорозвідки впродовж 24 годин.</span>
             <span data-lang="en">Data on the page is adjusted based on additional reconnaissance within 24 hours.</span>
         </div>
+        
+        <div class="home-socials-wrapper">
+            <div class="home-socials" id="dynamic-user-social-container"></div>
+        </div>
     </div>
+
+    <footer class="footer">
+        <div style="margin-bottom: 10px;">
+            <a href="status.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.3); transition: 0.2s;">Перевірити статус замовлення</a>
+        </div>
+        <span data-lang="ua"><strong>SVAROG TEAM</strong> © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
+        <span data-lang="en"><strong>SVAROG TEAM</strong> © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
+    </footer>
 
     <script>
         // Схема категорій та іконки (максимально наближено до військового стилю)
@@ -242,21 +268,58 @@
         setInterval(updateClock, 1000);
         updateClock();
 
+        // --- ДИНАМІЧНИЙ ПЕРЕКЛАДАЧ ---
+        async function autoTranslateText(text, targetLang) {
+            if (!text || text.trim() === '') return text;
+            if (targetLang === 'ua') return text; 
+            try {
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=uk&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                return data[0].map(item => item[0]).join('');
+            } catch (e) {
+                console.error("Translation error:", e);
+                return text; 
+            }
+        }
+
+        async function applyTranslationsToDOM(lang) {
+            const elements = document.querySelectorAll('.auto-translate');
+            for (let el of elements) {
+                if (!el.hasAttribute('data-orig-ua')) { el.setAttribute('data-orig-ua', el.innerHTML); }
+                if (lang === 'en') {
+                    if (el.hasAttribute('data-trans-en')) {
+                        el.innerHTML = el.getAttribute('data-trans-en');
+                    } else {
+                        let rawText = el.getAttribute('data-orig-ua').replace(/<br\s*[\/]?>/gi, "\n");
+                        const translated = await autoTranslateText(rawText, 'en');
+                        const formattedTranslation = translated.replace(/\n/g, "<br>");
+                        el.setAttribute('data-trans-en', formattedTranslation);
+                        el.innerHTML = formattedTranslation;
+                    }
+                } else {
+                    el.innerHTML = el.getAttribute('data-orig-ua');
+                }
+            }
+        }
+
         function setLanguage(lang) {
             localStorage.setItem('selectedLang', lang);
             document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? 'inline' : 'none');
             document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.innerText.toLowerCase() === lang));
+            
             renderLists(); 
+            applyTranslationsToDOM(lang);
         }
 
         let reportData = {};
 
+        // Завантаження з Firebase
         db.collection("config").doc("combat_report").onSnapshot(doc => {
             if (doc.exists) {
                 reportData = doc.data();
                 
-                // Анімація головних цифр
                 animateValue("ts-hit", 0, reportData.totalHit || 0, 1500);
                 animateValue("ts-dest", 0, reportData.totalDest || 0, 1500);
                 animateValue("ts-strike", 0, reportData.strikeSorties || 0, 1500);
@@ -266,6 +329,20 @@
                 animateValue("ts-pers-wound", 0, reportData.persWound || 0, 1500);
 
                 renderLists();
+            }
+        });
+
+        // Соціальні мережі
+        db.collection("config").doc("socials").onSnapshot(doc => {
+            const container = document.getElementById('dynamic-user-social-container');
+            if(!container) return;
+            const nets = doc.exists ? doc.data().list : [];
+            if(nets && nets.length > 0) {
+                container.style.display = '';
+                container.innerHTML = nets.map(n => `<a href="${n.url}" target="_blank" class="home-social-btn auto-translate">${n.name}</a>`).join('');
+                applyTranslationsToDOM(localStorage.getItem('selectedLang') || 'ua');
+            } else {
+                container.style.display = 'none';
             }
         });
 
@@ -317,11 +394,9 @@
                 if (cat.secret) {
                     valuesHtml = `<div class="top-secret">TOP SECRET</div>`;
                 } else {
-                    // Згідно зі скріншотом, обидві цифри білі, а текст вирівняно по правому краю/центру колонок
                     valuesHtml = `<div class="val-hit">${hit}</div><div class="val-dest">${dest}</div>`;
                 }
 
-                // Виділяємо ОС РОВ особливим фоном (як на скріншоті)
                 const bgStyle = cat.id === 'os_rov' ? 'background: rgba(121, 133, 84, 0.15);' : '';
 
                 targetCol.innerHTML += `
