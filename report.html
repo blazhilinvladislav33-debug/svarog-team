@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SVAROG TEAM | Бойовий Звіт</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+            authDomain: "svarog-team.firebaseapp.com",
+            projectId: "svarog-team",
+            storageBucket: "svarog-team.firebasestorage.app",
+            messagingSenderId: "311449325528",
+            appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
+            measurementId: "G-56T1VN72PF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
+    <style>
+        @font-face { font-family: 'SvarogTeamCustom'; src: url('SvarogTeam-Regular.woff') format('woff'); font-weight: normal; font-style: normal; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --theme-color: #798554;
+            --theme-color-rgb: 121, 133, 84;
+            --accent-blue: #4db8ff; /* Колір для заголовків таблиці зі скріншоту */
+            --bg-dark: #0a0a0c;
+            --card-bg: rgba(20, 20, 25, 0.65);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-main);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            background-color: var(--bg-dark); background-image: url('bg1.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8, 8, 10, 0.92); z-index: -2; }
+        body::after { content: ""; position: fixed; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(121, 133, 84, 0.1) 0%, transparent 70%); z-index: -1; filter: blur(80px); pointer-events: none; }
+
+        /* НАВІГАЦІЯ */
+        .navbar { width: 100%; background-color: rgba(10, 10, 12, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); position: fixed; top: 0; z-index: 1000; }
+        .navbar-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-text-group { display: flex; flex-direction: column; line-height: 1.1; }
+        .logo-main { font-family: 'SvarogTeamCustom', sans-serif; font-size: 1.2rem; color: #ffffff; letter-spacing: 0.5px; }
+        .logo-sub { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
+        .logo-img { height: 35px; filter: drop-shadow(0 0 8px rgba(121, 133, 84, 0.3)); }
+        
+        .lang-switcher { display: flex; gap: 4px; background: rgba(255, 255, 255, 0.05); padding: 3px; border-radius: 30px; border: 1px solid var(--border-color); }
+        .lang-btn { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 6px 12px; cursor: pointer; border-radius: 30px; transition: 0.3s; }
+        .lang-btn.active { color: #fff; background-color: var(--theme-color); box-shadow: 0 4px 12px rgba(121, 133, 84, 0.3); }
+
+        .btn-back { border: 1px solid var(--border-color); color: #fff; padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; font-weight: bold; transition: 0.3s; background: rgba(255,255,255,0.05); }
+        .btn-back:hover { background: var(--theme-color); color: #121212; border-color: var(--theme-color); }
+
+        /* ДАШБОРД */
+        .dashboard-container { width: 100%; max-width: 1400px; margin-top: 80px; padding: 20px; flex-grow: 1; }
+        
+        /* Хедер дашборду */
+        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .dash-title { font-size: 2rem; font-weight: 800; color: var(--theme-color); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .dash-clock { font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; color: var(--theme-color); background: rgba(255,255,255,0.03); padding: 8px 16px; border: 1px solid var(--theme-color); border-radius: 8px; }
+
+        /* Топ статистика */
+        .top-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .top-stat-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; backdrop-filter: blur(10px); }
+        .top-stat-card:first-child { border-bottom: 3px solid var(--theme-color); }
+        .ts-val { font-size: 2.6rem; font-weight: 800; color: #fff; margin-bottom: 5px; line-height: 1; font-family: 'Montserrat', sans-serif; }
+        .ts-label { font-size: 0.85rem; color: var(--theme-color); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .ts-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 6px;}
+
+        /* Детальна таблиця (СПИСКИ ЯК НА СКРІНШОТІ) */
+        .details-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; backdrop-filter: blur(10px); }
+        .details-col { display: flex; flex-direction: column; }
+        
+        .list-header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 10px; align-items: flex-end; }
+        .lh-title-left { flex: 1; }
+        .lh-values { display: flex; width: 140px; justify-content: space-between; gap: 10px; }
+        .lh-title { width: 65px; text-align: center; color: var(--accent-blue); font-size: 0.75rem; font-weight: 600; text-transform: lowercase; line-height: 1.2; letter-spacing: 0.5px; }
+        
+        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; border-radius: 6px; }
+        .list-row:hover { background: rgba(255,255,255,0.03); }
+        
+        .row-name { display: flex; align-items: center; gap: 14px; font-size: 0.95rem; font-weight: 500; color: #eaeaea; flex: 1; }
+        .row-icon { font-size: 1.4rem; filter: grayscale(100%) sepia(100%) hue-rotate(50deg) saturate(300%) brightness(0.9); display: flex; align-items: center; justify-content: center; width: 24px; }
+        
+        .row-values { display: flex; width: 140px; justify-content: space-between; gap: 10px; }
+        .val-hit, .val-dest { width: 65px; text-align: center; font-weight: 700; font-size: 1.15rem; color: #fff; }
+
+        .top-secret { color: #ff4a4a; font-family: 'Share Tech Mono', monospace; border: 1px solid #ff4a4a; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; letter-spacing: 1px; background: rgba(255,0,0,0.05); text-align: center; width: 140px; }
+
+        .disclaimer { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 30px; font-style: italic; }
+
+        [data-lang="en"] { display: none; }
+
+        /* =======================================
+           ІДЕАЛЬНА МОБІЛЬНА АДАПТАЦІЯ
+           ======================================= */
+        @media (max-width: 900px) {
+            .details-wrapper { grid-template-columns: 1fr; gap: 10px; padding: 0; background: transparent; border: none; box-shadow: none; backdrop-filter: none; }
+            .top-stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .dash-header { flex-direction: column; align-items: center; text-align: center; }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-container { padding: 15px 10px; margin-top: 75px; }
+            .top-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+            .top-stat-card { padding: 15px 10px; }
+            .ts-val { font-size: 2rem; }
+            .ts-label { font-size: 0.75rem; }
+            
+            /* Ширина колонок цифр на мобілці (щоб ідеально влазило) */
+            .lh-values, .row-values { width: 110px; gap: 5px; }
+            .lh-title { width: 50px; font-size: 0.65rem; }
+            .val-hit, .val-dest { width: 50px; font-size: 1.1rem; }
+            
+            .row-name { font-size: 0.85rem; gap: 10px; }
+            .row-icon { font-size: 1.2rem; }
+            .list-row { padding: 12px 5px; }
+            .list-header { padding-bottom: 10px; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.15); }
+            .top-secret { width: 110px; font-size: 0.65rem; padding: 2px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="left-side">
+                <a href="index.html" class="logo-container">
+                    <img src="logo.png" alt="SVAROG" class="logo-img">
+                    <div class="logo-text-group">
+                        <span class="logo-main">SVAROG TEAM</span>
+                        <span class="logo-sub"><span data-lang="ua">35-й Полк НГУ</span><span data-lang="en">35th Regiment</span></span>
+                    </div>
+                </a>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a href="index.html" class="btn-back"><span data-lang="ua">На головну</span><span data-lang="en">Home</span></a>
+                <div class="lang-switcher">
+                    <button class="lang-btn active" onclick="setLanguage('ua')">UA</button>
+                    <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="dashboard-container">
+        <div class="dash-header">
+            <div class="dash-title">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--theme-color)"><path d="M12 2L2 12h3v8h14v-8h3L12 2zm0 2.83l7 7V20H5v-8.17l7-7zM12 11a3 3 0 100 6 3 3 0 000-6z"/></svg>
+                <span data-lang="ua">ЗВІТ ФЕНІКС</span><span data-lang="en">PHOENIX REPORT</span>
+            </div>
+            <div class="dash-clock" id="live-clock">--:--:-- --.--.----</div>
+        </div>
+
+        <div class="top-stats-grid">
+            <div class="top-stat-card">
+                <div class="ts-val" id="ts-hit">0</div>
+                <div class="ts-label"><span data-lang="ua">Уражено цілей</span><span data-lang="en">Targets Hit</span></div>
+                <div class="ts-sub"><span data-lang="ua">в т.ч. знищено:</span><span data-lang="en">incl. destroyed:</span> <span id="ts-dest" style="color:#fff; font-weight:bold;">0</span></div>
+            </div>
+            <div class="top-stat-card">
+                <div class="ts-val" id="ts-strike">0</div>
+                <div class="ts-label"><span data-lang="ua">Ударних вильотів</span><span data-lang="en">Strike Sorties</span></div>
+            </div>
+            <div class="top-stat-card">
+                <div class="ts-val" id="ts-recon">0</div>
+                <div class="ts-label"><span data-lang="ua">Розвід. вильотів</span><span data-lang="en">Recon Sorties</span></div>
+            </div>
+            <div class="top-stat-card">
+                <div class="ts-val" id="ts-pers-hit">0</div>
+                <div class="ts-label"><span data-lang="ua">ОС РОВ</span><span data-lang="en">Enemy Personnel</span></div>
+                <div class="ts-sub">
+                    <span data-lang="ua">Знищено:</span><span data-lang="en">KIA:</span> <span id="ts-pers-kill" style="color:#fff;font-weight:bold;">0</span> | 
+                    <span data-lang="ua">Поранено:</span><span data-lang="en">WIA:</span> <span id="ts-pers-wound" style="color:#fff;font-weight:bold;">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-wrapper">
+            <div class="details-col" id="col-1">
+                </div>
+            <div class="details-col" id="col-2">
+                </div>
+        </div>
+
+        <div class="disclaimer">
+            <span data-lang="ua">Дані на сторінці коригуються за результатами здійснення дорозвідки впродовж 24 годин.</span>
+            <span data-lang="en">Data on the page is adjusted based on additional reconnaissance within 24 hours.</span>
+        </div>
+    </div>
+
+    <script>
+        // Схема категорій та іконки (максимально наближено до військового стилю)
+        const statCategories = [
+            { id: "os_rov", icon: "🪖", ua: "ОС РОВ", en: "Enemy Personnel", secret: false },
+            { id: "drone_points", icon: "🚁", ua: "Точки вильоту дронів", en: "UAV Launch Points", secret: false },
+            { id: "antennas", icon: "📡", ua: "Антени", en: "Antennas", secret: false },
+            { id: "air_defense", icon: "🎯", ua: "ЗРК, ЗГРК", en: "Air Defense Systems", secret: false },
+            { id: "aviation", icon: "✈️", ua: "Літаки та гелікоптери", en: "Aircraft & Helicopters", secret: false },
+            { id: "fleet", icon: "⛴️", ua: "Флот", en: "Fleet", secret: false },
+            { id: "radar_complex", icon: "📻", ua: "РЛС, РЕР та зв'язок (комплекси)", en: "Radar/EW (Complexes)", secret: false },
+            { id: "radar_port", icon: "📟", ua: "РЛС (портативні)", en: "Portable Radars", secret: false },
+            { id: "ew_complex", icon: "🎛️", ua: "РЕБ (комплекс)", en: "EW Complexes", secret: false },
+            { id: "ew_auto", icon: "🚙", ua: "РЕБ (авто + портативні)", en: "EW (Auto + Portable)", secret: false },
+            { id: "enemy_wings", icon: "🦅", ua: "Ворожі крила", en: "Enemy Fixed-wings", secret: false },
+            { id: "shaheds", icon: "🦇", ua: "Шахеди та Гербери", en: "Shaheds & Gerberas", secret: false },
+            { id: "tanks", icon: "🛡️", ua: "Танки", en: "Tanks", secret: false },
+            { id: "apc", icon: "🚜", ua: "ББМ, БМП, БТР", en: "Armored Vehicles", secret: false },
+            { id: "artillery", icon: "💥", ua: "Гармати, гаубиці", en: "Artillery", secret: false },
+            { id: "spg", icon: "🔥", ua: "САУ", en: "Self-Propelled Guns", secret: false },
+            { id: "mortars", icon: "💣", ua: "Міномети", en: "Mortars", secret: false },
+            { id: "mlrs", icon: "🚀", ua: "РСЗВ", en: "MLRS", secret: false },
+            { id: "vehicles", icon: "🚚", ua: "ЛАТ, ВАТ, спец. та інж. техніка", en: "Military Vehicles", secret: false },
+            { id: "moto", icon: "🏍️", ua: "Мотоцикли та баггі", en: "Motorcycles & Buggies", secret: false },
+            { id: "depots", icon: "🏭", ua: "Склади", en: "Depots", secret: false },
+            { id: "strat_infra", icon: "⚡", ua: "Стратегічна інфраструктура", en: "Strategic Infrastructure", secret: true },
+            { id: "tact_infra", icon: "🏗️", ua: "Тактична інфраструктура", en: "Tactical Infrastructure", secret: false },
+            { id: "trenches", icon: "🕳️", ua: "Укриття та бліндажі", en: "Shelters & Trenches", secret: false },
+            { id: "network", icon: "📹", ua: "Мережеве обладнання та камери", en: "Network Eq & Cameras", secret: false },
+            { id: "enemy_copters", icon: "🛸", ua: "Ворожі коптери", en: "Enemy Copters", secret: false },
+            { id: "other", icon: "📌", ua: "Інше", en: "Other", secret: false }
+        ];
+
+        // Годинник у стилі мілітарі
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('uk-UA', { hour12: false });
+            const date = now.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const days = ['Нд', 'Пн', 'Вв', 'Ср', 'Чт', 'Пт', 'Сб'];
+            const dayName = days[now.getDay()];
+            document.getElementById('live-clock').innerText = `${time} ${dayName} | ${date}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function setLanguage(lang) {
+            localStorage.setItem('selectedLang', lang);
+            document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? 'inline' : 'none');
+            document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.innerText.toLowerCase() === lang));
+            renderLists(); 
+        }
+
+        let reportData = {};
+
+        db.collection("config").doc("combat_report").onSnapshot(doc => {
+            if (doc.exists) {
+                reportData = doc.data();
+                
+                // Анімація головних цифр
+                animateValue("ts-hit", 0, reportData.totalHit || 0, 1500);
+                animateValue("ts-dest", 0, reportData.totalDest || 0, 1500);
+                animateValue("ts-strike", 0, reportData.strikeSorties || 0, 1500);
+                animateValue("ts-recon", 0, reportData.reconSorties || 0, 1500);
+                animateValue("ts-pers-hit", 0, reportData.persHit || 0, 1500);
+                animateValue("ts-pers-kill", 0, reportData.persKill || 0, 1500);
+                animateValue("ts-pers-wound", 0, reportData.persWound || 0, 1500);
+
+                renderLists();
+            }
+        });
+
+        function animateValue(id, start, end, duration) {
+            let obj = document.getElementById(id);
+            if(!obj || start === end) { if(obj) obj.innerText = end; return; }
+            let range = end - start;
+            let stepTime = Math.abs(Math.floor(duration / range));
+            if(stepTime < 10) stepTime = 10; 
+            let startTime = new Date().getTime();
+            let endTime = startTime + duration;
+            function step() {
+                let now = new Date().getTime();
+                let remaining = Math.max((endTime - now) / duration, 0);
+                let value = Math.round(end - (remaining * range));
+                obj.innerText = value;
+                if(value !== end) requestAnimationFrame(step);
+                else obj.innerText = end;
+            }
+            step();
+        }
+
+        function renderLists() {
+            const col1 = document.getElementById('col-1');
+            const col2 = document.getElementById('col-2');
+            const lang = localStorage.getItem('selectedLang') || 'ua';
+
+            const headerHtml = `
+                <div class="list-header">
+                    <div class="lh-title-left"></div>
+                    <div class="lh-values">
+                        <div class="lh-title">${lang==='ua'?'уражено':'hit'}</div>
+                        <div class="lh-title">${lang==='ua'?'в т.ч.<br>знищено':'incl.<br>destr.'}</div>
+                    </div>
+                </div>`;
+            col1.innerHTML = headerHtml;
+            col2.innerHTML = headerHtml;
+
+            const details = reportData.details || {};
+            const midpoint = Math.ceil(statCategories.length / 2);
+
+            statCategories.forEach((cat, index) => {
+                const targetCol = index < midpoint ? col1 : col2;
+                const name = lang === 'ua' ? cat.ua : cat.en;
+                const hit = details[`${cat.id}_hit`] || 0;
+                const dest = details[`${cat.id}_dest`] || 0;
+
+                let valuesHtml = '';
+                if (cat.secret) {
+                    valuesHtml = `<div class="top-secret">TOP SECRET</div>`;
+                } else {
+                    // Згідно зі скріншотом, обидві цифри білі, а текст вирівняно по правому краю/центру колонок
+                    valuesHtml = `<div class="val-hit">${hit}</div><div class="val-dest">${dest}</div>`;
+                }
+
+                // Виділяємо ОС РОВ особливим фоном (як на скріншоті)
+                const bgStyle = cat.id === 'os_rov' ? 'background: rgba(121, 133, 84, 0.15);' : '';
+
+                targetCol.innerHTML += `
+                    <div class="list-row" style="${bgStyle}">
+                        <div class="row-name"><span class="row-icon">${cat.icon}</span> <span>${name}</span></div>
+                        <div class="row-values">${valuesHtml}</div>
+                    </div>`;
+            });
+        }
+
+        window.onload = () => setLanguage(localStorage.getItem('selectedLang') || 'ua');
+    </script>
+</body>
+</html>
