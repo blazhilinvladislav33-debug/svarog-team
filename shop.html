@@ -23,6 +23,7 @@
     </script>
 
     <style>
+        /* Кастомний шрифт */
         @font-face {
             font-family: 'SvarogTeamCustom';
             src: url('SvarogTeam-Regular.woff') format('woff');
@@ -32,6 +33,7 @@
 
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
+        /* ПРЕМІАЛЬНА ОЛИВКОВА ПАЛІТРА */
         :root {
             --theme-color: #798554;
             --theme-color-rgb: 121, 133, 84;
@@ -81,7 +83,7 @@
         .logo-img { height: 40px; width: auto; display: block; filter: drop-shadow(0 0 8px rgba(121, 133, 84, 0.3)); }
 
         .lang-switcher { display: flex; gap: 4px; background: rgba(255, 255, 255, 0.05); padding: 3px; border-radius: 30px; border: 1px solid var(--border-color); }
-        .lang-btn { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 6px 12px; cursor: pointer; border-radius: 30px; transition: all 0.3s ease; }
+        .lang-btn { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 6px 12px; cursor: pointer; border-radius: 30px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .lang-btn:hover { color: #ffffff; }
         .lang-btn.active { color: #fff; background-color: var(--theme-color); box-shadow: 0 4px 12px rgba(121, 133, 84, 0.3); }
         
@@ -94,18 +96,16 @@
         .menu-chat-btn { border: 1px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: 700 !important; margin-top: 15px; }
         .menu-chat-btn:hover { background: var(--theme-color) !important; color: #fff !important; }
 
-        /* =========================================================
-           ОНОВЛЕНИЙ ГЕРОЙ-БАНЕР (ПЛАВНЕ РОЗЧИНЕННЯ)
-           ========================================================= */
+        /* ВЕЛИКИЙ БАНЕР / ГЕРОЙ ШАПКА */
         .hero-banner { 
             width: 100%; max-width: 1200px; margin-top: 100px; padding: 40px; 
             background: linear-gradient(135deg, rgba(20, 20, 25, 0.8) 0%, rgba(10, 10, 12, 0.9) 100%); 
             border: 1px solid var(--border-color); border-radius: 24px; 
             display: flex; align-items: center; justify-content: space-between; 
             position: relative; overflow: hidden; backdrop-filter: blur(15px); 
-            min-height: 380px; /* Збільшена висота */
+            min-height: 380px;
         }
-        
+        .hero-banner::before { content: ""; position: absolute; bottom: -100px; left: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(121, 133, 84, 0.1) 0%, transparent 70%); filter: blur(50px); pointer-events: none; }
         .hero-info { max-width: 550px; z-index: 2; position: relative; }
         .hero-info h1 { font-size: 2.8rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 12px; letter-spacing: -0.5px; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .hero-info p { color: #d0d0d0; font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
@@ -113,21 +113,11 @@
         .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(121, 133, 84, 0.6); filter: brightness(1.1); color: #000; }
         
         .hero-img-wrapper {
-            position: absolute;
-            right: 0; top: 0;
-            width: 55%; height: 100%;
-            z-index: 1;
-            display: none; 
-            /* Плавний градієнт-маска (ховає лівий край фото) */
+            position: absolute; right: 0; top: 0; width: 55%; height: 100%; z-index: 1; display: none; 
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%);
             mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%);
         }
-
-        .hero-showcase-img { 
-            width: 100%; height: 100%; 
-            object-fit: cover; /* Заповнює весь відведений блок */
-            object-position: center right; 
-        }
+        .hero-showcase-img { width: 100%; height: 100%; object-fit: cover; object-position: center right; }
 
         /* ОСНОВНИЙ КОНТЕНТ */
         .main-content { padding: 40px 20px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1200px; }
@@ -235,7 +225,7 @@
         .copy-btn { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-left: 8px; }
         
         .confirm-btn { width: 100%; padding: 16px; background: var(--theme-color); color: #121212; border: none; border-radius: 12px; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 24px rgba(121, 133, 84, 0.3); }
-        .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); color:#000; }
+        .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); color: #000; }
 
         .toast-notification { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(120px); background: #121215; border: 1px solid var(--theme-color); color: #fff; padding: 16px 28px; border-radius: 14px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 4000; opacity: 0; transition: all 0.4s ease; display: flex; align-items: center; gap: 12px; }
         .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -260,9 +250,12 @@
         .chat-input-area { padding: 16px; display: flex; gap: 10px; background: rgba(0,0,0,0.1); align-items: center; border-top: 1px solid var(--border-color); }
         .chat-input-area input { flex: 1; height: 42px; padding: 0 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 30px; color: #ffffff; outline: none; font-size: 0.9rem; transition: border-color 0.2s; }
         .chat-input-area input:focus { border-color: rgba(121, 133, 84, 0.5); }
-        .chat-send-btn { width: 42px; height: 42px; background: #fff; border: none; color: #121212; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .chat-send-btn { width: 42px; height: 42px; background: #fff; border: none; color: #121212; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
+        .chat-send-btn:hover { filter: brightness(0.9); transform: scale(1.05); }
         .chat-send-btn svg { width: 18px; height: 18px; fill: #000; margin-left: 2px; }
-        .user-clip-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); color: #fff; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .user-clip-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); color: #fff; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; padding: 0; }
+        .user-clip-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
+        .user-clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.75); }
 
         [data-lang="en"] { display: none; }
 
@@ -323,6 +316,7 @@
             </ul>
         </div>
     </nav>
+
     <div class="hero-banner">
         <div class="hero-info">
             <h1 class="auto-translate" data-lang="ua">СТИЛЬНИЙ ОДЯГ ДЛЯ ТВОГО РИТМУ</h1>
@@ -430,7 +424,8 @@
                         <input type="hidden" id="selected-payment-method" value="" required>
                     </div>
                     
-                    <div id="bank-payment-info" style="display: none; margin-bottom: 15px; padding: 12px; background: rgba(121, 133, 84, 0.1); border: 1px solid rgba(121, 133, 84, 0.3); border-radius: 6px; font-size: 0.9rem;"></div>
+                    <div id="bank-payment-info" style="display: none; margin-bottom: 15px; padding: 12px; background: rgba(121, 133, 84, 0.1); border: 1px solid rgba(121, 133, 84, 0.3); border-radius: 6px; font-size: 0.9rem;">
+                    </div>
 
                     <button type="submit" class="confirm-btn" id="confirm-order-btn">
                         <span data-lang="ua">Оформити замовлення</span>
@@ -471,7 +466,6 @@
             </button>
         </div>
     </div>
-
     <script>
         const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
         let bgIndex = 0;
@@ -572,7 +566,6 @@
             updatePaymentDetailsUI();
         });
 
-        // Завантаження фото банера з плавним з'явленням
         db.collection("config").doc("shop").onSnapshot(doc => {
             if(doc.exists && doc.data().heroImage) {
                 const img = document.getElementById('dynamic-hero-img');
@@ -644,6 +637,7 @@
         let cartLastUpdated = localStorage.getItem('svarog_shop_cart_time') || Date.now();
         let currentPromo = null; 
         let activeOrderUnsubscribe = null;
+        
         window.selectedVariants = {}; 
 
         function listenToActiveOrderStatus() {
@@ -730,7 +724,6 @@
         function renderCategoryBar() {
             const bar = document.getElementById('category-bar');
             
-            // Якщо категорії вже згенеровані, ми просто міняємо клас active
             if(bar.innerHTML.trim() !== '') {
                 Array.from(bar.children).forEach(btn => {
                     if(btn.dataset.cat === activeCategory) btn.classList.add('active');
@@ -749,7 +742,6 @@
                 btn.className = `category-btn ${activeCategory === catName ? 'active' : ''}`;
                 btn.dataset.cat = catName;
                 
-                // Текст винесено в окремий span, щоб перекладач не ламав іконку
                 btn.innerHTML = `${catIcon}<span class="auto-translate">${catName}</span>`;
                 
                 btn.onclick = () => {
@@ -842,7 +834,6 @@
                 renderItemsToContainer(regularItemsList, grid, lang);
             }
 
-            // Запускаємо переклад згенерованих товарів
             applyTranslationsToDOM(lang);
         }
 
@@ -863,7 +854,7 @@
                 let galleryHtml = ''; let indicatorsHtml = '';
                 if (currentImagesArray.length > 0) {
                     galleryHtml = `<div class="merch-gallery" id="gallery-${item.id}">`;
-                    currentImagesArray.forEach(imgSrc => { galleryHtml += `<img src="${imgSrc}" onclick="openLightbox('${imgSrc}')">`; });
+                    currentImagesArray.forEach(imgSrc => { galleryHtml += `<img src="${imgSrc}" onclick="openLightbox('${imgSrc}')" title="${lang==='ua'?'Клікніть для збільшення':'Click to zoom'}">`; });
                     galleryHtml += `</div>`;
                     if (currentImagesArray.length > 1) {
                         indicatorsHtml = `<div class="gallery-indicators">`;
@@ -1116,8 +1107,44 @@
             applyTranslationsToDOM(lang);
         }
 
-        function getBase64Image(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); reader.readAsDataURL(file); }); }
+        // ========================================================
+        // 1. ОНОВЛЕНА ФУНКЦІЯ: АВТОМАТИЧНЕ СТИСНЕННЯ ФОТО ЧЕКА
+        // ========================================================
+        function getBase64Image(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; // Зменшуємо ширину до 800 пікселів
+                        let width = img.width;
+                        let height = img.height;
 
+                        if (width > MAX_WIDTH) {
+                            height = Math.round((height * MAX_WIDTH) / width);
+                            width = MAX_WIDTH;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Стискаємо чек у формат JPEG з якістю 60% (важитиме ~50 КБ замість 3 МБ)
+                        resolve(canvas.toDataURL('image/jpeg', 0.6));
+                    };
+                    img.onerror = error => reject(error);
+                    img.src = e.target.result;
+                };
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ========================================================
+        // 2. ОНОВЛЕНЕ ВІДПРАВЛЕННЯ ЗАМОВЛЕННЯ (ОПТИМІЗОВАНО ДЛЯ БАЗИ)
+        // ========================================================
         async function submitOrder(e) {
             e.preventDefault();
             if(shoppingCart.length === 0) return;
@@ -1147,8 +1174,16 @@
             let paymentMethodText = paymentMethod === 'bank' ? "Оплата на Банку" : (paymentMethod === 'card' ? "Переказ на карту" : "Накладений платіж");
             let newlyCreatedOrderId = ""; let base64Receipt = null;
 
+            // ОЧИЩАЄМО ВАЖКІ ФОТО З КОШИКА ДЛЯ БАЗИ ДАНИХ
+            // Адміну в панелі потрібна тільки назва, розмір і ціна
+            const optimizedCartForDB = shoppingCart.map(item => {
+                return { ...item, image: "" }; 
+            });
+
             try {
-                if (fileInput && fileInput.files.length > 0) { base64Receipt = await getBase64Image(fileInput.files[0]); }
+                if (fileInput && fileInput.files.length > 0) { 
+                    base64Receipt = await getBase64Image(fileInput.files[0]); // Тут фото стиснеться
+                }
 
                 await db.runTransaction(async (transaction) => {
                     let merchRefsAndData = [];
@@ -1199,10 +1234,12 @@
                     let safePromoCode = (currentPromo && currentPromo.code) ? String(currentPromo.code) : "Не застосовано";
 
                     transaction.set(orderRef, {
-                        name: name, phone: phone, address: address, items: shoppingCart, 
+                        name: name, phone: phone, address: address, 
+                        items: optimizedCartForDB, // Зберігаємо легкий кошик без фото
                         merchTitle: "Комплексне замовлення", size: "Див. деталі", quantity: shoppingCart.reduce((s, i) => s + i.quantity, 0),
                         orderTextDetails: orderItemsString, totalPrice: finalSum, promoCode: safePromoCode, paymentMethod: paymentMethodText,
-                        paymentProof: base64Receipt, status: 'new', timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        paymentProof: base64Receipt, // Тепер це фото стиснене і легке
+                        status: 'new', timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
                     });
                 });
