@@ -728,7 +728,6 @@
 
         async function checkAdminAccess(userEmail) {
             if (!userEmail) return false;
-            // ВИПРАВЛЕНО: примусове переведення пошти в нижній регістр для Firestore
             const emailClean = userEmail.trim().toLowerCase();
             try {
                 const adminDoc = await db.collection("admins").doc(emailClean).get();
@@ -767,9 +766,9 @@
             }
         });
 
+        // --- ОНОВЛЕНА ФУНКЦІЯ ВХОДУ З ГЛИБОКОЮ ДІАГНОСТИКОЮ ---
         async function handleLogin(event) {
             event.preventDefault();
-            // ВИПРАВЛЕНО: автоматичний захист від випадкових великих літер при введенні
             const emailInp = document.getElementById('user-email').value.trim().toLowerCase();
             const passInp = document.getElementById('user-password').value.trim();
             const errorBlock = document.getElementById('error-block');
@@ -780,17 +779,27 @@
             submitBtn.disabled = true;
 
             try {
+                console.log("Надсилання запиту до Google Auth для:", emailInp);
                 const userCredential = await firebase.auth().signInWithEmailAndPassword(emailInp, passInp);
+                
+                console.log("Google Auth пустив! Перевіряємо роль в Firestore...");
                 const isAdmin = await checkAdminAccess(userCredential.user.email);
                 
                 if (!isAdmin) {
-                    errorBlock.innerText = "Доступ заборонено (відсутній в колекції admins)";
+                    errorBlock.innerText = "Доступ заборонено (Пароль вірний, але пошта відсутня в колекції admins)";
                     errorBlock.style.display = 'block';
                     await firebase.auth().signOut();
                 }
             } catch (error) {
                 errorBlock.style.display = 'block';
-                console.error("Помилка Firebase Auth:", error.code, error.message);
+                console.error("Критична помилка Firebase:", error);
+                
+                // Виводимо спливаюче вікно з повним технічним описом помилки від Google
+                alert("⚠️ ВІДПОВІДЬ ВІД СЕРВЕРА GOOGLE:\n\n" + 
+                      "Код помилки: " + error.code + "\n" + 
+                      "Повідомлення: " + error.message + "\n\n" +
+                      "Прочитайте код помилки вище, щоб зрозуміти причину.");
+
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
                     errorBlock.innerText = "Невірний Email або пароль. Перевірте дані.";
                 } else if (error.code === 'auth/wrong-password') {
@@ -904,7 +913,7 @@
             if (!workspace) return;
 
             if (!currentSelectedChatId || !globalChatsData[currentSelectedChatId]) {
-                workspace.innerHTML = '<div style="flex: 1; display: flex;"><div style="text-align:center; margin:auto; color:#666;">Оберіть чат зі списку ліворуч</div></div>';
+                workspace.innerHTML = '<div style="flex: 1; display: flex;"><div style="text-align:center; margin:auto; color:#666;">Оберіть чат зі спилку ліворуч</div></div>';
                 return;
             }
 
@@ -1229,7 +1238,7 @@
                 
                 const valueText = isCert ? `<b style="color:#da70d6">${promo.fiatValue || promo.discount} ₴</b>` : `<b style="color:#777777">${promo.discount}%</b>`;
                 const statusBadge = promo.active 
-                    ? `<span style="color:#00ffcc; font-size:0.85rem; font-weight:bold;">✅ Активний</span>` 
+                    ? `<span style="color:#00ffcc; font-size:0.85rem; font-weight:bold;">✅  Активний</span>` 
                     : `<span style="color:#ff4a4a; font-size:0.85rem; font-weight:bold;">🛑 Використаний / Неактивний</span>`;
 
                 const showBtn = `<button class="export-btn" style="margin:0 5px 0 0; padding:4px 8px; font-size:0.75rem;" onclick="showCertificatePreview('${codeName}', '${isCert ? 'certificate' : 'promo'}', ${isCert ? (promo.fiatValue || promo.discount) : promo.discount})">Генерувати картку</button>`;
@@ -1822,7 +1831,7 @@
                     cardNumber: cardNumber,
                     cardName: cardName
                 }, { merge: true });
-                alert("✓ Платіжні реквізити успішно збережено!");
+                alert("✓  Платіжні реквізити успішно збережено!");
                 logAdminAction('payment', 'Оновив платіжні реквізити');
             } catch(e) {
                 console.error(e);
@@ -1972,7 +1981,7 @@
                 await db.collection("config").doc("statistics").set({
                     targets: targets, funds: funds, missions: missions
                 }, { merge: true });
-                alert("✓ Статистику успішно оновлено на головній сторінці!");
+                alert("✓  Статистику успішно оновлено на головній сторінці!");
                 logAdminAction('payment', `Оновив статистику (Цілі: ${targets}, Донати: ${funds}, Вильоти: ${missions})`);
             } catch(e) {
                 console.error(e); alert("Помилка збереження: " + e.message);
@@ -2056,11 +2065,11 @@
             try {
                 if (editId) {
                     await db.collection(collectionName).doc(editId).set(dataObj, { merge: true });
-                    alert("✓ Зміни успішно збережено в базі!");
+                    alert("✓  Зміни успішно збережено в базі!");
                 } else {
                     dataObj.timestamp = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection(collectionName).add(dataObj);
-                    alert("✓ Опубліковано успішно! Дані вже синхронізовані із сайтом.");
+                    alert("✓  Опубліковано успішно! Дані вже синхронізовані із сайтом.");
                 }
                 logAdminAction('news', `Створив/Оновив ${publishType}: "${title || 'Фінансовий звіт'}"`);
                 cancelNewsEditing();
@@ -2199,7 +2208,7 @@
                     ? `<span style="background:#00ffcc; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold; margin-right:5px;">ЗВІТ</span>` 
                     : `<span style="background:var(--theme-color); color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold; margin-right:5px;">НОВИНА</span>`;
 
-                let title = item.isReport ? "Нинансовий звіт" : item.title;
+                let title = item.isReport ? "Финансовий звіт" : item.title;
                 let bodyText = item.isReport ? item.description : item.body;
 
                 box.innerHTML += `
