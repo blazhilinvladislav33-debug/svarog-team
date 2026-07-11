@@ -23,7 +23,6 @@
     </script>
 
     <style>
-        /* Кастомний шрифт */
         @font-face {
             font-family: 'SvarogTeamCustom';
             src: url('SvarogTeam-Regular.woff') format('woff');
@@ -33,7 +32,6 @@
 
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
-        /* ПРЕМІАЛЬНА ОЛИВКОВА ПАЛІТРА */
         :root {
             --theme-color: #798554;
             --theme-color-rgb: 121, 133, 84;
@@ -79,7 +77,7 @@
         .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-text-group { display: flex; flex-direction: column; line-height: 1.1; }
         .logo-main { font-family: 'SvarogTeamCustom', sans-serif; font-size: 1.3rem; font-weight: normal; color: #ffffff; letter-spacing: 0.5px; }
-        .logo-sub { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        .logo-sub { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; }
         .logo-img { height: 40px; width: auto; display: block; filter: drop-shadow(0 0 8px rgba(121, 133, 84, 0.3)); }
 
         .lang-switcher { display: flex; gap: 4px; background: rgba(255, 255, 255, 0.05); padding: 3px; border-radius: 30px; border: 1px solid var(--border-color); }
@@ -96,15 +94,40 @@
         .menu-chat-btn { border: 1px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: 700 !important; margin-top: 15px; }
         .menu-chat-btn:hover { background: var(--theme-color) !important; color: #fff !important; }
 
-        /* ВЕЛИКИЙ БАНЕР / ГЕРОЙ ШАПКА */
-        .hero-banner { width: 100%; max-width: 1200px; margin-top: 100px; padding: 40px 30px; background: linear-gradient(135deg, rgba(20, 20, 25, 0.4) 0%, rgba(10, 10, 12, 0.6) 100%); border: 1px solid var(--border-color); border-radius: 24px; display: flex; align-items: center; justify-content: space-between; gap: 30px; position: relative; overflow: hidden; backdrop-filter: blur(10px); }
-        .hero-banner::before { content: ""; position: absolute; bottom: -100px; left: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(121, 133, 84, 0.1) 0%, transparent 70%); filter: blur(50px); pointer-events: none; }
-        .hero-info { max-width: 550px; z-index: 2; }
-        .hero-info h1 { font-size: 2.8rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 12px; letter-spacing: -0.5px; }
-        .hero-info p { color: var(--text-muted); font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px; }
-        .hero-btn { display: inline-block; padding: 14px 28px; background: var(--theme-color); color: #fff; font-weight: 700; text-decoration: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(121, 133, 84, 0.3); transition: all 0.3s; }
-        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(121, 133, 84, 0.5); }
-        .hero-showcase-img { height: 200px; width: auto; max-width: 400px; object-fit: contain; z-index: 2; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); display: none; }
+        /* =========================================================
+           ОНОВЛЕНИЙ ГЕРОЙ-БАНЕР (ПЛАВНЕ РОЗЧИНЕННЯ)
+           ========================================================= */
+        .hero-banner { 
+            width: 100%; max-width: 1200px; margin-top: 100px; padding: 40px; 
+            background: linear-gradient(135deg, rgba(20, 20, 25, 0.8) 0%, rgba(10, 10, 12, 0.9) 100%); 
+            border: 1px solid var(--border-color); border-radius: 24px; 
+            display: flex; align-items: center; justify-content: space-between; 
+            position: relative; overflow: hidden; backdrop-filter: blur(15px); 
+            min-height: 380px; /* Збільшена висота */
+        }
+        
+        .hero-info { max-width: 550px; z-index: 2; position: relative; }
+        .hero-info h1 { font-size: 2.8rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 12px; letter-spacing: -0.5px; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .hero-info p { color: #d0d0d0; font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .hero-btn { display: inline-block; padding: 14px 28px; background: var(--theme-color); color: #121212; font-weight: 800; text-decoration: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(121, 133, 84, 0.4); transition: all 0.3s; }
+        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(121, 133, 84, 0.6); filter: brightness(1.1); color: #000; }
+        
+        .hero-img-wrapper {
+            position: absolute;
+            right: 0; top: 0;
+            width: 55%; height: 100%;
+            z-index: 1;
+            display: none; 
+            /* Плавний градієнт-маска (ховає лівий край фото) */
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%);
+        }
+
+        .hero-showcase-img { 
+            width: 100%; height: 100%; 
+            object-fit: cover; /* Заповнює весь відведений блок */
+            object-position: center right; 
+        }
 
         /* ОСНОВНИЙ КОНТЕНТ */
         .main-content { padding: 40px 20px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1200px; }
@@ -139,7 +162,7 @@
         .stock-badge { position: absolute; top: 16px; right: 16px; background: rgba(10, 10, 12, 0.75); backdrop-filter: blur(10px); color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color); z-index: 2; }
         .stock-badge.empty { color: #ff4a4a; border-color: rgba(255, 74, 74, 0.3); background: rgba(255, 74, 74, 0.1); }
         .sale-badge { position: absolute; top: 16px; left: 16px; background: #ff4a4a; color: #fff; font-size: 0.8rem; font-weight: 800; padding: 6px 14px; border-radius: 8px; z-index: 2; box-shadow: 0 4px 12px rgba(255, 74, 74, 0.3); }
-        .new-badge { position: absolute; top: 50px; left: 16px; background: var(--theme-color); color: #fff; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; z-index: 2; }
+        .new-badge { position: absolute; top: 50px; left: 16px; background: var(--theme-color); color: #121212; font-size: 0.75rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; z-index: 2; }
 
         .merch-details { padding: 24px; display: flex; flex-direction: column; flex-grow: 1; }
         .merch-title { font-size: 1.35rem; font-weight: 700; color: #fff; margin-bottom: 12px; line-height: 1.3; }
@@ -165,14 +188,14 @@
         .qty-btn:disabled { color: #444; cursor: not-allowed; }
         .qty-val { flex: 1; text-align: center; font-weight: 700; font-size: 1rem; user-select: none; }
         
-        .buy-btn { width: 100%; padding: 14px; background: var(--theme-color); color: #ffffff; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; margin-top: auto; box-shadow: 0 6px 20px rgba(121, 133, 84, 0.2); }
-        .buy-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(121, 133, 84, 0.4); filter: brightness(1.1); }
+        .buy-btn { width: 100%; padding: 14px; background: var(--theme-color); color: #121212; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; margin-top: auto; box-shadow: 0 6px 20px rgba(121, 133, 84, 0.2); }
+        .buy-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(121, 133, 84, 0.4); filter: brightness(1.1); color: #000; }
         .buy-btn:disabled { background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); color: #444; cursor: not-allowed; box-shadow: none; }
 
         /* КОШИК ТА ФОРМА ЗАМОВЛЕННЯ */
         .cart-fab { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: var(--theme-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1500; }
         .cart-fab:hover { transform: scale(1.08) rotate(-5deg); filter: brightness(1.1); }
-        .cart-fab svg { width: 26px; height: 28px; fill: #fff; }
+        .cart-fab svg { width: 26px; height: 28px; fill: #121212; }
         .cart-badge { position: absolute; top: -2px; right: -2px; background: #ff4a4a; color: #fff; font-size: 0.75rem; font-weight: 800; width: 24px; height: 24px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 3px solid #121215; }
 
         .order-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
@@ -211,8 +234,8 @@
 
         .copy-btn { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-left: 8px; }
         
-        .confirm-btn { width: 100%; padding: 16px; background: var(--theme-color); color: #ffffff; border: none; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 24px rgba(121, 133, 84, 0.3); }
-        .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+        .confirm-btn { width: 100%; padding: 16px; background: var(--theme-color); color: #121212; border: none; border-radius: 12px; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 24px rgba(121, 133, 84, 0.3); }
+        .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); color:#000; }
 
         .toast-notification { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(120px); background: #121215; border: 1px solid var(--theme-color); color: #fff; padding: 16px 28px; border-radius: 14px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 4000; opacity: 0; transition: all 0.4s ease; display: flex; align-items: center; gap: 12px; }
         .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -226,18 +249,18 @@
         .footer { width: 100%; padding: 30px 12px; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: auto; border-top: 1px solid var(--border-color); background: rgba(10, 10, 12, 0.6); backdrop-filter: blur(10px); }
 
         /* ЧАТ */
-        .user-chat-modal { display: none; position: fixed; bottom: 30px; left: 30px; width: 340px; height: 450px; background: #121215; border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); z-index: 3000; flex-direction: column; overflow: hidden; }
-        .chat-header { background: rgba(255,255,255,0.02); padding: 16px 20px; font-size: 1rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .user-chat-modal { display: none; position: fixed; bottom: 30px; left: 30px; width: 340px; height: 450px; background: #121215; border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); z-index: 3000; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .chat-header { background: rgba(255,255,255,0.02); padding: 16px 20px; font-size: 1rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); color: #ffffff; }
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; scrollbar-width: none; }
         .chat-bubble { padding: 10px 14px; border-radius: 14px; max-width: 80%; word-wrap: break-word; line-height: 1.45; }
-        .chat-bubble.user { background: var(--theme-color); align-self: flex-end; border-bottom-right-radius: 2px; color: #ffffff; }
+        .chat-bubble.user { background: var(--theme-color); align-self: flex-end; border-bottom-right-radius: 2px; color: #121212; font-weight: bold; }
         .chat-bubble.admin { background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 2px; color: #ffffff; }
         .chat-bubble img { max-width: 100%; max-height: 150px; border-radius: 8px; display: block; margin-top: 4px; }
         
         .chat-input-area { padding: 16px; display: flex; gap: 10px; background: rgba(0,0,0,0.1); align-items: center; border-top: 1px solid var(--border-color); }
-        .chat-input-area input { flex: 1; height: 42px; padding: 0 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 30px; color: #ffffff; outline: none; font-size: 0.9rem; }
+        .chat-input-area input { flex: 1; height: 42px; padding: 0 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 30px; color: #ffffff; outline: none; font-size: 0.9rem; transition: border-color 0.2s; }
         .chat-input-area input:focus { border-color: rgba(121, 133, 84, 0.5); }
-        .chat-send-btn { width: 42px; height: 42px; background: #fff; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .chat-send-btn { width: 42px; height: 42px; background: #fff; border: none; color: #121212; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .chat-send-btn svg { width: 18px; height: 18px; fill: #000; margin-left: 2px; }
         .user-clip-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); color: #fff; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
@@ -245,9 +268,21 @@
 
         @media (max-width: 768px) { 
             .navbar-container { padding: 12px 15px; }
-            .hero-banner { flex-direction: column; text-align: center; padding: 30px 20px; margin-top: 90px; }
-            .hero-info h1 { font-size: 2rem; }
-            .hero-showcase-img { height: 140px; margin-top: 10px; }
+            .hero-banner { 
+                flex-direction: column; text-align: center; padding: 40px 20px; margin-top: 90px;
+                min-height: 320px; justify-content: center;
+            }
+            .hero-info h1 { font-size: 2.2rem; }
+            
+            /* На мобілці фото стає напівпрозорим фоном під текстом */
+            .hero-img-wrapper { 
+                width: 100%; left: 0; right: 0; top: 0; bottom: 0;
+                opacity: 0.25; z-index: 0;
+                -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40%, transparent 100%);
+                mask-image: linear-gradient(to bottom, transparent 0%, black 40%, transparent 100%);
+            }
+            .hero-showcase-img { object-position: center; }
+            
             .shop-grid { grid-template-columns: 1fr; gap: 24px; }
             .user-chat-modal { width: calc(100% - 32px); left: 16px; bottom: 16px; height: 400px; } 
             .cart-fab { bottom: 20px; right: 20px; width: 58px; height: 55px; }
@@ -296,7 +331,9 @@
             <p data-lang="en">Modern military design. Premium quality. By purchasing our gear, you directly fund and support SVAROG TEAM special unit missions.</p>
             <a href="#catalog-section" class="hero-btn"><span data-lang="ua">Переглянути каталог</span><span data-lang="en">View Catalog</span></a>
         </div>
-        <img id="dynamic-hero-img" src="" alt="Showcase" class="hero-showcase-img">
+        <div class="hero-img-wrapper" id="dynamic-hero-wrapper">
+            <img id="dynamic-hero-img" src="" alt="Showcase" class="hero-showcase-img">
+        </div>
     </div>
 
     <div class="main-content">
@@ -393,8 +430,7 @@
                         <input type="hidden" id="selected-payment-method" value="" required>
                     </div>
                     
-                    <div id="bank-payment-info" style="display: none; margin-bottom: 15px; padding: 12px; background: rgba(121, 133, 84, 0.1); border: 1px solid rgba(121, 133, 84, 0.3); border-radius: 6px; font-size: 0.9rem;">
-                    </div>
+                    <div id="bank-payment-info" style="display: none; margin-bottom: 15px; padding: 12px; background: rgba(121, 133, 84, 0.1); border: 1px solid rgba(121, 133, 84, 0.3); border-radius: 6px; font-size: 0.9rem;"></div>
 
                     <button type="submit" class="confirm-btn" id="confirm-order-btn">
                         <span data-lang="ua">Оформити замовлення</span>
@@ -471,7 +507,6 @@
             document.getElementById('image-lightbox').style.display = 'none';
         }
 
-        // --- ДИНАМІЧНИЙ ПЕРЕКЛАДАЧ (GOOGLE TRANSLATE API) ---
         async function autoTranslateText(text, targetLang) {
             if (!text || text.trim() === '') return text;
             if (targetLang === 'ua') return text; 
@@ -521,9 +556,6 @@
             document.title = lang === 'ua' ? "SVAROG TEAM | Магазин" : 'SVAROG TEAM | Shop';
             
             applyTranslationsToDOM(lang);
-            renderShopGrid(); 
-            updateCartUI();   
-            listenToActiveOrderStatus();
         }
 
         let dynamicBankUrl = "https://send.monobank.ua/YOUR_JAR";
@@ -540,11 +572,13 @@
             updatePaymentDetailsUI();
         });
 
+        // Завантаження фото банера з плавним з'явленням
         db.collection("config").doc("shop").onSnapshot(doc => {
             if(doc.exists && doc.data().heroImage) {
                 const img = document.getElementById('dynamic-hero-img');
+                const wrapper = document.getElementById('dynamic-hero-wrapper');
                 img.src = doc.data().heroImage;
-                img.style.display = 'block';
+                wrapper.style.display = 'block';
             }
         });
 
@@ -610,7 +644,6 @@
         let cartLastUpdated = localStorage.getItem('svarog_shop_cart_time') || Date.now();
         let currentPromo = null; 
         let activeOrderUnsubscribe = null;
-        
         window.selectedVariants = {}; 
 
         function listenToActiveOrderStatus() {
@@ -619,10 +652,7 @@
             const info = document.getElementById('active-order-info');
             const lang = localStorage.getItem('selectedLang') || 'ua';
 
-            if (!activeOrderId) {
-                box.style.display = 'none'; return;
-            }
-
+            if (!activeOrderId) { box.style.display = 'none'; return; }
             if (activeOrderUnsubscribe) activeOrderUnsubscribe();
 
             activeOrderUnsubscribe = db.collection('orders').doc(activeOrderId).onSnapshot(doc => {
@@ -630,10 +660,7 @@
                     const data = doc.data();
                     let status = data.status || 'new';
 
-                    if (status === 'archived') {
-                        box.style.display = 'none'; return;
-                    }
-                    
+                    if (status === 'archived') { box.style.display = 'none'; return; }
                     if (status === 'cancelled') {
                         box.style.display = 'block'; 
                         info.innerHTML = `<span style="color: #ff4a4a;"><b>${lang === 'ua' ? 'Замовлення скасовано адміністратором ✖' : 'Order cancelled by administrator ✖'}</b><br>${lang === 'ua' ? 'Будь ласка, зверніться в чат підтримки для уточнення деталей.' : 'Please contact support chat for details.'}</span>`;
@@ -663,10 +690,7 @@
                 const now = Date.now();
                 const diffHours = (now - parseInt(cartLastUpdated)) / (1000 * 60 * 60);
                 if(diffHours >= 1) {
-                    shoppingCart = [];
-                    currentPromo = null; 
-                    saveCart();
-                    updateCartUI();
+                    shoppingCart = []; currentPromo = null; saveCart(); updateCartUI();
                     showToast(localStorage.getItem('selectedLang') === 'en' ? "Your cart has expired." : "Час дії кошика вийшов. Він був очищений.");
                 }
             }
@@ -676,7 +700,6 @@
         db.collection("config").doc("shop").onSnapshot(doc => {
             if (doc.exists) {
                 if(doc.data().active === false) window.location.href = 'index.html';
-                
                 if(doc.data().categories && doc.data().categories.length > 0) {
                     globalCategories = [{name: 'Всі товари'}].concat(doc.data().categories.map(c => typeof c === 'string' ? {name: c} : c));
                 } else {
@@ -693,7 +716,6 @@
             globalMerchList.sort((a, b) => {
                 let orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER;
                 let orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER;
-                
                 if (orderA === orderB) {
                     let timeA = a.timestamp ? a.timestamp.toMillis() : 0;
                     let timeB = b.timestamp ? b.timestamp.toMillis() : 0;
@@ -701,15 +723,22 @@
                 }
                 return orderA - orderB;
             });
-
-            checkCartExpiry();
-            renderShopGrid();
-            updateCartUI(); 
+            checkCartExpiry(); renderShopGrid(); updateCartUI(); 
         }, err => console.error("Помилка завантаження товарів:", err));
 
+        // ВДОСКОНАЛЕНИЙ РЕНДЕР КАТЕГОРІЙ БЕЗ БЛИМАННЯ ПЕРЕКЛАДУ
         function renderCategoryBar() {
             const bar = document.getElementById('category-bar');
-            bar.innerHTML = "";
+            
+            // Якщо категорії вже згенеровані, ми просто міняємо клас active
+            if(bar.innerHTML.trim() !== '') {
+                Array.from(bar.children).forEach(btn => {
+                    if(btn.dataset.cat === activeCategory) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                });
+                return;
+            }
+
             const lang = localStorage.getItem('selectedLang') || 'ua';
             
             globalCategories.forEach(cat => {
@@ -717,11 +746,16 @@
                 let catIcon = (typeof cat === 'object' && cat.icon) ? `<img src="${cat.icon}" class="cat-icon">` : '';
                 
                 let btn = document.createElement('button');
-                btn.className = `category-btn ${activeCategory === catName ? 'active' : ''} auto-translate`;
-                btn.innerHTML = `${catIcon}${catName}`;
+                btn.className = `category-btn ${activeCategory === catName ? 'active' : ''}`;
+                btn.dataset.cat = catName;
+                
+                // Текст винесено в окремий span, щоб перекладач не ламав іконку
+                btn.innerHTML = `${catIcon}<span class="auto-translate">${catName}</span>`;
+                
                 btn.onclick = () => {
                     activeCategory = catName;
-                    renderCategoryBar();
+                    Array.from(bar.children).forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
                     renderShopGrid();
                 };
                 bar.appendChild(btn);
@@ -808,15 +842,14 @@
                 renderItemsToContainer(regularItemsList, grid, lang);
             }
 
+            // Запускаємо переклад згенерованих товарів
             applyTranslationsToDOM(lang);
         }
 
         function renderItemsToContainer(itemsList, container, lang) {
             itemsList.forEach(item => {
                 let isVariant = item.variants && item.variants.length > 0;
-                if(isVariant && window.selectedVariants[item.id] === undefined) {
-                    window.selectedVariants[item.id] = 0;
-                }
+                if(isVariant && window.selectedVariants[item.id] === undefined) { window.selectedVariants[item.id] = 0; }
                 let activeVarIdx = window.selectedVariants[item.id] || 0;
                 
                 let currentDesc = isVariant ? (item.variants[activeVarIdx].description || item.description) : item.description;
@@ -824,31 +857,20 @@
                 let currentStockObj = isVariant ? (item.variants[activeVarIdx].stock || item.stock) : item.stock;
 
                 let currentImagesArray = [];
-                if (isVariant) {
-                    currentImagesArray = item.variants[activeVarIdx].images || (item.variants[activeVarIdx].image ? [item.variants[activeVarIdx].image] : []);
-                } else {
-                    currentImagesArray = item.images || (item.image ? [item.image] : []);
-                }
+                if (isVariant) { currentImagesArray = item.variants[activeVarIdx].images || (item.variants[activeVarIdx].image ? [item.variants[activeVarIdx].image] : []); } 
+                else { currentImagesArray = item.images || (item.image ? [item.image] : []); }
 
-                let galleryHtml = '';
-                let indicatorsHtml = '';
+                let galleryHtml = ''; let indicatorsHtml = '';
                 if (currentImagesArray.length > 0) {
                     galleryHtml = `<div class="merch-gallery" id="gallery-${item.id}">`;
-                    currentImagesArray.forEach(imgSrc => {
-                        galleryHtml += `<img src="${imgSrc}" onclick="openLightbox('${imgSrc}')" title="${lang==='ua'?'Клікніть для збільшення':'Click to zoom'}">`;
-                    });
+                    currentImagesArray.forEach(imgSrc => { galleryHtml += `<img src="${imgSrc}" onclick="openLightbox('${imgSrc}')">`; });
                     galleryHtml += `</div>`;
-                    
                     if (currentImagesArray.length > 1) {
                         indicatorsHtml = `<div class="gallery-indicators">`;
-                        currentImagesArray.forEach((_, idx) => {
-                            indicatorsHtml += `<div class="dot ${idx === 0 ? 'active' : ''}"></div>`;
-                        });
+                        currentImagesArray.forEach((_, idx) => { indicatorsHtml += `<div class="dot ${idx === 0 ? 'active' : ''}"></div>`; });
                         indicatorsHtml += `</div>`;
                     }
-                } else {
-                    galleryHtml = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#666;">No Image</div>`;
-                }
+                } else { galleryHtml = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#666;">No Image</div>`; }
 
                 let variantsHtml = '';
                 if (isVariant) {
@@ -861,30 +883,15 @@
                     variantsHtml += '</div>';
                 }
                 
-                let totalStock = 0;
-                if (typeof currentStockObj === 'object' && currentStockObj !== null) {
-                    totalStock = Object.values(currentStockObj).reduce((a, b) => a + parseInt(b || 0), 0);
-                } else {
-                    totalStock = parseInt(currentStockObj || 0);
-                }
-
+                let totalStock = typeof currentStockObj === 'object' && currentStockObj !== null ? Object.values(currentStockObj).reduce((a, b) => a + parseInt(b || 0), 0) : parseInt(currentStockObj || 0);
                 let isOutOfStock = !item.isPreorder && totalStock <= 0;
                 
-                let stockBadge = '';
-                if (item.isPreorder) {
-                    stockBadge = `<div class="stock-badge">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>`;
-                } else if (isOutOfStock) {
-                    stockBadge = `<div class="stock-badge empty">${lang==='ua'?'Немає в наявності':'Out of stock'}</div>`;
-                }
-
-                let hasDiscount = item.discountPrice && item.discountPrice < item.price;
-                let priceHtml = hasDiscount 
-                    ? `<span class="old-price">${item.price} ₴</span> <span class="merch-price">${item.discountPrice} ₴</span>`
-                    : `<span class="merch-price">${item.price} ₴</span>`;
+                let stockBadge = item.isPreorder ? `<div class="stock-badge">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>` : (isOutOfStock ? `<div class="stock-badge empty">${lang==='ua'?'Немає в наявності':'Out of stock'}</div>` : '');
                 
+                let hasDiscount = item.discountPrice && item.discountPrice < item.price;
+                let priceHtml = hasDiscount ? `<span class="old-price">${item.price} ₴</span> <span class="merch-price">${item.discountPrice} ₴</span>` : `<span class="merch-price">${item.price} ₴</span>`;
                 let saleBadgeHtml = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
                 
-                // КЛАС auto-translate для опису
                 let descHtml = currentDesc ? `<div class="merch-desc auto-translate">${currentDesc}</div>` : '';
                 
                 let sizeSelectHtml = '';
@@ -894,36 +901,23 @@
                 if(!isUniversalSize) {
                     let firstSize = currentSizes[0];
                     initialMaxStock = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj[firstSize] || 0) : 0);
-                    
                     sizeSelectHtml = `<select id="size-${item.id}" class="merch-select" onchange="updateQtyMax('${item.id}')">` + 
                         currentSizes.map(s => {
                             let sStock = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj[s] || 0) : 0);
                             let disabledAttr = (sStock <= 0 && !item.isPreorder) ? 'disabled' : '';
                             let outOfStockLabel = (sStock <= 0 && !item.isPreorder) ? (lang === 'ua' ? ' (Немає)' : ' (Out of stock)') : '';
                             return `<option value="${s}" ${disabledAttr}>${lang==='ua'?'Розмір:':'Size:'} ${s}${outOfStockLabel}</option>`;
-                        }).join('') + 
-                    `</select>`;
+                        }).join('') + `</select>`;
                 } else {
                     initialMaxStock = item.isPreorder ? 99 : ((typeof currentStockObj === 'object' && currentStockObj) ? parseInt(currentStockObj["Універсальний"] || 0) : totalStock);
-                    sizeSelectHtml = ''; 
                 }
 
-                let buyBtnHtml = '';
-                if (isOutOfStock) {
-                    buyBtnHtml = `<button class="buy-btn" disabled>${lang==='ua'?'Розпродано':'Sold out'}</button>`;
-                } else if (item.isPreorder) {
-                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')" style="background:#555; color:#fff; box-shadow:none;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>`;
-                } else {
-                    buyBtnHtml = `<button class="buy-btn" onclick="addToCart('${item.id}')">${lang==='ua'?'Додати в кошик 🛒':'Add to cart 🛒'}</button>`;
-                }
+                let buyBtnHtml = isOutOfStock ? `<button class="buy-btn" disabled>${lang==='ua'?'Розпродано':'Sold out'}</button>` : (item.isPreorder ? `<button class="buy-btn" onclick="addToCart('${item.id}')" style="background:#555; color:#fff; box-shadow:none;">${lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳'}</button>` : `<button class="buy-btn" onclick="addToCart('${item.id}')">${lang==='ua'?'Додати в кошик 🛒':'Add to cart 🛒'}</button>`);
 
                 container.innerHTML += `
                     <div class="merch-card">
                         <div class="merch-img-box">
-                            ${galleryHtml}
-                            ${indicatorsHtml}
-                            ${stockBadge}
-                            ${saleBadgeHtml}
+                            ${galleryHtml} ${indicatorsHtml} ${stockBadge} ${saleBadgeHtml}
                         </div>
                         <div class="merch-details">
                             <div class="cat-tag auto-translate">${item.category || 'Без категорії'}</div>
@@ -952,9 +946,7 @@
                         let scrollLeft = this.scrollLeft;
                         let width = this.clientWidth;
                         let activeIndex = Math.round(scrollLeft / width);
-                        dots.forEach((dot, idx) => {
-                            dot.classList.toggle('active', idx === activeIndex);
-                        });
+                        dots.forEach((dot, idx) => { dot.classList.toggle('active', idx === activeIndex); });
                     });
                 });
             }, 100);
@@ -989,9 +981,7 @@
             let actualPrice = (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price;
             
             let existingItemIndex = shoppingCart.findIndex(cartItem => 
-                cartItem.merchId === item.id && 
-                cartItem.size === size && 
-                cartItem.color === currentColorName
+                cartItem.merchId === item.id && cartItem.size === size && cartItem.color === currentColorName
             );
             
             let finalTitle = item.isPreorder ? `[ПЕРЕДЗАМОВЛЕННЯ] ${item.title}` : item.title;
@@ -1005,23 +995,14 @@
                 shoppingCart[existingItemIndex].totalPrice = shoppingCart[existingItemIndex].quantity * actualPrice;
             } else {
                 shoppingCart.push({
-                    cartId: Date.now().toString(), 
-                    merchId: item.id,
-                    merchTitle: finalTitle,
-                    image: currentImage,
-                    price: actualPrice,
-                    size: size,
-                    color: currentColorName,
-                    quantity: qty,
-                    totalPrice: actualPrice * qty,
+                    cartId: Date.now().toString(), merchId: item.id, merchTitle: finalTitle,
+                    image: currentImage, price: actualPrice, size: size,
+                    color: currentColorName, quantity: qty, totalPrice: actualPrice * qty,
                     isPreorder: item.isPreorder || false
                 });
             }
 
-            cartLastUpdated = Date.now();
-            saveCart();
-            updateCartUI();
-            
+            cartLastUpdated = Date.now(); saveCart(); updateCartUI();
             const lang = localStorage.getItem('selectedLang') || 'ua';
             showToast(lang === 'ua' ? "Товар додано в кошик 🛒" : "Item added to cart 🛒");
         }
@@ -1029,51 +1010,28 @@
         function removeFromCart(cartId) {
             shoppingCart = shoppingCart.filter(item => item.cartId !== cartId);
             cartLastUpdated = Date.now();
-            
             if(shoppingCart.length === 0) {
-                currentPromo = null; 
-                document.getElementById('checkout-form').style.display = 'none';
+                currentPromo = null; document.getElementById('checkout-form').style.display = 'none';
                 document.getElementById('cart-total-section').style.display = 'none';
                 document.getElementById('promo-block').style.display = 'none';
-                document.getElementById('promo-code-input').value = "";
-                document.getElementById('promo-message').innerText = "";
+                document.getElementById('promo-code-input').value = ""; document.getElementById('promo-message').innerText = "";
             }
-            
-            saveCart();
-            updateCartUI();
+            saveCart(); updateCartUI();
         }
 
-        function saveCart() {
-            localStorage.setItem('svarog_shop_cart', JSON.stringify(shoppingCart));
-            localStorage.setItem('svarog_shop_cart_time', cartLastUpdated);
-        }
+        function saveCart() { localStorage.setItem('svarog_shop_cart', JSON.stringify(shoppingCart)); localStorage.setItem('svarog_shop_cart_time', cartLastUpdated); }
 
         function updateCartUI() {
             const badge = document.getElementById('cart-badge-count');
             let totalItems = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
             badge.innerText = totalItems;
-
-            if(totalItems > 0) {
-                badge.style.display = 'flex';
-                document.querySelector('.cart-fab').style.transform = 'scale(1)';
-            } else {
-                badge.style.display = 'none';
-            }
-
-            if(document.getElementById('order-modal-wrapper').style.display === 'flex') {
-                renderCartModalContent();
-            }
+            if(totalItems > 0) { badge.style.display = 'flex'; document.querySelector('.cart-fab').style.transform = 'scale(1)'; } 
+            else { badge.style.display = 'none'; }
+            if(document.getElementById('order-modal-wrapper').style.display === 'flex') { renderCartModalContent(); }
         }
 
-        function openCartModal() {
-            document.getElementById('order-modal-wrapper').style.display = 'flex';
-            renderCartModalContent();
-            listenToActiveOrderStatus(); 
-        }
-
-        function closeOrderModal() {
-            document.getElementById('order-modal-wrapper').style.display = 'none';
-        }
+        function openCartModal() { document.getElementById('order-modal-wrapper').style.display = 'flex'; renderCartModalContent(); listenToActiveOrderStatus(); }
+        function closeOrderModal() { document.getElementById('order-modal-wrapper').style.display = 'none'; }
 
         async function applyPromo() {
             const input = document.getElementById('promo-code-input');
@@ -1081,11 +1039,7 @@
             const code = input.value.trim().toUpperCase();
             const lang = localStorage.getItem('selectedLang') || 'ua';
 
-            if(!code) {
-                msg.style.color = '#ff4a4a';
-                msg.innerText = lang === 'ua' ? 'Введіть код!' : 'Enter a code!';
-                return;
-            }
+            if(!code) { msg.style.color = '#ff4a4a'; msg.innerText = lang === 'ua' ? 'Введіть код!' : 'Enter a code!'; return; }
 
             try {
                 const doc = await db.collection('promocodes').doc(code).get();
@@ -1093,29 +1047,15 @@
                     let data = doc.data();
                     let safeCodeName = data.code || doc.id || "ПРОМОКОД";
                     
-                    currentPromo = { 
-                        code: safeCodeName, 
-                        type: data.type || (data.isCertificate ? 'certificate' : 'promo'),
-                        discount: data.discount || 0,
-                        fiatValue: data.fiatValue || 0
-                    }; 
+                    currentPromo = { code: safeCodeName, type: data.type || (data.isCertificate ? 'certificate' : 'promo'), discount: data.discount || 0, fiatValue: data.fiatValue || 0 }; 
                     msg.style.color = '#777777';
-                    
-                    if (currentPromo.type === 'certificate') {
-                        msg.innerText = lang === 'ua' ? `Сертифікат застосовано! Номінал ${currentPromo.fiatValue} ₴` : `Certificate applied! Value ${currentPromo.fiatValue} ₴`;
-                    } else {
-                        msg.innerText = lang === 'ua' ? `Код застосовано! Знижка ${currentPromo.discount}%` : `Code applied! Discount ${currentPromo.discount}%`;
-                    }
+                    if (currentPromo.type === 'certificate') { msg.innerText = lang === 'ua' ? `Сертифікат застосовано! Номінал ${currentPromo.fiatValue} ₴` : `Certificate applied! Value ${currentPromo.fiatValue} ₴`; } 
+                    else { msg.innerText = lang === 'ua' ? `Код застосовано! Знижка ${currentPromo.discount}%` : `Code applied! Discount ${currentPromo.discount}%`; }
                     renderCartModalContent(); 
                 } else {
-                    currentPromo = null;
-                    msg.style.color = '#ff4a4a';
-                    msg.innerText = lang === 'ua' ? 'Недійсний або неактивний код!' : 'Invalid or inactive code!';
-                    renderCartModalContent(); 
+                    currentPromo = null; msg.style.color = '#ff4a4a'; msg.innerText = lang === 'ua' ? 'Недійсний або неактивний код!' : 'Invalid or inactive code!'; renderCartModalContent(); 
                 }
-            } catch(e) {
-                console.error(e);
-            }
+            } catch(e) { console.error(e); }
         }
 
         function renderCartModalContent() {
@@ -1132,10 +1072,7 @@
 
             if(shoppingCart.length === 0) {
                 container.innerHTML = `<div style="text-align:center; padding: 40px 0; color:#888;">${lang==='ua'?'Ваш кошик порожній 😔':'Your cart is empty 😔'}</div>`;
-                totalSection.style.display = 'none';
-                formSection.style.display = 'none';
-                promoSection.style.display = 'none';
-                return;
+                totalSection.style.display = 'none'; formSection.style.display = 'none'; promoSection.style.display = 'none'; return;
             }
 
             let baseTotalSum = 0;
@@ -1143,12 +1080,8 @@
             shoppingCart.forEach(item => {
                 baseTotalSum += item.totalPrice;
                 let imgHtml = item.image ? `<img src="${item.image}" class="cart-item-img">` : `<div class="cart-item-img" style="display:flex; justify-content:center; align-items:center; font-size:0.7rem;">No IMG</div>`;
-                
                 let sizeLabelMeta = item.size === 'Універсальний' ? '' : `${lang==='ua'?'Розмір':'Size'}: ${item.size} | `;
-                
-                let titleHtml = item.merchTitle.includes('[ПЕРЕДЗАМОВЛЕННЯ]') 
-                    ? item.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#777777;">[ПЕРЕДЗАМОВЛЕННЯ]</span>')
-                    : item.merchTitle;
+                let titleHtml = item.merchTitle.includes('[ПЕРЕДЗАМОВЛЕННЯ]') ? item.merchTitle.replace('[ПЕРЕДЗАМОВЛЕННЯ]', '<span style="color:#777777;">[ПЕРЕДЗАМОВЛЕННЯ]</span>') : item.merchTitle;
 
                 container.innerHTML += `
                     <div class="cart-item">
@@ -1159,8 +1092,7 @@
                             <div class="cart-item-price">${item.totalPrice} ₴</div>
                         </div>
                         <button class="cart-item-remove" onclick="removeFromCart('${item.cartId}')">✖</button>
-                    </div>
-                `;
+                    </div>`;
             });
 
             let finalSum = baseTotalSum;
@@ -1173,32 +1105,18 @@
                     discountAmount = baseTotalSum * (currentPromo.discount / 100);
                     discountSumEl.innerText = `Знижка (${currentPromo.discount}%): -${Math.round(discountAmount)} ₴`;
                 }
-                
                 finalSum = baseTotalSum - discountAmount;
                 if (finalSum < 0) finalSum = 0; 
-                
                 discountSumEl.style.display = 'block';
-            } else {
-                discountSumEl.style.display = 'none';
-            }
+            } else { discountSumEl.style.display = 'none'; }
 
             totalSumEl.innerText = `${Math.round(finalSum)} ₴`;
+            promoSection.style.display = 'block'; totalSection.style.display = 'flex'; formSection.style.display = 'block';
             
-            promoSection.style.display = 'block';
-            totalSection.style.display = 'flex';
-            formSection.style.display = 'block';
-
             applyTranslationsToDOM(lang);
         }
 
-        function getBase64Image(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
+        function getBase64Image(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); reader.readAsDataURL(file); }); }
 
         async function submitOrder(e) {
             e.preventDefault();
@@ -1210,36 +1128,27 @@
             const paymentMethod = document.getElementById('selected-payment-method').value;
             const fileInput = document.getElementById('receipt-file');
             
-            if(!paymentMethod) {
-                alert("Будь ласка, оберіть спосіб оплати!"); return;
-            }
+            if(!paymentMethod) { alert("Будь ласка, оберіть спосіб оплати!"); return; }
 
             const lang = localStorage.getItem('selectedLang') || 'ua';
             const btn = document.getElementById('confirm-order-btn');
             
-            btn.innerText = "Обробка... / Processing...";
-            btn.disabled = true;
+            btn.innerText = "Обробка... / Processing..."; btn.disabled = true;
 
             let baseTotal = shoppingCart.reduce((sum, item) => sum + item.totalPrice, 0);
             let finalSum = baseTotal;
             if(currentPromo) {
-                if(currentPromo.type === 'certificate') {
-                    finalSum = baseTotal - currentPromo.fiatValue;
-                } else {
-                    finalSum = baseTotal - (baseTotal * (currentPromo.discount / 100));
-                }
+                if(currentPromo.type === 'certificate') { finalSum = baseTotal - currentPromo.fiatValue; } 
+                else { finalSum = baseTotal - (baseTotal * (currentPromo.discount / 100)); }
                 if (finalSum < 0) finalSum = 0;
             }
             finalSum = Math.round(finalSum);
 
             let paymentMethodText = paymentMethod === 'bank' ? "Оплата на Банку" : (paymentMethod === 'card' ? "Переказ на карту" : "Накладений платіж");
-            let newlyCreatedOrderId = "";
-            let base64Receipt = null;
+            let newlyCreatedOrderId = ""; let base64Receipt = null;
 
             try {
-                if (fileInput && fileInput.files.length > 0) {
-                    base64Receipt = await getBase64Image(fileInput.files[0]);
-                }
+                if (fileInput && fileInput.files.length > 0) { base64Receipt = await getBase64Image(fileInput.files[0]); }
 
                 await db.runTransaction(async (transaction) => {
                     let merchRefsAndData = [];
@@ -1251,268 +1160,125 @@
                         merchRefsAndData.push({ ref: ref, data: doc.data(), cartItem: item });
                     }
 
-                    let promoDocRef = null;
-                    let pDocData = null;
+                    let promoDocRef = null; let pDocData = null;
                     if (currentPromo && currentPromo.code) {
                         promoDocRef = db.collection('promocodes').doc(currentPromo.code);
                         let pDoc = await transaction.get(promoDocRef);
-                        if (pDoc.exists) {
-                            pDocData = pDoc.data();
-                            if (pDocData.active === false) {
-                                throw new Error(lang === 'ua' ? "Цей код вже був використаний!" : "This code has already been used!");
-                            }
-                        }
+                        if (pDoc.exists) { pDocData = pDoc.data(); if (pDocData.active === false) { throw new Error(lang === 'ua' ? "Цей код вже був використаний!" : "This code has already been used!"); } }
                     }
 
                     for(let obj of merchRefsAndData) {
                         if (!obj.cartItem.isPreorder) {
                             let isVariant = obj.data.variants && obj.data.variants.length > 0;
                             let variantIndex = -1;
-                            
-                            if(isVariant && obj.cartItem.color) {
-                                variantIndex = obj.data.variants.findIndex(v => v.colorName === obj.cartItem.color);
-                            }
+                            if(isVariant && obj.cartItem.color) { variantIndex = obj.data.variants.findIndex(v => v.colorName === obj.cartItem.color); }
 
                             let currentStockObj = {};
-                            if (isVariant && variantIndex > -1) {
-                                currentStockObj = typeof obj.data.variants[variantIndex].stock === 'object' ? { ...obj.data.variants[variantIndex].stock } : {};
-                            } else {
-                                currentStockObj = typeof obj.data.stock === 'object' ? { ...obj.data.stock } : {};
-                            }
+                            if (isVariant && variantIndex > -1) { currentStockObj = typeof obj.data.variants[variantIndex].stock === 'object' ? { ...obj.data.variants[variantIndex].stock } : {}; } 
+                            else { currentStockObj = typeof obj.data.stock === 'object' ? { ...obj.data.stock } : {}; }
 
                             let sizeKey = obj.cartItem.size;
                             let currentStockForSize = parseInt(currentStockObj[sizeKey] || 0);
                             
-                            if (currentStockForSize < obj.cartItem.quantity) {
-                                throw new Error(lang==='ua' ? `Недостатньо товару "${obj.cartItem.merchTitle}" на складі!` : `Not enough stock for ${obj.cartItem.merchTitle}!`);
-                            }
+                            if (currentStockForSize < obj.cartItem.quantity) { throw new Error(lang==='ua' ? `Недостатньо товару "${obj.cartItem.merchTitle}" на складі!` : `Not enough stock for ${obj.cartItem.merchTitle}!`); }
                             currentStockObj[sizeKey] = currentStockForSize - obj.cartItem.quantity;
                             
-                            if (isVariant && variantIndex > -1) {
-                                obj.data.variants[variantIndex].stock = currentStockObj;
-                            } else {
-                                obj.data.stock = currentStockObj;
-                            }
+                            if (isVariant && variantIndex > -1) { obj.data.variants[variantIndex].stock = currentStockObj; } 
+                            else { obj.data.stock = currentStockObj; }
                         }
                     }
 
                     for(let obj of merchRefsAndData) {
-                        if (!obj.cartItem.isPreorder) {
-                            transaction.update(obj.ref, { 
-                                stock: obj.data.stock,
-                                variants: obj.data.variants || []
-                            });
-                        }
+                        if (!obj.cartItem.isPreorder) { transaction.update(obj.ref, { stock: obj.data.stock, variants: obj.data.variants || [] }); }
                     }
 
-                    if (promoDocRef && pDocData && pDocData.isSingleUse === true) {
-                        transaction.update(promoDocRef, { active: false });
-                    }
+                    if (promoDocRef && pDocData && pDocData.isSingleUse === true) { transaction.update(promoDocRef, { active: false }); }
 
-                    const orderRef = db.collection('orders').doc();
-                    newlyCreatedOrderId = orderRef.id; 
+                    const orderRef = db.collection('orders').doc(); newlyCreatedOrderId = orderRef.id; 
                     let orderItemsString = shoppingCart.map(i => `${i.merchTitle} (Розмір: ${i.size}, К-сть: ${i.quantity})`).join('\n');
-
                     let safePromoCode = (currentPromo && currentPromo.code) ? String(currentPromo.code) : "Не застосовано";
 
                     transaction.set(orderRef, {
-                        name: name,
-                        phone: phone,
-                        address: address,
-                        items: shoppingCart, 
-                        merchTitle: "Комплексне замовлення", 
-                        size: "Див. деталі", 
-                        quantity: shoppingCart.reduce((s, i) => s + i.quantity, 0),
-                        orderTextDetails: orderItemsString,
-                        totalPrice: finalSum, 
-                        promoCode: safePromoCode,
-                        paymentMethod: paymentMethodText,
-                        paymentProof: base64Receipt, 
-                        status: 'new', 
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        name: name, phone: phone, address: address, items: shoppingCart, 
+                        merchTitle: "Комплексне замовлення", size: "Див. деталі", quantity: shoppingCart.reduce((s, i) => s + i.quantity, 0),
+                        orderTextDetails: orderItemsString, totalPrice: finalSum, promoCode: safePromoCode, paymentMethod: paymentMethodText,
+                        paymentProof: base64Receipt, status: 'new', timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
                     });
                 });
 
                 localStorage.setItem('svarog_active_order_id', newlyCreatedOrderId);
 
-                // ЗАМІНИ НА СВІЙ ТОКЕН І CHAT ID ВІД ТЕЛЕГРАМУ
                 const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; 
                 const chatId = '647245223';
                 
                 let tgPromoText = '';
                 if(currentPromo) {
-                    if (currentPromo.type === 'certificate') {
-                        tgPromoText = `🎁 <b>Сертифікат:</b> ${currentPromo.code} (-${currentPromo.fiatValue} ₴)\n`;
-                    } else {
-                        tgPromoText = `🎟 <b>Промокод:</b> ${currentPromo.code} (-${currentPromo.discount}%)\n`;
-                    }
+                    if (currentPromo.type === 'certificate') { tgPromoText = `🎁 <b>Сертифікат:</b> ${currentPromo.code} (-${currentPromo.fiatValue} ₴)\n`; } 
+                    else { tgPromoText = `🎟 <b>Промокод:</b> ${currentPromo.code} (-${currentPromo.discount}%)\n`; }
                 }
 
                 let itemsListFormatted = shoppingCart.map(i => `• ${i.merchTitle} [${i.size}] — ${i.quantity} шт. | ${i.totalPrice} ₴`).join('\n');
                 
-                let tgMessage = `📦 <b>НОВЕ ЗАМОВЛЕННЯ!</b>\n\n` +
-                                `👤 <b>Клієнт:</b> ${name}\n` +
-                                `📞 <b>Телефон:</b> ${phone}\n` +
-                                `📍 <b>Адреса:</b> ${address}\n` +
-                                `💳 <b>Метод оплати:</b> ${paymentMethodText}\n` +
-                                `⏳ <b>Статус:</b> Нове замовлення\n` +
-                                tgPromoText +
-                                `\n🛒 <b>Склад замовлення:</b>\n${itemsListFormatted}\n\n` +
-                                `💰 <b>До сплати:</b> ${finalSum} ₴`;
+                let tgMessage = `📦 <b>НОВЕ ЗАМОВЛЕННЯ!</b>\n\n👤 <b>Клієнт:</b> ${name}\n📞 <b>Телефон:</b> ${phone}\n📍 <b>Адреса:</b> ${address}\n💳 <b>Метод оплати:</b> ${paymentMethodText}\n⏳ <b>Статус:</b> Нове замовлення\n${tgPromoText}\n🛒 <b>Склад замовлення:</b>\n${itemsListFormatted}\n\n💰 <b>До сплати:</b> ${finalSum} ₴`;
 
                 const hasPhoto = (paymentMethod === 'bank' || paymentMethod === 'card') && fileInput && fileInput.files.length > 0;
 
                 if (hasPhoto) {
                     let formData = new FormData();
-                    formData.append('chat_id', chatId);
-                    formData.append('photo', fileInput.files[0]);
-                    formData.append('caption', tgMessage);
-                    formData.append('parse_mode', 'HTML');
-
-                    fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
-                        method: 'POST',
-                        body: formData
-                    }).catch(err => console.error("Помилка Telegram:", err));
+                    formData.append('chat_id', chatId); formData.append('photo', fileInput.files[0]); formData.append('caption', tgMessage); formData.append('parse_mode', 'HTML');
+                    fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, { method: 'POST', body: formData }).catch(err => console.error("Помилка Telegram:", err));
                 } else {
-                    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ chat_id: chatId, text: tgMessage, parse_mode: 'HTML' })
-                    });
+                    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chatId, text: tgMessage, parse_mode: 'HTML' }) });
                 }
 
-                showToast(
-                    lang === 'ua' 
-                        ? 'Замовлення прийнято! Статус замовлення можна перевірити в меню "Статус замовлення" або внизу сторінки. 📦' 
-                        : 'Order accepted! You can check your order status in the "Order Status" menu or at the bottom of the page. 📦', 
-                    6000
-                );
+                showToast(lang === 'ua' ? 'Замовлення прийнято! Статус замовлення можна перевірити в меню "Статус замовлення" або внизу сторінки. 📦' : 'Order accepted! You can check your order status in the "Order Status" menu or at the bottom of the page. 📦', 6000);
                 
-                shoppingCart = [];
-                currentPromo = null; 
-                document.getElementById('promo-code-input').value = "";
-                document.getElementById('promo-message').innerText = "";
-                document.getElementById('selected-payment-method').value = "";
-                document.querySelectorAll('.payment-tile').forEach(t => t.classList.remove('active'));
-                
-                saveCart();
-                updateCartUI();
-                closeOrderModal();
-                listenToActiveOrderStatus(); 
+                shoppingCart = []; currentPromo = null; document.getElementById('promo-code-input').value = ""; document.getElementById('promo-message').innerText = ""; document.getElementById('selected-payment-method').value = ""; document.querySelectorAll('.payment-tile').forEach(t => t.classList.remove('active'));
+                saveCart(); updateCartUI(); closeOrderModal(); listenToActiveOrderStatus(); 
 
-            } catch (err) {
-                console.error("Помилка транзакції: ", err);
-                alert(err.message);
-            } finally {
-                btn.innerHTML = `<span data-lang="ua">Оформити замовлення</span><span data-lang="en">Place Order</span>`;
-                btn.disabled = false;
-                setLanguage(lang); 
-            }
+            } catch (err) { console.error("Помилка транзакції: ", err); alert(err.message); } 
+            finally { btn.innerHTML = `<span data-lang="ua">Оформити замовлення</span><span data-lang="en">Place Order</span>`; btn.disabled = false; setLanguage(lang); }
         }
 
         let userChatSessionId = localStorage.getItem('userChatSessionId');
         let unsubscribeUserChat = null;
 
-        function initUserChat() {
-            if (!userChatSessionId) {
-                userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('userChatSessionId', userChatSessionId);
-            }
-            startRealtimeChatListener();
-        }
-
-        function openUserChat(e) {
-            if(e) e.preventDefault();
-            if(navMenu) navMenu.classList.remove('active');
-            if(menuButton) menuButton.classList.remove('open');
-            document.getElementById('user-chat-window').style.display = 'flex';
-            localStorage.setItem('svarogChatIsOpen', 'true');
-            renderUserChat();
-        }
-
-        function closeUserChat() {
-            document.getElementById('user-chat-window').style.display = 'none';
-            localStorage.setItem('svarogChatIsOpen', 'false');
-        }
+        function initUserChat() { if (!userChatSessionId) { userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId); } startRealtimeChatListener(); }
+        function openUserChat(e) { if(e) e.preventDefault(); if(navMenu) navMenu.classList.remove('active'); if(menuButton) menuButton.classList.remove('open'); document.getElementById('user-chat-window').style.display = 'flex'; localStorage.setItem('svarogChatIsOpen', 'true'); renderUserChat(); }
+        function closeUserChat() { document.getElementById('user-chat-window').style.display = 'none'; localStorage.setItem('svarogChatIsOpen', 'false'); }
 
         function startRealtimeChatListener() {
             if (unsubscribeUserChat) unsubscribeUserChat();
-
-            unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(doc => {
-                let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' };
-                renderUserChat(myChat);
-            }, err => {
-                console.error("Помилка хмари: ", err);
-            });
+            unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(doc => { let myChat = doc.exists ? doc.data() : { messages: [], status: 'active' }; renderUserChat(myChat); }, err => { console.error("Помилка хмари: ", err); });
         }
 
         function renderUserChat(myChatData) {
-            const messagesBox = document.getElementById('user-chat-messages');
-            const inputBlock = document.getElementById('user-chat-input-block');
-            const lang = localStorage.getItem('selectedLang') || 'ua';
-            let myChat = myChatData || { messages: [], status: 'active' };
+            const messagesBox = document.getElementById('user-chat-messages'); const inputBlock = document.getElementById('user-chat-input-block'); const lang = localStorage.getItem('selectedLang') || 'ua'; let myChat = myChatData || { messages: [], status: 'active' };
 
             if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
                 const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
-                if (Date.now() > clearTime) {
-                    localStorage.removeItem('clearChatTime_' + userChatSessionId);
-                    localStorage.removeItem('userChatSessionId');
-                    userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9);
-                    localStorage.setItem('userChatSessionId', userChatSessionId);
-                    messagesBox.innerHTML = "";
-                    inputBlock.style.display = 'flex';
-                    startRealtimeChatListener();
-                    return;
-                }
+                if (Date.now() > clearTime) { localStorage.removeItem('clearChatTime_' + userChatSessionId); localStorage.removeItem('userChatSessionId'); userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId); messagesBox.innerHTML = ""; inputBlock.style.display = 'flex'; startRealtimeChatListener(); return; }
             }
 
             messagesBox.innerHTML = "";
             myChat.messages.forEach(msg => {
-                const bubble = document.createElement('div');
-                bubble.className = `chat-bubble ${msg.sender}`;
-                if(msg.type === 'image') {
-                    bubble.innerHTML = `<img src="${msg.text}" onclick="openLightbox('${msg.text}')" style="cursor:zoom-in;">`;
-                } else { 
-                    bubble.innerText = msg.text; 
-                }
+                const bubble = document.createElement('div'); bubble.className = `chat-bubble ${msg.sender}`;
+                if(msg.type === 'image') { bubble.innerHTML = `<img src="${msg.text}" onclick="openLightbox('${msg.text}')" style="cursor:zoom-in;">`; } else { bubble.innerText = msg.text; }
                 messagesBox.appendChild(bubble);
             });
 
             if (myChat.status === 'closed') {
-                inputBlock.style.display = 'none';
-                const sysMsg = document.createElement('div');
-                sysMsg.className = 'chat-bubble system';
-                sysMsg.innerText = lang === 'ua' ? 'Адміністратор завершив сесію. Чат автоматично очиститься через 5 хвилин.' : 'Administrator has closed the session. Chat will automatically clear in 5 minutes.';
-                messagesBox.appendChild(sysMsg);
-                if (!localStorage.getItem('clearChatTime_' + userChatSessionId)) {
-                    localStorage.setItem('clearChatTime_' + userChatSessionId, Date.now() + 5 * 60 * 1000);
-                }
-            } else { 
-                inputBlock.style.display = 'flex'; 
-            }
-            
+                inputBlock.style.display = 'none'; const sysMsg = document.createElement('div'); sysMsg.className = 'chat-bubble system'; sysMsg.innerText = lang === 'ua' ? 'Адміністратор завершив сесію. Чат автоматично очиститься через 5 хвилин.' : 'Administrator has closed the session. Chat will automatically clear in 5 minutes.'; messagesBox.appendChild(sysMsg);
+                if (!localStorage.getItem('clearChatTime_' + userChatSessionId)) { localStorage.setItem('clearChatTime_' + userChatSessionId, Date.now() + 5 * 60 * 1000); }
+            } else { inputBlock.style.display = 'flex'; }
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }
 
         async function sendUserChatMessage() {
-            const input = document.getElementById('user-chat-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const msgObject = { sender: 'user', text: text, type: 'text', time: Date.now() };
-            input.value = "";
-
-            try {
-                await db.collection("chats").doc(userChatSessionId).set({
-                    id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
-                    messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
-                }, { merge: true });
-            } catch(e) { console.error(e); }
-        }
-
-        function sendUserChatPhoto(input) {
-            alert(localStorage.getItem('selectedLang') === 'en' ? "Photo transfer is in development." : "Надсилання фото знаходиться в розробці.");
+            const input = document.getElementById('user-chat-input'); const text = input.value.trim(); if (!text) return;
+            const msgObject = { sender: 'user', text: text, type: 'text', time: Date.now() }; input.value = "";
+            try { await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion(msgObject) }, { merge: true }); } catch(e) { console.error(e); }
         }
 
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
@@ -1520,13 +1286,8 @@
         window.addEventListener('DOMContentLoaded', () => { 
             setLanguage(localStorage.getItem('selectedLang') || 'ua'); 
             initUserChat(); 
-            checkCartExpiry();
-            updateCartUI(); 
-            listenToActiveOrderStatus();
-            
-            if (localStorage.getItem('svarogChatIsOpen') === 'true') {
-                openUserChat();
-            }
+            checkCartExpiry(); updateCartUI(); listenToActiveOrderStatus();
+            if (localStorage.getItem('svarogChatIsOpen') === 'true') { openUserChat(); }
         });
     </script>
 </body>
