@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVAROG TEAM</title>
     
-    <!-- Підключаємо чистий, сучасний тактичний шрифт -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -34,18 +33,18 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 30px 16px;
+            padding: 35px 16px;
         }
 
         .wrapper {
             width: 100%;
-            max-width: 380px; /* Ідеальний баланс для мобілок та центнування на ПК */
+            max-width: 380px;
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        /* Блок профілю без зайвого сміття */
+        /* Блок профілю */
         .header-profile {
             display: flex;
             flex-direction: column;
@@ -56,15 +55,17 @@
 
         .logo-box {
             position: relative;
-            width: 80px;
-            height: 80px;
+            width: 85px;
+            height: 85px;
             margin-bottom: 14px;
         }
 
+        /* НАЛАШТУВАННЯ ДЛЯ ПОВНОЇ ВИДИМОСТІ ЛОГОТИПА */
         .logo-box img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain; /* Змінено з cover на contain, щоб логотип не обрізався */
+            padding: 6px;        /* Додано відступ, щоб краї лого не торкалися рамки */
             border-radius: 50%;
             border: 1px solid var(--border-color);
             background: var(--card-bg);
@@ -72,8 +73,8 @@
 
         .online-dot {
             position: absolute;
-            bottom: 2px;
-            right: 2px;
+            bottom: 4px;
+            right: 4px;
             width: 12px;
             height: 12px;
             background: var(--green-glow);
@@ -156,7 +157,7 @@
             width: 100%;
         }
 
-        /* Нова стильна пласка кнопка */
+        /* Стильна пласка кнопка */
         .btn-link {
             width: 100%;
             background: var(--card-bg);
@@ -176,19 +177,16 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* Ефект наведення */
         .btn-link:hover {
             background: #171b14;
             border-color: var(--text-muted);
         }
 
-        /* Ефект затискання кнопок */
         .btn-link:active {
             transform: scale(0.98);
             background: var(--bg-main);
         }
 
-        /* Слот під іконку (емодзі або картинку), який підтягується з бази */
         .icon-slot {
             font-size: 16px;
             display: flex;
@@ -198,12 +196,14 @@
             height: 24px;
         }
 
+        /* ЧИСТИЙ МІНІМАЛІСТИЧНИЙ ПІДВАЛ */
         .footer-text {
             text-align: center;
             font-size: 10px;
             color: var(--text-muted);
-            letter-spacing: 1px;
-            margin-top: 10px;
+            letter-spacing: 2px;
+            margin-top: 15px;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -211,7 +211,6 @@
 
 <div class="wrapper">
 
-    <!-- Чистий профіль -->
     <div class="header-profile">
         <div class="logo-box">
             <img src="logo.png" alt="SVAROG">
@@ -220,21 +219,17 @@
         <h1>SVAROG TEAM</h1>
     </div>
 
-    <!-- Тактичний блок збору -->
     <div class="donation-block">
         <div class="block-title">
             <span>Цільовий збір</span>
             <span style="color: var(--green-glow);">● АКТИВНО</span>
         </div>
         
-        <!-- Головна кнопка збору -->
         <a href="https://send.monobank.ua/" target="_blank" class="btn-link" style="background: var(--olive-active); border-color: #556547;">
             <span>Перейти на банку Моно</span>
-            <!-- Твоя кастомна іконка для цієї кнопки -->
             <span class="icon-slot">🏦</span>
         </a>
 
-        <!-- Копіювання картки -->
         <div class="crypto-card" onclick="copyAction()">
             <div style="display: flex; flex-direction: column; gap: 2px;">
                 <span style="font-size: 9px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Натисніть для копіювання</span>
@@ -244,10 +239,8 @@
         </div>
     </div>
 
-    <!-- Конструктор інших посилань -->
     <div class="buttons-grid">
         
-        <!-- Кожна кнопка тепер має незалежну іконку справа -->
         <a href="https://t.me/" target="_blank" class="btn-link">
             <span>Офіційний Telegram Канал</span>
             <span class="icon-slot">📱</span>
@@ -266,7 +259,7 @@
     </div>
 
     <div class="footer-text">
-        SECURE CONNECT // EST. 2026
+        EST. 2026
     </div>
 
 </div>
