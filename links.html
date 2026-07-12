@@ -4,24 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVAROG TEAM | Command Center</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Russo+One&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-dark: #121411;
-            --panel-bg: #1a1d18;
-            --border-olive: #3b4234;
-            --tactical-olive: #556049;
-            --tactical-glow: #7a8b69;
+            --bg-dark: #0d0f0c;
+            --panel-bg: #151813;
+            --border-olive: #323a2b;
+            --tactical-olive: #48543c;
+            --tactical-glow: #6e825c;
             --text-sand: #ded7c2;
-            --text-dim: #737d68;
-            --accent-green: #4ade80;
+            --text-dim: #65705b;
+            --accent-green: #3cd070;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -32,23 +34,22 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 20px 15px;
+            padding: 25px 15px;
         }
 
-        /* Контейнер-оболонка: ідеально адаптується під будь-який екран */
         .container {
             width: 100%;
-            max-width: 420px; /* Обмеження для ПК, на смартфонах буде на весь екран */
+            max-width: 400px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 18px;
         }
 
         /* Шапка профілю */
         .profile {
             text-align: center;
-            margin-top: 10px;
+            margin-bottom: 5px;
         }
 
         .avatar-wrapper {
@@ -57,82 +58,76 @@
         }
 
         .avatar {
-            width: 90px;
-            height: 90px;
+            width: 85px;
+            height: 85px;
             border-radius: 50%;
             border: 2px solid var(--tactical-olive);
-            padding: 4px;
+            padding: 3px;
             background: var(--panel-bg);
-            object-fit: cover;
-            box-shadow: 0 0 15px rgba(122, 139, 105, 0.2);
+            object-fit: contain; /* Щоб твій логотип не стискався і не деформувався */
         }
 
         .status-badge {
             position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 14px;
-            height: 14px;
+            bottom: 3px;
+            right: 3px;
+            width: 12px;
+            height: 12px;
             background-color: var(--accent-green);
             border: 2px solid var(--bg-dark);
             border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
         }
 
         .profile h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 2px;
+            font-family: 'Russo One', sans-serif; /* Суворий військовий заголовок */
+            font-size: 22px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             margin-top: 12px;
             color: var(--text-sand);
         }
 
         .profile p {
-            font-size: 14px;
+            font-size: 11px;
             color: var(--text-dim);
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            margin-top: 2px;
+            font-weight: 700;
+            margin-top: 4px;
         }
 
-        /* Головний тактичний блок (Банка + Картка) */
+        /* Головна картка збору */
         .main-card {
             background: var(--panel-bg);
             border: 1px solid var(--border-olive);
-            border-radius: 12px;
+            border-radius: 10px;
             width: 100%;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .main-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--tactical-glow), transparent);
+            gap: 12px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 14px;
+            font-size: 11px;
             text-transform: uppercase;
+            font-weight: 700;
             color: var(--text-dim);
             letter-spacing: 1px;
+            padding: 0 2px;
         }
 
         /* Реквізити картки */
         .bank-details {
-            background: rgba(0, 0, 0, 0.2);
+            background: #090a08;
             border: 1px dashed var(--border-olive);
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 6px;
+            padding: 10px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -142,26 +137,29 @@
 
         .bank-details:hover {
             border-color: var(--tactical-olive);
-            background: rgba(85, 96, 73, 0.05);
+            background: #111310;
         }
 
         .card-number {
-            font-size: 18px;
-            font-weight: 600;
-            letter-spacing: 1.5px;
+            font-family: 'Russo One', sans-serif;
+            font-size: 16px;
+            letter-spacing: 1px;
+            color: var(--text-sand);
         }
 
         .copy-btn {
-            font-size: 12px;
+            font-size: 10px;
             text-transform: uppercase;
             background: var(--border-olive);
             color: var(--text-sand);
             padding: 4px 8px;
             border-radius: 4px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
         }
 
-        /* Список інших посилань */
+        /* Список посилань */
         .links-list {
             width: 100%;
             display: flex;
@@ -169,59 +167,58 @@
             gap: 12px;
         }
 
-        /* Крута кнопка з ефектом 3D-натискання та лазерним підсвічуванням */
+        /* Тактична 3D кнопка */
         .tactical-button {
             width: 100%;
             background: var(--panel-bg);
             border: 1px solid var(--border-olive);
             color: var(--text-sand);
-            padding: 16px 20px;
-            font-size: 16px;
-            font-weight: 600;
+            padding: 15px 18px;
+            font-size: 14px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             border-radius: 8px;
             cursor: pointer;
             text-decoration: none;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            box-shadow: 0 4px 0 var(--border-olive); /* Імітація об'єму клавіші */
+            box-shadow: 0 4px 0 var(--border-olive);
             transform: translateY(-4px);
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Ефект наведення (Hover) */
         .tactical-button:hover {
             border-color: var(--tactical-glow);
-            box-shadow: 0 4px 12px rgba(122, 139, 105, 0.15), 0 4px 0 var(--tactical-olive);
             color: #fff;
+            box-shadow: 0 4px 0 var(--tactical-olive), 0 4px 15px rgba(110, 130, 92, 0.1);
         }
 
-        /* Ефект затискання кнопки (Bounce Click) */
+        /* Механічний клік */
         .tactical-button:active {
-            transform: translateY(0px); /* Кнопка фізично опускається */
-            box-shadow: 0 0px 0 transparent; /* Об'єм зникає */
+            transform: translateY(0px);
+            box-shadow: 0 0px 0 transparent;
         }
 
         .button-icon {
-            font-size: 18px;
-            color: var(--text-dim);
-            transition: color 0.2s;
+            font-size: 16px;
+            opacity: 0.7;
+            transition: transform 0.2s;
         }
 
         .tactical-button:hover .button-icon {
-            color: var(--accent-green);
+            opacity: 1;
+            transform: scale(1.1);
         }
 
-        /* Технічний підвал */
+        /* Системний підвал */
         .footer {
-            margin-top: 15px;
-            font-size: 11px;
+            margin-top: 10px;
+            font-size: 10px;
             color: var(--text-dim);
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -231,27 +228,27 @@
 
     <div class="profile">
         <div class="avatar-wrapper">
-            <img src="https://via.placeholder.com/90/556049/ded7c2?text=SVAROG" alt="Svarog Logo" class="avatar">
+            <img src="logo.png" alt="SVAROG" class="avatar">
             <div class="status-badge"></div>
         </div>
-        <h1>Svarog Team</h1>
+        <h1>SVAROG TEAM</h1>
         <p>Command Center Live</p>
     </div>
 
     <div class="main-card">
         <div class="card-header">
             <span>Цільовий збір</span>
-            <span style="color: var(--accent-green);">Активно</span>
+            <span style="color: var(--accent-green); font-weight: 700;">● Активно</span>
         </div>
         
-        <a href="https://send.monobank.ua/" target="_blank" class="tactical-button" style="background: var(--tactical-olive); border-color: var(--tactical-glow); box-shadow: 0 4px 0 #3b4234;">
+        <a href="https://send.monobank.ua/" target="_blank" class="tactical-button" style="background: var(--tactical-olive); border-color: var(--tactical-glow); box-shadow: 0 4px 0 #2a3124;">
             <span>Перейти на банку Моно</span>
             <span class="button-icon">🏦</span>
         </a>
 
-        <div class="bank-details" id="cardDetails" onclick="copyCardNumber()">
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <span style="font-size: 10px; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.5px;">Номер картки (натисніть щоб скопіювати)</span>
+        <div class="bank-details" onclick="copyCardNumber()">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; text-transform: uppercase; color: var(--text-dim); font-weight: 700; letter-spacing: 0.5px;">Натисніть для копіювання картки</span>
                 <span class="card-number" id="cardNumber">4441 1111 2222 3333</span>
             </div>
             <span class="copy-btn" id="copyBadge">Копіювати</span>
@@ -284,25 +281,20 @@
 </div>
 
 <script>
-    // Функція тактильного копіювання картки в один клік
     function copyCardNumber() {
         const cardNumberText = document.getElementById('cardNumber').innerText.replace(/\s/g, '');
         const copyBadge = document.getElementById('copyBadge');
         
         navigator.clipboard.writeText(cardNumberText).then(() => {
-            // Візуальний ефект успіху
-            copyBadge.innerText = "Скопійовано!";
+            copyBadge.innerText = "Готово!";
             copyBadge.style.background = "var(--tactical-olive)";
-            copyBadge.style.color = "var(--accent-green)";
+            copyBadge.style.color = var(--accent-green);
             
-            // Повертаємо назад через 2 секунди
             setTimeout(() => {
                 copyBadge.innerText = "Копіювати";
                 copyBadge.style.background = "var(--border-olive)";
                 copyBadge.style.color = "var(--text-sand)";
             }, 2000);
-        }).catch(err => {
-            console.error('Не вдалося скопіювати реквізити: ', err);
         });
     }
 </script>
