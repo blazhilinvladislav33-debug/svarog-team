@@ -7,6 +7,9 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --bg-main: #0b0c0a;
@@ -44,164 +47,40 @@
             gap: 20px;
         }
 
-        /* Блок профілю */
-        .header-profile {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin-bottom: 5px;
-        }
-
-        .logo-box {
-            position: relative;
-            width: 90px; /* Трохи збільшили, щоб логотип читався ідеально */
-            height: 90px;
-            margin-bottom: 14px;
-        }
-
-        /* ПОВНЕОЧИЩЕННЯ ВІД РАМОК ТА КІЛ */
-        .logo-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Логотип зберігає свої пропорції щита */
-            /* Жодних border, background, padding чи border-radius! */
-        }
-
+        .header-profile { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 5px; }
+        .logo-box { position: relative; width: 90px; height: 90px; margin-bottom: 14px; }
+        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+        
         .online-dot {
-            position: absolute;
-            bottom: 0px;
-            right: 4px;
-            width: 12px;
-            height: 12px;
-            background: var(--green-glow);
-            border: 2px solid var(--bg-main);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--green-glow);
+            position: absolute; bottom: 0px; right: 4px; width: 12px; height: 12px;
+            background: var(--green-glow); border: 2px solid var(--bg-main); border-radius: 50%; box-shadow: 0 0 8px var(--green-glow);
         }
 
-        .header-profile h1 {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: var(--text-main);
-        }
+        .header-profile h1 { font-size: 20px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-main); }
 
-        /* Головна картка збору */
-        .donation-block {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .donation-block { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .block-title { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
 
-        .block-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-        }
+        .crypto-card { background: rgba(0, 0, 0, 0.3); border: 1px dashed var(--border-color); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; }
+        .crypto-card:hover { background: rgba(36, 43, 31, 0.2); }
+        .number-slots { font-size: 15px; font-weight: 600; letter-spacing: 0.5px; color: var(--text-main); }
+        .copy-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); background: var(--bg-main); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color); transition: all 0.2s; }
 
-        /* Реквізити */
-        .crypto-card {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px dashed var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .crypto-card:hover {
-            background: rgba(36, 43, 31, 0.2);
-        }
-
-        .number-slots {
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            color: var(--text-main);
-        }
-
-        .copy-badge {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            background: var(--bg-main);
-            padding: 4px 8px;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            transition: all 0.2s;
-        }
-
-        /* Контейнер кнопок */
-        .buttons-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-        }
-
-        /* Стильна пласка кнопка */
+        .buttons-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        
         .btn-link {
-            width: 100%;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 16px 18px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.1s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            width: 100%; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 16px 18px; font-size: 14px; font-weight: 600; text-decoration: none; text-transform: uppercase;
+            letter-spacing: 0.5px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.1s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
+        .btn-link:hover { background: #171b14; border-color: var(--text-muted); }
+        .btn-link:active { transform: scale(0.98); background: var(--bg-main); }
+        .icon-slot { font-size: 16px; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; }
 
-        .btn-link:hover {
-            background: #171b14;
-            border-color: var(--text-muted);
-        }
-
-        .btn-link:active {
-            transform: scale(0.98);
-            background: var(--bg-main);
-        }
-
-        .icon-slot {
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-        }
-
-        /* Чистий лаконічний підвал */
-        .footer-text {
-            text-align: center;
-            font-size: 10px;
-            color: var(--text-muted);
-            letter-spacing: 2px;
-            margin-top: 15px;
-            font-weight: 600;
-        }
+        .footer-text { text-align: center; font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-top: 15px; font-weight: 600; }
+        
+        #loading-indicator { text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px 0; }
     </style>
 </head>
 <body>
@@ -222,7 +101,7 @@
             <span style="color: var(--green-glow);">● АКТИВНО</span>
         </div>
         
-        <a href="https://send.monobank.ua/" target="_blank" class="btn-link" style="background: var(--olive-active); border-color: #556547;">
+        <a href="#" target="_blank" class="btn-link" id="bank-btn" onclick="trackClick('monobank', 'bank')" style="background: var(--olive-active); border-color: #556547;">
             <span>Перейти на банку Моно</span>
             <span class="icon-slot">🏦</span>
         </a>
@@ -230,29 +109,14 @@
         <div class="crypto-card" onclick="copyAction()">
             <div style="display: flex; flex-direction: column; gap: 2px;">
                 <span style="font-size: 9px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Натисніть для копіювання</span>
-                <span class="number-slots" id="targetCard">4441 1111 2222 3333</span>
+                <span class="number-slots" id="targetCard">Завантаження...</span>
             </div>
             <span class="copy-badge" id="badge">Копіювати</span>
         </div>
     </div>
 
-    <div class="buttons-grid">
-        
-        <a href="https://t.me/" target="_blank" class="btn-link">
-            <span>Офіційний Telegram Канал</span>
-            <span class="icon-slot">📱</span>
-        </a>
-
-        <a href="#" target="_blank" class="btn-link">
-            <span>Зв'язок з Адміністрацією</span>
-            <span class="icon-slot">🛡️</span>
-        </a>
-
-        <a href="#" target="_blank" class="btn-link">
-            <span>Інструкція користувача</span>
-            <span class="icon-slot">📄</span>
-        </a>
-
+    <div class="buttons-grid" id="dynamic-links-container">
+        <div id="loading-indicator">Завантаження даних системи...</div>
     </div>
 
     <div class="footer-text">
@@ -262,11 +126,42 @@
 </div>
 
 <script>
+    // 1. ІНІЦІАЛІЗАЦІЯ FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+        authDomain: "svarog-team.firebaseapp.com",
+        projectId: "svarog-team",
+        storageBucket: "svarog-team.firebasestorage.app",
+        messagingSenderId: "311449325528",
+        appId: "1:311449325528:web:b254c6aed4fea56fe96cad"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // 2. ФУНКЦІЯ ФІКСАЦІЇ КЛІКІВ (АНАЛІТИКА)
+    function trackClick(linkId, type) {
+        try {
+            db.collection("hub_clicks").add({
+                linkId: linkId,
+                type: type, // 'bank', 'copy_card', 'custom_link'
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (e) {
+            console.error("Помилка запису кліку:", e);
+        }
+    }
+
+    // 3. ФУНКЦІЯ КОПІЮВАННЯ КАРТКИ З АНАЛІТИКОЮ
     function copyAction() {
         const text = document.getElementById('targetCard').innerText.replace(/\s/g, '');
+        if(text === "Завантаження...") return; // Якщо ще не провантажилось
+        
         const badge = document.getElementById('badge');
         
         navigator.clipboard.writeText(text).then(() => {
+            // Фіксуємо клік в аналітику
+            trackClick('copy_card_number', 'copy_card');
+
             badge.innerText = "Готово";
             badge.style.color = "var(--green-glow)";
             badge.style.borderColor = "var(--green-glow)";
@@ -278,6 +173,58 @@
             }, 1800);
         });
     }
+
+    // 4. ЗАВАНТАЖЕННЯ ДАНИХ У РЕАЛЬНОМУ ЧАСІ
+    document.addEventListener("DOMContentLoaded", () => {
+        
+        // А) Підтягуємо реквізити Банки та Картки
+        db.collection("config").doc("payment").onSnapshot(doc => {
+            if (doc.exists) {
+                const data = doc.data();
+                if(data.bankUrl) {
+                    document.getElementById('bank-btn').href = data.bankUrl;
+                }
+                if(data.cardNumber) {
+                    document.getElementById('targetCard').innerText = data.cardNumber;
+                }
+            }
+        });
+
+        // Б) Підтягуємо кастомні посилання з Конструктора
+        db.collection("hub_links").where("active", "==", true).onSnapshot(snapshot => {
+            const container = document.getElementById('dynamic-links-container');
+            container.innerHTML = ""; // Очищаємо індикатор завантаження
+            
+            let links = [];
+            snapshot.forEach(doc => {
+                links.push({ id: doc.id, ...doc.data() });
+            });
+
+            // Сортуємо посилання так, як ти виставив їх в адмінці
+            links.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+            if(links.length === 0) {
+                container.innerHTML = `<div id="loading-indicator">Немає активних посилань</div>`;
+                return;
+            }
+
+            // Малюємо кнопки
+            links.forEach(link => {
+                const a = document.createElement('a');
+                a.href = link.url;
+                a.target = "_blank";
+                a.className = "btn-link";
+                // Додаємо відстеження кліку
+                a.onclick = () => trackClick(link.id, 'custom_link');
+                
+                a.innerHTML = `
+                    <span>${link.title}</span>
+                    <span class="icon-slot">${link.icon || ''}</span>
+                `;
+                container.appendChild(a);
+            });
+        });
+    });
 </script>
 
 </body>
