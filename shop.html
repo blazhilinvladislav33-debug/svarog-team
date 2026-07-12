@@ -93,6 +93,7 @@
         .menu-chat-btn { border: 1px solid var(--theme-color) !important; color: var(--theme-color) !important; text-align: center !important; font-weight: 700 !important; margin-top: 15px; }
         .menu-chat-btn:hover { background: var(--theme-color) !important; color: #fff !important; }
 
+        /* ВЕЛИКИЙ БАНЕР / ГЕРОЙ ШАПКА */
         .hero-banner { width: 100%; max-width: 1200px; margin-top: 100px; padding: 40px; background: linear-gradient(135deg, rgba(20, 20, 25, 0.8) 0%, rgba(10, 10, 12, 0.9) 100%); border: 1px solid var(--border-color); border-radius: 24px; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; backdrop-filter: blur(15px); min-height: 380px; }
         .hero-banner::before { content: ""; position: absolute; bottom: -100px; left: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(121, 133, 84, 0.1) 0%, transparent 70%); filter: blur(50px); pointer-events: none; }
         .hero-info { max-width: 550px; z-index: 2; position: relative; }
@@ -104,9 +105,11 @@
         .hero-img-wrapper { position: absolute; right: 0; top: 0; width: 55%; height: 100%; z-index: 1; display: none; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%); mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%); }
         .hero-showcase-img { width: 100%; height: 100%; object-fit: cover; object-position: center right; }
 
+        /* ОСНОВНИЙ КОНТЕНТ */
         .main-content { padding: 40px 20px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1200px; }
         .section-title { width: 100%; text-align: left; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; color: #fff; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
 
+        /* НАВІГАЦІЯ ПО КАТЕГОРІЯХ */
         .categories-nav { display: flex; gap: 12px; overflow-x: auto; width: 100%; justify-content: flex-start; padding-bottom: 15px; margin-bottom: 25px; scrollbar-width: none; }
         .categories-nav::-webkit-scrollbar { display: none; }
         .category-btn { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); color: var(--text-muted); padding: 10px 24px; border-radius: 12px; cursor: pointer; font-size: 0.95rem; font-weight: 600; white-space: nowrap; transition: all 0.3s ease; }
@@ -116,10 +119,12 @@
         .category-btn.active { background: var(--card-bg); color: var(--theme-color); border-color: var(--theme-color); box-shadow: 0 8px 20px rgba(121, 133, 84, 0.15); }
         .category-btn.active img.cat-icon { filter: sepia(1) hue-rotate(60deg) saturate(1000%); }
 
+        /* КАТАЛОГ ТОВАРІВ */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; width: 100%; margin-bottom: 60px; }
         .merch-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; }
         .merch-card:hover { transform: translateY(-6px); border-color: rgba(121, 133, 84, 0.4); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(121, 133, 84, 0.05); }
         
+        /* ГАЛЕРЕЯ ДЛЯ ФОТО */
         .merch-img-box { width: 100%; height: 320px; background: rgba(0,0,0,0.2); position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .merch-gallery { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; width: 100%; height: 100%; scroll-behavior: smooth; }
         .merch-gallery::-webkit-scrollbar { display: none; }
@@ -164,6 +169,7 @@
         .buy-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(121, 133, 84, 0.4); filter: brightness(1.1); color: #000; }
         .buy-btn:disabled { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); color: #444; cursor: not-allowed; box-shadow: none; }
 
+        /* КОШИК */
         .cart-fab { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: var(--theme-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1500; }
         .cart-fab:hover { transform: scale(1.08) rotate(-5deg); filter: brightness(1.1); }
         .cart-fab svg { width: 26px; height: 28px; fill: #121212; }
@@ -220,10 +226,10 @@
 
         .footer { width: 100%; padding: 30px 12px; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: auto; border-top: 1px solid var(--border-color); background: rgba(10, 10, 12, 0.6); backdrop-filter: blur(10px); }
 
+        /* ЧАТ */
         .user-chat-modal { display: none; position: fixed; bottom: 30px; left: 30px; width: 340px; height: 450px; background: #121215; border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); z-index: 3000; flex-direction: column; overflow: hidden; }
         .chat-header { background: rgba(255,255,255,0.02); padding: 16px 20px; font-size: 1rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); color: #ffffff; }
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; scrollbar-width: none; }
-        .chat-messages::-webkit-scrollbar { display: none; }
         .chat-bubble { padding: 10px 14px; border-radius: 14px; max-width: 80%; word-wrap: break-word; line-height: 1.45; }
         .chat-bubble.user { background: var(--theme-color); align-self: flex-end; border-bottom-right-radius: 2px; color: #121212; font-weight: bold; }
         .chat-bubble.admin { background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 2px; color: #ffffff; }
@@ -236,8 +242,6 @@
         .chat-send-btn:hover { filter: brightness(0.9); transform: scale(1.05); } .chat-send-btn svg { width: 18px; height: 18px; fill: #000; margin-left: 2px; }
         .user-clip-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); color: #fff; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; padding: 0; }
         .user-clip-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); } .user-clip-btn svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.75); }
-
-        [data-lang="en"] { display: none; }
 
         @media (max-width: 768px) { 
             .navbar-container { padding: 12px 15px; }
@@ -333,7 +337,7 @@
             <div class="modal-body">
                 <div id="active-order-status-box" style="display:none; margin-bottom: 20px; padding: 14px; background: rgba(0, 191, 255, 0.1); border: 1px solid rgba(0, 191, 255, 0.25); border-radius: 10px;">
                     <div style="font-weight: bold; color: #00bfff; margin-bottom: 5px; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
-                        <span>🛰️</span> <span data-lang="ua">Ваше поточне замовлення:</span><span data-lang="en">Your active order:</span>
+                        <span>🛰️</span> <span data-lang="ua">Ваше замовлення:</span><span data-lang="en">Your order:</span>
                     </div>
                     <div id="active-order-info" style="font-size: 0.88rem; color: #e0e0e0; line-height: 1.4;"></div>
                 </div>
@@ -371,9 +375,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label style="font-size:0.88rem; color:#aaa; display:block; margin-bottom:8px;" data-lang="ua">Оберіть спосіб оплати:</label>
-                        <label style="font-size:0.88rem; color:#aaa; display:block; margin-bottom:8px;" data-lang="en">Select payment method:</label>
-                        
+                        <label style="font-size:0.88rem; color:#aaa; display:block; margin-bottom:8px;" data-lang="ua">Спосіб оплати:</label>
                         <div class="payment-tiles">
                             <div class="payment-tile" id="tile-bank" onclick="selectPaymentTile('bank')">
                                 <svg viewBox="0 0 24 24"><path d="M11.5 2L2 6v2h19V6L11.5 2zm0 14c1.38 0 2.5-1.12 2.5-2.5S12.88 11 11.5 11 9 12.12 9 13.5s1.12 2.5 2.5 2.5zM2 22h19v-2H2v2zm4-12v6h3v-6H6zm6 0v6h3v-6h-3zm6 0v6h3v-6h-3z"/></svg>
@@ -410,8 +412,8 @@
         <div style="margin-bottom: 10px;">
             <a href="status.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.3);">Перевірити статус замовлення</a>
         </div>
-        <span data-lang="ua">SVAROG TEAM © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
-        <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
+        <span data-lang="ua">SVAROG TEAM © 2026 | Всі права захищені. Розроблено з ❤️ для України.</span>
+        <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ for Ukraine.</span>
     </footer>
 
     <div class="user-chat-modal" id="user-chat-window">
@@ -666,6 +668,7 @@
             document.getElementById('cart-total-sum').innerText = `${Math.round(finalSum)} ₴`; promoSection.style.display = 'block'; totalSection.style.display = 'flex'; formSection.style.display = 'block'; applyTranslationsToDOM(lang);
         }
 
+        // МАТРИЦЯ СКЛАДУ ТА СТИСНЕННЯ ЗОБРАЖЕНЬ
         function getBase64Image(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader(); reader.onload = (e) => {
@@ -706,6 +709,7 @@
                     let promoDocRef = null; let pDoc = null;
                     if (currentPromo && currentPromo.code) { promoDocRef = db.collection('promocodes').doc(currentPromo.code); pDoc = await transaction.get(promoDocRef); if (pDoc.exists && pDoc.data().active === false) throw new Error("Код вже використано!"); }
 
+                    // МАТРИЦЯ ВІДНІМАННЯ ДЛЯ ОБ'ЄКТІВ СКЛАДУ ТА РОЗМІРІВ
                     for(let obj of merchRefsAndData) {
                         if (!obj.cartItem.isPreorder) {
                             let isVariant = obj.data.variants && obj.data.variants.length > 0; let variantIndex = -1;
@@ -734,6 +738,7 @@
 
                 localStorage.setItem('svarog_active_order_id', newlyCreatedOrderId);
 
+                // Сповіщення в телеграм
                 const botToken = '7706609379:AAEKkdrRCgzjDCMQc8EpDfO9WW6gYOlUW5g'; const chatId = '647245223';
                 let tgMsg = `📦 <b>НОВЕ ЗАМОВЛЕННЯ!</b>\n\n👤 <b>Клієнт:</b> ${name}\n📞 <b>Тел:</b> ${phone}\n📍 <b>Адреса:</b> ${address}\n💳 <b>Оплата:</b> ${paymentMethodText}\n🛒 <b>Склад:</b>\n${shoppingCart.map(i => `• ${i.merchTitle} [${i.size}] x${i.quantity}`).join('\n')}\n\n💰 <b>Сума:</b> ${finalSum} ₴`;
                 if (fileInput && fileInput.files.length > 0) {
@@ -746,6 +751,7 @@
             finally { btn.innerHTML = `Оформити замовлення`; btn.disabled = false; setLanguage(lang); }
         }
 
+        // АНОНІМНИЙ ЧАТ
         let userChatSessionId = localStorage.getItem('userChatSessionId'); let unsubscribeUserChat = null;
         function initUserChat() { if (!userChatSessionId) { userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId); } startRealtimeChatListener(); }
         function openUserChat(e) { if(e) e.preventDefault(); if(navMenu) navMenu.classList.remove('active'); if(menuButton) menuButton.classList.remove('open'); document.getElementById('user-chat-window').style.display = 'flex'; localStorage.setItem('svarogChatIsOpen', 'true'); }
@@ -758,7 +764,6 @@
             messagesBox.innerHTML = ""; myChat.messages.forEach(msg => { const bubble = document.createElement('div'); bubble.className = `chat-bubble ${msg.sender}`; if(msg.type === 'image') bubble.innerHTML = `<img src="${msg.text}" onclick="openLightbox('${msg.text}')">`; else bubble.innerText = msg.text; messagesBox.appendChild(bubble); });
             if (myChat.status === 'closed') { inputBlock.style.display = 'none'; const sysMsg = document.createElement('div'); sysMsg.className = 'chat-bubble system'; sysMsg.innerText = lang === 'ua' ? 'Сесію завершено.' : 'Session closed.'; messagesBox.appendChild(sysMsg); if (!localStorage.getItem('clearChatTime_' + userChatSessionId)) localStorage.setItem('clearChatTime_' + userChatSessionId, Date.now() + 5 * 60 * 1000); } else { inputBlock.style.display = 'flex'; } messagesBox.scrollTop = messagesBox.scrollHeight;
         }
-        
         async function sendUserChatMessage() { const input = document.getElementById('user-chat-input'); const text = input.value.trim(); if (!text) return; const msgObject = { sender: 'user', text: text, type: 'text', time: Date.now() }; input.value = ""; try { await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion(msgObject) }, { merge: true }); } catch(e) { console.error(e); } }
         async function sendUserChatPhoto(input) { if (input.files && input.files[0]) { try { let base64 = await getBase64Image(input.files[0]); const msgObject = { sender: 'user', text: base64, type: 'image', time: Date.now() }; await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion(msgObject) }, { merge: true }); } catch(e) { alert("Помилка файлу"); } } }
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
