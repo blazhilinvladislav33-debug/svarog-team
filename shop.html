@@ -327,9 +327,9 @@
         .confirm-btn-sticky-wrap { position: sticky; bottom: -24px; margin: 0 -30px -24px; padding: 16px 30px; background: linear-gradient(to top, #121215 60%, transparent); }
 
         /* ==================== ІКОНКИ СОЦМЕРЕЖ У ФУТЕРІ ==================== */
-        .footer-socials { display: flex; justify-content: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
-        .footer-social-link { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; font-weight: 800; font-size: 0.85rem; transition: all 0.25s; }
-        .footer-social-link:hover { transform: translateY(-3px); }
+        .footer-socials { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .footer-social-link { padding: 12px 20px; border: 1px solid var(--border-color); border-radius: 12px; color: #fff; text-align: center; text-decoration: none; font-weight: 600; font-size: 0.85rem; background: var(--card-bg); transition: all 0.3s ease; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; }
+        .footer-social-link:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(0,0,0,0.8); transform: translateY(-3px); }
 
         @media (max-width: 768px) { 
             .navbar-container { padding: 12px 15px; }
@@ -556,6 +556,9 @@
                     <p style="color:#aaa; font-size:0.9rem; margin-top:8px;" data-lang="ua">Ми зв'яжемось з вами найближчим часом.</p>
                     <p style="color:#aaa; font-size:0.9rem; margin-top:8px;" data-lang="en" style="display:none;">We'll contact you shortly.</p>
                     <div class="order-success-id" id="order-success-id-text"></div>
+                    <button type="button" class="copy-btn" style="margin: -12px 0 20px;" onclick="copyToClipboard(fullOrderIdForCopy)"><span data-lang="ua">Скопіювати номер</span><span data-lang="en">Copy number</span></button>
+                    <p style="color:#888; font-size:0.8rem; margin-top:-8px; margin-bottom:20px;" data-lang="ua">Збережіть номер — за ним можна перевірити статус на сторінці "Статус замовлення".</p>
+                    <p style="color:#888; font-size:0.8rem; margin-top:-8px; margin-bottom:20px;" data-lang="en">Save this number — use it on the "Order Status" page to track your order.</p>
                     <div style="display:flex; gap:10px; width:100%;">
                         <button type="button" class="confirm-btn" onclick="closeOrderModal()"><span data-lang="ua">Готово</span><span data-lang="en">Done</span></button>
                     </div>
@@ -626,7 +629,8 @@
             const box = document.getElementById('footer-socials-box'); if (!box) return;
             if (!list || list.length === 0) { box.style.display = 'none'; return; }
             box.style.display = 'flex';
-            box.innerHTML = list.map(net => `<a href="${net.url}" target="_blank" rel="noopener" class="footer-social-link" style="border-color:${net.color || 'var(--border-color)'}; color:${net.color || '#fff'};" title="${net.name || ''}">${(net.name || '?').charAt(0).toUpperCase()}</a>`).join('');
+            box.innerHTML = list.map(net => `<a href="${net.url}" target="_blank" rel="noopener" class="footer-social-link auto-translate">${net.name}</a>`).join('');
+            applyTranslationsToDOM(localStorage.getItem('selectedLang') || 'ua');
         }
         db.collection("config").doc("socials").onSnapshot(doc => { renderFooterSocials(doc.exists && doc.data().list ? doc.data().list : []); });
         
@@ -686,7 +690,7 @@
 
         let globalMerchList = []; let globalCategories = []; let activeCategory = 'Всі товари';
         let shoppingCart = JSON.parse(localStorage.getItem('svarog_shop_cart')) || []; let cartLastUpdated = localStorage.getItem('svarog_shop_cart_time') || Date.now();
-        let currentPromo = null; let activeOrderUnsubscribe = null; window.selectedVariants = {}; 
+        let currentPromo = null; let activeOrderUnsubscribe = null; let fullOrderIdForCopy = ''; window.selectedVariants = {}; 
 
         function listenToActiveOrderStatus() {
             const activeOrderId = localStorage.getItem('svarog_active_order_id'); const box = document.getElementById('active-order-status-box'); const info = document.getElementById('active-order-info'); const lang = localStorage.getItem('selectedLang') || 'ua';
@@ -1007,7 +1011,8 @@
 
                 shoppingCart = []; currentPromo = null; saveCart(); updateCartUI(); listenToActiveOrderStatus();
                 ['checkout-step-1', 'checkout-step-2', 'checkout-form', 'checkout-steps-indicator'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-                document.getElementById('order-success-id-text').innerText = `#${newlyCreatedOrderId.substring(0, 10).toUpperCase()}`;
+                document.getElementById('order-success-id-text').innerText = `#${newlyCreatedOrderId.substring(0, 12)}`;
+                fullOrderIdForCopy = newlyCreatedOrderId;
                 document.getElementById('order-success-screen').style.display = 'flex';
             } catch (err) { console.error(err); alert(err.message); } 
             finally { btn.innerHTML = `<span data-lang="ua">Оформити замовлення</span><span data-lang="en">Place Order</span>`; btn.disabled = false; setLanguage(lang); }
