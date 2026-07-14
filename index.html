@@ -220,11 +220,12 @@
         .news-see-all:hover { background: var(--theme-color); color: #121212; }
 
         /* ==================== ТИЗЕР МАГАЗИНУ — СТОПКА ТОВАРІВ ==================== */
-        .shop-teaser-stack { display: flex; align-items: center; flex-shrink: 0; }
-        .shop-teaser-stack-item { width: 110px; height: 110px; border-radius: 16px; overflow: hidden; border: 3px solid #16161a; box-shadow: 0 12px 28px rgba(0,0,0,0.5); margin-left: -36px; position: relative; transition: transform 0.3s ease, z-index 0s; }
-        .shop-teaser-stack-item:first-child { margin-left: 0; }
-        .shop-teaser-stack-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        @media (hover: hover) { .shop-teaser-stack-item:hover { transform: translateY(-10px) scale(1.15); z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 0 3px var(--theme-color); } }
+        .shop-teaser-visual { flex: 1; min-width: 200px; max-width: 340px; height: 170px; align-self: stretch; opacity: 0; transition: opacity 1.4s ease; overflow: hidden; }
+        .shop-teaser-visual.loaded { opacity: 1; }
+        .shop-teaser-visual img { width: 100%; height: 100%; object-fit: cover; display: block;
+            -webkit-mask-image: radial-gradient(ellipse at center, black 35%, transparent 72%);
+            mask-image: radial-gradient(ellipse at center, black 35%, transparent 72%); }
+        @media (max-width: 768px) { .shop-teaser-visual { max-width: 100%; height: 140px; } }
 
         /* ==================== ТИЗЕР МАГАЗИНУ ==================== */
         .shop-teaser { width: 100%; max-width: 1200px; padding: 40px; border-radius: 24px; background: linear-gradient(135deg, rgba(121,133,84,0.12) 0%, rgba(10,10,12,0.7) 100%); border: 1px solid rgba(121,133,84,0.3); display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap; text-align: left; }
@@ -249,7 +250,6 @@
             .home-socials { display: grid; grid-template-columns: 1fr 1fr; }
             .home-social-btn { min-width: 0; padding: 14px 10px; font-size: 0.85rem; }
             .shop-teaser { flex-direction: column; text-align: center; padding: 30px 20px; }
-            .shop-teaser-stack { margin: 5px 0; justify-content: center; }
             .shop-teaser-text p { max-width: none; }
         }
     </style>
@@ -355,7 +355,7 @@
                 <h2><span data-lang="ua">Підтримай нас через мерч 🛒</span><span data-lang="en">Support us through merch 🛒</span></h2>
                 <p><span data-lang="ua">Стильний мілітарі одяг — кожна покупка напряму фінансує роботу підрозділу.</span><span data-lang="en">Stylish military gear — every purchase directly funds the unit's operations.</span></p>
             </div>
-            <div class="shop-teaser-stack" id="shop-teaser-stack"></div>
+            <div class="shop-teaser-visual" id="shop-teaser-visual"><img id="shop-teaser-visual-img" src="" alt=""></div>
             <a href="https://svarogteam.com/shop.html" class="btn shop-teaser-btn"><span data-lang="ua">До магазину →</span><span data-lang="en">Visit Shop →</span></a>
         </div>
 
@@ -485,19 +485,16 @@
             applyTranslationsToDOM(lang);
         }).catch(err => console.error("Помилка завантаження новин:", err));
 
-        // --- СТОПКА ТОВАРІВ У ТИЗЕРІ МАГАЗИНУ (новинки, якщо є — інакше перші товари) ---
-        db.collection("merch").get().then(snapshot => {
-            const stack = document.getElementById('shop-teaser-stack');
-            if (!stack || snapshot.empty) return;
-            let allItems = snapshot.docs.map(doc => doc.data());
-            let picked = allItems.filter(m => m.isNew === true);
-            if (picked.length < 3) picked = allItems;
-            picked = picked.slice(0, 3);
-            stack.innerHTML = picked.map(item => {
-                let img = item.image || (item.images && item.images[0]) || (item.variants && item.variants[0] && (item.variants[0].image || (item.variants[0].images && item.variants[0].images[0]))) || 'logo.png';
-                return `<div class="shop-teaser-stack-item"><img src="${img}" loading="lazy" onerror="this.src='logo.png'"></div>`;
-            }).join('');
-        }).catch(err => console.error("Помилка завантаження товарів для тизера:", err));
+        // --- ВІЗУАЛ У ТИЗЕРІ МАГАЗИНУ: те саме зображення, що й у шапці shop.html ---
+        db.collection("config").doc("shop").onSnapshot(doc => {
+            const visual = document.getElementById('shop-teaser-visual');
+            const img = document.getElementById('shop-teaser-visual-img');
+            if (!visual || !img) return;
+            if (doc.exists && doc.data().heroImage) {
+                img.src = doc.data().heroImage;
+                img.onload = () => visual.classList.add('loaded');
+            }
+        });
         
         // --- ДИНАМІЧНИЙ ПЕРЕКЛАДАЧ (GOOGLE TRANSLATE API) ---
         // Ця функція перекладає будь-який текст з UA на EN безкоштовно
