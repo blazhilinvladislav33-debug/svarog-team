@@ -663,7 +663,7 @@
                         const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
                         mediaHtml = `<div class="report-img"><iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
                     } else if (data.image) {
-                        mediaHtml = `<div class="report-img"><img src="${data.image}" loading="lazy" onclick="openLightbox('${data.image}')" alt="Report Image"></div>`;
+                        mediaHtml = `<div class="report-img"><img src="${data.image}" loading="lazy" style="object-position:${data.imagePosition || '50% 50%'};" onclick="openLightbox('${data.image}')" alt="Report Image"></div>`;
                     }
                     
                     // ЗВЕРНИ УВАГУ: Додано клас auto-translate для опису звіту!
