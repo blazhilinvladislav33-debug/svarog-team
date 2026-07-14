@@ -197,14 +197,24 @@
         <div class="page-title-box">
             <h1 data-lang="ua">Статус замовлення</h1>
             <h1 data-lang="en">Order Status</h1>
-            <p data-lang="ua">Введіть номер телефону, вказаний при оформленні, щоб дізнатися, на якому етапі ваше замовлення.</p>
-            <p data-lang="en">Enter the phone number used during checkout to track your order.</p>
+            <p data-lang="ua" id="hint-text-ua">Введіть номер телефону або номер замовлення, щоб дізнатися, на якому етапі ваше замовлення.</p>
+            <p data-lang="en" id="hint-text-en">Enter your phone number or order number to track your order.</p>
         </div>
         
         <div class="container">
+            <div style="display:flex; gap:8px; margin-bottom:20px; background:rgba(255,255,255,0.03); padding:4px; border-radius:12px;">
+                <button type="button" class="search-mode-btn active" id="mode-btn-phone" onclick="setSearchMode('phone')" style="flex:1; padding:10px; border:none; border-radius:9px; background:var(--theme-color); color:#121212; font-weight:700; cursor:pointer; transition:0.2s;">
+                    <span data-lang="ua">За телефоном</span><span data-lang="en">By phone</span>
+                </button>
+                <button type="button" class="search-mode-btn" id="mode-btn-order" onclick="setSearchMode('order')" style="flex:1; padding:10px; border:none; border-radius:9px; background:transparent; color:#aaa; font-weight:700; cursor:pointer; transition:0.2s;">
+                    <span data-lang="ua">За номером замовлення</span><span data-lang="en">By order number</span>
+                </button>
+            </div>
+
             <form onsubmit="checkOrderStatus(event)">
                 <div class="form-group">
                     <input type="tel" id="search-phone" class="form-input" data-placeholder-ua="Номер телефону (напр. 099...)" data-placeholder-en="Phone number" placeholder="Номер телефону" required autocomplete="off">
+                    <input type="text" id="search-order-number" class="form-input" data-placeholder-ua="Номер замовлення (з екрана підтвердження)" data-placeholder-en="Order number (from confirmation screen)" placeholder="Номер замовлення" autocomplete="off" style="display:none;">
                 </div>
                 <button type="submit" class="btn" id="search-btn">
                     <span data-lang="ua">Знайти замовлення 🔍</span>
@@ -314,32 +324,74 @@
             applyTranslationsToDOM(lang);
         }
 
+        // --- ПЕРЕМИКАННЯ РЕЖИМУ ПОШУКУ ---
+        let currentSearchMode = 'phone';
+        function setSearchMode(mode) {
+            currentSearchMode = mode;
+            const phoneBtn = document.getElementById('mode-btn-phone'); const orderBtn = document.getElementById('mode-btn-order');
+            const phoneInput = document.getElementById('search-phone'); const orderInput = document.getElementById('search-order-number');
+            if (mode === 'phone') {
+                phoneBtn.style.background = 'var(--theme-color)'; phoneBtn.style.color = '#121212'; orderBtn.style.background = 'transparent'; orderBtn.style.color = '#aaa';
+                phoneInput.style.display = 'block'; phoneInput.required = true; orderInput.style.display = 'none'; orderInput.required = false;
+            } else {
+                orderBtn.style.background = 'var(--theme-color)'; orderBtn.style.color = '#121212'; phoneBtn.style.background = 'transparent'; phoneBtn.style.color = '#aaa';
+                orderInput.style.display = 'block'; orderInput.required = true; phoneInput.style.display = 'none'; phoneInput.required = false;
+            }
+        }
+
         // --- ЛОГІКА ПОШУКУ ЗАМОВЛЕННЯ З АВТОПЕРЕКЛАДОМ ТОВАРІВ ---
         async function checkOrderStatus(e) {
             e.preventDefault();
-            const phoneInput = document.getElementById('search-phone').value.trim();
             const resultBox = document.getElementById('result-box');
             const lang = localStorage.getItem('selectedLang') || 'ua';
             const btn = document.getElementById('search-btn');
 
-            if(!phoneInput) return;
+            let ordersList = [];
 
-            btn.disabled = true;
-            btn.innerHTML = lang === 'ua' ? 'Шукаємо...' : 'Searching...';
-            resultBox.style.display = 'none';
+            if (currentSearchMode === 'phone') {
+                const phoneInput = document.getElementById('search-phone').value.trim();
+                if(!phoneInput) return;
+                btn.disabled = true; btn.innerHTML = lang === 'ua' ? 'Шукаємо...' : 'Searching...'; resultBox.style.display = 'none';
+                try {
+                    const snapshot = await db.collection("orders").where("phone", "==", phoneInput).get();
+                    snapshot.forEach(doc => ordersList.push(doc.data()));
+                } catch(e) {
+                    console.error(e);
+                    resultBox.innerHTML = `<div style="padding: 20px; color:#ff4a4a; background:rgba(255,74,74,0.1); border:1px solid rgba(255,74,74,0.3); border-radius:12px;">${lang === 'ua' ? 'Помилка бази даних. Спробуйте пізніше.' : 'Database error. Try again later.'}</div>`;
+                    resultBox.style.display = 'block'; btn.disabled = false; btn.innerHTML = lang === 'ua' ? 'Знайти замовлення 🔍' : 'Find Order 🔍'; return;
+                }
+            } else {
+                // Пошук за номером замовлення: людина бачить лише перші 12 символів
+                // справжнього ID документа Firestore (на екрані підтвердження в магазині) —
+                // тому шукаємо за ПРЕФІКСОМ реального ID, а не точним співпадінням.
+                const orderNumInput = document.getElementById('search-order-number').value.trim().replace(/^#/, '');
+                if(!orderNumInput) return;
+                btn.disabled = true; btn.innerHTML = lang === 'ua' ? 'Шукаємо...' : 'Searching...'; resultBox.style.display = 'none';
+                try {
+                    const snapshot = await db.collection("orders")
+                        .orderBy(firebase.firestore.FieldPath.documentId())
+                        .startAt(orderNumInput)
+                        .endAt(orderNumInput + '\uf8ff')
+                        .limit(5)
+                        .get();
+                    snapshot.forEach(doc => ordersList.push(doc.data()));
+                } catch(e) {
+                    console.error(e);
+                    resultBox.innerHTML = `<div style="padding: 20px; color:#ff4a4a; background:rgba(255,74,74,0.1); border:1px solid rgba(255,74,74,0.3); border-radius:12px;">${lang === 'ua' ? 'Помилка бази даних. Спробуйте пізніше.' : 'Database error. Try again later.'}</div>`;
+                    resultBox.style.display = 'block'; btn.disabled = false; btn.innerHTML = lang === 'ua' ? 'Знайти замовлення 🔍' : 'Find Order 🔍'; return;
+                }
+            }
 
             try {
-                const snapshot = await db.collection("orders").where("phone", "==", phoneInput).get();
-
-                if (snapshot.empty) {
-                    resultBox.innerHTML = `<div style="padding: 20px; color:#ff4a4a; background:rgba(255,74,74,0.1); border:1px solid rgba(255,74,74,0.3); border-radius:12px;">${lang === 'ua' ? 'Замовлень за цим номером не знайдено 😔' : 'No orders found for this phone number 😔'}</div>`;
+                if (ordersList.length === 0) {
+                    const noResultMsg = currentSearchMode === 'phone'
+                        ? (lang === 'ua' ? 'Замовлень за цим номером не знайдено 😔' : 'No orders found for this phone number 😔')
+                        : (lang === 'ua' ? 'Замовлення з таким номером не знайдено 😔' : 'No order found with this number 😔');
+                    resultBox.innerHTML = `<div style="padding: 20px; color:#ff4a4a; background:rgba(255,74,74,0.1); border:1px solid rgba(255,74,74,0.3); border-radius:12px;">${noResultMsg}</div>`;
                     resultBox.style.display = 'block';
                     return;
                 }
 
-                let ordersList = [];
-                snapshot.forEach(doc => ordersList.push(doc.data()));
-                
                 ordersList.sort((a, b) => {
                     let tA = a.timestamp ? a.timestamp.toMillis() : 0;
                     let tB = b.timestamp ? b.timestamp.toMillis() : 0;
