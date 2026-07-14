@@ -204,6 +204,7 @@
         
         <div class="container">
             <form id="feedback-form" onsubmit="sendFeedback(event)">
+                <input type="text" id="fb-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px; opacity:0; height:0; width:0;" aria-hidden="true">
                 <div class="form-group">
                     <input type="text" id="fb-name" class="form-input" data-placeholder-ua="Ваше ПІБ" data-placeholder-en="Full Name" placeholder="Ваше ПІБ" required autocomplete="off">
                 </div>
@@ -321,6 +322,9 @@
 
         async function sendFeedback(e) { 
             e.preventDefault(); 
+            // Honeypot: приховане поле, яке бачать лише боти й автоматично заповнюють.
+            // Людина його ніколи не побачить і не заповнить.
+            if (document.getElementById('fb-website').value.trim() !== '') { return; }
             const name = document.getElementById('fb-name').value.trim();
             const contact = document.getElementById('fb-contact').value.trim();
             const message = document.getElementById('fb-message').value.trim();
