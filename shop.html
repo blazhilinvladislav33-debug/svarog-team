@@ -125,7 +125,7 @@
         .merch-card:hover { transform: translateY(-6px); border-color: rgba(121, 133, 84, 0.4); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(121, 133, 84, 0.05); }
         
         /* ГАЛЕРЕЯ ДЛЯ ФОТО */
-        .merch-img-box { width: 100%; height: 320px; background: rgba(0,0,0,0.2); position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .merch-img-box { width: 100%; height: 320px; background: transparent; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .merch-gallery { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; width: 100%; height: 100%; scroll-behavior: smooth; }
         .merch-gallery::-webkit-scrollbar { display: none; }
         .merch-gallery img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; scroll-snap-align: center; cursor: zoom-in; transition: transform 0.6s ease; }
@@ -327,9 +327,9 @@
         .confirm-btn-sticky-wrap { position: sticky; bottom: -24px; margin: 0 -30px -24px; padding: 16px 30px; background: linear-gradient(to top, #121215 60%, transparent); }
 
         /* ==================== ІКОНКИ СОЦМЕРЕЖ У ФУТЕРІ ==================== */
-        .footer-socials { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-        .footer-social-link { padding: 12px 20px; border: 1px solid var(--border-color); border-radius: 12px; color: #fff; text-align: center; text-decoration: none; font-weight: 600; font-size: 0.85rem; background: var(--card-bg); transition: all 0.3s ease; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; }
-        .footer-social-link:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(0,0,0,0.8); transform: translateY(-3px); }
+        .footer-socials { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .footer-social-link { flex: 1; min-width: 180px; padding: 16px 20px; border: 1px solid var(--border-color); border-radius: 12px; color: #fff; text-align: center; text-decoration: none; font-weight: 600; background: var(--card-bg); transition: all 0.3s ease; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; }
+        .footer-social-link:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(0,0,0,0.8); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(121, 133, 84, 0.15); }
 
         @media (max-width: 768px) { 
             .navbar-container { padding: 12px 15px; }
@@ -342,6 +342,8 @@
             .cart-fab { bottom: 20px; right: 20px; width: 58px; height: 55px; }
             .categories-nav { justify-content: flex-start; padding-left: 15px; padding-right: 15px; }
             .order-modal { max-height: 95vh; border-radius: 20px; } .modal-body { padding: 16px 20px; }
+            .footer-socials { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+            .footer-social-link { min-width: 0; padding: 14px 10px; font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -665,7 +667,9 @@
             document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none');
             document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText.toLowerCase() === lang); });
             document.querySelectorAll('[data-placeholder-ua]').forEach(el => { el.placeholder = lang === 'ua' ? el.getAttribute('data-placeholder-ua') : el.getAttribute('data-placeholder-en'); });
+            document.querySelectorAll('#shop-sort-select option').forEach(opt => { const txt = lang === 'ua' ? opt.getAttribute('data-txt-ua') : opt.getAttribute('data-txt-en'); if (txt) opt.innerText = txt; });
             document.title = lang === 'ua' ? "SVAROG TEAM | Магазин" : 'SVAROG TEAM | Shop'; applyTranslationsToDOM(lang);
+            if (typeof renderShopGrid === 'function' && document.getElementById('dynamic-shop-grid')) renderShopGrid();
         }
 
         let dynamicBankUrl = "https://send.monobank.ua/YOUR_JAR"; let dynamicCardNumber = "0000 0000 0000 0000"; let dynamicCardName = "Не вказано";
@@ -719,8 +723,17 @@
 
         db.collection("merch").onSnapshot(snapshot => { globalMerchList = []; snapshot.forEach(doc => { globalMerchList.push({ id: doc.id, ...doc.data() }); }); globalMerchList.sort((a, b) => { let orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER; let orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER; if (orderA === orderB) { return (b.timestamp ? b.timestamp.toMillis() : 0) - (a.timestamp ? a.timestamp.toMillis() : 0); } return orderA - orderB; }); checkCartExpiry(); renderShopGrid(); updateCartUI(); }, err => console.error(err));
 
+        let lastRenderedCategoriesKey = '';
         function renderCategoryBar() {
-            const bar = document.getElementById('category-bar'); if(bar.innerHTML.trim() !== '') { Array.from(bar.children).forEach(btn => { if(btn.dataset.cat === activeCategory) btn.classList.add('active'); else btn.classList.remove('active'); }); return; }
+            const bar = document.getElementById('category-bar');
+            const namesKey = globalCategories.map(c => typeof c === 'object' ? c.name : c).join('|');
+            if (namesKey === lastRenderedCategoriesKey) {
+                // Список категорій не змінився — просто оновлюємо, яка активна
+                Array.from(bar.children).forEach(btn => { btn.classList.toggle('active', btn.dataset.cat === activeCategory); });
+                return;
+            }
+            lastRenderedCategoriesKey = namesKey;
+            bar.innerHTML = '';
             const lang = localStorage.getItem('selectedLang') || 'ua';
             globalCategories.forEach(cat => {
                 let catName = typeof cat === 'object' ? cat.name : cat; let catIcon = (typeof cat === 'object' && cat.icon) ? `<img src="${cat.icon}" class="cat-icon">` : '';
@@ -799,7 +812,7 @@
                 let totalStock = typeof currentStockObj === 'object' && currentStockObj !== null ? Object.values(currentStockObj).reduce((a, b) => a + parseInt(b || 0), 0) : parseInt(currentStockObj || 0);
                 let isOutOfStock = !item.isPreorder && totalStock <= 0;
                 let isLowStock = !item.isPreorder && !isOutOfStock && totalStock <= LOW_STOCK_THRESHOLD_SHOP;
-                let stockBadge = item.isPreorder ? `<div class="stock-badge">⏳ ПЕРЕДЗАМОВЛЕННЯ</div>` : (isOutOfStock ? `<div class="stock-badge empty">${lang==='ua'?'Немає':'Out of stock'}</div>` : '');
+                let stockBadge = item.isPreorder ? `<div class="stock-badge">${lang==='ua'?'⏳ ПЕРЕДЗАМОВЛЕННЯ':'⏳ PRE-ORDER'}</div>` : (isOutOfStock ? `<div class="stock-badge empty">${lang==='ua'?'Немає':'Out of stock'}</div>` : '');
                 let lowStockHtml = isLowStock ? `<div class="low-stock-tag">🔥 ${lang==='ua'?`Залишилось лише ${totalStock} шт!`:`Only ${totalStock} left!`}</div>` : '';
                 let hasDiscount = item.discountPrice && item.discountPrice < item.price;
                 let priceHtml = hasDiscount ? `<span class="old-price">${item.price} ₴</span> <span class="merch-price">${item.discountPrice} ₴</span>` : `<span class="merch-price">${item.price} ₴</span>`;
