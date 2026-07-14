@@ -116,6 +116,8 @@
         .qr-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; padding: 30px 15px; background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1); }
         .qr-image { width: 190px; height: 190px; background: #fff; border-radius: 12px; padding: 8px; box-shadow: 0 0 25px rgba(121, 133, 84, 0.2); }
         .card-number-display { font-size: 1.15rem; font-weight: 800; letter-spacing: 1.5px; color: var(--theme-color); background: rgba(121, 133, 84, 0.1); padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(121, 133, 84, 0.3); text-align: center; width: 100%; display: none; margin-top: 10px; }
+        .copy-btn { background: rgba(121, 133, 84, 0.15); color: var(--theme-color); border: 1px solid var(--theme-color); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-left: 8px; transition: 0.2s; vertical-align: middle; }
+        .copy-btn:hover { background: var(--theme-color); color: #000; }
 
         .attached-preview { max-width: 100%; max-height: 150px; border-radius: 8px; margin-top: 10px; display: none; border: 1px dashed rgba(255,255,255,0.3); object-fit: contain; }
 
@@ -130,7 +132,27 @@
         .reports-wrapper { width: 100%; max-width: 1100px; display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 20px; margin-bottom: 20px; }
         .reports-wrapper h2 { font-size: 1.8rem; font-weight: 800; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 10px; border-bottom: 2px solid var(--theme-color); padding-bottom: 10px; }
         .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; width: 100%; }
-        .report-card { background: var(--card-bg); backdrop-filter: blur(15px); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4); transition: transform 0.3s ease, border-color 0.3s; }
+        @keyframes cardFadeIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+        .report-card { background: var(--card-bg); backdrop-filter: blur(15px); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4); transition: transform 0.3s ease, border-color 0.3s; animation: cardFadeIn 0.5s ease forwards; opacity: 0; }
+        .load-more-btn { width: auto; margin-top: 5px; padding: 12px 32px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff; box-shadow: none; }
+        .load-more-btn:hover:not(:disabled) { border-color: var(--theme-color); color: var(--theme-color); background: rgba(121,133,84,0.08); }
+
+        /* ==================== ТОСТИ ==================== */
+        .toast-notification { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(120px); background: #121215; border: 1px solid var(--theme-color); color: #fff; padding: 16px 28px; border-radius: 14px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 4000; opacity: 0; transition: all 0.4s ease; display: flex; align-items: center; gap: 12px; max-width: 90vw; }
+        .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-notification.error { border-color: #ff4a4a; }
+
+        /* ==================== КНОПКА "НАГОРУ" ==================== */
+        .back-to-top { position: fixed; bottom: 30px; left: 30px; width: 48px; height: 48px; border-radius: 50%; background: rgba(20,20,25,0.85); backdrop-filter: blur(10px); border: 1px solid var(--border-color); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1400; opacity: 0; pointer-events: none; transition: all 0.3s ease; font-size: 1.3rem; }
+        .back-to-top.visible { opacity: 1; pointer-events: auto; }
+        .back-to-top:hover { background: var(--theme-color); color: #121212; transform: translateY(-3px); }
+        @media (max-width: 768px) { .back-to-top { left: 20px; bottom: 20px; width: 42px; height: 42px; } }
+
+        /* ==================== ЕКРАН ПОДЯКИ ПІСЛЯ АНКЕТИ ==================== */
+        .vol-success-screen { display: none; flex-direction: column; align-items: center; text-align: center; padding: 20px 10px 10px; }
+        .vol-success-icon { width: 70px; height: 70px; border-radius: 50%; background: rgba(121,133,84,0.15); border: 2px solid var(--theme-color); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 18px; }
+        .vol-success-screen h3 { color: #fff; font-size: 1.2rem; margin-bottom: 8px; }
+        .vol-success-screen p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
         .report-card:hover { transform: translateY(-6px); border-color: rgba(121, 133, 84, 0.5); box-shadow: 0 20px 40px rgba(121, 133, 84, 0.15); }
         .report-img { width: 100%; height: 240px; background: rgba(0,0,0,0.5); position: relative; overflow: hidden; }
         .report-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; cursor: pointer; }
@@ -178,6 +200,14 @@
 
         [data-lang="en"] { display: none; }
 
+        /* ==================== ПЛАВНИЙ ФОН (crossfade замість стрибка) ==================== */
+        .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background-image: linear-gradient(rgba(10, 10, 12, 0.85), rgba(10, 10, 12, 0.95)), var(--layer-img);
+            background-position: center; background-repeat: no-repeat; background-size: cover;
+            opacity: 0; transition: opacity 2.5s ease-in-out; }
+        .bg-layer.visible { opacity: 1; }
+        body::before { display: none; }
+
         @media (max-width: 768px) { 
             .navbar-container { padding: 12px 15px; }
             .nav-links { width: 280px; } 
@@ -192,6 +222,8 @@
     </style>
 </head>
 <body>
+    <div class="bg-layer visible" id="bg-layer-a"></div>
+    <div class="bg-layer" id="bg-layer-b"></div>
     <nav class="navbar">
         <div class="navbar-container">
             <div class="left-side">
@@ -234,6 +266,7 @@
             <div class="qr-zone">
                 <img id="donation-qr" class="qr-image" src="" alt="Fundraiser QR">
                 <div id="donation-card-number" class="card-number-display"></div>
+                <button type="button" class="copy-btn" id="copy-card-btn" style="display:none;" onclick="copyCardNumber()"><span data-lang="ua">Скопіювати</span><span data-lang="en">Copy</span></button>
                 <a id="donation-btn" href="#" target="_blank" class="btn">
                     <span data-lang="ua">Перейти до Банки</span>
                     <span data-lang="en">Go to Fundraiser</span>
@@ -249,36 +282,46 @@
             </div>
             
             <div id="volunteer-form-wrapper" style="display: none; padding-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); margin-top: 15px;">
-                <p data-lang="ua" style="color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem;">Заповніть форму — ваша заявка миттєво з'явиться для зворотного зв'язку.</p>
-                <p data-lang="en" style="color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem;">Fill out the form — your application will instantly appear for feedback.</p>
-                
-                <form id="volunteer-form" onsubmit="sendVolunteerForm(event)">
-                    <input type="text" id="vol-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px; opacity:0; height:0; width:0;" aria-hidden="true">
-                    <div class="form-group">
-                        <input type="text" id="vol-name" class="form-input" data-placeholder-ua="Прізвище та Ім'я" data-placeholder-en="Full Name" placeholder="Прізвище та Ім'я" required autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="vol-org" class="form-input" data-placeholder-ua="Назва Організації / Фонду" data-placeholder-en="Organization / Foundation Name" placeholder="Назва Організації / Фонду" required autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <input type="tel" id="vol-phone" class="form-input" data-placeholder-ua="Номер телефону" data-placeholder-en="Phone Number" placeholder="Номер телефону" required autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="vol-whatsapp" class="form-input" data-placeholder-ua="Контактний WhatsApp або Telegram" data-placeholder-en="Contact WhatsApp or Telegram" placeholder="Contact WhatsApp or Telegram" required autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <textarea id="vol-message" class="form-textarea" data-placeholder-ua="Чим саме можете допомогти підрозділу?" data-placeholder-en="How exactly can you help the unit?" placeholder="Повідомлення" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;" data-lang="ua">Прикріпити офіційний бланк / фото документа (необов'язково):</label>
-                        <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;" data-lang="en">Attach official form / document photo (optional):</label>
-                        <input type="file" id="vol-file" accept="image/*" class="form-input" onchange="previewVolunteerPhoto(this)" style="padding: 10px;">
-                        <img id="vol-preview-element" class="attached-preview" src="">
-                    </div>
-                    <button type="submit" class="btn" id="vol-submit-btn">
-                        <span data-lang="ua">Надіслати анкету</span><span data-lang="en">Submit Application</span>
+                <div id="volunteer-form-content">
+                    <p data-lang="ua" style="color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem;">Заповніть форму — ваша заявка миттєво з'явиться для зворотного зв'язку.</p>
+                    <p data-lang="en" style="color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem;">Fill out the form — your application will instantly appear for feedback.</p>
+                    
+                    <form id="volunteer-form" onsubmit="sendVolunteerForm(event)">
+                        <input type="text" id="vol-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px; opacity:0; height:0; width:0;" aria-hidden="true">
+                        <div class="form-group">
+                            <input type="text" id="vol-name" class="form-input" data-placeholder-ua="Прізвище та Ім'я" data-placeholder-en="Full Name" placeholder="Прізвище та Ім'я" required autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="vol-org" class="form-input" data-placeholder-ua="Назва Організації / Фонду" data-placeholder-en="Organization / Foundation Name" placeholder="Назва Організації / Фонду" required autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="vol-phone" class="form-input" data-placeholder-ua="Номер телефону" data-placeholder-en="Phone Number" placeholder="Номер телефону" required autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="vol-whatsapp" class="form-input" data-placeholder-ua="Контактний WhatsApp або Telegram" data-placeholder-en="Contact WhatsApp or Telegram" placeholder="Contact WhatsApp or Telegram" required autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <textarea id="vol-message" class="form-textarea" data-placeholder-ua="Чим саме можете допомогти підрозділу?" data-placeholder-en="How exactly can you help the unit?" placeholder="Повідомлення" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;" data-lang="ua">Прикріпити офіційний бланк / фото документа (необов'язково):</label>
+                            <label style="font-size:0.85rem; color:#aaa; display:block; margin-bottom:5px;" data-lang="en">Attach official form / document photo (optional):</label>
+                            <input type="file" id="vol-file" accept="image/*" class="form-input" onchange="previewVolunteerPhoto(this)" style="padding: 10px;">
+                            <img id="vol-preview-element" class="attached-preview" src="">
+                        </div>
+                        <button type="submit" class="btn" id="vol-submit-btn">
+                            <span data-lang="ua">Надіслати анкету</span><span data-lang="en">Submit Application</span>
+                        </button>
+                    </form>
+                </div>
+                <div class="vol-success-screen" id="vol-success-screen">
+                    <div class="vol-success-icon">✅</div>
+                    <h3><span data-lang="ua">Дякуємо!</span><span data-lang="en">Thank you!</span></h3>
+                    <p><span data-lang="ua">Анкету надіслано. Ми зв'яжемось з вами найближчим часом.</span><span data-lang="en">Application sent. We'll get in touch with you shortly.</span></p>
+                    <button type="button" class="btn" style="max-width:260px;" onclick="resetVolunteerForm()">
+                        <span data-lang="ua">Заповнити ще раз</span><span data-lang="en">Submit another</span>
                     </button>
-                </form>
+                </div>
             </div>
         </div>
 
@@ -290,12 +333,21 @@
             <div class="reports-grid" id="dynamic-reports-grid">
                 <div style="grid-column: 1 / -1; text-align:center; color:#aaa; font-style:italic;">Завантаження звітів...</div>
             </div>
+            <button class="btn load-more-btn" id="reports-load-more-btn" style="display:none;" onclick="loadMoreReports()">
+                <span data-lang="ua">Показати ще</span><span data-lang="en">Show more</span>
+            </button>
         </div>
 
         <div class="home-socials-wrapper">
             <div class="home-socials" id="dynamic-user-social-container"></div>
         </div>
     </div>
+
+    <div class="toast-notification" id="toast-msg">
+        <span id="toast-text">Сповіщення</span>
+    </div>
+
+    <div class="back-to-top" id="back-to-top-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</div>
 
     <div id="image-lightbox" class="lightbox-overlay" onclick="closeLightbox()">
         <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
@@ -333,13 +385,18 @@
     </div>
 
     <script>
-        // Анімація фону
+        // Плавна зміна фону (crossfade)
         const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
-        let bgIndex = 0;
-        setInterval(() => { 
-            bgIndex = (bgIndex + 1) % images.length; 
-            document.body.style.setProperty('--bg-image', `url('${images[bgIndex]}')`); 
-        }, 3000);
+        let bgIndex = 0; let bgShowingA = true;
+        const bgLayerA = document.getElementById('bg-layer-a'); const bgLayerB = document.getElementById('bg-layer-b');
+        bgLayerA.style.setProperty('--layer-img', `url('${images[0]}')`);
+        setInterval(() => {
+            bgIndex = (bgIndex + 1) % images.length;
+            const nextLayer = bgShowingA ? bgLayerB : bgLayerA; const curLayer = bgShowingA ? bgLayerA : bgLayerB;
+            nextLayer.style.setProperty('--layer-img', `url('${images[bgIndex]}')`);
+            nextLayer.classList.add('visible'); curLayer.classList.remove('visible');
+            bgShowingA = !bgShowingA;
+        }, 6000);
 
         // Мобільне меню
         const menuButton = document.getElementById('menu-button');
@@ -412,6 +469,27 @@
             applyTranslationsToDOM(lang);
         }
 
+        // --- ТОСТ-СПОВІЩЕННЯ ---
+        function showToast(message, type = 'success', duration = 4000) {
+            const toast = document.getElementById('toast-msg'); document.getElementById('toast-text').innerText = message;
+            toast.classList.toggle('error', type === 'error');
+            toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, duration);
+        }
+
+        // Кнопка "нагору"
+        window.addEventListener('scroll', () => {
+            const backBtn = document.getElementById('back-to-top-btn');
+            if (backBtn) backBtn.classList.toggle('visible', window.scrollY > 600);
+        });
+
+        let currentCardNumber = "";
+        function copyCardNumber() {
+            if (!currentCardNumber) return;
+            navigator.clipboard.writeText(currentCardNumber.replace(/\s/g, '')).then(() => {
+                showToast(localStorage.getItem('selectedLang') === 'en' ? "Card number copied!" : "Номер картки скопійовано!");
+            });
+        }
+
         // --- ЛОГІКА ДИНАМІЧНОГО ЗЧИТУВАННЯ БАНКИ ТА КАРТИ ---
         db.collection("config").doc("payment").onSnapshot(doc => {
             let currentLink = "https://send.monobank.ua/jar/default";
@@ -420,18 +498,22 @@
                 if(doc.data().bankUrl) currentLink = doc.data().bankUrl;
                 if(doc.data().cardNumber) currentCard = doc.data().cardNumber;
             }
+            currentCardNumber = currentCard;
             
             document.getElementById('donation-btn').href = currentLink;
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=${encodeURIComponent(currentLink)}`;
             document.getElementById('donation-qr').src = qrApiUrl;
             
             const cardEl = document.getElementById('donation-card-number');
+            const copyBtn = document.getElementById('copy-card-btn');
             if(cardEl) {
                 if(currentCard) {
                     cardEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.85rem; font-weight:normal;">Номер картки:</span><br><span style="font-size:1.15rem; letter-spacing:1px; color:#fff;">${currentCard}</span>`;
                     cardEl.style.display = 'block';
+                    if (copyBtn) copyBtn.style.display = 'inline-block';
                 } else {
                     cardEl.style.display = 'none';
+                    if (copyBtn) copyBtn.style.display = 'none';
                 }
             }
         });
@@ -527,20 +609,25 @@
                     });
                 }
 
-                alert(lang === 'ua' ? 'Анкету успішно надіслано!' : 'Application successfully sent!'); 
                 document.getElementById('volunteer-form').reset();
                 document.getElementById('vol-preview-element').style.display = 'none';
                 volunteerImgBase64 = "";
-                toggleVolunteerForm();
+                document.getElementById('volunteer-form-content').style.display = 'none';
+                document.getElementById('vol-success-screen').style.display = 'flex';
 
             } catch (err) {
                 console.error("Помилка відправки анкету: ", err);
-                alert(lang === 'ua' ? 'Помилка: ' + err.message : 'Error: ' + err.message);
+                showToast((lang === 'ua' ? 'Помилка: ' : 'Error: ') + err.message, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<span data-lang="ua">Надіслати анкету</span><span data-lang="en">Submit Application</span>`;
                 setLanguage(lang);
             }
+        }
+
+        function resetVolunteerForm() {
+            document.getElementById('vol-success-screen').style.display = 'none';
+            document.getElementById('volunteer-form-content').style.display = 'block';
         }
 
         function getYouTubeEmbedUrl(url) {
@@ -551,19 +638,24 @@
         }
 
         // --- ЛОГІКА ЗВІТІВ (REPORTS) З АВТОПЕРЕКЛАДОМ ---
+        let reportsLimit = 6;
+        let unsubscribeReports = null;
         function initReportsStream() {
-            db.collection("reports").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+            if (unsubscribeReports) unsubscribeReports();
+            unsubscribeReports = db.collection("reports").orderBy("timestamp", "desc").limit(reportsLimit).onSnapshot(snapshot => {
                 const grid = document.getElementById('dynamic-reports-grid');
+                const loadMoreBtn = document.getElementById('reports-load-more-btn');
                 if(!grid) return;
                 grid.innerHTML = "";
                 const lang = localStorage.getItem('selectedLang') || 'ua';
                 
                 if(snapshot.empty) {
                     grid.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; color:#aaa; font-style:italic;">${lang === 'ua' ? 'Звітів поки немає...' : 'No reports yet...'}</div>`;
+                    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
                     return;
                 }
                 
-                snapshot.forEach(doc => {
+                snapshot.docs.forEach((doc, idx) => {
                     const data = doc.data();
                     let mediaHtml = '';
                     
@@ -571,22 +663,30 @@
                         const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
                         mediaHtml = `<div class="report-img"><iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
                     } else if (data.image) {
-                        mediaHtml = `<div class="report-img"><img src="${data.image}" onclick="openLightbox('${data.image}')" alt="Report Image"></div>`;
+                        mediaHtml = `<div class="report-img"><img src="${data.image}" loading="lazy" onclick="openLightbox('${data.image}')" alt="Report Image"></div>`;
                     }
                     
                     // ЗВЕРНИ УВАГУ: Додано клас auto-translate для опису звіту!
                     grid.innerHTML += `
-                        <div class="report-card">
+                        <div class="report-card" style="animation-delay:${(idx % 6) * 0.08}s">
                             ${mediaHtml}
                             <div class="report-desc auto-translate">${data.description}</div>
                         </div>
                     `;
                 });
 
+                // "Показати ще" видно, тільки якщо схоже, що звітів може бути більше
+                if (loadMoreBtn) loadMoreBtn.style.display = snapshot.size >= reportsLimit ? 'block' : 'none';
+
                 // Викликаємо функцію перекладу після рендеру
                 applyTranslationsToDOM(lang);
 
             }, err => console.error("Помилка звітів: ", err));
+        }
+
+        function loadMoreReports() {
+            reportsLimit += 6;
+            initReportsStream();
         }
 
         // --- ЛОГІКА СОЦІАЛЬНИХ МЕРЕЖ З АВТОПЕРЕКЛАДОМ ---
@@ -701,8 +801,30 @@
             } catch(e) { console.error(e); }
         }
 
-        function sendUserChatPhoto(input) {
-            alert(localStorage.getItem('selectedLang') === 'en' ? "Photo transfer is in development." : "Надсилання фото знаходиться в розробці.");
+        function getBase64Image(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader(); reader.onload = (e) => {
+                    const img = new Image(); img.onload = () => {
+                        const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let w = img.width; let h = img.height;
+                        if (w > MAX_WIDTH) { h = Math.round((h * MAX_WIDTH) / w); w = MAX_WIDTH; }
+                        canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); resolve(canvas.toDataURL('image/jpeg', 0.6));
+                    }; img.onerror = reject; img.src = e.target.result;
+                }; reader.onerror = reject; reader.readAsDataURL(file);
+            });
+        }
+
+        async function sendUserChatPhoto(input) {
+            if (!(input.files && input.files[0])) return;
+            try {
+                const base64 = await getBase64Image(input.files[0]);
+                const msgObject = { sender: 'user', text: base64, type: 'image', time: Date.now() };
+                await db.collection("chats").doc(userChatSessionId).set({
+                    id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
+                    messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
+                }, { merge: true });
+            } catch(e) {
+                alert(localStorage.getItem('selectedLang') === 'en' ? "Error sending photo." : "Помилка надсилання фото.");
+            } finally { input.value = ''; }
         }
 
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
