@@ -2,416 +2,492 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SVAROG TEAM | Бойовий Звіт</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бойовий Звіт | SVAROG TEAM</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Підключаємо Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
-            authDomain: "svarog-team.firebaseapp.com",
-            projectId: "svarog-team",
-            storageBucket: "svarog-team.firebasestorage.app",
-            messagingSenderId: "311449325528",
-            appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
-            measurementId: "G-56T1VN72PF"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-    </script>
 
     <style>
-        @font-face { font-family: 'SvarogTeamCustom'; src: url('SvarogTeam-Regular.woff') format('woff'); font-weight: normal; font-style: normal; }
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap');
-
         :root {
-            --theme-color: #798554;
-            --theme-color-rgb: 121, 133, 84;
-            --accent-blue: #4db8ff; /* Колір для заголовків таблиці */
-            --bg-dark: #0a0a0c;
-            --card-bg: rgba(20, 20, 25, 0.65);
+            --bg-main: #0b0c0a;
+            --card-bg: #121510;
             --border-color: rgba(255, 255, 255, 0.08);
-            --text-main: #ffffff;
+            --text-main: #e3ded2;
             --text-muted: #8e8e93;
+            --cyan-glow: #00ffcc;
+            --theme-color: #798554;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body { height: 100%; }
+
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-main);
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-            background-color: var(--bg-dark); background-image: url('bg1.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
-        }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8, 8, 10, 0.92); z-index: -2; }
-        body::after { content: ""; position: fixed; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(121, 133, 84, 0.1) 0%, transparent 70%); z-index: -1; filter: blur(80px); pointer-events: none; }
-
-        /* НАВІГАЦІЯ */
-        .navbar { width: 100%; background-color: rgba(10, 10, 12, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); position: fixed; top: 0; z-index: 1000; }
-        .navbar-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
-        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-text-group { display: flex; flex-direction: column; line-height: 1.1; }
-        .logo-main { font-family: 'SvarogTeamCustom', sans-serif; font-size: 1.2rem; color: #ffffff; letter-spacing: 0.5px; }
-        .logo-sub { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
-        .logo-img { height: 35px; filter: drop-shadow(0 0 8px rgba(121, 133, 84, 0.3)); }
-        
-        .lang-switcher { display: flex; gap: 4px; background: rgba(255, 255, 255, 0.05); padding: 3px; border-radius: 30px; border: 1px solid var(--border-color); }
-        .lang-btn { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 6px 12px; cursor: pointer; border-radius: 30px; transition: 0.3s; }
-        .lang-btn.active { color: #fff; background-color: var(--theme-color); box-shadow: 0 4px 12px rgba(121, 133, 84, 0.3); }
-
-        .btn-back { border: 1px solid var(--border-color); color: #fff; padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; font-weight: bold; transition: 0.3s; background: rgba(255,255,255,0.05); }
-        .btn-back:hover { background: var(--theme-color); color: #121212; border-color: var(--theme-color); }
-
-        /* ДАШБОРД */
-        .dashboard-container { width: 100%; max-width: 1400px; margin-top: 80px; padding: 20px; flex-grow: 1; }
-        
-        /* Хедер дашборду */
-        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .dash-title-group { display: flex; flex-direction: column; }
-        .dash-title { font-size: 2rem; font-weight: 800; color: var(--theme-color); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 10px rgba(121, 133, 84, 0.3); }
-        .dash-subtitle { font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; margin-left: 42px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-        .dash-clock { font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; color: var(--theme-color); background: rgba(255,255,255,0.03); padding: 8px 16px; border: 1px solid var(--theme-color); border-radius: 8px; }
-
-        /* Топ статистика */
-        .top-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .top-stat-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; backdrop-filter: blur(10px); }
-        .top-stat-card:first-child { border-bottom: 3px solid var(--theme-color); }
-        .ts-val { font-size: 2.6rem; font-weight: 800; color: #fff; margin-bottom: 5px; line-height: 1; font-family: 'Montserrat', sans-serif; }
-        .ts-label { font-size: 0.85rem; color: var(--theme-color); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-        .ts-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 6px;}
-
-        /* Детальна таблиця */
-        .details-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; backdrop-filter: blur(10px); }
-        .details-col { display: flex; flex-direction: column; }
-        
-        .list-header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 10px; align-items: flex-end; }
-        .lh-title-left { flex: 1; }
-        .lh-values { display: flex; width: 140px; justify-content: space-between; gap: 10px; }
-        .lh-title { width: 65px; text-align: center; color: var(--accent-blue); font-size: 0.75rem; font-weight: 600; text-transform: lowercase; line-height: 1.2; letter-spacing: 0.5px; }
-        
-        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; border-radius: 6px; }
-        .list-row:hover { background: rgba(255,255,255,0.03); }
-        
-        .row-name { display: flex; align-items: center; gap: 14px; font-size: 0.95rem; font-weight: 500; color: #eaeaea; flex: 1; }
-        .row-icon { font-size: 1.4rem; filter: grayscale(100%) sepia(100%) hue-rotate(50deg) saturate(300%) brightness(0.9); display: flex; align-items: center; justify-content: center; width: 24px; }
-        
-        .row-values { display: flex; width: 140px; justify-content: space-between; gap: 10px; }
-        .val-hit, .val-dest { width: 65px; text-align: center; font-weight: 700; font-size: 1.15rem; color: #fff; }
-
-        .top-secret { color: #ff4a4a; font-family: 'Share Tech Mono', monospace; border: 1px solid #ff4a4a; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; letter-spacing: 1px; background: rgba(255,0,0,0.05); text-align: center; width: 140px; }
-
-        .disclaimer { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 30px; font-style: italic; }
-
-        /* СОЦІАЛЬНІ МЕРЕЖІ ТА ФУТЕР */
-        .home-socials-wrapper { width: 100%; max-width: 1400px; margin: 40px auto 20px; }
-        .home-socials { display: flex; gap: 15px; justify-content: center; width: 100%; flex-wrap: wrap; }
-        .home-social-btn { flex: 1; min-width: 180px; padding: 14px 20px; border: 1px solid var(--border-color); border-radius: 12px; color: #fff; text-align: center; text-decoration: none; font-weight: 600; background: var(--card-bg); transition: all 0.3s ease; backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; }
-        .home-social-btn:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(0,0,0,0.8); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(121, 133, 84, 0.15); }
-
-        .footer { width: 100%; padding: 30px 12px; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: auto; border-top: 1px solid var(--border-color); background: rgba(10, 10, 12, 0.6); backdrop-filter: blur(10px); }
-        .footer span strong { font-family: 'SvarogTeamCustom', sans-serif; font-weight: normal; color: #fff; }
-
-        [data-lang="en"] { display: none; }
-
-        /* МОБІЛЬНА АДАПТАЦІЯ */
-        @media (max-width: 900px) {
-            .details-wrapper { grid-template-columns: 1fr; gap: 10px; padding: 0; background: transparent; border: none; box-shadow: none; backdrop-filter: none; }
-            .top-stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .dash-header { flex-direction: column; align-items: center; text-align: center; }
-            .dash-subtitle { margin-left: 0; }
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px 16px 60px;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        @media (max-width: 600px) {
-            .dashboard-container { padding: 15px 10px; margin-top: 75px; }
-            .top-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-            .top-stat-card { padding: 15px 10px; }
-            .ts-val { font-size: 2rem; }
-            .ts-label { font-size: 0.75rem; }
-            
-            .lh-values, .row-values { width: 110px; gap: 5px; }
-            .lh-title { width: 50px; font-size: 0.65rem; }
-            .val-hit, .val-dest { width: 50px; font-size: 1.1rem; }
-            
-            .row-name { font-size: 0.85rem; gap: 10px; }
-            .row-icon { font-size: 1.2rem; }
-            .list-row { padding: 12px 5px; }
-            .list-header { padding-bottom: 10px; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.15); }
-            .top-secret { width: 110px; font-size: 0.65rem; padding: 2px; }
+        /* ==================== ТАКТИЧНИЙ ФОН ==================== */
+        .bg-grid {
+            position: fixed; inset: 0; z-index: -2; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(121,133,84,0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(121,133,84,0.07) 1px, transparent 1px);
+            background-size: 42px 42px;
+            mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, black 20%, transparent 75%);
+            -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, black 20%, transparent 75%);
+        }
+        .bg-sweep {
+            position: fixed; top: -30vw; left: 50%; width: 90vw; height: 90vw; z-index: -1; pointer-events: none;
+            transform: translateX(-50%);
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(0,255,204,0.05) 25deg, transparent 55deg, transparent 360deg);
+            border-radius: 50%;
+            animation: sweepRotate 14s linear infinite;
+        }
+        @keyframes sweepRotate { to { transform: translateX(-50%) rotate(360deg); } }
+        .bg-vignette { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(ellipse at 50% 0%, transparent 0%, var(--bg-main) 85%); }
 
-            .home-socials { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 10px; }
-            .home-social-btn { min-width: 0; padding: 12px; font-size: 0.85rem; }
+        .wrapper {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Шапка */
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 10px;
+            opacity: 0; animation: dropIn 0.7s ease forwards;
+        }
+        
+        .logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(121, 133, 84, 0.4));
+            animation: logoPulse 3.5s ease-in-out infinite;
+        }
+        @keyframes logoPulse { 0%,100% { filter: drop-shadow(0 0 10px rgba(121,133,84,0.4)); } 50% { filter: drop-shadow(0 0 22px rgba(121,133,84,0.75)); } }
+
+        .title-box h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        
+        .title-box p {
+            font-size: 12px;
+            color: var(--theme-color);
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .live-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 10px; padding: 5px 12px;
+            background: rgba(0,255,204,0.08); border: 1px solid rgba(0,255,204,0.3); border-radius: 20px;
+            font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--cyan-glow); text-transform: uppercase;
+        }
+        .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan-glow); animation: livePulse 1.6s ease-in-out infinite; }
+        @keyframes livePulse { 0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,204,0.5); } 50% { opacity: 0.5; box-shadow: 0 0 0 5px rgba(0,255,204,0); } }
+
+        /* Загальна статистика (Топ-блок) */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .sum-card {
+            background: rgba(121, 133, 84, 0.1);
+            border: 1px solid rgba(121, 133, 84, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            opacity: 0; transform: translateY(14px); animation: cardIn 0.6s ease forwards;
+            animation-delay: 0.15s;
+            transition: border-color 0.4s, box-shadow 0.4s;
+        }
+
+        .sum-card.dest {
+            background: rgba(0, 255, 204, 0.05);
+            border-color: rgba(0, 255, 204, 0.2);
+            animation-delay: 0.25s;
+        }
+        .sum-card.flash { animation: cardIn 0.6s ease forwards, flashGlow 1s ease; }
+
+        .sum-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .sum-value { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .sum-value.hit { color: var(--text-main); }
+        .sum-value.dest { color: var(--cyan-glow); }
+
+        /* Таблиця цілей */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            opacity: 0; transform: translateY(14px); animation: cardIn 0.6s ease forwards;
+            animation-delay: 0.35s;
+        }
+
+        .filter-toggle-row { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+        .filter-toggle-btn {
+            font-size: 10.5px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase;
+            color: var(--text-muted); background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+            padding: 5px 10px; border-radius: 20px; cursor: pointer; transition: all 0.25s;
+        }
+        .filter-toggle-btn:hover { color: var(--cyan-glow); border-color: rgba(0,255,204,0.3); }
+        .filter-toggle-btn.active { color: var(--cyan-glow); border-color: rgba(0,255,204,0.4); background: rgba(0,255,204,0.06); }
+
+        .table-header {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .col-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--cyan-glow);
+            letter-spacing: 0.5px;
+            width: 60px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .target-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            opacity: 0; transform: translateX(-10px);
+            animation: rowIn 0.45s ease forwards;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        @media (hover: hover) { .target-row:hover { background: rgba(255,255,255,0.02); } }
+        
+        .target-row:last-child {
+            border-bottom: none;
+        }
+        .target-row.is-zero { opacity: 0.4; }
+        .target-row.flash-update { animation: rowIn 0.45s ease forwards, flashRow 1.2s ease; }
+
+        .target-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .target-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .target-text { min-width: 0; flex: 1; }
+
+        .target-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #d1d1d1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .target-bar-track { height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+        .target-bar-fill { height: 100%; background: linear-gradient(90deg, var(--theme-color), var(--cyan-glow)); border-radius: 2px; width: 0%; transition: width 1s cubic-bezier(.2,.8,.2,1); }
+
+        .target-stats {
+            display: flex;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .stat-num {
+            width: 60px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-num.zero {
+            color: #444;
+        }
+
+        #loading {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 60px 0;
+            font-size: 14px;
+        }
+        .loading-spinner { width: 34px; height: 34px; margin: 0 auto 16px; border-radius: 50%; border: 2px solid rgba(0,255,204,0.15); border-top-color: var(--cyan-glow); animation: spin 0.9s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .last-update {
+            text-align: center;
+            font-size: 11px;
+            color: #555;
+            margin-top: -5px;
+            margin-bottom: 10px;
+        }
+
+        @keyframes dropIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
+        @keyframes rowIn { to { opacity: 1; transform: translateX(0); } }
+        @keyframes flashGlow { 0% { box-shadow: 0 0 0 0 rgba(0,255,204,0.5); } 40% { box-shadow: 0 0 25px 4px rgba(0,255,204,0.35); } 100% { box-shadow: 0 0 0 0 rgba(0,255,204,0); } }
+        @keyframes flashRow { 0% { background: rgba(0,255,204,0.14); } 100% { background: transparent; } }
+
+        /* ==================== ДЕСКТОП ==================== */
+        @media (min-width: 820px) {
+            body { padding: 50px 20px; align-items: flex-start; }
+            .wrapper { max-width: 760px; }
+            .header { margin-bottom: 20px; }
+            .logo { width: 88px; height: 88px; }
+            .title-box h1 { font-size: 30px; }
+            .table-container { padding: 25px 30px; }
+            #targets-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 30px; }
+            .target-row { grid-column: span 1; }
+        }
+
+        @media (max-width: 400px) {
+            .target-name { font-size: 12px; }
+            .stat-num, .col-title { width: 48px; }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="left-side">
-                <a href="index.html" class="logo-container">
-                    <img src="logo.png" alt="SVAROG" class="logo-img">
-                    <div class="logo-text-group">
-                        <span class="logo-main">SVAROG TEAM</span>
-                        <span class="logo-sub"><span data-lang="ua">35-й Полк НГУ</span><span data-lang="en">35th Regiment</span></span>
-                    </div>
-                </a>
-            </div>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <a href="index.html" class="btn-back"><span data-lang="ua">На головну</span><span data-lang="en">Home</span></a>
-                <div class="lang-switcher">
-                    <button class="lang-btn active" onclick="setLanguage('ua')">UA</button>
-                    <button class="lang-btn" onclick="setLanguage('en')">EN</button>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <div class="dashboard-container">
-        <div class="dash-header">
-            <div class="dash-title-group">
-                <div class="dash-title">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--theme-color)">
-                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                    </svg>
-                    <span data-lang="ua">ЗВІТ SVAROG TEAM</span><span data-lang="en">SVAROG TEAM REPORT</span>
-                </div>
-                <div class="dash-subtitle">
-                    <span data-lang="ua">Дані синхронізовано з 01.07.2026р.</span>
-                    <span data-lang="en">Data synchronized since 01.07.2026</span>
-                </div>
-            </div>
-            <div class="dash-clock" id="live-clock">--:--:-- --.--.----</div>
-        </div>
 
-        <div class="top-stats-grid">
-            <div class="top-stat-card">
-                <div class="ts-val" id="ts-hit">0</div>
-                <div class="ts-label"><span data-lang="ua">Уражено цілей</span><span data-lang="en">Targets Hit</span></div>
-                <div class="ts-sub"><span data-lang="ua">в т.ч. знищено:</span><span data-lang="en">incl. destroyed:</span> <span id="ts-dest" style="color:#fff; font-weight:bold;">0</span></div>
-            </div>
-            <div class="top-stat-card">
-                <div class="ts-val" id="ts-strike">0</div>
-                <div class="ts-label"><span data-lang="ua">Ударних вильотів</span><span data-lang="en">Strike Sorties</span></div>
-            </div>
-            <div class="top-stat-card">
-                <div class="ts-val" id="ts-recon">0</div>
-                <div class="ts-label"><span data-lang="ua">Розвід. вильотів</span><span data-lang="en">Recon Sorties</span></div>
-            </div>
-            <div class="top-stat-card">
-                <div class="ts-val" id="ts-pers-hit">0</div>
-                <div class="ts-label"><span data-lang="ua">ОС РОВ</span><span data-lang="en">Enemy Personnel</span></div>
-                <div class="ts-sub">
-                    <span data-lang="ua">Знищено:</span><span data-lang="en">KIA:</span> <span id="ts-pers-kill" style="color:#fff;font-weight:bold;">0</span> | 
-                    <span data-lang="ua">Поранено:</span><span data-lang="en">WIA:</span> <span id="ts-pers-wound" style="color:#fff;font-weight:bold;">0</span>
-                </div>
-            </div>
-        </div>
+<div class="bg-grid"></div>
+<div class="bg-sweep"></div>
+<div class="bg-vignette"></div>
 
-        <div class="details-wrapper">
-            <div class="details-col" id="col-1">
-                </div>
-            <div class="details-col" id="col-2">
-                </div>
+<div class="wrapper">
+    <!-- Шапка -->
+    <div class="header">
+        <img src="logo.png" alt="SVAROG" class="logo">
+        <div class="title-box">
+            <h1>Результати роботи</h1>
+            <p>SVAROG TEAM</p>
         </div>
-
-        <div class="disclaimer">
-            <span data-lang="ua">Дані на сторінці коригуються за результатами здійснення дорозвідки впродовж 24 годин.</span>
-            <span data-lang="en">Data on the page is adjusted based on additional reconnaissance within 24 hours.</span>
-        </div>
-        
-        <div class="home-socials-wrapper">
-            <div class="home-socials" id="dynamic-user-social-container"></div>
-        </div>
+        <div class="live-badge"><span class="live-dot"></span> Наживо</div>
     </div>
 
-    <footer class="footer">
-        <div style="margin-bottom: 10px;">
-            <a href="status.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.3); transition: 0.2s;">Перевірити статус замовлення</a>
+    <div id="loading"><div class="loading-spinner"></div>📡 Синхронізація з базою даних...</div>
+
+    <!-- Основний контент (прихований до завантаження) -->
+    <div id="report-content" style="display: none;">
+        
+        <!-- Загальні цифри -->
+        <div class="summary-grid">
+            <div class="sum-card" id="sum-hit-card">
+                <div class="sum-title">Усього уражено</div>
+                <div class="sum-value hit" id="sum-hit">0</div>
+            </div>
+            <div class="sum-card dest" id="sum-dest-card">
+                <div class="sum-title">З них знищено</div>
+                <div class="sum-value dest" id="sum-dest">0</div>
+            </div>
         </div>
-        <span data-lang="ua"><strong>SVAROG TEAM</strong> © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
-        <span data-lang="en"><strong>SVAROG TEAM</strong> © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
-    </footer>
 
-    <script>
-        // Схема категорій та іконки
-        const statCategories = [
-            { id: "os_rov", icon: "🪖", ua: "ОС РОВ", en: "Enemy Personnel", secret: false },
-            { id: "drone_points", icon: "🚁", ua: "Точки вильоту дронів", en: "UAV Launch Points", secret: false },
-            { id: "antennas", icon: "📡", ua: "Антени", en: "Antennas", secret: false },
-            { id: "air_defense", icon: "🎯", ua: "ЗРК, ЗГРК", en: "Air Defense Systems", secret: false },
-            { id: "aviation", icon: "✈️", ua: "Літаки та гелікоптери", en: "Aircraft & Helicopters", secret: false },
-            { id: "fleet", icon: "⛴️", ua: "Флот", en: "Fleet", secret: false },
-            { id: "radar_complex", icon: "📻", ua: "РЛС, РЕР та зв'язок (комплекси)", en: "Radar/EW (Complexes)", secret: false },
-            { id: "radar_port", icon: "📟", ua: "РЛС (портативні)", en: "Portable Radars", secret: false },
-            { id: "ew_complex", icon: "🎛️", ua: "РЕБ (комплекс)", en: "EW Complexes", secret: false },
-            { id: "ew_auto", icon: "🚙", ua: "РЕБ (авто + портативні)", en: "EW (Auto + Portable)", secret: false },
-            { id: "enemy_wings", icon: "🦅", ua: "Ворожі крила", en: "Enemy Fixed-wings", secret: false },
-            { id: "shaheds", icon: "🦇", ua: "Шахеди та Гербери", en: "Shaheds & Gerberas", secret: false },
-            { id: "tanks", icon: "🛡️", ua: "Танки", en: "Tanks", secret: false },
-            { id: "apc", icon: "🚜", ua: "ББМ, БМП, БТР", en: "Armored Vehicles", secret: false },
-            { id: "artillery", icon: "💥", ua: "Гармати, гаубиці", en: "Artillery", secret: false },
-            { id: "spg", icon: "🔥", ua: "САУ", en: "Self-Propelled Guns", secret: false },
-            { id: "mortars", icon: "💣", ua: "Міномети", en: "Mortars", secret: false },
-            { id: "mlrs", icon: "🚀", ua: "РСЗВ", en: "MLRS", secret: false },
-            { id: "vehicles", icon: "🚚", ua: "ЛАТ, ВАТ, спец. та інж. техніка", en: "Military Vehicles", secret: false },
-            { id: "moto", icon: "🏍️", ua: "Мотоцикли та баггі", en: "Motorcycles & Buggies", secret: false },
-            { id: "depots", icon: "🏭", ua: "Склади", en: "Depots", secret: false },
-            { id: "strat_infra", icon: "⚡", ua: "Стратегічна інфраструктура", en: "Strategic Infrastructure", secret: true },
-            { id: "tact_infra", icon: "🏗️", ua: "Тактична інфраструктура", en: "Tactical Infrastructure", secret: false },
-            { id: "trenches", icon: "🕳️", ua: "Укриття та бліндажі", en: "Shelters & Trenches", secret: false },
-            { id: "network", icon: "📹", ua: "Мережеве обладнання та камери", en: "Network Eq & Cameras", secret: false },
-            { id: "enemy_copters", icon: "🛸", ua: "Ворожі коптери", en: "Enemy Copters", secret: false },
-            { id: "other", icon: "📌", ua: "Інше", en: "Other", secret: false }
-        ];
-
-        // Годинник
-        function updateClock() {
-            const now = new Date();
-            const time = now.toLocaleTimeString('uk-UA', { hour12: false });
-            const date = now.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const days = ['Нд', 'Пн', 'Вв', 'Ср', 'Чт', 'Пт', 'Сб'];
-            const dayName = days[now.getDay()];
-            document.getElementById('live-clock').innerText = `${time} ${dayName} | ${date}`;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // Автоперекладач для соцмереж
-        async function autoTranslateText(text, targetLang) {
-            if (!text || text.trim() === '') return text;
-            if (targetLang === 'ua') return text; 
-            try {
-                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=uk&tl=en&dt=t&q=${encodeURIComponent(text)}`;
-                const res = await fetch(url);
-                const data = await res.json();
-                return data[0].map(item => item[0]).join('');
-            } catch (e) {
-                console.error("Translation error:", e);
-                return text; 
-            }
-        }
-
-        async function applyTranslationsToDOM(lang) {
-            const elements = document.querySelectorAll('.auto-translate');
-            for (let el of elements) {
-                if (!el.hasAttribute('data-orig-ua')) { el.setAttribute('data-orig-ua', el.innerHTML); }
-                if (lang === 'en') {
-                    if (el.hasAttribute('data-trans-en')) {
-                        el.innerHTML = el.getAttribute('data-trans-en');
-                    } else {
-                        let rawText = el.getAttribute('data-orig-ua').replace(/<br\s*[\/]?>/gi, "\n");
-                        const translated = await autoTranslateText(rawText, 'en');
-                        const formattedTranslation = translated.replace(/\n/g, "<br>");
-                        el.setAttribute('data-trans-en', formattedTranslation);
-                        el.innerHTML = formattedTranslation;
-                    }
-                } else {
-                    el.innerHTML = el.getAttribute('data-orig-ua');
-                }
-            }
-        }
-
-        function setLanguage(lang) {
-            localStorage.setItem('selectedLang', lang);
-            document.querySelectorAll('[data-lang="ua"]').forEach(el => el.style.display = lang === 'ua' ? 'inline' : 'none');
-            document.querySelectorAll('[data-lang="en"]').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.innerText.toLowerCase() === lang));
+        <!-- Детальна таблиця -->
+        <div class="table-container">
+            <div class="filter-toggle-row">
+                <button class="filter-toggle-btn" id="filter-toggle-btn" onclick="toggleActiveOnlyFilter()">Лише активні</button>
+            </div>
+            <div class="table-header">
+                <div class="col-title">Уражено</div>
+                <div class="col-title">В т.ч.<br>знищено</div>
+            </div>
             
-            renderLists(); 
-            applyTranslationsToDOM(lang);
+            <div id="targets-list">
+                <!-- Рядки генеруватимуться автоматично -->
+            </div>
+        </div>
+
+        <div class="last-update" id="update-time">Останнє оновлення: ...</div>
+    </div>
+</div>
+
+<script>
+    // 1. ІНІЦІАЛІЗАЦІЯ FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+        authDomain: "svarog-team.firebaseapp.com",
+        projectId: "svarog-team",
+        storageBucket: "svarog-team.firebasestorage.app",
+        messagingSenderId: "311449325528",
+        appId: "1:311449325528:web:b254c6aed4fea56fe96cad"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // 2. КАТЕГОРІЇ (Точно як в Адмінці) + Іконки
+    const categoriesMap = [
+        { id: "os_rov", ua: "ОС РОВ", icon: "🪖" },
+        { id: "drone_points", ua: "Точки вильоту дронів", icon: "🎯" },
+        { id: "antennas", ua: "Антени", icon: "📡" },
+        { id: "air_defense", ua: "ЗРК, ЗГРК", icon: "🛡️" },
+        { id: "aviation", ua: "Літаки та гелікоптери", icon: "✈️" },
+        { id: "fleet", ua: "Флот", icon: "🚢" },
+        { id: "radar_complex", ua: "РЛС, РЕР", icon: "📻" },
+        { id: "radar_port", ua: "РЛС (портативні)", icon: "📟" },
+        { id: "ew_complex", ua: "РЕБ (комплекс)", icon: "🚛" },
+        { id: "ew_auto", ua: "РЕБ (авто)", icon: "🚙" },
+        { id: "enemy_wings", ua: "Ворожі крила", icon: "🦅" },
+        { id: "shaheds", ua: "Шахеди", icon: "🛩️" },
+        { id: "tanks", ua: "Танки", icon: "🚜" },
+        { id: "apc", ua: "ББМ, БМП, БТР", icon: "🦬" },
+        { id: "artillery", ua: "Гармати", icon: "💥" },
+        { id: "spg", ua: "САУ", icon: "🏗️" },
+        { id: "mortars", ua: "Міномети", icon: "💣" },
+        { id: "mlrs", ua: "РСЗВ", icon: "☄️" },
+        { id: "vehicles", ua: "Техніка", icon: "🚚" },
+        { id: "moto", ua: "Мотоцикли", icon: "🏍️" },
+        { id: "depots", ua: "Склади", icon: "🏭" },
+        { id: "strat_infra", ua: "Страт. інфраструктура", icon: "🌉" },
+        { id: "tact_infra", ua: "Тактична інфраструктура", icon: "🛖" },
+        { id: "trenches", ua: "Укриття", icon: "🛤️" },
+        { id: "network", ua: "Камери / Мережа", icon: "👁️" },
+        { id: "enemy_copters", ua: "Ворожі коптери", icon: "🚁" },
+        { id: "other", ua: "Інше", icon: "❓" }
+    ];
+
+    // Допоміжна: плавно "прокручує" число від поточного до нового
+    function animateCount(el, newVal) {
+        const startVal = parseInt(el.innerText.replace(/\D/g, '')) || 0;
+        if (startVal === newVal) { el.innerText = newVal; return; }
+        const duration = 700; const startTime = performance.now();
+        function step(now) {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.innerText = Math.round(startVal + (newVal - startVal) * eased);
+            if (progress < 1) requestAnimationFrame(step);
+            else el.innerText = newVal;
+        }
+        requestAnimationFrame(step);
+    }
+
+    let previousDetails = null; let previousTotals = null; let showActiveOnly = (localStorage.getItem('reportActiveOnly') === '1'); let isFirstRender = true;
+
+    function toggleActiveOnlyFilter() {
+        showActiveOnly = !showActiveOnly;
+        localStorage.setItem('reportActiveOnly', showActiveOnly ? '1' : '0');
+        document.getElementById('filter-toggle-btn').classList.toggle('active', showActiveOnly);
+        document.querySelectorAll('.target-row').forEach(row => { row.style.display = (showActiveOnly && row.dataset.isZero === '1') ? 'none' : 'flex'; });
+    }
+
+    // 3. СЛУХАЄМО ОНОВЛЕННЯ З БАЗИ
+    db.collection("config").doc("combat_report").onSnapshot(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            renderReport(data);
+        }
+    });
+
+    function renderReport(data) {
+        // Приховуємо завантаження, показуємо контент
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('report-content').style.display = 'block';
+
+        // Заповнюємо загальні суми (з анімацією прокрутки числа)
+        const newHit = data.totalHit || 0; const newDest = data.totalDest || 0;
+        animateCount(document.getElementById('sum-hit'), newHit);
+        animateCount(document.getElementById('sum-dest'), newDest);
+        if (previousTotals && !isFirstRender) {
+            if (newHit !== previousTotals.hit) { const c = document.getElementById('sum-hit-card'); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); }
+            if (newDest !== previousTotals.dest) { const c = document.getElementById('sum-dest-card'); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); }
+        }
+        previousTotals = { hit: newHit, dest: newDest };
+
+        // Час оновлення
+        if (data.lastUpdated) {
+            const date = new Date(data.lastUpdated.toMillis());
+            document.getElementById('update-time').innerText = `Останнє оновлення: ${date.toLocaleString('uk-UA')}`;
         }
 
-        let reportData = {};
+        // Рендеримо таблицю
+        const listContainer = document.getElementById('targets-list');
+        const details = data.details || {};
+        const maxHit = Math.max(1, ...categoriesMap.map(cat => details[`${cat.id}_hit`] || 0));
 
-        // Завантаження з Firebase
-        db.collection("config").doc("combat_report").onSnapshot(doc => {
-            if (doc.exists) {
-                reportData = doc.data();
-                
-                animateValue("ts-hit", 0, reportData.totalHit || 0, 1500);
-                animateValue("ts-dest", 0, reportData.totalDest || 0, 1500);
-                animateValue("ts-strike", 0, reportData.strikeSorties || 0, 1500);
-                animateValue("ts-recon", 0, reportData.reconSorties || 0, 1500);
-                animateValue("ts-pers-hit", 0, reportData.persHit || 0, 1500);
-                animateValue("ts-pers-kill", 0, reportData.persKill || 0, 1500);
-                animateValue("ts-pers-wound", 0, reportData.persWound || 0, 1500);
+        listContainer.innerHTML = '';
+        categoriesMap.forEach((cat, idx) => {
+            const hitCount = details[`${cat.id}_hit`] || 0;
+            const destCount = details[`${cat.id}_dest`] || 0;
+            const isZero = hitCount === 0 && destCount === 0;
 
-                renderLists();
-            }
-        });
+            const hitClass = hitCount === 0 ? "stat-num zero" : "stat-num";
+            const destClass = destCount === 0 ? "stat-num zero" : "stat-num";
 
-        // Соціальні мережі
-        db.collection("config").doc("socials").onSnapshot(doc => {
-            const container = document.getElementById('dynamic-user-social-container');
-            if(!container) return;
-            const nets = doc.exists ? doc.data().list : [];
-            if(nets && nets.length > 0) {
-                container.style.display = '';
-                container.innerHTML = nets.map(n => `<a href="${n.url}" target="_blank" class="home-social-btn auto-translate">${n.name}</a>`).join('');
-                applyTranslationsToDOM(localStorage.getItem('selectedLang') || 'ua');
-            } else {
-                container.style.display = 'none';
-            }
-        });
+            const changed = previousDetails && !isFirstRender && (previousDetails[`${cat.id}_hit`] !== hitCount || previousDetails[`${cat.id}_dest`] !== destCount);
+            const barPct = Math.round((hitCount / maxHit) * 100);
 
-        function animateValue(id, start, end, duration) {
-            let obj = document.getElementById(id);
-            if(!obj || start === end) { if(obj) obj.innerText = end; return; }
-            let range = end - start;
-            let stepTime = Math.abs(Math.floor(duration / range));
-            if(stepTime < 10) stepTime = 10; 
-            let startTime = new Date().getTime();
-            let endTime = startTime + duration;
-            function step() {
-                let now = new Date().getTime();
-                let remaining = Math.max((endTime - now) / duration, 0);
-                let value = Math.round(end - (remaining * range));
-                obj.innerText = value;
-                if(value !== end) requestAnimationFrame(step);
-                else obj.innerText = end;
-            }
-            step();
-        }
-
-        function renderLists() {
-            const col1 = document.getElementById('col-1');
-            const col2 = document.getElementById('col-2');
-            const lang = localStorage.getItem('selectedLang') || 'ua';
-
-            const headerHtml = `
-                <div class="list-header">
-                    <div class="lh-title-left"></div>
-                    <div class="lh-values">
-                        <div class="lh-title">${lang==='ua'?'уражено':'hit'}</div>
-                        <div class="lh-title">${lang==='ua'?'в т.ч.<br>знищено':'incl.<br>destr.'}</div>
+            const row = document.createElement('div');
+            row.className = `target-row${isZero ? ' is-zero' : ''}${changed ? ' flash-update' : ''}`;
+            row.dataset.isZero = isZero ? '1' : '0';
+            row.style.animationDelay = `${Math.min(idx, 14) * 0.035}s`;
+            if (showActiveOnly && isZero) row.style.display = 'none';
+            row.innerHTML = `
+                <div class="target-info">
+                    <span class="target-icon">${cat.icon}</span>
+                    <div class="target-text">
+                        <span class="target-name">${cat.ua}</span>
+                        <div class="target-bar-track"><div class="target-bar-fill" style="width:${isZero ? 0 : barPct}%"></div></div>
                     </div>
-                </div>`;
-            col1.innerHTML = headerHtml;
-            col2.innerHTML = headerHtml;
+                </div>
+                <div class="target-stats">
+                    <span class="${hitClass}">${hitCount}</span>
+                    <span class="${destClass}">${destCount}</span>
+                </div>
+            `;
+            listContainer.appendChild(row);
+        });
 
-            const details = reportData.details || {};
-            const midpoint = Math.ceil(statCategories.length / 2);
+        document.getElementById('filter-toggle-btn').classList.toggle('active', showActiveOnly);
+        previousDetails = details;
+        isFirstRender = false;
+    }
+</script>
 
-            statCategories.forEach((cat, index) => {
-                const targetCol = index < midpoint ? col1 : col2;
-                const name = lang === 'ua' ? cat.ua : cat.en;
-                const hit = details[`${cat.id}_hit`] || 0;
-                const dest = details[`${cat.id}_dest`] || 0;
-
-                let valuesHtml = '';
-                if (cat.secret) {
-                    valuesHtml = `<div class="top-secret">TOP SECRET</div>`;
-                } else {
-                    valuesHtml = `<div class="val-hit">${hit}</div><div class="val-dest">${dest}</div>`;
-                }
-
-                targetCol.innerHTML += `
-                    <div class="list-row">
-                        <div class="row-name"><span class="row-icon">${cat.icon}</span> <span>${name}</span></div>
-                        <div class="row-values">${valuesHtml}</div>
-                    </div>`;
-            });
-        }
-
-        window.onload = () => setLanguage(localStorage.getItem('selectedLang') || 'ua');
-    </script>
 </body>
 </html>
