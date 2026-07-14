@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVAROG TEAM | Про нас</title>
+    <meta name="description" content="Хроніка діяльності SVAROG TEAM — 35-й Полк НГУ. Новини підрозділу та виконана робота команди.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SVAROG TEAM | Хроніка діяльності">
+    <meta property="og:description" content="Основні етапи розвитку, новини підрозділу та виконана робота команди SVAROG TEAM.">
+    <meta property="og:image" content="https://svarogteam.com/SvarogTeam.png">
+    <meta property="og:url" content="https://svarogteam.com/about.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SVAROG TEAM | Хроніка діяльності">
+    <meta name="twitter:image" content="https://svarogteam.com/SvarogTeam.png">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -181,6 +190,41 @@
 
         [data-lang="en"] { display: none; }
 
+        /* ==================== ПЛАВНИЙ ФОН (crossfade замість стрибка) ==================== */
+        .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background-image: linear-gradient(rgba(10, 10, 12, 0.85), rgba(10, 10, 12, 0.95)), var(--layer-img);
+            background-position: center; background-repeat: no-repeat; background-size: cover;
+            opacity: 0; transition: opacity 2.5s ease-in-out; }
+        .bg-layer.visible { opacity: 1; }
+        body::before { display: none; }
+
+        /* ==================== ЛАЙТБОКС ==================== */
+        .lightbox-overlay { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(5,5,7,0.9); backdrop-filter: blur(20px); justify-content: center; align-items: center; cursor: zoom-out; }
+        .lightbox-content { max-width: 85%; max-height: 85vh; border-radius: 16px; object-fit: contain; border: 1px solid var(--border-color); box-shadow: 0 30px 60px rgba(0,0,0,0.7); }
+        .lightbox-close { position: absolute; top: 25px; right: 35px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; opacity: 0.6; }
+        .lightbox-close:hover { color: var(--theme-color); opacity: 1; }
+
+        /* ==================== ЗНАЧОК ВІДЕО НА МІНІАТЮРІ ==================== */
+        .video-play-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; border-radius: 50%; background: rgba(10,10,12,0.7); backdrop-filter: blur(4px); border: 2px solid rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center; z-index: 2; pointer-events: none; transition: transform 0.3s; }
+        .news-card:hover .video-play-badge { transform: translate(-50%, -50%) scale(1.1); }
+        .video-play-badge svg { width: 22px; height: 22px; fill: #fff; margin-left: 3px; }
+
+        /* ==================== КНОПКА "НАГОРУ" ==================== */
+        .back-to-top { position: fixed; bottom: 30px; left: 30px; width: 48px; height: 48px; border-radius: 50%; background: rgba(20,20,25,0.85); backdrop-filter: blur(10px); border: 1px solid var(--border-color); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1400; opacity: 0; pointer-events: none; transition: all 0.3s ease; font-size: 1.3rem; }
+        .back-to-top.visible { opacity: 1; pointer-events: auto; }
+        .back-to-top:hover { background: var(--theme-color); color: #121212; transform: translateY(-3px); }
+        @media (max-width: 768px) { .back-to-top { left: 20px; bottom: 20px; width: 42px; height: 42px; } }
+
+        /* ==================== "ПОКАЗАТИ ЩЕ" ==================== */
+        .load-more-btn { display: block; margin: 10px auto 0; padding: 12px 32px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.25s; }
+        .load-more-btn:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(121,133,84,0.08); }
+
+        /* ==================== SKELETON-ЗАВАНТАЖЕННЯ ==================== */
+        .skeleton-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; height: 420px; }
+        .skeleton-shimmer { background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 37%, rgba(255,255,255,0.03) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; }
+        @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+        .skeleton-img { height: 220px; } .skeleton-line { height: 16px; margin: 24px 24px 0; border-radius: 6px; } .skeleton-line.w70 { width: 70%; } .skeleton-line.w50 { width: 50%; margin-top: 14px; }
+
         @media (max-width: 768px) { 
             .navbar-container { padding: 12px 15px; }
             .nav-links { width: 280px; } 
@@ -194,6 +238,8 @@
     </style>
 </head>
 <body>
+    <div class="bg-layer visible" id="bg-layer-a"></div>
+    <div class="bg-layer" id="bg-layer-b"></div>
     <nav class="navbar">
         <div class="navbar-container">
             <div class="left-side">
@@ -233,7 +279,14 @@
         </div>
 
         <div class="news-grid-wrapper">
-            <div class="news-grid" id="dynamic-news-grid"></div>
+            <div class="news-grid" id="dynamic-news-grid">
+                <div class="skeleton-card skeleton-shimmer"><div class="skeleton-img skeleton-shimmer"></div><div class="skeleton-line skeleton-shimmer w70"></div><div class="skeleton-line skeleton-shimmer w50"></div></div>
+                <div class="skeleton-card skeleton-shimmer"><div class="skeleton-img skeleton-shimmer"></div><div class="skeleton-line skeleton-shimmer w70"></div><div class="skeleton-line skeleton-shimmer w50"></div></div>
+                <div class="skeleton-card skeleton-shimmer"><div class="skeleton-img skeleton-shimmer"></div><div class="skeleton-line skeleton-shimmer w70"></div><div class="skeleton-line skeleton-shimmer w50"></div></div>
+            </div>
+            <button class="load-more-btn" id="news-load-more-btn" style="display:none;" onclick="loadMoreNews()">
+                <span data-lang="ua">Показати ще</span><span data-lang="en">Show more</span>
+            </button>
         </div>
 
         <div class="home-socials-wrapper">
@@ -248,6 +301,13 @@
         <span data-lang="ua"><strong>SVAROG TEAM</strong> © 2026 | Всі права захищені. Розроблено з ❤️ для підтримки України.</span>
         <span data-lang="en"><strong>SVAROG TEAM</strong> © 2026 | All rights reserved. Built with ❤️ to support Ukraine.</span>
     </footer>
+
+    <div id="image-lightbox" class="lightbox-overlay" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+
+    <div class="back-to-top" id="back-to-top-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</div>
 
     <div class="user-chat-modal" id="user-chat-window">
         <div class="chat-header">
@@ -268,12 +328,34 @@
     </div>
 
     <script>
+        // Плавна зміна фону (crossfade)
         const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
-        let currentIndex = 0;
+        let currentIndex = 0; let bgShowingA = true;
+        const bgLayerA = document.getElementById('bg-layer-a'); const bgLayerB = document.getElementById('bg-layer-b');
+        bgLayerA.style.setProperty('--layer-img', `url('${images[0]}')`);
         setInterval(() => {
             currentIndex = (currentIndex + 1) % images.length;
-            document.body.style.setProperty('--bg-image', `url('${images[currentIndex]}')`);
-        }, 3000);
+            const nextLayer = bgShowingA ? bgLayerB : bgLayerA; const curLayer = bgShowingA ? bgLayerA : bgLayerB;
+            nextLayer.style.setProperty('--layer-img', `url('${images[currentIndex]}')`);
+            nextLayer.classList.add('visible'); curLayer.classList.remove('visible');
+            bgShowingA = !bgShowingA;
+        }, 6000);
+
+        // Лайтбокс для збільшення фото
+        function openLightbox(src) {
+            if (!src) return;
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('image-lightbox').style.display = 'flex';
+        }
+        function closeLightbox() {
+            document.getElementById('image-lightbox').style.display = 'none';
+        }
+
+        // Кнопка "нагору"
+        window.addEventListener('scroll', () => {
+            const backBtn = document.getElementById('back-to-top-btn');
+            if (backBtn) backBtn.classList.toggle('visible', window.scrollY > 600);
+        });
 
         const menuButton = document.getElementById('menu-button');
         const navMenu = document.getElementById('nav-menu');
@@ -351,20 +433,30 @@
             }
         });
 
+        let newsLimit = 6;
+        let unsubscribeTimeline = null;
         function initTimelineRealtimeStream() {
             const container = document.getElementById('dynamic-news-grid');
             if(!container) return;
+            if (unsubscribeTimeline) unsubscribeTimeline();
 
-            db.collection("news").orderBy("date", "desc").onSnapshot(snapshot => {
+            unsubscribeTimeline = db.collection("news").orderBy("date", "desc").limit(newsLimit).onSnapshot(snapshot => {
                 let dataset = [];
                 snapshot.forEach(doc => { dataset.push({ id: doc.id, ...doc.data() }); });
                 renderNewsGrid(dataset);
+                const loadMoreBtn = document.getElementById('news-load-more-btn');
+                if (loadMoreBtn) loadMoreBtn.style.display = snapshot.size >= newsLimit ? 'block' : 'none';
             }, err => {
                 console.error("Помилка хмари новин: ", err);
                 let localDataset = JSON.parse(localStorage.getItem('sitePublishedNewsChronicle')) || [];
                 localDataset.sort((a, b) => new Date(b.date) - new Date(a.date));
                 renderNewsGrid(localDataset);
             });
+        }
+
+        function loadMoreNews() {
+            newsLimit += 6;
+            initTimelineRealtimeStream();
         }
 
         function renderNewsGrid(dataset) {
@@ -397,13 +489,18 @@
                     }
                     
                     if (videoId) {
-                        mediaHtml = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+                        // Лінива загрузка: спершу лише статична мініатюра + значок ▶️,
+                        // сам iframe (важкий) підвантажується тільки при кліку.
+                        mediaHtml = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" loading="lazy">
+                            <div class="video-play-badge" onclick="event.stopPropagation(); this.parentElement.innerHTML='<iframe src=\\'https://www.youtube.com/embed/${videoId}?autoplay=1\\' allow=\\'autoplay; encrypted-media\\' allowfullscreen></iframe>';">
+                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>`;
                     } else {
                         mediaHtml = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#666;">Неправильне посилання на відео</div>`;
                     }
                 } else {
                     let imgSrc = item.image ? item.image : 'logo_placeholder.png'; 
-                    mediaHtml = `<img src="${imgSrc}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\' fill=\\'%23aaa\\'><path d=\\'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z\\'/></svg>'">`;
+                    mediaHtml = `<img src="${imgSrc}" loading="lazy" onclick="event.stopPropagation(); openLightbox('${imgSrc}')" style="cursor:zoom-in;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\' fill=\\'%23aaa\\'><path d=\\'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z\\'/></svg>'">`;
                 }
                 
                 let displayDate = item.date;
@@ -547,7 +644,7 @@
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${msg.sender}`;
                 if(msg.type === 'image') {
-                    bubble.innerHTML = `<img src="${msg.text}" onclick="window.open().document.write('<img src=\\'${msg.text}\\'>')">`;
+                    bubble.innerHTML = `<img src="${msg.text}" onclick="openLightbox('${msg.text}')">`;
                 } else { 
                     bubble.innerText = msg.text; 
                 }
@@ -586,8 +683,30 @@
             } catch(e) { console.error(e); }
         }
 
-        function sendUserChatPhoto(input) {
-            alert(localStorage.getItem('selectedLang') === 'en' ? "Photo transfer is in development." : "Надсилання фото знаходиться в розробці.");
+        function getBase64Image(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader(); reader.onload = (e) => {
+                    const img = new Image(); img.onload = () => {
+                        const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let w = img.width; let h = img.height;
+                        if (w > MAX_WIDTH) { h = Math.round((h * MAX_WIDTH) / w); w = MAX_WIDTH; }
+                        canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); resolve(canvas.toDataURL('image/jpeg', 0.6));
+                    }; img.onerror = reject; img.src = e.target.result;
+                }; reader.onerror = reject; reader.readAsDataURL(file);
+            });
+        }
+
+        async function sendUserChatPhoto(input) {
+            if (!(input.files && input.files[0])) return;
+            try {
+                const base64 = await getBase64Image(input.files[0]);
+                const msgObject = { sender: 'user', text: base64, type: 'image', time: Date.now() };
+                await db.collection("chats").doc(userChatSessionId).set({
+                    id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(),
+                    messages: firebase.firestore.FieldValue.arrayUnion(msgObject)
+                }, { merge: true });
+            } catch(e) {
+                alert(localStorage.getItem('selectedLang') === 'en' ? "Error sending photo." : "Помилка надсилання фото.");
+            } finally { input.value = ''; }
         }
 
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
