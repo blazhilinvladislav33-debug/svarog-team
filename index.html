@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preload" href="SvarogTeam-Regular.woff" as="font" type="font/woff" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --graphite:#0E0E0F; --plate:#16171A; --iron:#26282D; --bone:#F2EFE9;
+      --ash:#C4C7CC; --ember:#D9663D; --copper:#E8A88A; --olive:#7A8450;
+    }
+    @font-face{
+      font-family:'SvarogDisplay';
+      src:url('SvarogTeam-Regular.woff') format('woff');
+      font-weight:400; font-style:normal; font-display:block;
+    }
+    * { box-sizing:border-box; }
+    html,body{ margin:0; padding:0; background:var(--graphite); }
+    @keyframes kenburns{ 0%{ transform:scale(1); } 100%{ transform:scale(1.06); } }
+    @media (prefers-reduced-motion: reduce){
+      .kb{ animation:none !important; }
+    }
+  </style>
+</helmet>
+
+<div style="background:var(--graphite); color:var(--bone); font-family:'Manrope',sans-serif; min-height:100vh; overflow-x:hidden;">
+
+  <!-- NAV -->
+  <nav style="{{ navBarStyle }}" data-screen-label="nav">
+    <div style="max-width:1200px; margin:0 auto; padding:0 24px; height:64px; display:flex; align-items:center; justify-content:space-between; gap:16px;">
+      <div style="font-family:'Oswald',sans-serif; font-weight:600; font-size:14px; letter-spacing:.14em; color:var(--bone); text-transform:uppercase; flex-shrink:0;">Svarog Team</div>
+      <div style="display:flex; align-items:center; gap:16px; flex-shrink:0;">
+        <button onClick="{{ toggleLang }}" style="background:none; border:1px solid var(--iron); color:var(--ash); font-size:13px; letter-spacing:.08em; padding:9px 14px; cursor:pointer; font-family:'Manrope',sans-serif;" style-hover="border-color:var(--ash); color:var(--bone);" style-focus="outline:2px solid var(--copper); outline-offset:2px;">{{ langLabel }}</button>
+        <a href="#support" style="background:var(--ember); color:var(--bone); font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:10px 18px; text-decoration:none; border:1px solid var(--ember); white-space:nowrap;" style-hover="background:#c65a34;" style-focus="outline:2px solid var(--copper); outline-offset:2px;">{{ txt_btnSupport }}</a>
+        <button onClick="{{ toggleMenu }}" style="background:none; border:1px solid var(--iron); color:var(--bone); font-size:13px; letter-spacing:.08em; text-transform:uppercase; padding:9px 16px; cursor:pointer; display:flex; align-items:center; gap:10px; font-family:'Manrope',sans-serif;" style-hover="border-color:var(--ash);" style-focus="outline:2px solid var(--copper); outline-offset:2px;">
+          <span>{{ menuLabel }}</span>
+          <span style="display:flex; flex-direction:column; gap:3px; width:16px;">
+            <span style="{{ burgerLine1Style }}"></span>
+            <span style="{{ burgerLine2Style }}"></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- FULLSCREEN MENU OVERLAY -->
+  <div style="{{ menuOverlayStyle }}">
+    <div style="max-width:1200px; margin:0 auto; padding:0 24px; height:64px; display:flex; align-items:center; justify-content:space-between;">
+      <div style="font-family:'Oswald',sans-serif; font-weight:600; font-size:14px; letter-spacing:.14em; color:var(--bone); text-transform:uppercase;">Svarog Team</div>
+      <button onClick="{{ toggleMenu }}" style="background:none; border:1px solid var(--iron); color:var(--bone); font-size:13px; letter-spacing:.08em; text-transform:uppercase; padding:9px 16px; cursor:pointer; font-family:'Manrope',sans-serif;" style-hover="border-color:var(--ash);" style-focus="outline:2px solid var(--copper); outline-offset:2px;">{{ txt_menuCloseBtn }}</button>
+    </div>
+    <div style="max-width:1200px; margin:0 auto; padding:64px 24px; display:flex; flex-direction:column; gap:28px;">
+      <a href="#directions" onClick="{{ toggleMenu }}" style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); text-decoration:none; font-weight:600;" style-hover="color:var(--copper);">{{ txt_menuDirections }}</a>
+      <a href="#join" onClick="{{ toggleMenu }}" style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); text-decoration:none; font-weight:600;" style-hover="color:var(--copper);">{{ txt_menuJoin }}</a>
+      <a href="#news" onClick="{{ toggleMenu }}" style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); text-decoration:none; font-weight:600;" style-hover="color:var(--copper);">{{ txt_menuNews }}</a>
+      <a href="#merch" onClick="{{ toggleMenu }}" style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); text-decoration:none; font-weight:600;" style-hover="color:var(--copper);">{{ txt_menuMerch }}</a>
+      <a href="#support" onClick="{{ toggleMenu }}" style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--copper); text-decoration:none; font-weight:600;">{{ txt_menuSupport }}</a>
+    </div>
+    <div style="max-width:1200px; margin:0 auto; padding:24px; display:flex; gap:24px; border-top:1px solid var(--iron); font-size:14px; color:var(--ash);">
+      <a href="#" style="color:var(--ash); text-decoration:none;" style-hover="color:var(--bone);">Telegram</a>
+      <a href="#" style="color:var(--ash); text-decoration:none;" style-hover="color:var(--bone);">Instagram</a>
+      <a href="#" style="color:var(--ash); text-decoration:none;" style-hover="color:var(--bone);">YouTube</a>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section ref="{{ setHeroRef }}" data-screen-label="hero" style="position:relative; height:100svh; min-height:520px; width:100%; overflow:hidden;">
+    <div class="kb" style="position:absolute; inset:-4%; background:repeating-linear-gradient(115deg, var(--plate) 0px, var(--plate) 22px, var(--iron) 22px, var(--iron) 24px); animation:kenburns 20s linear infinite alternate;"></div>
+    <div style="position:absolute; top:88px; left:0; right:0; display:flex; align-items:center; justify-content:center;">
+      <span style="font-family:'Manrope',monospace; font-size:12px; letter-spacing:.1em; color:var(--ash); text-transform:uppercase; opacity:.5;">фото — заглушка, підставте героя</span>
+    </div>
+    <div style="position:absolute; inset:0; background:linear-gradient(to top, #0E0E0F 0%, rgba(14,14,15,.7) 40%, transparent 75%);"></div>
+    <div style="position:absolute; left:0; right:0; bottom:0; padding-bottom:64px;">
+      <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
+        <div style="max-width:720px;">
+          <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ash); margin-bottom:16px;">{{ txt_eyebrow }}</div>
+          <h1 style="font-family:'SvarogDisplay','Oswald',sans-serif; font-size:clamp(56px,9vw,132px); line-height:0.95; color:var(--copper); margin:0 0 20px; font-weight:400;">SVAROG TEAM</h1>
+          <p style="font-size:19px; line-height:1.5; color:var(--bone); margin:0 0 8px; max-width:640px;">{{ txt_heroSub }}</p>
+          <p style="font-size:16px; line-height:1.5; color:var(--ash); margin:0 0 32px; max-width:640px;">{{ txt_heroLine }}</p>
+          <div style="display:flex; flex-wrap:wrap; gap:16px;">
+            <a href="#support" style="background:var(--ember); color:var(--bone); font-size:15px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:16px 32px; text-decoration:none; border:1px solid var(--ember); white-space:nowrap;" style-hover="background:#c65a34; border-color:#c65a34;" style-focus="outline:2px solid var(--copper); outline-offset:3px;">{{ txt_btnSupport }}</a>
+            <a href="#directions" style="background:transparent; color:var(--bone); font-size:15px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:16px 32px; text-decoration:none; border:1px solid var(--iron); white-space:nowrap;" style-hover="border-color:var(--ash);" style-focus="outline:2px solid var(--copper); outline-offset:3px;">{{ txt_btnAbout }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COUNTERS -->
+  <section ref="{{ setCountersRef }}" data-screen-label="counters" data-reveal="counters" style="border-bottom:1px solid var(--iron); background:var(--graphite);">
+    <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:flex; flex-wrap:wrap;">
+      <div style="{{ counterItemStyle0 }}">
+        <div style="font-size:48px; font-weight:700; color:var(--ember); font-variant-numeric:tabular-nums; font-family:'Oswald',sans-serif;">{{ countSorties }}</div>
+        <div style="font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--ash); margin-top:10px;">{{ txt_statSorties }}</div>
+      </div>
+      <div style="{{ counterItemStyle1 }}">
+        <div style="font-size:48px; font-weight:700; color:var(--ember); font-variant-numeric:tabular-nums; font-family:'Oswald',sans-serif;">{{ countTargets }}</div>
+        <div style="font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--ash); margin-top:10px;">{{ txt_statTargets }}</div>
+      </div>
+      <div style="{{ counterItemStyle2 }}">
+        <div style="font-size:48px; font-weight:700; color:var(--ember); font-variant-numeric:tabular-nums; font-family:'Oswald',sans-serif;">₴{{ countFunds }}</div>
+        <div style="font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--ash); margin-top:10px;">{{ txt_statFunds }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOIN / ДОЛУЧАЙСЯ -->
+  <section ref="{{ setJoinRef }}" id="join" data-screen-label="join" data-reveal="join" style="background:var(--plate); border-bottom:1px solid var(--iron);">
+    <div style="{{ joinStyle }}">
+      <div style="flex:1 1 420px; min-width:280px;">
+        <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ash); margin-bottom:16px;">{{ txt_joinEyebrow }}</div>
+        <h2 style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(28px,4vw,40px); color:var(--bone); margin:0 0 16px; font-weight:600;">{{ txt_joinTitle }}</h2>
+        <p style="font-size:17px; line-height:1.6; color:var(--ash); margin:0; max-width:520px;">{{ txt_joinBody }}</p>
+      </div>
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:20px; min-width:260px;">
+        <div>
+          <div style="font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ash); margin-bottom:6px;">{{ txt_joinBotLabel }}</div>
+          <a href="https://t.me/svarogteam_bot" style="color:var(--copper); font-size:17px; text-decoration:none; border-bottom:1px solid rgba(232,168,138,.4);" style-hover="border-color:var(--copper);">@svarogteam_bot</a>
+        </div>
+        <div>
+          <div style="font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ash); margin-bottom:6px;">{{ txt_joinPhoneLabel }}</div>
+          <a href="tel:+380000000000" style="color:var(--bone); font-size:17px; text-decoration:none;" style-hover="color:var(--copper);">+38 (0__) ___ __ __</a>
+        </div>
+        <a href="#" style="background:var(--olive); color:var(--graphite); font-size:14px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:14px 26px; text-decoration:none; text-align:center; border:1px solid var(--olive); white-space:nowrap;" style-hover="filter:brightness(1.1);" style-focus="outline:2px solid var(--copper); outline-offset:3px;">{{ txt_joinApply }}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIRECTIONS -->
+  <section ref="{{ setDirectionsRef }}" id="directions" data-screen-label="directions" data-reveal="directions" style="background:var(--graphite);">
+    <div style="max-width:1200px; margin:0 auto; padding:96px 24px;">
+      <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ash); margin-bottom:48px;">{{ txt_dirEyebrow }}</div>
+      <div style="display:flex; flex-wrap:wrap;">
+        <div style="{{ dirItemStyle0 }}">
+          <div style="font-family:'Oswald',sans-serif; font-size:15px; color:rgba(217,102,61,.4); font-weight:600;">01</div>
+          <div style="width:32px; height:2px; background:var(--copper); margin:16px 0 20px;"></div>
+          <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:22px; color:var(--bone); margin:0 0 14px; font-weight:600;">{{ txt_dir1Title }}</h3>
+          <p style="font-size:17px; line-height:1.6; color:var(--ash); margin:0;">{{ txt_dir1Body }}</p>
+        </div>
+        <div style="{{ dirItemStyle1 }}">
+          <div style="font-family:'Oswald',sans-serif; font-size:15px; color:rgba(217,102,61,.4); font-weight:600;">02</div>
+          <div style="width:32px; height:2px; background:var(--copper); margin:16px 0 20px;"></div>
+          <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:22px; color:var(--bone); margin:0 0 14px; font-weight:600;">{{ txt_dir2Title }}</h3>
+          <p style="font-size:17px; line-height:1.6; color:var(--ash); margin:0;">{{ txt_dir2Body }}</p>
+        </div>
+        <div style="{{ dirItemStyle2 }}">
+          <div style="font-family:'Oswald',sans-serif; font-size:15px; color:rgba(217,102,61,.4); font-weight:600;">03</div>
+          <div style="width:32px; height:2px; background:var(--copper); margin:16px 0 20px;"></div>
+          <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:22px; color:var(--bone); margin:0 0 14px; font-weight:600;">{{ txt_dir3Title }}</h3>
+          <p style="font-size:17px; line-height:1.6; color:var(--ash); margin:0;">{{ txt_dir3Body }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section ref="{{ setValuesRef }}" id="values" data-screen-label="values" data-reveal="values" style="background:var(--plate); border-top:1px solid var(--iron); border-bottom:1px solid var(--iron);">
+    <div style="max-width:1200px; margin:0 auto; padding:96px 24px;">
+      <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ash); margin-bottom:48px;">{{ txt_valuesEyebrow }}</div>
+      <div style="{{ valuesGridStyle }}">
+        <div>
+          <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:19px; color:var(--bone); margin:0 0 10px; font-weight:600;">{{ txt_val1Title }}</h3>
+          <p style="font-size:15px; line-height:1.6; color:var(--ash); margin:0;">{{ txt_val1Body }}</p>
+        </div>
+        <div>
+          <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:19px; color:var(--bone); margin:0 0 10px; font-weight:600;">{{ txt_val2Title }}</h3>
+          <p style="font-size:15px; line-height:1.6; color:var(--ash); margin:0;">{{ txt_val2Body }}</p>
+        </div>
+        <div>
+          <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:19px; color:var(--bone); margin:0 0 10px; font-weight:600;">{{ txt_val3Title }}</h3>
+          <p style="font-size:15px; line-height:1.6; color:var(--ash); margin:0;">{{ txt_val3Body }}</p>
+        </div>
+        <div>
+          <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:19px; color:var(--bone); margin:0 0 10px; font-weight:600;">{{ txt_val4Title }}</h3>
+          <p style="font-size:15px; line-height:1.6; color:var(--ash); margin:0;">{{ txt_val4Body }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWS -->
+  <section ref="{{ setNewsRef }}" id="news" data-screen-label="news" data-reveal="news" style="background:var(--graphite);">
+    <div style="max-width:1200px; margin:0 auto; padding:96px 24px;">
+      <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ash); margin-bottom:48px;">{{ txt_newsEyebrow }}</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1px; background:var(--iron);">
+        <a href="#" style="{{ newsItemStyle0 }}" style-hover="background:#1a1b1e;">
+          <div style="aspect-ratio:16/10; background:repeating-linear-gradient(115deg, var(--iron) 0px, var(--iron) 14px, var(--plate) 14px, var(--plate) 16px); display:flex; align-items:center; justify-content:center;">
+            <span style="font-family:monospace; font-size:11px; color:var(--ash); opacity:.5; text-transform:uppercase;">{{ txt_newsPhoto }}</span>
+          </div>
+          <div style="padding:24px;">
+            <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ash); margin-bottom:10px;">{{ txt_newsStub }}</div>
+            <h4 style="font-size:18px; color:var(--bone); margin:0; font-weight:600;">{{ txt_newsTitle }}</h4>
+          </div>
+        </a>
+        <a href="#" style="{{ newsItemStyle1 }}" style-hover="background:#1a1b1e;">
+          <div style="aspect-ratio:16/10; background:repeating-linear-gradient(115deg, var(--iron) 0px, var(--iron) 14px, var(--plate) 14px, var(--plate) 16px); display:flex; align-items:center; justify-content:center;">
+            <span style="font-family:monospace; font-size:11px; color:var(--ash); opacity:.5; text-transform:uppercase;">{{ txt_newsPhoto }}</span>
+          </div>
+          <div style="padding:24px;">
+            <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ash); margin-bottom:10px;">{{ txt_newsStub }}</div>
+            <h4 style="font-size:18px; color:var(--bone); margin:0; font-weight:600;">{{ txt_newsTitle }}</h4>
+          </div>
+        </a>
+        <a href="#" style="{{ newsItemStyle2 }}" style-hover="background:#1a1b1e;">
+          <div style="aspect-ratio:16/10; background:repeating-linear-gradient(115deg, var(--iron) 0px, var(--iron) 14px, var(--plate) 14px, var(--plate) 16px); display:flex; align-items:center; justify-content:center;">
+            <span style="font-family:monospace; font-size:11px; color:var(--ash); opacity:.5; text-transform:uppercase;">{{ txt_newsPhoto }}</span>
+          </div>
+          <div style="padding:24px;">
+            <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ash); margin-bottom:10px;">{{ txt_newsStub }}</div>
+            <h4 style="font-size:18px; color:var(--bone); margin:0; font-weight:600;">{{ txt_newsTitle }}</h4>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MERCH -->
+  <section ref="{{ setMerchRef }}" id="merch" data-screen-label="merch" data-reveal="merch" style="background:var(--plate); border-top:1px solid var(--iron); border-bottom:1px solid var(--iron);">
+    <div style="max-width:1200px; margin:0 auto; padding:96px 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:48px; gap:16px; flex-wrap:wrap;">
+        <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ash);">{{ txt_merchEyebrow }}</div>
+        <a href="#" style="color:var(--copper); font-size:14px; text-decoration:none; border-bottom:1px solid rgba(232,168,138,.4);" style-hover="border-color:var(--copper);">{{ txt_merchAll }}</a>
+      </div>
+      <div style="{{ merchGridStyle }}">
+        <div style="border:1px solid var(--iron);" style-hover="border-color:var(--ash);">
+          <div style="aspect-ratio:1; background:repeating-linear-gradient(115deg, var(--graphite) 0px, var(--graphite) 14px, var(--iron) 14px, var(--iron) 16px); display:flex; align-items:center; justify-content:center;">
+            <span style="font-family:monospace; font-size:11px; color:var(--ash); opacity:.5;">{{ txt_merchPhoto }}</span>
+          </div>
+          <div style="padding:16px;">
+            <div style="font-size:15px; color:var(--bone); margin-bottom:6px;">{{ txt_merch1 }}</div>
+            <div style="font-size:14px; color:var(--ember); font-variant-numeric:tabular-nums;">₴ 000</div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--iron);" style-hover="border-color:var(--ash);">
+          <div style="aspect-ratio:1; background:repeating-linear-gradient(115deg, var(--graphite) 0px, var(--graphite) 14px, var(--iron) 14px, var(--iron) 16px); display:flex; align-items:center; justify-content:center;">
+            <span style="font-family:monospace; font-size:11px; color:var(--ash); opacity:.5;">{{ txt_merchPhoto }}</span>
+          </div>
+          <div style="padding:16px;">
+            <div style="font-size:15px; color:var(--bone); margin-bottom:6px;">{{ txt_merch2 }}</div>
+            <div style="font-size:14px; color:var(--ember); font-variant-numeric:tabular-nums;">₴ 000</div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--iron);" style-hover="border-color:var(--ash);">
+          <div style="aspect-ratio:1; background:repeating-linear-gradient(115deg, var(--graphite) 0px, var(--graphite) 14px, var(--iron) 14px, var(--iron) 16px); display:flex; align-items:center; justify-content:center;">
+            <span style="font-family:monospace; font-size:11px; color:var(--ash); opacity:.5;">{{ txt_merchPhoto }}</span>
+          </div>
+          <div style="padding:16px;">
+            <div style="font-size:15px; color:var(--bone); margin-bottom:6px;">{{ txt_merch3 }}</div>
+            <div style="font-size:14px; color:var(--ember); font-variant-numeric:tabular-nums;">₴ 000</div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--iron);" style-hover="border-color:var(--ash);">
+          <div style="aspect-ratio:1; background:repeating-linear-gradient(115deg, var(--graphite) 0px, var(--graphite) 14px, var(--iron) 14px, var(--iron) 16px); display:flex; align-items:center; justify-content:center;">
+            <span style="font-family:monospace; font-size:11px; color:var(--ash); opacity:.5;">{{ txt_merchPhoto }}</span>
+          </div>
+          <div style="padding:16px;">
+            <div style="font-size:15px; color:var(--bone); margin-bottom:6px;">{{ txt_merch4 }}</div>
+            <div style="font-size:14px; color:var(--ember); font-variant-numeric:tabular-nums;">₴ 000</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section ref="{{ setFaqRef }}" id="faq" data-screen-label="faq" data-reveal="faq" style="background:var(--graphite);">
+    <div style="{{ faqSectionStyle }}">
+      <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ash); margin-bottom:48px;">{{ txt_faqEyebrow }}</div>
+      <div style="max-width:800px;">
+        <div style="border-top:1px solid var(--iron);">
+          <button onClick="{{ toggleFaq0 }}" style="width:100%; text-align:left; background:none; border:none; padding:24px 0; display:flex; justify-content:space-between; align-items:center; gap:16px; cursor:pointer; color:var(--bone); font-size:17px; font-family:'Manrope',sans-serif;" style-focus="outline:2px solid var(--copper); outline-offset:-2px;">
+            <span>{{ txt_faqQ0 }}</span>
+            <span style="color:var(--ember); font-size:20px; flex-shrink:0;">{{ faqIcon0 }}</span>
+          </button>
+          <div style="{{ faqBodyStyle0 }}">
+            <p style="font-size:15px; line-height:1.6; color:var(--ash); margin:0 0 24px; max-width:640px;">{{ txt_faqA0 }}</p>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--iron);">
+          <button onClick="{{ toggleFaq1 }}" style="width:100%; text-align:left; background:none; border:none; padding:24px 0; display:flex; justify-content:space-between; align-items:center; gap:16px; cursor:pointer; color:var(--bone); font-size:17px; font-family:'Manrope',sans-serif;" style-focus="outline:2px solid var(--copper); outline-offset:-2px;">
+            <span>{{ txt_faqQ1 }}</span>
+            <span style="color:var(--ember); font-size:20px; flex-shrink:0;">{{ faqIcon1 }}</span>
+          </button>
+          <div style="{{ faqBodyStyle1 }}">
+            <p style="font-size:15px; line-height:1.6; color:var(--ash); margin:0 0 24px; max-width:640px;">{{ txt_faqA1 }}</p>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--iron);">
+          <button onClick="{{ toggleFaq2 }}" style="width:100%; text-align:left; background:none; border:none; padding:24px 0; display:flex; justify-content:space-between; align-items:center; gap:16px; cursor:pointer; color:var(--bone); font-size:17px; font-family:'Manrope',sans-serif;" style-focus="outline:2px solid var(--copper); outline-offset:-2px;">
+            <span>{{ txt_faqQ2 }}</span>
+            <span style="color:var(--ember); font-size:20px; flex-shrink:0;">{{ faqIcon2 }}</span>
+          </button>
+          <div style="{{ faqBodyStyle2 }}">
+            <p style="font-size:15px; line-height:1.6; color:var(--ash); margin:0 0 24px; max-width:640px;">{{ txt_faqA2 }}</p>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--iron); border-bottom:1px solid var(--iron);">
+          <button onClick="{{ toggleFaq3 }}" style="width:100%; text-align:left; background:none; border:none; padding:24px 0; display:flex; justify-content:space-between; align-items:center; gap:16px; cursor:pointer; color:var(--bone); font-size:17px; font-family:'Manrope',sans-serif;" style-focus="outline:2px solid var(--copper); outline-offset:-2px;">
+            <span>{{ txt_faqQ3 }}</span>
+            <span style="color:var(--ember); font-size:20px; flex-shrink:0;">{{ faqIcon3 }}</span>
+          </button>
+          <div style="{{ faqBodyStyle3 }}">
+            <p style="font-size:15px; line-height:1.6; color:var(--ash); margin:0 0 24px; max-width:640px;">{{ txt_faqA3 }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section ref="{{ setSupportRef }}" id="support" data-screen-label="support" data-reveal="support" style="background:var(--plate); border-top:1px solid var(--iron);">
+    <div style="{{ supportSectionStyle }}">
+      <div style="flex-shrink:0;">
+        <div style="width:180px; height:180px; background:var(--graphite); border:1px solid var(--iron); display:flex; align-items:center; justify-content:center;">
+          <span style="font-family:monospace; font-size:12px; color:var(--ash); opacity:.6;">{{ txt_supportQr }}</span>
+        </div>
+      </div>
+      <div style="flex:1 1 380px; min-width:280px;">
+        <h2 style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(28px,4vw,40px); color:var(--bone); margin:0 0 16px; font-weight:600;">{{ txt_supportTitle }}</h2>
+        <p style="font-size:17px; line-height:1.6; color:var(--ash); margin:0 0 32px; max-width:520px;">{{ txt_supportBody }}</p>
+        <div style="display:flex; flex-wrap:wrap; gap:16px;">
+          <a href="#" style="background:var(--ember); color:var(--bone); font-size:15px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:16px 32px; text-decoration:none; border:1px solid var(--ember); white-space:nowrap;" style-hover="background:#c65a34; border-color:#c65a34;" style-focus="outline:2px solid var(--copper); outline-offset:3px;">{{ txt_supportBank }}</a>
+          <a href="#" style="background:transparent; color:var(--bone); font-size:15px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:16px 32px; text-decoration:none; border:1px solid var(--olive); white-space:nowrap;" style-hover="border-color:var(--bone);" style-focus="outline:2px solid var(--copper); outline-offset:3px;">{{ txt_supportCard }}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer data-screen-label="footer" style="background:var(--graphite); border-top:1px solid var(--iron);">
+    <div style="max-width:1200px; margin:0 auto; padding:64px 24px 32px; display:flex; flex-wrap:wrap; gap:48px; justify-content:space-between;">
+      <div style="flex:1 1 240px;">
+        <div style="font-family:'Oswald',sans-serif; font-weight:600; font-size:15px; letter-spacing:.14em; color:var(--bone); text-transform:uppercase; margin-bottom:12px;">Svarog Team</div>
+        <p style="font-size:14px; line-height:1.6; color:var(--ash); max-width:280px; margin:0;">{{ txt_footerDesc }}</p>
+      </div>
+      <div style="display:flex; gap:64px; flex-wrap:wrap;">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ash); margin-bottom:6px;">{{ txt_footerSections }}</div>
+          <a href="#directions" style="color:var(--bone); font-size:14px; text-decoration:none;" style-hover="color:var(--copper);">{{ txt_menuDirections }}</a>
+          <a href="#join" style="color:var(--bone); font-size:14px; text-decoration:none;" style-hover="color:var(--copper);">{{ txt_menuJoin }}</a>
+          <a href="#news" style="color:var(--bone); font-size:14px; text-decoration:none;" style-hover="color:var(--copper);">{{ txt_menuNews }}</a>
+          <a href="#merch" style="color:var(--bone); font-size:14px; text-decoration:none;" style-hover="color:var(--copper);">{{ txt_menuMerch }}</a>
+          <a href="#support" style="color:var(--bone); font-size:14px; text-decoration:none;" style-hover="color:var(--copper);">{{ txt_menuSupport }}</a>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ash); margin-bottom:6px;">{{ txt_footerContacts }}</div>
+          <a href="#" style="color:var(--bone); font-size:14px; text-decoration:none;" style-hover="color:var(--copper);">Telegram</a>
+          <a href="#" style="color:var(--bone); font-size:14px; text-decoration:none;" style-hover="color:var(--copper);">Instagram</a>
+          <a href="#" style="color:var(--bone); font-size:14px; text-decoration:none;" style-hover="color:var(--copper);">Email</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1200px; margin:0 auto; padding:24px; border-top:1px solid var(--iron); font-size:12px; color:var(--ash);">{{ txt_footerCopy }}</div>
+  </footer>
+
+  <!-- MOBILE STICKY CTA -->
+  <div style="{{ mobileCtaStyle }}">
+    <a href="#support" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; background:var(--ember); color:var(--bone); text-decoration:none; font-size:15px; font-weight:600; letter-spacing:.02em; text-transform:uppercase;" style-focus="outline:2px solid var(--copper); outline-offset:-3px;">{{ txt_btnSupport }}</a>
+  </div>
+
+  <!-- COOKIE BANNER -->
+  <div style="{{ cookieBannerStyle }}">
+    <div style="max-width:1200px; margin:0 auto; padding:24px; display:flex; flex-wrap:wrap; gap:20px; align-items:center; justify-content:space-between;">
+      <p style="font-size:14px; line-height:1.6; color:var(--ash); margin:0; max-width:760px;">Ми відповідально підходимо до вашої конфіденційності. Для забезпечення безперебійної та коректної роботи нашого сайту ми використовуємо файли cookie. Інформація, пов'язана з файлами cookie, не використовується для вашої особистої ідентифікації. Продовжуючи користуватися нашим сайтом, ви автоматично погоджуєтесь із використанням необхідних файлів cookie. Якщо ви не погоджуєтесь, будь ласка, залиште наш сайт.</p>
+      <div style="display:flex; gap:12px; flex-shrink:0;">
+        <a href="about:blank" style="background:transparent; color:var(--ash); font-size:14px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:12px 22px; text-decoration:none; border:1px solid var(--iron); white-space:nowrap;" style-hover="border-color:var(--ash); color:var(--bone);" style-focus="outline:2px solid var(--copper); outline-offset:3px;">Залишити сайт</a>
+        <button onClick="{{ acceptCookies }}" style="background:var(--ember); color:var(--bone); font-size:14px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:12px 22px; border:1px solid var(--ember); cursor:pointer; white-space:nowrap; font-family:'Manrope',sans-serif;" style-hover="background:#c65a34;" style-focus="outline:2px solid var(--copper); outline-offset:3px;">Погоджуюсь</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    navScrolled: false,
+    isMobileCta: false,
+    heroPassed: false,
+    menuOpen: false,
+    counted: false,
+    countSorties: 0,
+    countTargets: 0,
+    countFunds: 0,
+    revealed: {},
+    faqOpen: null,
+    lang: 'ua',
+    cookiesAccepted: true
+  };
+
+  TARGETS = { sorties: 1240, targets: 860, funds: 18400000 };
+
+  T = {
+    eyebrow: { ua: '35-й полк НГУ', en: '35th Regiment NGU' },
+    heroSub: { ua: 'Повітряна розвідка. Ударні системи. Інженерне забезпечення.', en: 'Aerial reconnaissance. Strike systems. Engineering support.' },
+    heroLine: { ua: 'Знаходимо, б\u2019ємо, ремонтуємо й повертаємо в небо.', en: 'We find, strike, repair, and send it back into the sky.' },
+    btnSupport: { ua: 'Підтримати', en: 'Support' },
+    btnAbout: { ua: 'Про нас', en: 'About us' },
+    navMenu: { ua: 'меню', en: 'menu' },
+    navClose: { ua: 'закрити', en: 'close' },
+    menuCloseBtn: { ua: 'Закрити ✕', en: 'Close ✕' },
+    menuDirections: { ua: 'Напрямки', en: 'Directions' },
+    menuJoin: { ua: 'Долучитися', en: 'Join' },
+    menuNews: { ua: 'Новини', en: 'News' },
+    menuMerch: { ua: 'Мерч', en: 'Merch' },
+    menuSupport: { ua: 'Підтримати', en: 'Support' },
+    statSorties: { ua: 'Бойових вильотів', en: 'Combat missions' },
+    statTargets: { ua: 'Знищено цілей', en: 'Targets destroyed' },
+    statFunds: { ua: 'Зібрано на дрони', en: 'Raised for drones' },
+    joinEyebrow: { ua: 'Долучайся', en: 'Join us' },
+    joinTitle: { ua: 'Волонтери й бійці потрібні щодня', en: 'Volunteers and fighters needed every day' },
+    joinBody: { ua: 'Пишіть у Telegram-бот — розкажемо, де саме потрібні руки: від збору дронів до логістики й розвідки.', en: 'Message our Telegram bot — we\u2019ll tell you exactly where help is needed: drone assembly, logistics, reconnaissance.' },
+    joinBotLabel: { ua: 'Telegram-бот', en: 'Telegram bot' },
+    joinPhoneLabel: { ua: 'Контакт-центр', en: 'Contact center' },
+    joinApply: { ua: 'Подати заявку', en: 'Apply now' },
+    dirEyebrow: { ua: 'Напрямки діяльності', en: 'Areas of activity' },
+    dir1Title: { ua: 'Повітряна розвідка', en: 'Aerial Reconnaissance' },
+    dir1Body: { ua: 'Виявлення позицій противника, коригування вогню артилерії та збір стратегічних розвіддани\u0301х у реальному часі.', en: 'Detecting enemy positions, adjusting artillery fire, and gathering strategic real-time intelligence.' },
+    dir2Title: { ua: 'Ударні системи', en: 'Strike Systems' },
+    dir2Body: { ua: 'Точкове знищення ворожої техніки, укриттів та живої сили за допомогою ударних FPV-дронів та систем скидів.', en: 'Pinpoint destruction of enemy equipment, shelters, and personnel using strike FPV drones and drop systems.' },
+    dir3Title: { ua: 'Інженерне забезпечення', en: 'Engineering Support' },
+    dir3Body: { ua: 'Ремонт, прошивка та модернізація безпілотних комплексів, виготовлення боєприпасів та нестандартних технічних рішень.', en: 'Repair, firmware, and modernization of drone systems, production of munitions and custom technical solutions.' },
+    valuesEyebrow: { ua: 'Наші цінності', en: 'Our values' },
+    val1Title: { ua: 'Дисципліна', en: 'Discipline' },
+    val1Body: { ua: 'Порядок у діях рятує життя — собі і побратимам.', en: 'Order in action saves lives — your own and your brothers\u2019.' },
+    val2Title: { ua: 'Ремесло', en: 'Craft' },
+    val2Body: { ua: 'Кожен дрон і кожен вузол — робота, зроблена як для себе.', en: 'Every drone and every part built as if for ourselves.' },
+    val3Title: { ua: 'Точність', en: 'Precision' },
+    val3Body: { ua: 'Рішення на основі даних, а не здогадок.', en: 'Decisions based on data, not guesswork.' },
+    val4Title: { ua: 'Побратимство', en: 'Brotherhood' },
+    val4Body: { ua: 'Одна родина в небі, на землі й після служби.', en: 'One family in the sky, on the ground, and after service.' },
+    newsEyebrow: { ua: 'Останні новини', en: 'Latest news' },
+    newsPhoto: { ua: 'фото новини', en: 'news photo' },
+    newsStub: { ua: 'Заглушка · дата', en: 'Placeholder · date' },
+    newsTitle: { ua: 'Заголовок новини — підставте матеріал', en: 'News headline — add material' },
+    merchEyebrow: { ua: 'Мерч', en: 'Merch' },
+    merchAll: { ua: 'Весь каталог →', en: 'Full catalog →' },
+    merchPhoto: { ua: 'фото товару', en: 'product photo' },
+    merch1: { ua: 'Футболка «Sварог»', en: '"Svarog" T-shirt' },
+    merch2: { ua: 'Шеврон полку', en: 'Regiment patch' },
+    merch3: { ua: 'Кепка польова', en: 'Field cap' },
+    merch4: { ua: 'Патч «Ковадло»', en: '"Anvil" patch' },
+    faqEyebrow: { ua: 'Питання і відповіді', en: 'Questions and answers' },
+    faqQ0: { ua: 'Як перевірити, на що йдуть кошти?', en: 'How can I check where the money goes?' },
+    faqA0: { ua: 'Регулярно публікуємо звіти про закупівлі й передачі в соцмережах підрозділу — з фото та сумами.', en: 'We regularly publish procurement and handover reports on the unit\u2019s social media — with photos and amounts.' },
+    faqQ1: { ua: 'Чи можна стати волонтером без досвіду?', en: 'Can I volunteer without experience?' },
+    faqA1: { ua: 'Так. Є завдання під різні навички — від збірки дронів до логістики. Навчимо на місці.', en: 'Yes. There are tasks for various skills — from drone assembly to logistics. We\u2019ll train you on site.' },
+    faqQ2: { ua: 'Скільки йде доставка мерчу?', en: 'How long does merch delivery take?' },
+    faqA2: { ua: 'В межах України — 3–7 днів після оплати. Виторг іде на закупівлю дронів.', en: 'Within Ukraine — 3–7 days after payment. Proceeds go toward drone purchases.' },
+    faqQ3: { ua: 'Чи можна оформити регулярний донат?', en: 'Can I set up a recurring donation?' },
+    faqA3: { ua: 'Так, у формі підтримки можна налаштувати щомісячне списання на банку підрозділу.', en: 'Yes, the support form lets you set up a monthly transfer to the unit\u2019s fund.' },
+    supportTitle: { ua: 'Підтримати', en: 'Support' },
+    supportBody: { ua: 'Кожна гривня йде на дрони, ремонт техніки та спорядження підрозділу. Скануйте QR або натисніть кнопку нижче.', en: 'Every hryvnia goes toward drones, equipment repair, and unit gear. Scan the QR code or tap the button below.' },
+    supportQr: { ua: 'QR-код', en: 'QR code' },
+    supportBank: { ua: 'Донат-банка', en: 'Donation fund' },
+    supportCard: { ua: 'Реквізити картки', en: 'Card details' },
+    footerDesc: { ua: '35-й окремий полк Національної гвардії України.', en: '35th separate regiment of the National Guard of Ukraine.' },
+    footerSections: { ua: 'Розділи', en: 'Sections' },
+    footerContacts: { ua: 'Контакти', en: 'Contacts' },
+    footerCopy: { ua: '© 2026 SVAROG TEAM', en: '© 2026 SVAROG TEAM' }
+  };
+
+  t(key) {
+    return (this.T[key] && this.T[key][this.state.lang]) || key;
+  }
+
+  componentDidMount() {
+    this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    try {
+      const accepted = window.localStorage.getItem('svarog_cookies_accepted');
+      this.setState({ cookiesAccepted: accepted === '1' });
+    } catch (e) {
+      this.setState({ cookiesAccepted: true });
+    }
+
+    this.onScroll = () => {
+      const scrolled = window.scrollY > 40;
+      if (scrolled !== this.state.navScrolled) this.setState({ navScrolled: scrolled });
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+
+    this.mqCta = window.matchMedia('(max-width: 680px)');
+    this.onMqCta = (e) => this.setState({ isMobileCta: e.matches });
+    this.mqCta.addEventListener('change', this.onMqCta);
+    this.setState({ isMobileCta: this.mqCta.matches });
+
+    if (this.reduced) {
+      this.setState({
+        counted: true,
+        countSorties: this.TARGETS.sorties,
+        countTargets: this.TARGETS.targets,
+        countFunds: this.TARGETS.funds,
+        heroPassed: true,
+        revealed: { counters: true, join: true, directions: true, values: true, news: true, merch: true, faq: true, support: true }
+      });
+      return;
+    }
+
+    this.heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const passed = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        this.setState({ heroPassed: passed });
+      });
+    }, { threshold: 0 });
+    if (this.heroEl) this.heroObserver.observe(this.heroEl);
+
+    this.revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const name = entry.target.dataset.reveal;
+        if (entry.isIntersecting && name && !this.state.revealed[name]) {
+          this.setState((s) => ({ revealed: { ...s.revealed, [name]: true } }));
+          this.revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    ['countersEl', 'joinEl', 'directionsEl', 'valuesEl', 'newsEl', 'merchEl', 'faqEl', 'supportEl'].forEach((key) => {
+      if (this[key]) this.revealObserver.observe(this[key]);
+    });
+
+    this.countersObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !this.state.counted) {
+          this.setState({ counted: true });
+          this.runCountUp();
+          this.countersObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    if (this.countersEl) this.countersObserver.observe(this.countersEl);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScroll);
+    if (this.mqCta) this.mqCta.removeEventListener('change', this.onMqCta);
+    if (this.heroObserver) this.heroObserver.disconnect();
+    if (this.revealObserver) this.revealObserver.disconnect();
+    if (this.countersObserver) this.countersObserver.disconnect();
+  }
+
+  runCountUp() {
+    const duration = 1200;
+    const start = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      this.setState({
+        countSorties: Math.round(this.TARGETS.sorties * eased),
+        countTargets: Math.round(this.TARGETS.targets * eased),
+        countFunds: Math.round(this.TARGETS.funds * eased)
+      });
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  fmt(n) {
+    return new Intl.NumberFormat('uk-UA').format(n);
+  }
+
+  revealStyle(name, extraDelayMs, extra) {
+    const revealed = !!this.state.revealed[name] || this.reduced;
+    const delay = extraDelayMs || 0;
+    return {
+      ...(extra || {}),
+      opacity: revealed ? 1 : 0,
+      transform: revealed ? 'translateY(0px)' : 'translateY(16px)',
+      transition: this.reduced ? 'none' : `opacity 500ms cubic-bezier(.16,1,.3,1) ${delay}ms, transform 500ms cubic-bezier(.16,1,.3,1) ${delay}ms`
+    };
+  }
+
+  faqBodyStyle(i) {
+    const open = this.state.faqOpen === i;
+    return {
+      overflow: 'hidden',
+      maxHeight: open ? '200px' : '0px',
+      transition: this.reduced ? 'none' : 'max-height 300ms ease'
+    };
+  }
+
+  toggleFaq(i) {
+    this.setState((s) => ({ faqOpen: s.faqOpen === i ? null : i }));
+  }
+
+  acceptCookies() {
+    try { window.localStorage.setItem('svarog_cookies_accepted', '1'); } catch (e) {}
+    this.setState({ cookiesAccepted: true });
+  }
+
+  renderVals() {
+    return {
+      navBarStyle: {
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+        background: 'transparent',
+        borderBottom: '1px solid transparent'
+      },
+      menuLabel: this.state.menuOpen ? this.t('navClose') : this.t('navMenu'),
+      toggleMenu: () => this.setState((s) => ({ menuOpen: !s.menuOpen })),
+      langLabel: this.state.lang === 'ua' ? 'EN' : 'UA',
+      toggleLang: () => this.setState((s) => ({ lang: s.lang === 'ua' ? 'en' : 'ua' })),
+      txt_eyebrow: this.t('eyebrow'), txt_heroSub: this.t('heroSub'), txt_heroLine: this.t('heroLine'),
+      txt_btnSupport: this.t('btnSupport'), txt_btnAbout: this.t('btnAbout'),
+      txt_menuCloseBtn: this.t('menuCloseBtn'), txt_menuDirections: this.t('menuDirections'), txt_menuJoin: this.t('menuJoin'),
+      txt_menuNews: this.t('menuNews'), txt_menuMerch: this.t('menuMerch'), txt_menuSupport: this.t('menuSupport'),
+      txt_statSorties: this.t('statSorties'), txt_statTargets: this.t('statTargets'), txt_statFunds: this.t('statFunds'),
+      txt_joinEyebrow: this.t('joinEyebrow'), txt_joinTitle: this.t('joinTitle'), txt_joinBody: this.t('joinBody'),
+      txt_joinBotLabel: this.t('joinBotLabel'), txt_joinPhoneLabel: this.t('joinPhoneLabel'), txt_joinApply: this.t('joinApply'),
+      txt_dirEyebrow: this.t('dirEyebrow'),
+      txt_dir1Title: this.t('dir1Title'), txt_dir1Body: this.t('dir1Body'),
+      txt_dir2Title: this.t('dir2Title'), txt_dir2Body: this.t('dir2Body'),
+      txt_dir3Title: this.t('dir3Title'), txt_dir3Body: this.t('dir3Body'),
+      txt_valuesEyebrow: this.t('valuesEyebrow'),
+      txt_val1Title: this.t('val1Title'), txt_val1Body: this.t('val1Body'),
+      txt_val2Title: this.t('val2Title'), txt_val2Body: this.t('val2Body'),
+      txt_val3Title: this.t('val3Title'), txt_val3Body: this.t('val3Body'),
+      txt_val4Title: this.t('val4Title'), txt_val4Body: this.t('val4Body'),
+      txt_newsEyebrow: this.t('newsEyebrow'), txt_newsPhoto: this.t('newsPhoto'), txt_newsStub: this.t('newsStub'), txt_newsTitle: this.t('newsTitle'),
+      txt_merchEyebrow: this.t('merchEyebrow'), txt_merchAll: this.t('merchAll'), txt_merchPhoto: this.t('merchPhoto'),
+      txt_merch1: this.t('merch1'), txt_merch2: this.t('merch2'), txt_merch3: this.t('merch3'), txt_merch4: this.t('merch4'),
+      txt_faqEyebrow: this.t('faqEyebrow'),
+      txt_faqQ0: this.t('faqQ0'), txt_faqA0: this.t('faqA0'),
+      txt_faqQ1: this.t('faqQ1'), txt_faqA1: this.t('faqA1'),
+      txt_faqQ2: this.t('faqQ2'), txt_faqA2: this.t('faqA2'),
+      txt_faqQ3: this.t('faqQ3'), txt_faqA3: this.t('faqA3'),
+      txt_supportTitle: this.t('supportTitle'), txt_supportBody: this.t('supportBody'), txt_supportQr: this.t('supportQr'),
+      txt_supportBank: this.t('supportBank'), txt_supportCard: this.t('supportCard'),
+      txt_footerDesc: this.t('footerDesc'), txt_footerSections: this.t('footerSections'), txt_footerContacts: this.t('footerContacts'), txt_footerCopy: this.t('footerCopy'),
+      burgerLine1Style: { height: '1px', background: 'var(--bone)', width: '100%', transform: this.state.menuOpen ? 'translateY(2px) rotate(45deg)' : 'none', transition: 'transform 160ms ease-out' },
+      burgerLine2Style: { height: '1px', background: 'var(--bone)', width: '100%', transform: this.state.menuOpen ? 'translateY(-2px) rotate(-45deg)' : 'none', transition: 'transform 160ms ease-out' },
+      menuOverlayStyle: {
+        position: 'fixed', inset: 0, zIndex: 80, background: 'var(--graphite)',
+        opacity: this.state.menuOpen ? 1 : 0,
+        pointerEvents: this.state.menuOpen ? 'auto' : 'none',
+        transition: this.reduced ? 'none' : 'opacity 200ms ease-out'
+      },
+      setHeroRef: (el) => { this.heroEl = el; },
+      setCountersRef: (el) => { this.countersEl = el; },
+      setJoinRef: (el) => { this.joinEl = el; },
+      setDirectionsRef: (el) => { this.directionsEl = el; },
+      setValuesRef: (el) => { this.valuesEl = el; },
+      setNewsRef: (el) => { this.newsEl = el; },
+      setMerchRef: (el) => { this.merchEl = el; },
+      setFaqRef: (el) => { this.faqEl = el; },
+      setSupportRef: (el) => { this.supportEl = el; },
+      countSorties: this.fmt(this.state.countSorties),
+      countTargets: this.fmt(this.state.countTargets),
+      countFunds: this.fmt(this.state.countFunds),
+      counterItemStyle0: this.revealStyle('counters', 0, { flex: '1 1 260px', padding: '48px 32px', borderRight: '1px solid var(--iron)', textAlign: 'center' }),
+      counterItemStyle1: this.revealStyle('counters', 70, { flex: '1 1 260px', padding: '48px 32px', borderRight: '1px solid var(--iron)', textAlign: 'center' }),
+      counterItemStyle2: this.revealStyle('counters', 140, { flex: '1 1 260px', padding: '48px 32px', textAlign: 'center' }),
+      joinStyle: this.revealStyle('join', 0, { maxWidth: '1200px', margin: '0 auto', padding: '80px 24px', display: 'flex', flexWrap: 'wrap', gap: '48px', alignItems: 'center', justifyContent: 'space-between' }),
+      dirItemStyle0: this.revealStyle('directions', 0, { flex: '1 1 300px', padding: '0 32px 32px 0', borderRight: '1px solid var(--iron)', marginRight: '-1px' }),
+      dirItemStyle1: this.revealStyle('directions', 70, { flex: '1 1 300px', padding: '0 32px 32px', borderRight: '1px solid var(--iron)' }),
+      dirItemStyle2: this.revealStyle('directions', 140, { flex: '1 1 300px', padding: '0 0 32px 32px' }),
+      valuesGridStyle: this.revealStyle('values', 0, { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '40px' }),
+      newsItemStyle0: this.revealStyle('news', 0, { background: 'var(--graphite)', textDecoration: 'none', display: 'block' }),
+      newsItemStyle1: this.revealStyle('news', 70, { background: 'var(--graphite)', textDecoration: 'none', display: 'block' }),
+      newsItemStyle2: this.revealStyle('news', 140, { background: 'var(--graphite)', textDecoration: 'none', display: 'block' }),
+      merchGridStyle: this.revealStyle('merch', 0, { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }),
+      faqSectionStyle: this.revealStyle('faq', 0, { maxWidth: '1200px', margin: '0 auto', padding: '96px 24px' }),
+      faqIcon0: this.state.faqOpen === 0 ? '−' : '+',
+      faqIcon1: this.state.faqOpen === 1 ? '−' : '+',
+      faqIcon2: this.state.faqOpen === 2 ? '−' : '+',
+      faqIcon3: this.state.faqOpen === 3 ? '−' : '+',
+      faqBodyStyle0: this.faqBodyStyle(0),
+      faqBodyStyle1: this.faqBodyStyle(1),
+      faqBodyStyle2: this.faqBodyStyle(2),
+      faqBodyStyle3: this.faqBodyStyle(3),
+      toggleFaq0: () => this.toggleFaq(0),
+      toggleFaq1: () => this.toggleFaq(1),
+      toggleFaq2: () => this.toggleFaq(2),
+      toggleFaq3: () => this.toggleFaq(3),
+      supportSectionStyle: this.revealStyle('support', 0, { maxWidth: '1200px', margin: '0 auto', padding: '96px 24px', display: 'flex', gap: '64px', flexWrap: 'wrap', alignItems: 'center' }),
+      mobileCtaStyle: {
+        position: 'fixed', left: 0, right: 0, bottom: 0, height: '56px', zIndex: 60,
+        opacity: (this.state.isMobileCta && this.state.heroPassed) ? 1 : 0,
+        transform: (this.state.isMobileCta && this.state.heroPassed) ? 'translateY(0px)' : 'translateY(100%)',
+        pointerEvents: (this.state.isMobileCta && this.state.heroPassed) ? 'auto' : 'none',
+        transition: this.reduced ? 'none' : 'opacity 200ms ease-out, transform 200ms ease-out'
+      },
+      acceptCookies: () => this.acceptCookies(),
+      cookieBannerStyle: {
+        position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 90,
+        background: 'var(--plate)', borderTop: '1px solid var(--iron)',
+        transform: this.state.cookiesAccepted ? 'translateY(100%)' : 'translateY(0px)',
+        transition: this.reduced ? 'none' : 'transform 260ms ease-out'
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>
