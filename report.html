@@ -63,6 +63,29 @@
         @keyframes sweepRotate { to { transform: translateX(-50%) rotate(360deg); } }
         .bg-vignette { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(ellipse at 50% 0%, transparent 0%, var(--bg-main) 85%); }
 
+        /* Скан-лінії (легка текстура старого монітора) */
+        .bg-scanlines {
+            position: fixed; inset: 0; z-index: 5; pointer-events: none; opacity: 0.35;
+            background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+        }
+
+        /* Частинки, що повільно спливають угору */
+        .particle {
+            position: fixed; bottom: -10px; z-index: -1; pointer-events: none; border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,255,204,0.7), transparent 70%);
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp { 0% { transform: translateY(0) translateX(0); opacity: 0; } 8% { opacity: 0.6; } 92% { opacity: 0.4; } 100% { transform: translateY(-105vh) translateX(var(--drift, 20px)); opacity: 0; } }
+
+        /* Кутові HUD-дужки */
+        .hud-corners { position: absolute; inset: 0; pointer-events: none; }
+        .hud-corners::before, .hud-corners::after,
+        .hud-corners > .c2::before, .hud-corners > .c2::after { content: ""; position: absolute; width: 14px; height: 14px; border: 2px solid rgba(0,255,204,0.5); }
+        .hud-corners::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+        .hud-corners::after { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+        .hud-corners > .c2::before { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+        .hud-corners > .c2::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
         .wrapper {
             width: 100%;
             max-width: 450px;
@@ -99,6 +122,14 @@
             letter-spacing: 1px;
             text-transform: uppercase;
             margin-bottom: 4px;
+            position: relative;
+            display: inline-block;
+            animation: titleGlitchIn 1s ease 0.3s both;
+        }
+        @keyframes titleGlitchIn {
+            0% { opacity: 0; letter-spacing: 6px; filter: blur(4px); text-shadow: 2px 0 var(--cyan-glow), -2px 0 #ff4a4a; }
+            60% { opacity: 1; letter-spacing: 2px; filter: blur(0); text-shadow: 1px 0 var(--cyan-glow), -1px 0 #ff4a4a; }
+            100% { opacity: 1; letter-spacing: 1px; filter: blur(0); text-shadow: none; }
         }
         
         .title-box p {
@@ -135,6 +166,7 @@
             opacity: 0; transform: translateY(14px); animation: cardIn 0.6s ease forwards;
             animation-delay: 0.15s;
             transition: border-color 0.4s, box-shadow 0.4s;
+            position: relative;
         }
 
         .sum-card.dest {
@@ -158,6 +190,7 @@
             margin-bottom: 20px;
             opacity: 0; transform: translateY(14px); animation: cardIn 0.6s ease forwards;
             animation-delay: 0.35s;
+            position: relative;
         }
 
         .filter-toggle-row { display: flex; justify-content: flex-end; margin-bottom: 10px; }
@@ -217,11 +250,25 @@
         }
 
         .target-icon {
-            font-size: 18px;
-            width: 24px;
-            text-align: center;
+            font-size: 16px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
+            border-radius: 10px;
+            background: linear-gradient(145deg, rgba(121,133,84,0.15), rgba(0,255,204,0.04));
+            border: 1px solid rgba(121,133,84,0.35);
+            position: relative;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
         }
+        .target-row.has-count .target-icon {
+            border-color: rgba(0,255,204,0.45);
+            animation: chipBreathe 3.2s ease-in-out infinite;
+        }
+        .target-row:hover .target-icon { transform: scale(1.12) rotate(-4deg); }
+        @keyframes chipBreathe { 0%,100% { box-shadow: 0 0 0 0 rgba(0,255,204,0.15); } 50% { box-shadow: 0 0 10px 2px rgba(0,255,204,0.25); } }
 
         .target-text { min-width: 0; flex: 1; }
 
@@ -233,7 +280,9 @@
         }
 
         .target-bar-track { height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 6px; overflow: hidden; }
-        .target-bar-fill { height: 100%; background: linear-gradient(90deg, var(--theme-color), var(--cyan-glow)); border-radius: 2px; width: 0%; transition: width 1s cubic-bezier(.2,.8,.2,1); }
+        .target-bar-fill { height: 100%; background: linear-gradient(90deg, var(--theme-color), var(--cyan-glow)); border-radius: 2px; width: 0%; transition: width 1s cubic-bezier(.2,.8,.2,1); position: relative; overflow: hidden; }
+        .target-bar-fill::after { content:""; position:absolute; inset:0; background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%); background-size: 200% 100%; animation: shimmerSlide 2.8s ease-in-out infinite; }
+        @keyframes shimmerSlide { 0% { background-position: 200% 0; } 100% { background-position: -50% 0; } }
 
         .target-stats {
             display: flex;
@@ -300,6 +349,8 @@
 <div class="bg-grid"></div>
 <div class="bg-sweep"></div>
 <div class="bg-vignette"></div>
+<div class="bg-scanlines"></div>
+<div id="particle-field"></div>
 
 <div class="wrapper">
     <!-- Шапка -->
@@ -320,10 +371,12 @@
         <!-- Загальні цифри -->
         <div class="summary-grid">
             <div class="sum-card" id="sum-hit-card">
+                <div class="hud-corners"><div class="c2"></div></div>
                 <div class="sum-title">Усього уражено</div>
                 <div class="sum-value hit" id="sum-hit">0</div>
             </div>
             <div class="sum-card dest" id="sum-dest-card">
+                <div class="hud-corners"><div class="c2"></div></div>
                 <div class="sum-title">З них знищено</div>
                 <div class="sum-value dest" id="sum-dest">0</div>
             </div>
@@ -331,6 +384,7 @@
 
         <!-- Детальна таблиця -->
         <div class="table-container">
+            <div class="hud-corners"><div class="c2"></div></div>
             <div class="filter-toggle-row">
                 <button class="filter-toggle-btn" id="filter-toggle-btn" onclick="toggleActiveOnlyFilter()">Лише активні</button>
             </div>
@@ -416,6 +470,24 @@
         document.querySelectorAll('.target-row').forEach(row => { row.style.display = (showActiveOnly && row.dataset.isZero === '1') ? 'none' : 'flex'; });
     }
 
+    // Плаваючі частинки на фоні
+    function spawnParticles(count) {
+        const field = document.getElementById('particle-field');
+        for (let i = 0; i < count; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = 2 + Math.random() * 3;
+            p.style.width = size + 'px'; p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.setProperty('--drift', (Math.random() * 60 - 30) + 'px');
+            const duration = 10 + Math.random() * 12;
+            p.style.animationDuration = duration + 's';
+            p.style.animationDelay = (Math.random() * duration) + 's';
+            field.appendChild(p);
+        }
+    }
+    spawnParticles(22);
+
     // 3. СЛУХАЄМО ОНОВЛЕННЯ З БАЗИ
     db.collection("config").doc("combat_report").onSnapshot(doc => {
         if (doc.exists) {
@@ -463,7 +535,7 @@
             const barPct = Math.round((hitCount / maxHit) * 100);
 
             const row = document.createElement('div');
-            row.className = `target-row${isZero ? ' is-zero' : ''}${changed ? ' flash-update' : ''}`;
+            row.className = `target-row${isZero ? ' is-zero' : ''}${changed ? ' flash-update' : ''}${!isZero ? ' has-count' : ''}`;
             row.dataset.isZero = isZero ? '1' : '0';
             row.style.animationDelay = `${Math.min(idx, 14) * 0.035}s`;
             if (showActiveOnly && isZero) row.style.display = 'none';
