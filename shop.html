@@ -99,8 +99,8 @@
         .hero-info { max-width: 550px; z-index: 2; position: relative; }
         .hero-info h1 { font-size: 2.8rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 12px; letter-spacing: -0.5px; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .hero-info p { color: #d0d0d0; font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .hero-btn { display: inline-block; padding: 14px 28px; background: var(--theme-color); color: #121212; font-weight: 800; text-decoration: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(121, 133, 84, 0.4); transition: all 0.3s; }
-        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(121, 133, 84, 0.6); filter: brightness(1.1); color: #000; }
+        .hero-btn { display: inline-block; padding: 14px 28px; background: var(--theme-color); color: #fff; font-weight: 700; text-decoration: none; border-radius: 12px; box-shadow: 0 6px 20px rgba(121, 133, 84, 0.25); transition: all 0.3s; }
+        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(121, 133, 84, 0.6); filter: brightness(1.1); color: #fff; }
         
         .hero-img-wrapper { position: absolute; right: 0; top: 0; width: 55%; height: 100%; z-index: 1; display: none; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%); mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%); }
         .hero-showcase-img { width: 100%; height: 100%; object-fit: cover; object-position: center right; }
@@ -138,7 +138,7 @@
         .stock-badge { position: absolute; top: 16px; right: 16px; background: rgba(10, 10, 12, 0.75); backdrop-filter: blur(10px); color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color); z-index: 2; }
         .stock-badge.empty { color: #ff4a4a; border-color: rgba(255, 74, 74, 0.3); background: rgba(255, 74, 74, 0.1); }
         .sale-badge { position: absolute; top: 16px; left: 16px; background: #ff4a4a; color: #fff; font-size: 0.8rem; font-weight: 800; padding: 6px 14px; border-radius: 8px; z-index: 2; box-shadow: 0 4px 12px rgba(255, 74, 74, 0.3); }
-        .new-badge { position: absolute; top: 50px; left: 16px; background: var(--theme-color); color: #121212; font-size: 0.75rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; z-index: 2; }
+        .new-badge { position: absolute; top: 50px; left: 16px; background: var(--theme-color); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; z-index: 2; }
 
         .merch-details { padding: 24px; display: flex; flex-direction: column; flex-grow: 1; }
         .cat-tag { font-size: 0.75rem; color: var(--theme-color); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
@@ -165,8 +165,8 @@
         .qty-btn:disabled { color: #444; cursor: not-allowed; }
         .qty-val { flex: 1; text-align: center; font-weight: 700; font-size: 1rem; user-select: none; }
         
-        .buy-btn { width: 100%; padding: 14px; background: var(--theme-color); color: #121212; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; margin-top: auto; box-shadow: 0 6px 20px rgba(121, 133, 84, 0.2); }
-        .buy-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(121, 133, 84, 0.4); filter: brightness(1.1); color: #000; }
+        .buy-btn { width: 100%; padding: 14px; background: var(--theme-color); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; margin-top: auto; box-shadow: 0 6px 20px rgba(121, 133, 84, 0.25); }
+        .buy-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(121, 133, 84, 0.4); filter: brightness(1.1); color: #fff; }
         .buy-btn:disabled { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); color: #444; cursor: not-allowed; box-shadow: none; }
 
         /* КОШИК */
@@ -212,8 +212,18 @@
         .copy-btn { background: rgba(121, 133, 84, 0.15); color: var(--theme-color); border: 1px solid var(--theme-color); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-left: 8px; transition: 0.2s; }
         .copy-btn:hover { background: var(--theme-color); color: #000; }
         
-        .confirm-btn { width: 100%; padding: 16px; background: var(--theme-color); color: #121212; border: none; border-radius: 12px; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 24px rgba(121, 133, 84, 0.3); }
-        .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); color: #000; }
+        .confirm-btn { width: 100%; padding: 16px; background: var(--theme-color); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 1.05rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 20px rgba(121, 133, 84, 0.25); }
+        .confirm-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); color: #fff; }
+
+        /* ==================== БАНЕР ЗГОДИ НА COOKIE ==================== */
+        .cookie-banner { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 5000; background: rgba(10,10,12,0.97); backdrop-filter: blur(20px); border-top: 1px solid var(--border-color); padding: 18px 20px; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; transform: translateY(110%); transition: transform 0.5s cubic-bezier(.22,.9,.32,1.1); box-shadow: 0 -10px 40px rgba(0,0,0,0.4); }
+        .cookie-banner.visible { transform: translateY(0); }
+        .cookie-banner-text { color: #ccc; font-size: 0.88rem; line-height: 1.5; max-width: 640px; }
+        .cookie-banner-text b { color: #fff; }
+        .cookie-banner-actions { display: flex; gap: 10px; flex-shrink: 0; }
+        .cookie-banner-btn { padding: 11px 26px; border-radius: 10px; font-weight: 700; font-size: 0.9rem; cursor: pointer; border: none; background: var(--theme-color); color: #fff; transition: all 0.25s; white-space: nowrap; }
+        .cookie-banner-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        @media (max-width: 700px) { .cookie-banner { flex-direction: column; text-align: center; padding: 18px; } }
 
         .toast-notification { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(120px); background: #121215; border: 1px solid var(--theme-color); color: #fff; padding: 16px 28px; border-radius: 14px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 4000; opacity: 0; transition: all 0.4s ease; display: flex; align-items: center; gap: 12px; }
         .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -583,6 +593,16 @@
         <span data-lang="en">SVAROG TEAM © 2026 | All rights reserved. Built with ❤️ for Ukraine.</span>
     </footer>
 
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-banner-text">
+            <span data-lang="ua">🍪 Цей сайт використовує файли cookie та локальне сховище браузера — щоб пам'ятати ваш <b>кошик</b>, обрану <b>мову</b> та сесію <b>анонімного чату</b>. Продовжуючи користуватись сайтом, ви погоджуєтесь з цим.</span>
+            <span data-lang="en">🍪 This site uses cookies and browser local storage — to remember your <b>cart</b>, chosen <b>language</b>, and <b>anonymous chat</b> session. By continuing to use the site, you agree to this.</span>
+        </div>
+        <div class="cookie-banner-actions">
+            <button class="cookie-banner-btn" onclick="acceptCookieConsent()"><span data-lang="ua">Зрозуміло</span><span data-lang="en">Got it</span></button>
+        </div>
+    </div>
+
     <div class="user-chat-modal" id="user-chat-window">
         <div class="chat-header">
             <span data-lang="ua">Анонімна розмова</span><span data-lang="en">Anonymous Chat</span>
@@ -801,7 +821,7 @@
 
                 let galleryHtml = ''; let indicatorsHtml = ''; let arrowsHtml = '';
                 if (currentImagesArray.length > 0) {
-                    galleryHtml = `<div class="merch-gallery" id="gallery-${item.id}">`; currentImagesArray.forEach(imgSrc => { galleryHtml += `<img src="${imgSrc}" loading="lazy" onclick="openLightbox('${imgSrc}')">`; }); galleryHtml += `</div>`;
+                    galleryHtml = `<div class="merch-gallery" id="gallery-${item.id}">`; currentImagesArray.forEach((imgSrc, imgIdx) => { const posStyle = imgIdx === 0 && item.imagePosition ? ` style="object-position:${item.imagePosition};"` : ''; galleryHtml += `<img src="${imgSrc}" loading="lazy"${posStyle} onclick="openLightbox('${imgSrc}')">`; }); galleryHtml += `</div>`;
                     if (currentImagesArray.length > 1) {
                         indicatorsHtml = `<div class="gallery-indicators">`; currentImagesArray.forEach((_, i) => { indicatorsHtml += `<div class="dot ${i === 0 ? 'active' : ''}"></div>`; }); indicatorsHtml += `</div>`;
                         arrowsHtml = `<div class="gallery-arrow prev" onclick="scrollGallery('${item.id}', -1)">‹</div><div class="gallery-arrow next" onclick="scrollGallery('${item.id}', 1)">›</div>`;
@@ -817,6 +837,7 @@
                 let hasDiscount = item.discountPrice && item.discountPrice < item.price;
                 let priceHtml = hasDiscount ? `<span class="old-price">${item.price} ₴</span> <span class="merch-price">${item.discountPrice} ₴</span>` : `<span class="merch-price">${item.price} ₴</span>`;
                 let saleBadgeHtml = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
+                let newBadgeHtml = item.isNew ? `<div class="new-badge">🔥 NEW</div>` : ``;
                 let descHtml = currentDesc ? `<div class="merch-desc auto-translate">${currentDesc}</div>` : '';
                 
                 let sizeSelectHtml = ''; let initialMaxStock = 0; let isUniversalSize = !(currentSizes && currentSizes.length > 0);
@@ -827,7 +848,7 @@
 
                 let buyBtnHtml = isOutOfStock ? `<button class="buy-btn" disabled>${lang==='ua'?'Розпродано':'Sold out'}</button>` : `<button class="buy-btn" onclick="addToCart('${item.id}')">${item.isPreorder ? (lang==='ua'?'Передзамовити ⏳':'Pre-order ⏳') : (lang==='ua'?'Додати в кошик 🛒':'Add to cart 🛒')}</button>`;
 
-                container.innerHTML += `<div class="merch-card card-animate ${isOutOfStock ? 'is-sold-out' : ''}" style="animation-delay:${Math.min(idx,10)*0.05}s"><div class="merch-img-box">${galleryHtml} ${arrowsHtml} ${indicatorsHtml} ${stockBadge} ${saleBadgeHtml}</div><div class="merch-details"><div class="cat-tag auto-translate">${item.category || 'Без категорії'}</div><div class="merch-title auto-translate">${item.title}</div>${variantsHtml}<div class="price-wrapper">${priceHtml}</div>${descHtml}<div class="merch-options">${sizeSelectHtml}<div class="qty-container" id="qty-container-${item.id}" style="${isUniversalSize ? 'width: 100%;' : ''}"><button type="button" class="qty-btn" onclick="adjustGridQty('${item.id}', -1)">−</button><span class="qty-val" id="qty-val-${item.id}">${initialMaxStock > 0 || item.isPreorder ? 1 : 0}</span><button type="button" class="qty-btn" onclick="adjustGridQty('${item.id}', 1)">+</button></div></div>${lowStockHtml}${buyBtnHtml}</div></div>`;
+                container.innerHTML += `<div class="merch-card card-animate ${isOutOfStock ? 'is-sold-out' : ''}" style="animation-delay:${Math.min(idx,10)*0.05}s"><div class="merch-img-box">${galleryHtml} ${arrowsHtml} ${indicatorsHtml} ${stockBadge} ${saleBadgeHtml} ${newBadgeHtml}</div><div class="merch-details"><div class="cat-tag auto-translate">${item.category || 'Без категорії'}</div><div class="merch-title auto-translate">${item.title}</div>${variantsHtml}<div class="price-wrapper">${priceHtml}</div>${descHtml}<div class="merch-options">${sizeSelectHtml}<div class="qty-container" id="qty-container-${item.id}" style="${isUniversalSize ? 'width: 100%;' : ''}"><button type="button" class="qty-btn" onclick="adjustGridQty('${item.id}', -1)">−</button><span class="qty-val" id="qty-val-${item.id}">${initialMaxStock > 0 || item.isPreorder ? 1 : 0}</span><button type="button" class="qty-btn" onclick="adjustGridQty('${item.id}', 1)">+</button></div></div>${lowStockHtml}${buyBtnHtml}</div></div>`;
             });
             setTimeout(() => { document.querySelectorAll('.merch-gallery').forEach(g => { g.addEventListener('scroll', function() { const dots = this.parentElement.querySelectorAll('.dot'); if(dots.length === 0) return; dots.forEach((dot, idx) => { dot.classList.toggle('active', idx === Math.round(this.scrollLeft / this.clientWidth)); }); }); }); }, 100);
         }
@@ -1048,7 +1069,17 @@
         async function sendUserChatPhoto(input) { if (input.files && input.files[0]) { try { let base64 = await getBase64Image(input.files[0]); const msgObject = { sender: 'user', text: base64, type: 'image', time: Date.now() }; await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion(msgObject) }, { merge: true }); } catch(e) { alert("Помилка файлу"); } } }
         document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
 
-        window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); initUserChat(); listenToActiveOrderStatus(); if (localStorage.getItem('svarogChatIsOpen') === 'true') openUserChat(); });
+        function acceptCookieConsent() {
+            localStorage.setItem('cookieConsentAccepted', '1');
+            document.getElementById('cookie-banner').classList.remove('visible');
+        }
+        function initCookieBanner() {
+            if (localStorage.getItem('cookieConsentAccepted') !== '1') {
+                setTimeout(() => { document.getElementById('cookie-banner').classList.add('visible'); }, 800);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => { setLanguage(localStorage.getItem('selectedLang') || 'ua'); initUserChat(); listenToActiveOrderStatus(); initCookieBanner(); if (localStorage.getItem('svarogChatIsOpen') === 'true') openUserChat(); });
     </script>
 </body>
 </html>
