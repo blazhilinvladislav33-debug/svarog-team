@@ -4,7 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Svarog Team</title>
-<link rel="preload" href="fonts/SvarogDisplay.woff" as="font" type="font/woff" crossorigin="anonymous">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+        authDomain: "svarog-team.firebaseapp.com",
+        projectId: "svarog-team",
+        storageBucket: "svarog-team.firebasestorage.app",
+        messagingSenderId: "311449325528",
+        appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
+        measurementId: "G-56T1VN72PF"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+</script>
+<link rel="preload" href="SvarogTeam-Regular.woff" as="font" type="font/woff" crossorigin="anonymous">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,7 +30,7 @@
   }
   @font-face{
     font-family:'SvarogDisplay';
-    src:url('fonts/SvarogDisplay.woff') format('woff');
+    src:url('SvarogTeam-Regular.woff') format('woff');
     font-weight:400; font-style:normal; font-display:block;
   }
   * { box-sizing:border-box; }
@@ -56,8 +71,9 @@
   .menu-social a:hover{ color:var(--bone); }
 
   .hero{ position:relative; height:100svh; min-height:520px; width:100%; overflow:hidden; }
-  .hero-bg{ position:absolute; inset:-4%; background:repeating-linear-gradient(115deg, var(--plate) 0px, var(--plate) 22px, var(--iron) 22px, var(--iron) 24px); animation:kenburns 20s linear infinite alternate; }
-  .hero-placeholder{ position:absolute; top:88px; left:0; right:0; display:flex; align-items:center; justify-content:center; }
+  .hero-bg-layer{ position:absolute; inset:-4%; background-position:center; background-size:cover; opacity:0; transition:opacity 2.5s ease-in-out; }
+  .hero-bg-layer.visible{ opacity:1; animation:kenburns 20s linear infinite alternate; }
+  .hero-placeholder{ position:absolute; top:88px; left:0; right:0; display:flex; align-items:center; justify-content:center; transition:opacity 0.4s; }
   .hero-placeholder span{ font-family:monospace; font-size:12px; letter-spacing:.1em; color:var(--ash); text-transform:uppercase; opacity:.5; }
   .hero-fade{ position:absolute; inset:0; background:linear-gradient(to top, #0E0E0F 0%, rgba(14,14,15,.7) 40%, transparent 75%); }
   .hero-content{ position:absolute; left:0; right:0; bottom:0; padding-bottom:64px; }
@@ -228,16 +244,17 @@
     <a href="#support" class="menu-link accent"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
   </div>
   <div class="menu-social">
-    <a href="#">Telegram</a>
-    <a href="#">Instagram</a>
-    <a href="#">YouTube</a>
+    <a href="#" id="social-menu-telegram" target="_blank" rel="noopener">Telegram</a>
+    <a href="#" id="social-menu-instagram" target="_blank" rel="noopener">Instagram</a>
+    <a href="#" id="social-menu-youtube" target="_blank" rel="noopener">YouTube</a>
   </div>
 </div>
 
 <!-- HERO -->
 <section class="hero" id="hero">
-  <div class="hero-bg kb"></div>
-  <div class="hero-placeholder"><span>фото — заглушка, підставте героя</span></div>
+  <div class="hero-bg-layer visible" id="heroBgA" style="background-image:url('bg1.jpg');"></div>
+  <div class="hero-bg-layer" id="heroBgB"></div>
+  <div class="hero-placeholder" id="heroPlaceholder"><span>фото — заглушка, підставте героя</span></div>
   <div class="hero-fade"></div>
   <div class="hero-content">
     <div class="hero-inner">
@@ -258,9 +275,9 @@
 <!-- COUNTERS -->
 <section class="counters" id="counters">
   <div class="counters-row">
-    <div class="counter-item"><div class="counter-num" data-target="1240">0</div><div class="counter-label"><span data-lang="ua">Бойових вильотів</span><span data-lang="en">Combat missions</span></div></div>
-    <div class="counter-item"><div class="counter-num" data-target="860">0</div><div class="counter-label"><span data-lang="ua">Знищено цілей</span><span data-lang="en">Targets destroyed</span></div></div>
-    <div class="counter-item"><div class="counter-num" data-target="18400000" data-currency="₴">0</div><div class="counter-label"><span data-lang="ua">Зібрано на дрони</span><span data-lang="en">Raised for drones</span></div></div>
+    <div class="counter-item"><div class="counter-num" id="counterSorties" data-target="0">0</div><div class="counter-label"><span data-lang="ua">Бойових вильотів</span><span data-lang="en">Combat missions</span></div></div>
+    <div class="counter-item"><div class="counter-num" id="counterTargets" data-target="0">0</div><div class="counter-label"><span data-lang="ua">Знищено цілей</span><span data-lang="en">Targets destroyed</span></div></div>
+    <div class="counter-item"><div class="counter-num" id="counterFunds" data-target="0" data-currency="₴">0</div><div class="counter-label"><span data-lang="ua">Зібрано на дрони</span><span data-lang="en">Raised for drones</span></div></div>
   </div>
 </section>
 
@@ -281,7 +298,7 @@
         <div class="join-label"><span data-lang="ua">Контакт-центр</span><span data-lang="en">Contact center</span></div>
         <a href="tel:+380000000000" class="plain">+38 (0__) ___ __ __</a>
       </div>
-      <a href="#" class="btn btn-olive"><span data-lang="ua">Подати заявку</span><span data-lang="en">Apply now</span></a>
+      <a href="https://svarogteam.com/support.html#volunteer-form-wrapper" class="btn btn-olive"><span data-lang="ua">Подати заявку</span><span data-lang="en">Apply now</span></a>
     </div>
   </div>
 </section>
@@ -330,7 +347,7 @@
 <section class="news" id="news">
   <div class="wrap">
     <div class="eyebrow" style="margin-bottom:48px;"><span data-lang="ua">Останні новини</span><span data-lang="en">Latest news</span></div>
-    <div class="news-grid">
+    <div class="news-grid" id="newsGrid">
       <a href="#" class="news-card"><div class="news-img"><span data-lang="ua">фото новини</span><span data-lang="en">news photo</span></div><div class="news-body"><div class="news-stub"><span data-lang="ua">Заглушка · дата</span><span data-lang="en">Placeholder · date</span></div><h4 class="news-title"><span data-lang="ua">Заголовок новини — підставте матеріал</span><span data-lang="en">News headline — add material</span></h4></div></a>
       <a href="#" class="news-card"><div class="news-img"><span data-lang="ua">фото новини</span><span data-lang="en">news photo</span></div><div class="news-body"><div class="news-stub"><span data-lang="ua">Заглушка · дата</span><span data-lang="en">Placeholder · date</span></div><h4 class="news-title"><span data-lang="ua">Заголовок новини — підставте матеріал</span><span data-lang="en">News headline — add material</span></h4></div></a>
       <a href="#" class="news-card"><div class="news-img"><span data-lang="ua">фото новини</span><span data-lang="en">news photo</span></div><div class="news-body"><div class="news-stub"><span data-lang="ua">Заглушка · дата</span><span data-lang="en">Placeholder · date</span></div><h4 class="news-title"><span data-lang="ua">Заголовок новини — підставте матеріал</span><span data-lang="en">News headline — add material</span></h4></div></a>
@@ -343,9 +360,9 @@
   <div class="wrap">
     <div class="merch-head">
       <div class="eyebrow"><span data-lang="ua">Мерч</span><span data-lang="en">Merch</span></div>
-      <a href="#" class="accent" style="text-decoration:none; border-bottom:1px solid rgba(232,168,138,.4); font-size:14px;"><span data-lang="ua">Весь каталог →</span><span data-lang="en">Full catalog →</span></a>
+      <a href="https://svarogteam.com/shop.html" class="accent" style="text-decoration:none; border-bottom:1px solid rgba(232,168,138,.4); font-size:14px;"><span data-lang="ua">Весь каталог →</span><span data-lang="en">Full catalog →</span></a>
     </div>
-    <div class="merch-grid reveal">
+    <div class="merch-grid reveal" id="merchGrid">
       <div class="merch-card"><div class="merch-img"><span data-lang="ua">фото товару</span><span data-lang="en">product photo</span></div><div class="merch-body"><div class="merch-name"><span data-lang="ua">Футболка «Sварог»</span><span data-lang="en">"Svarog" T-shirt</span></div><div class="merch-price">₴ 000</div></div></div>
       <div class="merch-card"><div class="merch-img"><span data-lang="ua">фото товару</span><span data-lang="en">product photo</span></div><div class="merch-body"><div class="merch-name"><span data-lang="ua">Шеврон полку</span><span data-lang="en">Regiment patch</span></div><div class="merch-price">₴ 000</div></div></div>
       <div class="merch-card"><div class="merch-img"><span data-lang="ua">фото товару</span><span data-lang="en">product photo</span></div><div class="merch-body"><div class="merch-name"><span data-lang="ua">Кепка польова</span><span data-lang="en">Field cap</span></div><div class="merch-price">₴ 000</div></div></div>
@@ -382,13 +399,13 @@
 <!-- SUPPORT -->
 <section class="support" id="support">
   <div class="support-inner reveal">
-    <div class="qr-box"><span data-lang="ua">QR-код</span><span data-lang="en">QR code</span></div>
+    <div class="qr-box" id="qrBox"><span data-lang="ua">QR-код</span><span data-lang="en">QR code</span></div>
     <div class="support-copy">
       <h2 class="support-title"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></h2>
       <p class="support-body"><span data-lang="ua">Кожна гривня йде на дрони, ремонт техніки та спорядження підрозділу. Скануйте QR або натисніть кнопку нижче.</span><span data-lang="en">Every hryvnia goes toward drones, equipment repair, and unit gear. Scan the QR code or tap the button below.</span></p>
       <div class="support-actions">
-        <a href="#" class="btn btn-support-primary"><span data-lang="ua">Донат-банка</span><span data-lang="en">Donation fund</span></a>
-        <a href="#" class="btn btn-support-secondary"><span data-lang="ua">Реквізити картки</span><span data-lang="en">Card details</span></a>
+        <a href="#" id="donateBankBtn" target="_blank" class="btn btn-support-primary"><span data-lang="ua">Донат-банка</span><span data-lang="en">Donation fund</span></a>
+        <button type="button" id="donateCardBtn" class="btn btn-support-secondary" style="display:none;"><span data-lang="ua">Реквізити картки</span><span data-lang="en">Card details</span></button>
       </div>
     </div>
   </div>
@@ -412,9 +429,9 @@
       </div>
       <div class="footer-col">
         <div class="footer-col-title"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></div>
-        <a href="#">Telegram</a>
-        <a href="#">Instagram</a>
-        <a href="#">Email</a>
+        <a href="#" id="social-footer-telegram" target="_blank" rel="noopener">Telegram</a>
+        <a href="#" id="social-footer-instagram" target="_blank" rel="noopener">Instagram</a>
+        <a href="#" id="social-footer-email">Email</a>
       </div>
     </div>
   </div>
@@ -436,6 +453,102 @@
     </div>
   </div>
 </div>
+
+<script>
+(function(){
+    // ==================== ФОН ГЕРОЯ: 3 ФОТО З ПЛАВНОЮ ЗМІНОЮ ====================
+    const heroImages = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
+    let heroIdx = 0; let showingA = true;
+    const layerA = document.getElementById('heroBgA');
+    const layerB = document.getElementById('heroBgB');
+    const placeholder = document.getElementById('heroPlaceholder');
+
+    const testImg = new Image();
+    testImg.onload = () => { if (placeholder) placeholder.style.opacity = '0'; };
+    testImg.src = heroImages[0];
+
+    setInterval(() => {
+        heroIdx = (heroIdx + 1) % heroImages.length;
+        const next = showingA ? layerB : layerA;
+        const cur = showingA ? layerA : layerB;
+        next.style.backgroundImage = `url('${heroImages[heroIdx]}')`;
+        next.classList.add('visible');
+        cur.classList.remove('visible');
+        showingA = !showingA;
+    }, 6000);
+})();
+
+// ==================== ЛІЧИЛЬНИКИ ====================
+db.collection("config").doc("statistics").onSnapshot(doc => {
+    if (!doc.exists) return;
+    const data = doc.data();
+    const setTarget = (id, val) => { const el = document.getElementById(id); if (el) el.dataset.target = parseInt(val) || 0; };
+    setTarget('counterSorties', data.missions);
+    setTarget('counterTargets', data.targets);
+    setTarget('counterFunds', data.funds);
+    if (typeof window.svarogStatsReady === 'function') window.svarogStatsReady();
+});
+
+// ==================== ПІДТРИМКА: QR, БАНКА, КАРТКА ====================
+db.collection("config").doc("payment").onSnapshot(doc => {
+    const bankUrl = (doc.exists && doc.data().bankUrl) || "https://send.monobank.ua/jar/default";
+    const cardNumber = doc.exists ? doc.data().cardNumber : null;
+
+    const qrBox = document.getElementById('qrBox');
+    if (qrBox) qrBox.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(bankUrl)}" style="width:100%; height:100%; object-fit:contain;" alt="QR">`;
+
+    const bankBtn = document.getElementById('donateBankBtn');
+    if (bankBtn) bankBtn.href = bankUrl;
+
+    const cardBtn = document.getElementById('donateCardBtn');
+    if (cardBtn && cardNumber) {
+        cardBtn.style.display = 'inline-block';
+        const originalHtml = cardBtn.innerHTML;
+        cardBtn.onclick = () => {
+            navigator.clipboard.writeText(cardNumber.replace(/\s/g, '')).then(() => {
+                cardBtn.textContent = document.documentElement.classList.contains('lang-en') ? 'Copied!' : 'Скопійовано!';
+                setTimeout(() => { cardBtn.innerHTML = originalHtml; }, 1800);
+            });
+        };
+    }
+});
+
+// ==================== СОЦМЕРЕЖІ ====================
+db.collection("config").doc("socials").onSnapshot(doc => {
+    const list = (doc.exists && doc.data().list) || [];
+    const findUrl = (needle) => { const m = list.find(n => (n.name || '').toLowerCase().includes(needle)); return m ? m.url : null; };
+    const tg = findUrl('telegram'); const ig = findUrl('instagram'); const yt = findUrl('youtube');
+    [['social-menu-telegram', tg], ['social-footer-telegram', tg], ['social-menu-instagram', ig], ['social-footer-instagram', ig], ['social-menu-youtube', yt]].forEach(([id, url]) => {
+        if (!url) return; const el = document.getElementById(id); if (el) el.href = url;
+    });
+});
+
+// ==================== ОСТАННІ НОВИНИ ====================
+db.collection("news").orderBy("date", "desc").limit(3).get().then(snapshot => {
+    if (snapshot.empty) return;
+    const grid = document.getElementById('newsGrid'); if (!grid) return;
+    grid.innerHTML = snapshot.docs.map(doc => {
+        const item = doc.data();
+        let displayDate = item.date;
+        try { const d = new Date(item.date); if (!isNaN(d.getTime())) displayDate = d.toLocaleDateString('uk-UA'); } catch(e) {}
+        const imgHtml = item.image ? `<img src="${item.image}" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block;">` : `<span>фото новини</span>`;
+        return `<a href="https://svarogteam.com/about.html" class="news-card"><div class="news-img">${imgHtml}</div><div class="news-body"><div class="news-stub">${displayDate || ''}</div><h4 class="news-title">${item.title || ''}</h4></div></a>`;
+    }).join('');
+}).catch(err => console.error("Новини:", err));
+
+// ==================== МЕРЧ ====================
+db.collection("merch").limit(4).get().then(snapshot => {
+    if (snapshot.empty) return;
+    const grid = document.getElementById('merchGrid'); if (!grid) return;
+    grid.innerHTML = snapshot.docs.map(doc => {
+        const item = doc.data();
+        const img = item.image || (item.images && item.images[0]) || (item.variants && item.variants[0] && item.variants[0].image);
+        const imgHtml = img ? `<img src="${img}" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block;">` : `<span>фото товару</span>`;
+        const price = item.discountPrice || item.price || 0;
+        return `<div class="merch-card"><div class="merch-img">${imgHtml}</div><div class="merch-body"><div class="merch-name">${item.title || ''}</div><div class="merch-price">₴ ${price}</div></div></div>`;
+    }).join('');
+}).catch(err => console.error("Мерч:", err));
+</script>
 
 <script>
 (function(){
@@ -489,9 +602,11 @@
     revealEls.forEach(function(el){ io.observe(el); });
   }
 
-  // Counters count-up
+  // Counters count-up (чекає і видимість, і реальні дані з бази — щоб не "застигнути" на нулях)
   var counters = document.getElementById('counters');
   var counted = false;
+  var isCountersVisible = false;
+  var statsDataReady = false;
   function runCountUp(){
     var nums = counters.querySelectorAll('.counter-num');
     var start = performance.now();
@@ -509,17 +624,26 @@
     }
     requestAnimationFrame(step);
   }
+  function tryStartCounters(){
+    if (counted || !isCountersVisible || !statsDataReady) return;
+    counted = true;
+    runCountUp();
+  }
+  window.svarogStatsReady = function(){ statsDataReady = true; tryStartCounters(); };
   if (reduced) {
-    counters.querySelectorAll('.counter-num').forEach(function(el){
-      var target = parseInt(el.dataset.target, 10);
-      el.textContent = (el.dataset.currency || '') + target.toLocaleString('uk-UA');
-    });
+    statsDataReady = true; isCountersVisible = true;
+    window.svarogStatsReady = function(){
+      counters.querySelectorAll('.counter-num').forEach(function(el){
+        var target = parseInt(el.dataset.target, 10);
+        el.textContent = (el.dataset.currency || '') + target.toLocaleString('uk-UA');
+      });
+    };
   } else {
     var cio = new IntersectionObserver(function(entries){
       entries.forEach(function(entry){
-        if (entry.isIntersecting && !counted) {
-          counted = true;
-          runCountUp();
+        if (entry.isIntersecting) {
+          isCountersVisible = true;
+          tryStartCounters();
           cio.unobserve(entry.target);
         }
       });
