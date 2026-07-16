@@ -19,7 +19,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 </script>
-<link rel="preload" href="fonts/SvarogDisplay.woff" as="font" type="font/woff" crossorigin="anonymous">
+<link rel="preload" href="SvarogTeam-Regular.woff" as="font" type="font/woff" crossorigin="anonymous">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -30,7 +30,7 @@
   }
   @font-face{
     font-family:'SvarogDisplay';
-    src:url('fonts/SvarogDisplay.woff') format('woff');
+    src:url('SvarogTeam-Regular.woff') format('woff');
     font-weight:400; font-style:normal; font-display:block;
   }
   * { box-sizing:border-box; }
@@ -486,6 +486,7 @@ db.collection("config").doc("statistics").onSnapshot(doc => {
     setTarget('counterSorties', data.missions);
     setTarget('counterTargets', data.targets);
     setTarget('counterFunds', data.funds);
+    if (typeof window.svarogStatsReady === 'function') window.svarogStatsReady();
 });
 
 // ==================== ПІДТРИМКА: QR, БАНКА, КАРТКА ====================
@@ -601,9 +602,11 @@ db.collection("merch").limit(4).get().then(snapshot => {
     revealEls.forEach(function(el){ io.observe(el); });
   }
 
-  // Counters count-up
+  // Counters count-up (чекає і видимість, і реальні дані з бази — щоб не "застигнути" на нулях)
   var counters = document.getElementById('counters');
   var counted = false;
+  var isCountersVisible = false;
+  var statsDataReady = false;
   function runCountUp(){
     var nums = counters.querySelectorAll('.counter-num');
     var start = performance.now();
@@ -621,17 +624,26 @@ db.collection("merch").limit(4).get().then(snapshot => {
     }
     requestAnimationFrame(step);
   }
+  function tryStartCounters(){
+    if (counted || !isCountersVisible || !statsDataReady) return;
+    counted = true;
+    runCountUp();
+  }
+  window.svarogStatsReady = function(){ statsDataReady = true; tryStartCounters(); };
   if (reduced) {
-    counters.querySelectorAll('.counter-num').forEach(function(el){
-      var target = parseInt(el.dataset.target, 10);
-      el.textContent = (el.dataset.currency || '') + target.toLocaleString('uk-UA');
-    });
+    statsDataReady = true; isCountersVisible = true;
+    window.svarogStatsReady = function(){
+      counters.querySelectorAll('.counter-num').forEach(function(el){
+        var target = parseInt(el.dataset.target, 10);
+        el.textContent = (el.dataset.currency || '') + target.toLocaleString('uk-UA');
+      });
+    };
   } else {
     var cio = new IntersectionObserver(function(entries){
       entries.forEach(function(entry){
-        if (entry.isIntersecting && !counted) {
-          counted = true;
-          runCountUp();
+        if (entry.isIntersecting) {
+          isCountersVisible = true;
+          tryStartCounters();
           cio.unobserve(entry.target);
         }
       });
