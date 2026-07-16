@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Svarog Team</title>
+<link rel="preload" href="fonts/SvarogDisplay.woff" as="font" type="font/woff" crossorigin="anonymous">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --graphite:#0E0E0F; --plate:#16171A; --iron:#26282D; --bone:#F2EFE9;
+    --ash:#C4C7CC; --ember:#D9663D; --copper:#E8A88A; --olive:#7A8450;
+  }
+  @font-face{
+    font-family:'SvarogDisplay';
+    src:url('fonts/SvarogDisplay.woff') format('woff');
+    font-weight:400; font-style:normal; font-display:block;
+  }
+  * { box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--graphite); color:var(--bone); font-family:'Manrope',sans-serif; overflow-x:hidden; }
+  a { color:var(--copper); }
+  a:hover { color:var(--bone); }
+  button { font-family:'Manrope',sans-serif; }
+  @keyframes kenburns{ 0%{ transform:scale(1); } 100%{ transform:scale(1.06); } }
+  @media (prefers-reduced-motion: reduce){
+    .kb{ animation:none !important; }
+    * { transition-duration:0.001ms !important; }
+  }
+
+  .nav{ position:fixed; top:0; left:0; right:0; z-index:50; background:transparent; border-bottom:1px solid transparent; }
+  .nav-inner{ max-width:1200px; margin:0 auto; padding:0 24px; height:64px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .wordmark{ font-family:'Oswald',sans-serif; font-weight:600; font-size:14px; letter-spacing:.14em; text-transform:uppercase; flex-shrink:0; }
+  .nav-actions{ display:flex; align-items:center; gap:16px; flex-shrink:0; }
+  .btn{ text-decoration:none; cursor:pointer; font-family:'Manrope',sans-serif; white-space:nowrap; }
+  .btn-lang{ background:none; border:1px solid var(--iron); color:var(--ash); font-size:13px; letter-spacing:.08em; padding:9px 14px; }
+  .btn-lang:hover{ border-color:var(--ash); color:var(--bone); }
+  .btn-ember{ background:var(--ember); color:var(--bone); font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:10px 18px; border:1px solid var(--ember); }
+  .btn-ember:hover{ background:#c65a34; border-color:#c65a34; }
+  .btn-menu{ background:none; border:1px solid var(--iron); color:var(--bone); font-size:13px; letter-spacing:.08em; text-transform:uppercase; padding:9px 16px; display:flex; align-items:center; gap:10px; }
+  .btn-menu:hover{ border-color:var(--ash); }
+  .burger{ display:flex; flex-direction:column; gap:3px; width:16px; }
+  .burger span{ height:1px; background:var(--bone); width:100%; transition:transform 160ms ease-out; }
+  .menu-open .burger span:first-child{ transform:translateY(2px) rotate(45deg); }
+  .menu-open .burger span:last-child{ transform:translateY(-2px) rotate(-45deg); }
+
+  .menu-overlay{ position:fixed; inset:0; z-index:80; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; }
+  .menu-overlay.open{ opacity:1; pointer-events:auto; }
+  .menu-links{ max-width:1200px; margin:0 auto; padding:64px 24px; display:flex; flex-direction:column; gap:28px; }
+  .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); text-decoration:none; font-weight:600; }
+  .menu-links a:hover{ color:var(--copper); }
+  .menu-links a.accent{ color:var(--copper); }
+  .menu-social{ max-width:1200px; margin:0 auto; padding:24px; display:flex; gap:24px; border-top:1px solid var(--iron); font-size:14px; }
+  .menu-social a{ color:var(--ash); text-decoration:none; }
+  .menu-social a:hover{ color:var(--bone); }
+
+  .hero{ position:relative; height:100svh; min-height:520px; width:100%; overflow:hidden; }
+  .hero-bg{ position:absolute; inset:-4%; background:repeating-linear-gradient(115deg, var(--plate) 0px, var(--plate) 22px, var(--iron) 22px, var(--iron) 24px); animation:kenburns 20s linear infinite alternate; }
+  .hero-placeholder{ position:absolute; top:88px; left:0; right:0; display:flex; align-items:center; justify-content:center; }
+  .hero-placeholder span{ font-family:monospace; font-size:12px; letter-spacing:.1em; color:var(--ash); text-transform:uppercase; opacity:.5; }
+  .hero-fade{ position:absolute; inset:0; background:linear-gradient(to top, #0E0E0F 0%, rgba(14,14,15,.7) 40%, transparent 75%); }
+  .hero-content{ position:absolute; left:0; right:0; bottom:0; padding-bottom:64px; }
+  .hero-inner{ max-width:1200px; margin:0 auto; padding:0 24px; }
+  .hero-copy{ max-width:720px; }
+  .eyebrow{ font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ash); margin-bottom:16px; }
+  h1.title{ font-family:'SvarogDisplay','Oswald',sans-serif; font-size:clamp(56px,9vw,132px); line-height:0.95; color:var(--copper); margin:0 0 20px; font-weight:400; }
+  .hero-sub{ font-size:19px; line-height:1.5; color:var(--bone); margin:0 0 8px; max-width:640px; }
+  .hero-line{ font-size:16px; line-height:1.5; color:var(--ash); margin:0 0 32px; max-width:640px; }
+  .hero-cta{ display:flex; flex-wrap:wrap; gap:16px; margin-bottom:0; }
+  .btn-hero-primary{ background:var(--ember); color:var(--bone); font-size:15px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:16px 32px; border:1px solid var(--ember); }
+  .btn-hero-primary:hover{ background:#c65a34; border-color:#c65a34; }
+  .btn-hero-secondary{ background:transparent; color:var(--bone); font-size:15px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:16px 32px; border:1px solid var(--iron); }
+  .btn-hero-secondary:hover{ border-color:var(--ash); }
+
+  section{ background:var(--graphite); }
+  .wrap{ max-width:1200px; margin:0 auto; padding:96px 24px; }
+
+  .counters{ border-bottom:1px solid var(--iron); }
+  .counters-row{ max-width:1200px; margin:0 auto; padding:0 24px; display:flex; flex-wrap:wrap; }
+  .counter-item{ flex:1 1 260px; padding:48px 32px; border-right:1px solid var(--iron); text-align:center; opacity:0; transform:translateY(16px); transition:opacity 500ms cubic-bezier(.16,1,.3,1), transform 500ms cubic-bezier(.16,1,.3,1); }
+  .counter-item:last-child{ border-right:none; }
+  .counter-item.visible{ opacity:1; transform:translateY(0); }
+  .counter-num{ font-size:48px; font-weight:700; color:var(--ember); font-variant-numeric:tabular-nums; font-family:'Oswald',sans-serif; }
+  .counter-label{ font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--ash); margin-top:10px; }
+
+  .reveal{ opacity:0; transform:translateY(16px); transition:opacity 500ms cubic-bezier(.16,1,.3,1), transform 500ms cubic-bezier(.16,1,.3,1); }
+  .reveal.visible{ opacity:1; transform:translateY(0); }
+
+  .join{ background:var(--plate); border-bottom:1px solid var(--iron); }
+  .join-inner{ max-width:1200px; margin:0 auto; padding:80px 24px; display:flex; flex-wrap:wrap; gap:48px; align-items:center; justify-content:space-between; }
+  .join-title{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(28px,4vw,40px); color:var(--bone); margin:0 0 16px; font-weight:600; }
+  .join-body{ font-size:17px; line-height:1.6; color:var(--ash); margin:0; max-width:520px; }
+  .join-actions{ flex-shrink:0; display:flex; flex-direction:column; gap:20px; min-width:260px; }
+  .join-label{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ash); margin-bottom:6px; }
+  .join-actions a.plain{ color:var(--bone); font-size:17px; text-decoration:none; }
+  .join-actions a.plain:hover{ color:var(--copper); }
+  .join-actions a.accent{ color:var(--copper); font-size:17px; text-decoration:none; border-bottom:1px solid rgba(232,168,138,.4); }
+  .join-actions a.accent:hover{ border-color:var(--copper); }
+  .btn-olive{ background:var(--olive); color:var(--graphite); font-size:14px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:14px 26px; border:1px solid var(--olive); text-align:center; }
+  .btn-olive:hover{ filter:brightness(1.1); }
+
+  .directions{ background:var(--graphite); }
+  .dir-grid{ display:flex; flex-wrap:wrap; }
+  .dir-item{ flex:1 1 300px; padding:0 32px 32px; border-right:1px solid var(--iron); }
+  .dir-item:first-child{ padding-left:0; margin-right:-1px; }
+  .dir-item:last-child{ border-right:none; padding-right:0; }
+  .dir-num{ font-family:'Oswald',sans-serif; font-size:15px; color:rgba(217,102,61,.4); font-weight:600; }
+  .dir-rule{ width:32px; height:2px; background:var(--copper); margin:16px 0 20px; }
+  .dir-title{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:22px; color:var(--bone); margin:0 0 14px; font-weight:600; }
+  .dir-body{ font-size:17px; line-height:1.6; color:var(--ash); margin:0; }
+
+  .values{ background:var(--plate); border-top:1px solid var(--iron); border-bottom:1px solid var(--iron); }
+  .values-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:40px; }
+  .val-title{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:19px; color:var(--bone); margin:0 0 10px; font-weight:600; }
+  .val-body{ font-size:15px; line-height:1.6; color:var(--ash); margin:0; }
+
+  .news{ background:var(--graphite); }
+  .news-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1px; background:var(--iron); }
+  .news-card{ background:var(--graphite); text-decoration:none; display:block; }
+  .news-card:hover{ background:#1a1b1e; }
+  .news-img{ aspect-ratio:16/10; background:repeating-linear-gradient(115deg, var(--iron) 0px, var(--iron) 14px, var(--plate) 14px, var(--plate) 16px); display:flex; align-items:center; justify-content:center; }
+  .news-img span{ font-family:monospace; font-size:11px; color:var(--ash); opacity:.5; text-transform:uppercase; }
+  .news-body{ padding:24px; }
+  .news-stub{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ash); margin-bottom:10px; }
+  .news-title{ font-size:18px; color:var(--bone); margin:0; font-weight:600; }
+
+  .merch{ background:var(--plate); border-top:1px solid var(--iron); border-bottom:1px solid var(--iron); }
+  .merch-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:48px; gap:16px; flex-wrap:wrap; }
+  .merch-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:24px; }
+  .merch-card{ border:1px solid var(--iron); }
+  .merch-card:hover{ border-color:var(--ash); }
+  .merch-img{ aspect-ratio:1; background:repeating-linear-gradient(115deg, var(--graphite) 0px, var(--graphite) 14px, var(--iron) 14px, var(--iron) 16px); display:flex; align-items:center; justify-content:center; }
+  .merch-img span{ font-family:monospace; font-size:11px; color:var(--ash); opacity:.5; }
+  .merch-body{ padding:16px; }
+  .merch-name{ font-size:15px; color:var(--bone); margin-bottom:6px; }
+  .merch-price{ font-size:14px; color:var(--ember); font-variant-numeric:tabular-nums; }
+
+  .faq{ background:var(--graphite); }
+  .faq-list{ max-width:800px; }
+  .faq-item{ border-top:1px solid var(--iron); }
+  .faq-item:last-child{ border-bottom:1px solid var(--iron); }
+  .faq-q{ width:100%; text-align:left; background:none; border:none; padding:24px 0; display:flex; justify-content:space-between; align-items:center; gap:16px; cursor:pointer; color:var(--bone); font-size:17px; }
+  .faq-icon{ color:var(--ember); font-size:20px; flex-shrink:0; }
+  .faq-a{ overflow:hidden; max-height:0; transition:max-height 300ms ease; }
+  .faq-a.open{ max-height:200px; }
+  .faq-a p{ font-size:15px; line-height:1.6; color:var(--ash); margin:0 0 24px; max-width:640px; }
+
+  .support{ background:var(--plate); border-top:1px solid var(--iron); }
+  .support-inner{ max-width:1200px; margin:0 auto; padding:96px 24px; display:flex; gap:64px; flex-wrap:wrap; align-items:center; }
+  .qr-box{ width:180px; height:180px; background:var(--graphite); border:1px solid var(--iron); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .qr-box span{ font-family:monospace; font-size:12px; color:var(--ash); opacity:.6; }
+  .support-copy{ flex:1 1 380px; min-width:280px; }
+  .support-title{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(28px,4vw,40px); color:var(--bone); margin:0 0 16px; font-weight:600; }
+  .support-body{ font-size:17px; line-height:1.6; color:var(--ash); margin:0 0 32px; max-width:520px; }
+  .support-actions{ display:flex; flex-wrap:wrap; gap:16px; }
+  .btn-support-primary{ background:var(--ember); color:var(--bone); font-size:15px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:16px 32px; border:1px solid var(--ember); }
+  .btn-support-primary:hover{ background:#c65a34; border-color:#c65a34; }
+  .btn-support-secondary{ background:transparent; color:var(--bone); font-size:15px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:16px 32px; border:1px solid var(--olive); }
+  .btn-support-secondary:hover{ border-color:var(--bone); }
+
+  footer{ background:var(--graphite); border-top:1px solid var(--iron); }
+  .footer-inner{ max-width:1200px; margin:0 auto; padding:64px 24px 32px; display:flex; flex-wrap:wrap; gap:48px; justify-content:space-between; }
+  .footer-brand{ flex:1 1 240px; }
+  .footer-brand .wordmark{ margin-bottom:12px; }
+  .footer-desc{ font-size:14px; line-height:1.6; color:var(--ash); max-width:280px; margin:0; }
+  .footer-cols{ display:flex; gap:64px; flex-wrap:wrap; }
+  .footer-col{ display:flex; flex-direction:column; gap:10px; }
+  .footer-col-title{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ash); margin-bottom:6px; }
+  .footer-col a{ color:var(--bone); font-size:14px; text-decoration:none; }
+  .footer-col a:hover{ color:var(--copper); }
+  .footer-bottom{ max-width:1200px; margin:0 auto; padding:24px; border-top:1px solid var(--iron); font-size:12px; color:var(--ash); }
+
+  .mobile-cta{ position:fixed; left:0; right:0; bottom:0; height:56px; z-index:60; opacity:0; transform:translateY(100%); pointer-events:none; transition:opacity 200ms ease-out, transform 200ms ease-out; }
+  .mobile-cta.show{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .mobile-cta a{ display:flex; align-items:center; justify-content:center; width:100%; height:100%; background:var(--ember); color:var(--bone); text-decoration:none; font-size:15px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; }
+
+  .cookie-banner{ position:fixed; left:0; right:0; bottom:0; z-index:90; background:var(--plate); border-top:1px solid var(--iron); transform:translateY(100%); transition:transform 260ms ease-out; pointer-events:none; }
+  .cookie-banner.show{ transform:translateY(0); pointer-events:auto; }
+  .cookie-inner{ max-width:1200px; margin:0 auto; padding:16px 24px; display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between; }
+  .cookie-text{ font-size:13px; line-height:1.5; color:var(--ash); margin:0; max-width:760px; }
+  .cookie-actions{ display:flex; gap:12px; flex-shrink:0; }
+  .btn-cookie-leave{ background:transparent; color:var(--ash); font-size:13px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:10px 18px; border:1px solid var(--iron); }
+  .btn-cookie-leave:hover{ border-color:var(--ash); color:var(--bone); }
+  .btn-cookie-accept{ background:var(--ember); color:var(--bone); font-size:13px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; padding:10px 18px; border:1px solid var(--ember); }
+  .btn-cookie-accept:hover{ background:#c65a34; }
+
+  [data-lang="en"]{ display:none; }
+  html.lang-en [data-lang="ua"]{ display:none; }
+  html.lang-en [data-lang="en"]{ display:inherit; }
+  html.lang-en .faq-q span[data-lang="en"],
+  html.lang-en .menu-links a[data-lang="en"],
+  html.lang-en .join-actions a[data-lang="en"]{ display:inline; }
+
+  @media (max-width: 680px){
+    .mobile-cta-target{ display:block; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <div class="wordmark">Svarog Team</div>
+    <div class="nav-actions">
+      <button class="btn btn-lang" id="langToggle">EN</button>
+      <a href="#support" class="btn btn-ember"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+      <button class="btn btn-menu" id="menuToggle">
+        <span><span data-lang="ua">меню</span><span data-lang="en">menu</span></span>
+        <span class="burger"><span></span><span></span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MENU OVERLAY -->
+<div class="menu-overlay" id="menuOverlay">
+  <div class="nav-inner">
+    <div class="wordmark">Svarog Team</div>
+    <button class="btn btn-menu" id="menuClose"><span data-lang="ua">Закрити ✕</span><span data-lang="en">Close ✕</span></button>
+  </div>
+  <div class="menu-links">
+    <a href="#directions" class="menu-link"><span data-lang="ua">Напрямки</span><span data-lang="en">Directions</span></a>
+    <a href="#join" class="menu-link"><span data-lang="ua">Долучитися</span><span data-lang="en">Join</span></a>
+    <a href="#news" class="menu-link"><span data-lang="ua">Новини</span><span data-lang="en">News</span></a>
+    <a href="#merch" class="menu-link"><span data-lang="ua">Мерч</span><span data-lang="en">Merch</span></a>
+    <a href="#support" class="menu-link accent"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+  </div>
+  <div class="menu-social">
+    <a href="#">Telegram</a>
+    <a href="#">Instagram</a>
+    <a href="#">YouTube</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg kb"></div>
+  <div class="hero-placeholder"><span>фото — заглушка, підставте героя</span></div>
+  <div class="hero-fade"></div>
+  <div class="hero-content">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <div class="eyebrow"><span data-lang="ua">35-й полк НГУ</span><span data-lang="en">35th Regiment NGU</span></div>
+        <h1 class="title">SVAROG TEAM</h1>
+        <p class="hero-sub"><span data-lang="ua">Повітряна розвідка. Ударні системи. Інженерне забезпечення.</span><span data-lang="en">Aerial reconnaissance. Strike systems. Engineering support.</span></p>
+        <p class="hero-line"><span data-lang="ua">Знаходимо, б'ємо, ремонтуємо й повертаємо в небо.</span><span data-lang="en">We find, strike, repair, and send it back into the sky.</span></p>
+        <div class="hero-cta" id="heroCta">
+          <a href="#support" class="btn btn-hero-primary"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+          <a href="#directions" class="btn btn-hero-secondary"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTERS -->
+<section class="counters" id="counters">
+  <div class="counters-row">
+    <div class="counter-item"><div class="counter-num" data-target="1240">0</div><div class="counter-label"><span data-lang="ua">Бойових вильотів</span><span data-lang="en">Combat missions</span></div></div>
+    <div class="counter-item"><div class="counter-num" data-target="860">0</div><div class="counter-label"><span data-lang="ua">Знищено цілей</span><span data-lang="en">Targets destroyed</span></div></div>
+    <div class="counter-item"><div class="counter-num" data-target="18400000" data-currency="₴">0</div><div class="counter-label"><span data-lang="ua">Зібрано на дрони</span><span data-lang="en">Raised for drones</span></div></div>
+  </div>
+</section>
+
+<!-- JOIN -->
+<section class="join reveal" id="join">
+  <div class="join-inner">
+    <div>
+      <div class="eyebrow"><span data-lang="ua">Долучайся</span><span data-lang="en">Join us</span></div>
+      <h2 class="join-title"><span data-lang="ua">Волонтери й бійці потрібні щодня</span><span data-lang="en">Volunteers and fighters needed every day</span></h2>
+      <p class="join-body"><span data-lang="ua">Пишіть у Telegram-бот — розкажемо, де саме потрібні руки: від збору дронів до логістики й розвідки.</span><span data-lang="en">Message our Telegram bot — we'll tell you exactly where help is needed: drone assembly, logistics, reconnaissance.</span></p>
+    </div>
+    <div class="join-actions">
+      <div>
+        <div class="join-label"><span data-lang="ua">Telegram-бот</span><span data-lang="en">Telegram bot</span></div>
+        <a href="https://t.me/svarogteam_bot" class="accent">@svarogteam_bot</a>
+      </div>
+      <div>
+        <div class="join-label"><span data-lang="ua">Контакт-центр</span><span data-lang="en">Contact center</span></div>
+        <a href="tel:+380000000000" class="plain">+38 (0__) ___ __ __</a>
+      </div>
+      <a href="#" class="btn btn-olive"><span data-lang="ua">Подати заявку</span><span data-lang="en">Apply now</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- DIRECTIONS -->
+<section class="directions" id="directions">
+  <div class="wrap">
+    <div class="eyebrow" style="margin-bottom:48px;"><span data-lang="ua">Напрямки діяльності</span><span data-lang="en">Areas of activity</span></div>
+    <div class="dir-grid reveal">
+      <div class="dir-item">
+        <div class="dir-num">01</div>
+        <div class="dir-rule"></div>
+        <h3 class="dir-title"><span data-lang="ua">Повітряна розвідка</span><span data-lang="en">Aerial Reconnaissance</span></h3>
+        <p class="dir-body"><span data-lang="ua">Виявлення позицій противника, коригування вогню артилерії та збір стратегічних розвіддани́х у реальному часі.</span><span data-lang="en">Detecting enemy positions, adjusting artillery fire, and gathering strategic real-time intelligence.</span></p>
+      </div>
+      <div class="dir-item">
+        <div class="dir-num">02</div>
+        <div class="dir-rule"></div>
+        <h3 class="dir-title"><span data-lang="ua">Ударні системи</span><span data-lang="en">Strike Systems</span></h3>
+        <p class="dir-body"><span data-lang="ua">Точкове знищення ворожої техніки, укриттів та живої сили за допомогою ударних FPV-дронів та систем скидів.</span><span data-lang="en">Pinpoint destruction of enemy equipment, shelters, and personnel using strike FPV drones and drop systems.</span></p>
+      </div>
+      <div class="dir-item">
+        <div class="dir-num">03</div>
+        <div class="dir-rule"></div>
+        <h3 class="dir-title"><span data-lang="ua">Інженерне забезпечення</span><span data-lang="en">Engineering Support</span></h3>
+        <p class="dir-body"><span data-lang="ua">Ремонт, прошивка та модернізація безпілотних комплексів, виготовлення боєприпасів та нестандартних технічних рішень.</span><span data-lang="en">Repair, firmware, and modernization of drone systems, production of munitions and custom technical solutions.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="values" id="values">
+  <div class="wrap">
+    <div class="eyebrow" style="margin-bottom:48px;"><span data-lang="ua">Наші цінності</span><span data-lang="en">Our values</span></div>
+    <div class="values-grid reveal">
+      <div><h3 class="val-title"><span data-lang="ua">Дисципліна</span><span data-lang="en">Discipline</span></h3><p class="val-body"><span data-lang="ua">Порядок у діях рятує життя — собі і побратимам.</span><span data-lang="en">Order in action saves lives — your own and your brothers'.</span></p></div>
+      <div><h3 class="val-title"><span data-lang="ua">Ремесло</span><span data-lang="en">Craft</span></h3><p class="val-body"><span data-lang="ua">Кожен дрон і кожен вузол — робота, зроблена як для себе.</span><span data-lang="en">Every drone and every part built as if for ourselves.</span></p></div>
+      <div><h3 class="val-title"><span data-lang="ua">Точність</span><span data-lang="en">Precision</span></h3><p class="val-body"><span data-lang="ua">Рішення на основі даних, а не здогадок.</span><span data-lang="en">Decisions based on data, not guesswork.</span></p></div>
+      <div><h3 class="val-title"><span data-lang="ua">Побратимство</span><span data-lang="en">Brotherhood</span></h3><p class="val-body"><span data-lang="ua">Одна родина в небі, на землі й після служби.</span><span data-lang="en">One family in the sky, on the ground, and after service.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section class="news" id="news">
+  <div class="wrap">
+    <div class="eyebrow" style="margin-bottom:48px;"><span data-lang="ua">Останні новини</span><span data-lang="en">Latest news</span></div>
+    <div class="news-grid">
+      <a href="#" class="news-card"><div class="news-img"><span data-lang="ua">фото новини</span><span data-lang="en">news photo</span></div><div class="news-body"><div class="news-stub"><span data-lang="ua">Заглушка · дата</span><span data-lang="en">Placeholder · date</span></div><h4 class="news-title"><span data-lang="ua">Заголовок новини — підставте матеріал</span><span data-lang="en">News headline — add material</span></h4></div></a>
+      <a href="#" class="news-card"><div class="news-img"><span data-lang="ua">фото новини</span><span data-lang="en">news photo</span></div><div class="news-body"><div class="news-stub"><span data-lang="ua">Заглушка · дата</span><span data-lang="en">Placeholder · date</span></div><h4 class="news-title"><span data-lang="ua">Заголовок новини — підставте матеріал</span><span data-lang="en">News headline — add material</span></h4></div></a>
+      <a href="#" class="news-card"><div class="news-img"><span data-lang="ua">фото новини</span><span data-lang="en">news photo</span></div><div class="news-body"><div class="news-stub"><span data-lang="ua">Заглушка · дата</span><span data-lang="en">Placeholder · date</span></div><h4 class="news-title"><span data-lang="ua">Заголовок новини — підставте матеріал</span><span data-lang="en">News headline — add material</span></h4></div></a>
+    </div>
+  </div>
+</section>
+
+<!-- MERCH -->
+<section class="merch" id="merch">
+  <div class="wrap">
+    <div class="merch-head">
+      <div class="eyebrow"><span data-lang="ua">Мерч</span><span data-lang="en">Merch</span></div>
+      <a href="#" class="accent" style="text-decoration:none; border-bottom:1px solid rgba(232,168,138,.4); font-size:14px;"><span data-lang="ua">Весь каталог →</span><span data-lang="en">Full catalog →</span></a>
+    </div>
+    <div class="merch-grid reveal">
+      <div class="merch-card"><div class="merch-img"><span data-lang="ua">фото товару</span><span data-lang="en">product photo</span></div><div class="merch-body"><div class="merch-name"><span data-lang="ua">Футболка «Sварог»</span><span data-lang="en">"Svarog" T-shirt</span></div><div class="merch-price">₴ 000</div></div></div>
+      <div class="merch-card"><div class="merch-img"><span data-lang="ua">фото товару</span><span data-lang="en">product photo</span></div><div class="merch-body"><div class="merch-name"><span data-lang="ua">Шеврон полку</span><span data-lang="en">Regiment patch</span></div><div class="merch-price">₴ 000</div></div></div>
+      <div class="merch-card"><div class="merch-img"><span data-lang="ua">фото товару</span><span data-lang="en">product photo</span></div><div class="merch-body"><div class="merch-name"><span data-lang="ua">Кепка польова</span><span data-lang="en">Field cap</span></div><div class="merch-price">₴ 000</div></div></div>
+      <div class="merch-card"><div class="merch-img"><span data-lang="ua">фото товару</span><span data-lang="en">product photo</span></div><div class="merch-body"><div class="merch-name"><span data-lang="ua">Патч «Ковадло»</span><span data-lang="en">"Anvil" patch</span></div><div class="merch-price">₴ 000</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="eyebrow" style="margin-bottom:48px;"><span data-lang="ua">Питання і відповіді</span><span data-lang="en">Questions and answers</span></div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q"><span><span data-lang="ua">Як перевірити, на що йдуть кошти?</span><span data-lang="en">How can I check where the money goes?</span></span><span class="faq-icon">+</span></button>
+        <div class="faq-a"><p><span data-lang="ua">Регулярно публікуємо звіти про закупівлі й передачі в соцмережах підрозділу — з фото та сумами.</span><span data-lang="en">We regularly publish procurement and handover reports on the unit's social media — with photos and amounts.</span></p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span><span data-lang="ua">Чи можна стати волонтером без досвіду?</span><span data-lang="en">Can I volunteer without experience?</span></span><span class="faq-icon">+</span></button>
+        <div class="faq-a"><p><span data-lang="ua">Так. Є завдання під різні навички — від збірки дронів до логістики. Навчимо на місці.</span><span data-lang="en">Yes. There are tasks for various skills — from drone assembly to logistics. We'll train you on site.</span></p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span><span data-lang="ua">Скільки йде доставка мерчу?</span><span data-lang="en">How long does merch delivery take?</span></span><span class="faq-icon">+</span></button>
+        <div class="faq-a"><p><span data-lang="ua">В межах України — 3–7 днів після оплати. Виторг іде на закупівлю дронів.</span><span data-lang="en">Within Ukraine — 3–7 days after payment. Proceeds go toward drone purchases.</span></p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span><span data-lang="ua">Чи можна оформити регулярний донат?</span><span data-lang="en">Can I set up a recurring donation?</span></span><span class="faq-icon">+</span></button>
+        <div class="faq-a"><p><span data-lang="ua">Так, у формі підтримки можна налаштувати щомісячне списання на банку підрозділу.</span><span data-lang="en">Yes, the support form lets you set up a monthly transfer to the unit's fund.</span></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUPPORT -->
+<section class="support" id="support">
+  <div class="support-inner reveal">
+    <div class="qr-box"><span data-lang="ua">QR-код</span><span data-lang="en">QR code</span></div>
+    <div class="support-copy">
+      <h2 class="support-title"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></h2>
+      <p class="support-body"><span data-lang="ua">Кожна гривня йде на дрони, ремонт техніки та спорядження підрозділу. Скануйте QR або натисніть кнопку нижче.</span><span data-lang="en">Every hryvnia goes toward drones, equipment repair, and unit gear. Scan the QR code or tap the button below.</span></p>
+      <div class="support-actions">
+        <a href="#" class="btn btn-support-primary"><span data-lang="ua">Донат-банка</span><span data-lang="en">Donation fund</span></a>
+        <a href="#" class="btn btn-support-secondary"><span data-lang="ua">Реквізити картки</span><span data-lang="en">Card details</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="wordmark">Svarog Team</div>
+      <p class="footer-desc"><span data-lang="ua">35-й окремий полк Національної гвардії України.</span><span data-lang="en">35th separate regiment of the National Guard of Ukraine.</span></p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <div class="footer-col-title"><span data-lang="ua">Розділи</span><span data-lang="en">Sections</span></div>
+        <a href="#directions"><span data-lang="ua">Напрямки</span><span data-lang="en">Directions</span></a>
+        <a href="#join"><span data-lang="ua">Долучитися</span><span data-lang="en">Join</span></a>
+        <a href="#news"><span data-lang="ua">Новини</span><span data-lang="en">News</span></a>
+        <a href="#merch"><span data-lang="ua">Мерч</span><span data-lang="en">Merch</span></a>
+        <a href="#support"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></div>
+        <a href="#">Telegram</a>
+        <a href="#">Instagram</a>
+        <a href="#">Email</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 SVAROG TEAM</div>
+</footer>
+
+<!-- MOBILE STICKY CTA -->
+<div class="mobile-cta" id="mobileCta">
+  <a href="#support"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+</div>
+
+<!-- COOKIE BANNER -->
+<div class="cookie-banner" id="cookieBanner">
+  <div class="cookie-inner">
+    <p class="cookie-text">Ми відповідально підходимо до вашої конфіденційності. Для забезпечення безперебійної та коректної роботи нашого сайту ми використовуємо файли cookie. Інформація, пов'язана з файлами cookie, не використовується для вашої особистої ідентифікації. Продовжуючи користуватися нашим сайтом, ви автоматично погоджуєтесь із використанням необхідних файлів cookie. Якщо ви не погоджуєтесь, будь ласка, залиште наш сайт.</p>
+    <div class="cookie-actions">
+      <a href="about:blank" class="btn btn-cookie-leave">Залишити сайт</a>
+      <button class="btn btn-cookie-accept" id="cookieAccept">Погоджуюсь</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Language toggle
+  var langToggle = document.getElementById('langToggle');
+  function setLang(lang){
+    document.documentElement.classList.toggle('lang-en', lang === 'en');
+    langToggle.textContent = lang === 'ua' ? 'EN' : 'UA';
+    document.querySelectorAll('[data-lang="en"]').forEach(function(el){
+      el.style.display = lang === 'en' ? 'inline' : 'none';
+    });
+    document.querySelectorAll('[data-lang="ua"]').forEach(function(el){
+      el.style.display = lang === 'ua' ? 'inline' : 'none';
+    });
+  }
+  setLang('ua');
+  langToggle.addEventListener('click', function(){
+    var next = document.documentElement.classList.contains('lang-en') ? 'ua' : 'en';
+    setLang(next);
+  });
+
+  // Menu overlay
+  var menuOverlay = document.getElementById('menuOverlay');
+  var menuToggle = document.getElementById('menuToggle');
+  var menuClose = document.getElementById('menuClose');
+  function toggleMenu(){
+    var open = menuOverlay.classList.toggle('open');
+    menuToggle.classList.toggle('menu-open', open);
+  }
+  menuToggle.addEventListener('click', toggleMenu);
+  menuClose.addEventListener('click', toggleMenu);
+  document.querySelectorAll('.menu-link').forEach(function(a){
+    a.addEventListener('click', toggleMenu);
+  });
+
+  // Reveal-on-scroll
+  var revealEls = document.querySelectorAll('.reveal, .counter-item');
+  if (reduced) {
+    revealEls.forEach(function(el){ el.classList.add('visible'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(function(el){ io.observe(el); });
+  }
+
+  // Counters count-up
+  var counters = document.getElementById('counters');
+  var counted = false;
+  function runCountUp(){
+    var nums = counters.querySelectorAll('.counter-num');
+    var start = performance.now();
+    var duration = 1200;
+    function step(now){
+      var t = Math.min(1, (now - start) / duration);
+      var eased = 1 - Math.pow(1 - t, 3);
+      nums.forEach(function(el){
+        var target = parseInt(el.dataset.target, 10);
+        var value = Math.round(target * eased);
+        var currency = el.dataset.currency || '';
+        el.textContent = currency + value.toLocaleString('uk-UA');
+      });
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if (reduced) {
+    counters.querySelectorAll('.counter-num').forEach(function(el){
+      var target = parseInt(el.dataset.target, 10);
+      el.textContent = (el.dataset.currency || '') + target.toLocaleString('uk-UA');
+    });
+  } else {
+    var cio = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && !counted) {
+          counted = true;
+          runCountUp();
+          cio.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    cio.observe(counters);
+  }
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var item = btn.parentElement;
+      var body = item.querySelector('.faq-a');
+      var icon = btn.querySelector('.faq-icon');
+      var open = body.classList.toggle('open');
+      icon.textContent = open ? '−' : '+';
+    });
+  });
+
+  // Nav scroll state (kept transparent per current design, hook left in place)
+  window.addEventListener('scroll', function(){ /* intentionally no bg change */ }, { passive: true });
+
+  // Hero passed / mobile sticky CTA
+  var hero = document.getElementById('hero');
+  var mobileCta = document.getElementById('mobileCta');
+  var heroPassed = false;
+  var isMobileCta = window.matchMedia('(max-width: 680px)').matches;
+  function updateMobileCta(){
+    mobileCta.classList.toggle('show', isMobileCta && heroPassed);
+  }
+  var heroIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      heroPassed = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      updateMobileCta();
+    });
+  }, { threshold: 0 });
+  heroIo.observe(hero);
+  window.matchMedia('(max-width: 680px)').addEventListener('change', function(e){
+    isMobileCta = e.matches;
+    updateMobileCta();
+  });
+
+  // Cookie banner
+  var cookieBanner = document.getElementById('cookieBanner');
+  var cookieAccept = document.getElementById('cookieAccept');
+  var heroCta = document.getElementById('heroCta');
+  function refreshCookieUi(accepted){
+    cookieBanner.classList.toggle('show', !accepted);
+    heroCta.style.marginBottom = accepted ? '0px' : '84px';
+  }
+  var accepted = false;
+  try { accepted = window.localStorage.getItem('svarog_cookies_accepted') === '1'; } catch(e) {}
+  refreshCookieUi(accepted);
+  cookieAccept.addEventListener('click', function(){
+    try { window.localStorage.setItem('svarog_cookies_accepted', '1'); } catch(e) {}
+    refreshCookieUi(true);
+  });
+})();
+</script>
+</body>
+</html>
