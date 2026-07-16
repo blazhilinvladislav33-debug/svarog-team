@@ -68,12 +68,12 @@
         .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); font-weight:600; }
         .menu-links a:hover, .menu-links a.active-link{ color:var(--brand-yellow); }
 
-        /* ================= ГОЛОВНИЙ БАНЕР (Збільшений) ================= */
+        /* ================= ГОЛОВНИЙ БАНЕР ================= */
         .hero-banner { 
-            width: 100%; max-width: var(--max-w); margin: 100px auto 40px; padding: 60px 40px; /* Збільшені відступи */
+            width: 100%; max-width: var(--max-w); margin: 100px auto 40px; padding: 60px 40px;
             background: linear-gradient(135deg, rgba(20, 20, 25, 0.85) 0%, rgba(10, 10, 12, 0.95) 100%); 
             border: 1px solid var(--border-color); border-radius: 24px; display: flex; align-items: center; justify-content: space-between; gap: 40px;
-            position: relative; overflow: hidden; backdrop-filter: blur(15px); min-height: 480px; /* Збільшена висота */
+            position: relative; overflow: hidden; backdrop-filter: blur(15px); min-height: 480px; 
         }
         .hero-banner::before { content: ""; position: absolute; bottom: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(121, 133, 84, 0.15) 0%, transparent 70%); filter: blur(50px); pointer-events: none; }
         .hero-info { flex: 1 1 500px; max-width: 600px; z-index: 2; position: relative; }
@@ -83,13 +83,12 @@
         .hero-actions { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap;}
         .hero-btn { display: inline-flex; align-items: center; gap: 10px; padding: 18px 36px; background: var(--bone); color: var(--graphite); font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; border-radius: 8px;}
         .hero-btn:hover { background: var(--brand-yellow); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(240, 202, 40, 0.2);}
-        .hero-btn-outline { display: inline-flex; padding: 16px 28px; border: 1px solid var(--iron); color: var(--ash); font-family: 'Oswald', sans-serif; text-transform: uppercase; transition: 0.3s; border-radius: 8px;}
-        .hero-btn-outline:hover { border-color: var(--bone); color: var(--bone); }
-
+        
         .hero-features { display: flex; gap: 30px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px; }
         .feature-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
         .feature-item svg { width: 24px; height: 24px; fill: none; stroke: var(--brand-yellow); stroke-width: 2; }
 
+        /* ВАЖЛИВО: дисплей тут none за замовчуванням, ми його змінюємо в JS, коли є фото */
         .hero-img-wrapper { position: absolute; right: 0; top: 0; width: 55%; height: 100%; z-index: 1; display: none; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%); mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%); }
         .hero-showcase-img { width: 100%; height: 100%; object-fit: cover; object-position: center right; }
 
@@ -105,17 +104,13 @@
         .category-title { font-size: 1.1rem; font-weight: 700; color: var(--bone); z-index: 2;}
         .category-subtitle { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; z-index: 2;}
         .category-card.active .category-title { color: var(--brand-yellow); }
-        .category-icon-bg { position: absolute; right: -10px; bottom: -20px; width: 80px; height: 80px; opacity: 0.05; transition: 0.3s; pointer-events: none;}
-        .category-card:hover .category-icon-bg { opacity: 0.15; transform: scale(1.1); }
 
-        /* ПАНЕЛЬ ПІДКАТЕГОРІЙ */
         .subcategories-bar { display: none; width: 100%; gap: 10px; overflow-x: auto; padding: 10px 0 20px; border-bottom: 1px dashed var(--iron); margin-bottom: 30px; scrollbar-width: none; }
         .subcategories-bar::-webkit-scrollbar { display: none; }
         .subcat-btn { padding: 8px 20px; border-radius: 30px; border: 1px solid var(--iron); color: var(--ash); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s; white-space: nowrap;}
         .subcat-btn:hover { border-color: var(--ash); color: #fff; }
         .subcat-btn.active { background: var(--bone); color: var(--graphite); border-color: var(--bone); }
 
-        /* ПАНЕЛЬ ПОШУКУ */
         .catalog-toolbar { width: 100%; display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
         .search-input-wrap { flex: 1; min-width: 250px; position: relative; }
         .search-input-wrap input { width: 100%; height: 48px; padding: 0 16px 0 46px; background: transparent; border: 1px solid var(--iron); color: #fff; border-radius: 8px; font-size: 1rem; transition: 0.3s; }
@@ -126,10 +121,8 @@
 
         /* СІТКА ТОВАРІВ */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; margin-bottom: 60px; }
-        
         .merch-card { display: flex; flex-direction: column; transition: all 0.3s ease; }
         
-        /* Зміна курсора на фото: клік відкриває деталі */
         .merch-img-box { width: 100%; aspect-ratio: 4/5; background: var(--plate); border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; border: 1px solid transparent; transition: 0.3s; cursor: pointer;}
         .merch-card:hover .merch-img-box { border-color: var(--iron); box-shadow: 0 10px 25px rgba(0,0,0,0.4);}
         .merch-gallery { display: flex; width: 100%; height: 100%; }
@@ -141,8 +134,6 @@
         .fav-btn:hover { transform: scale(1.1); }
         .fav-btn.active svg { fill: #ff4a4a; stroke: #ff4a4a; }
 
-        .stock-badge { position: absolute; top: 12px; left: 12px; background: rgba(10, 10, 12, 0.8); color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 4px; z-index: 2; }
-        .stock-badge.empty { color: #ff4a4a; }
         .sale-badge { position: absolute; top: 12px; left: 12px; background: #ff4a4a; color: #fff; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 4px; z-index: 2; }
         .new-badge { position: absolute; top: 40px; left: 12px; background: var(--olive); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 4px; z-index: 2; }
 
@@ -170,7 +161,7 @@
         .buy-btn:hover:not(:disabled) { background: var(--brand-yellow); transform: translateY(-2px); }
         .buy-btn:disabled { background: var(--iron); color: #555; cursor: not-allowed; }
 
-        /* ================= ДЕТАЛІ ТОВАРУ (МОДАЛЬНЕ ВІКНО) ================= */
+        /* ================= ДЕТАЛІ ТОВАРУ (МОДАЛКА) ================= */
         .product-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2500; justify-content: center; align-items: center; padding: 20px; }
         .product-modal { display: flex; flex-direction: row; width: 1000px; max-width: 100%; max-height: 90vh; background: var(--plate); border: 1px solid var(--iron); border-radius: 20px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.7); position: relative;}
         
@@ -216,7 +207,7 @@
         .cart-fab svg { width: 24px; height: 24px; fill: #121212; }
         .cart-badge { position: absolute; top: -2px; right: -2px; background: #ff4a4a; color: #fff; font-size: 0.75rem; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--graphite); }
 
-        /* МОДАЛКА КОШИКА (Залишаємо без змін) */
+        /* МОДАЛКА ОФОРМЛЕННЯ */
         .order-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
         .order-modal { background: var(--plate); border: 1px solid var(--iron); border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
         .modal-header { padding: 20px; border-bottom: 1px solid var(--iron); display: flex; justify-content: space-between; align-items: center; }
@@ -281,6 +272,17 @@
         .lightbox-content { max-width: 90%; max-height: 90vh; object-fit: contain; box-shadow: 0 30px 60px rgba(0,0,0,0.8); }
         .lightbox-close { position: absolute; top: 25px; right: 35px; color: #fff; font-size: 40px; font-family: sans-serif; cursor: pointer; opacity: 0.6; }
         .lightbox-close:hover { opacity: 1; color: var(--brand-yellow); }
+
+        /* ================= УТИЛІТИ МОВИ ================= */
+        [data-lang="en"] { display: none; }
+        html.lang-en [data-lang="ua"] { display: none !important; }
+        html.lang-en [data-lang="en"] { display: inline-block; }
+        html.lang-en div[data-lang="en"], 
+        html.lang-en h1[data-lang="en"], 
+        html.lang-en h2[data-lang="en"], 
+        html.lang-en p[data-lang="en"] { display: block; }
+        html.lang-en span[data-lang="en"],
+        html.lang-en a[data-lang="en"] { display: inline; }
 
         /* Адаптивність */
         @media (max-width: 768px) { 
@@ -632,9 +634,14 @@
 
         db.collection("config").doc("shop").onSnapshot(doc => {
             if (doc.exists) {
-                if(doc.data().heroImage) document.getElementById('dynamic-hero-img').src = doc.data().heroImage;
+                if(doc.data().heroImage) {
+                    document.getElementById('dynamic-hero-img').src = doc.data().heroImage;
+                    document.getElementById('dynamic-hero-wrapper').style.display = 'block'; // ВАЖЛИВО!
+                } else {
+                    document.getElementById('dynamic-hero-wrapper').style.display = 'none';
+                }
+
                 if(doc.data().categories && doc.data().categories.length > 0) {
-                    // Зчитуємо структуру: [{name: "Одяг", subcats: ["Футболки"]}, "Шеврони"]
                     globalCategories = [{name: 'Всі товари', subcats: []}].concat(
                         doc.data().categories.map(c => typeof c === 'string' ? {name: c, subcats: []} : {name: c.name, subcats: c.subcats || []})
                     );
@@ -667,7 +674,7 @@
                 `;
                 btn.onclick = () => { 
                     activeCategory = cat.name; 
-                    activeSubcategory = 'Всі'; // Скидаємо підкатегорію при зміні основної
+                    activeSubcategory = 'Всі'; 
                     renderCategoryBar(); 
                     renderShopGrid(); 
                 }; 
@@ -702,17 +709,10 @@
             const grid = document.getElementById('dynamic-shop-grid'); grid.innerHTML = "";
             let filteredList = globalMerchList; 
             
-            // Фільтр по Основній категорії
-            if(activeCategory !== 'Всі товари') {
-                filteredList = filteredList.filter(m => m.category === activeCategory);
-            }
-            // Фільтр по Підкатегорії
-            if(activeSubcategory !== 'Всі') {
-                // Припускаємо, що в базі в товару є поле subcategory (або воно заповнено)
-                filteredList = filteredList.filter(m => m.subcategory === activeSubcategory);
-            }
-
+            if(activeCategory !== 'Всі товари') filteredList = filteredList.filter(m => m.category === activeCategory);
+            if(activeSubcategory !== 'Всі') filteredList = filteredList.filter(m => m.subcategory === activeSubcategory);
             if (shopSearchTerm) filteredList = filteredList.filter(m => (m.title || '').toLowerCase().includes(shopSearchTerm));
+            
             if (shopSortMode === 'price_asc') filteredList = [...filteredList].sort((a, b) => (a.discountPrice || a.price) - (b.discountPrice || b.price));
             else if (shopSortMode === 'price_desc') filteredList = [...filteredList].sort((a, b) => (b.discountPrice || b.price) - (a.discountPrice || a.price));
 
@@ -738,7 +738,6 @@
 
                 grid.innerHTML += `
                     <div class="merch-card">
-                        <!-- КЛІК ПО ФОТО ВІДКРИВАЄ МОДАЛКУ ДЕТАЛЕЙ -->
                         <div class="merch-img-box" onclick="openProductModal('${item.id}')">
                             <div class="fav-btn" onclick="event.stopPropagation(); toggleFav(this)">
                                 <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -757,7 +756,6 @@
                                     <span class="qty-val" id="qty-val-${item.id}">1</span>
                                     <button class="qty-btn" onclick="event.stopPropagation(); adjustGridQty('${item.id}', 1)">+</button>
                                 </div>
-                                <!-- КНОПКА КУПИТИ -->
                                 <button class="buy-btn" onclick="event.stopPropagation(); addToCart('${item.id}')">В кошик</button>
                             </div>
                         </div>
@@ -791,11 +789,9 @@
             pmGalleryImages = isVariant ? (currentPmItem.variants[activeVarIdx].images || (currentPmItem.variants[activeVarIdx].image ? [currentPmItem.variants[activeVarIdx].image] : [])) : (currentPmItem.images || (currentPmItem.image ? [currentPmItem.image] : []));
             pmCurrentImgIndex = 0;
 
-            // Галерея
             document.getElementById('pm-main-img').src = pmGalleryImages[0] || 'logo.png';
             document.getElementById('pm-arrows').style.display = pmGalleryImages.length > 1 ? 'flex' : 'none';
 
-            // Тексти
             clearTranslationCache('pm-category', currentPmItem.category || '');
             clearTranslationCache('pm-title', currentPmItem.title || '');
             
@@ -804,7 +800,6 @@
             
             clearTranslationCache('pm-desc', currentPmItem.description || (currentLang === 'ua' ? 'Опис відсутній.' : 'No description.'));
 
-            // Розмірна сітка
             const scBtn = document.getElementById('pm-size-chart-btn');
             if(currentPmItem.sizeChartImage) {
                 scBtn.style.display = 'inline-flex';
@@ -812,7 +807,6 @@
                 scBtn.style.display = 'none';
             }
 
-            // Варіанти та Розміри
             let variantsHtml = ''; 
             if (isVariant) { 
                 variantsHtml = '<div class="pm-label auto-translate">Колір:</div><div class="pm-variants-row">'; 
@@ -831,7 +825,6 @@
             document.getElementById('pm-size-select-wrapper').innerHTML = sizeSelectHtml;
             document.getElementById('pm-qty-val').innerText = '1';
 
-            // Показуємо модалку
             document.getElementById('product-modal').style.display = 'flex';
             applyTranslationsToDOM(currentLang);
         }
@@ -851,8 +844,8 @@
         window.pmChangeVariant = function(vIndex) {
             if(!currentPmItem) return;
             window.selectedVariants[currentPmItem.id] = vIndex;
-            openProductModal(currentPmItem.id); // Перерендер модалки
-            renderShopGrid(); // Оновлення заднього фону
+            openProductModal(currentPmItem.id); 
+            renderShopGrid(); 
         }
 
         window.pmAdjustQty = function(amount) {
@@ -867,7 +860,6 @@
             let size = "Універсальний"; const sizeSelect = document.getElementById('pm-size-select'); if(sizeSelect) size = sizeSelect.value;
             let qty = parseInt(document.getElementById('pm-qty-val').innerText);
             
-            // Оновлюємо значення в сітці, щоб addToCart спрацював коректно
             const gridQtyEl = document.getElementById(`qty-val-${currentPmItem.id}`);
             if(gridQtyEl) gridQtyEl.innerText = qty;
             const gridSizeEl = document.getElementById(`size-${currentPmItem.id}`);
@@ -877,7 +869,7 @@
             closeProductModal();
         }
 
-        // ================= КОШИК І ОФОРМЛЕННЯ (ЛОГІКА) =================
+        // ================= КОШИК І ОФОРМЛЕННЯ =================
         function addToCart(merchId) {
             const item = globalMerchList.find(m => m.id === merchId); if(!item) return;
             let isVariant = item.variants && item.variants.length > 0; let activeVarIdx = window.selectedVariants[item.id] || 0;
