@@ -81,7 +81,7 @@
   .hero-inner{ max-width:1200px; margin:0 auto; padding:0 24px; }
   .hero-copy{ max-width:720px; }
   .eyebrow{ font-size:14px; letter-spacing:.22em; text-transform:uppercase; color:var(--copper); font-weight:700; margin-bottom:18px; padding:4px 0; border-top:1px solid rgba(232,168,138,.35); border-bottom:1px solid rgba(232,168,138,.35); display:inline-block; }
-  h1.title{ font-family:'SvarogDisplay','Oswald',sans-serif; font-size:clamp(112px,18vw,264px); line-height:0.92; color:var(--copper); margin:0 0 20px; font-weight:400; }
+  h1.title{ font-family:'SvarogDisplay','Oswald',sans-serif; font-size:clamp(90px,14.4vw,211px); line-height:0.92; color:var(--copper); margin:0 0 20px; font-weight:400; white-space:nowrap; }
   .hero-sub{ font-size:19px; line-height:1.5; color:var(--bone); margin:0 0 8px; max-width:640px; }
   .hero-line{ font-size:16px; line-height:1.5; color:var(--ash); margin:0 0 32px; max-width:640px; }
   .hero-cta{ display:flex; flex-wrap:wrap; gap:16px; margin-bottom:0; }
@@ -212,7 +212,7 @@
 
   @media (max-width: 680px){
     .mobile-cta-target{ display:block; }
-    h1.title{ font-size:clamp(64px,16vw,96px); }
+    h1.title{ font-size:clamp(34px,11vw,64px); white-space:nowrap; }
   }
 
   /* ==================== ВБУДОВАНЕ ВІКНО ЗАЯВКИ ==================== */
@@ -507,28 +507,48 @@
 
 <script>
 (function(){
-    // ==================== ФОН ГЕРОЯ: 3 ФОТО З ПЛАВНОЮ ЗМІНОЮ ====================
-    const heroImages = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
-    let heroIdx = 0; let showingA = true;
+    // ==================== ФОН ГЕРОЯ: ФОТО З АДМІНКИ (Firestore), З ПЛАВНОЮ ЗМІНОЮ ====================
+    let heroImages = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg']; // запасний варіант, поки в адмінці нічого не завантажено
+    let heroIdx = 0; let showingA = true; let heroCycleTimer = null;
     const layerA = document.getElementById('heroBgA');
     const layerB = document.getElementById('heroBgB');
     const placeholder = document.getElementById('heroPlaceholder');
 
-    const testImg = new Image();
-    testImg.onload = () => { if (placeholder) placeholder.style.opacity = '0'; };
-    testImg.src = heroImages[0];
+    function testAndShowFirstImage(src) {
+        const testImg = new Image();
+        testImg.onload = () => { if (placeholder) placeholder.style.opacity = '0'; layerA.style.backgroundImage = `url('${src}')`; };
+        testImg.onerror = () => { if (placeholder) placeholder.style.opacity = '1'; };
+        testImg.src = src;
+    }
 
-    setInterval(() => {
-        heroIdx = (heroIdx + 1) % heroImages.length;
-        const next = showingA ? layerB : layerA;
-        const cur = showingA ? layerA : layerB;
-        next.style.backgroundImage = `url('${heroImages[heroIdx]}')`;
-        next.classList.add('visible');
-        cur.classList.remove('visible');
-        showingA = !showingA;
-    }, 6000);
+    function startHeroCycle() {
+        if (heroCycleTimer) clearInterval(heroCycleTimer);
+        heroIdx = 0; showingA = true;
+        layerA.classList.add('visible'); layerB.classList.remove('visible');
+        testAndShowFirstImage(heroImages[0]);
+        if (heroImages.length <= 1) return; // немає сенсу перемикати саме на себе
+        heroCycleTimer = setInterval(() => {
+            heroIdx = (heroIdx + 1) % heroImages.length;
+            const next = showingA ? layerB : layerA;
+            const cur = showingA ? layerA : layerB;
+            next.style.backgroundImage = `url('${heroImages[heroIdx]}')`;
+            next.classList.add('visible');
+            cur.classList.remove('visible');
+            showingA = !showingA;
+        }, 6000);
+    }
+
+    startHeroCycle(); // запускаємо одразу із запасними файлами, щоб не було чорного екрана поки йде запит
+
+    // Якщо в адмінці завантажені реальні фото — підміняємо на них
+    db.collection("config").doc("heroImages").onSnapshot(doc => {
+        const uploaded = (doc.exists && Array.isArray(doc.data().images)) ? doc.data().images.filter(Boolean) : [];
+        if (uploaded.length > 0) { heroImages = uploaded; startHeroCycle(); }
+    });
 })();
 
+</script>
+<script>
 // ==================== ЛІЧИЛЬНИКИ ====================
 db.collection("config").doc("statistics").onSnapshot(doc => {
     if (!doc.exists) return;
