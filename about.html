@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Про нас | Svarog Team</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+        authDomain: "svarog-team.firebaseapp.com",
+        projectId: "svarog-team",
+        storageBucket: "svarog-team.firebasestorage.app",
+        messagingSenderId: "311449325528",
+        appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
+        measurementId: "G-56T1VN72PF"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+</script>
+<link rel="preload" href="SvarogTeam-Regular.woff" as="font" type="font/woff" crossorigin="anonymous">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --graphite:#0E0E0F; --plate:#16171A; --iron:#26282D; --bone:#F2EFE9;
+    --ash:#C4C7CC; --ember:#D9663D; --copper:#E8A88A; --olive:#7A8450;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--graphite); color:var(--bone); font-family:'Manrope',sans-serif; }
+  a{ color:inherit; }
+  .wordmark{ font-family:'SvarogDisplay','Oswald',sans-serif; font-size:20px; letter-spacing:.02em; }
+  @font-face{ font-family:'SvarogDisplay'; src:url('SvarogTeam-Regular.woff') format('woff'); font-weight:400; font-style:normal; font-display:block; }
+
+  /* ==================== NAV ==================== */
+  .nav{ position:sticky; top:0; z-index:90; background:rgba(14,14,15,.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--iron); }
+  .nav-inner{ max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:18px 24px; }
+  .nav-inner a.wordmark{ text-decoration:none; color:var(--bone); }
+  .nav-actions{ display:flex; align-items:center; gap:12px; }
+  .btn{ text-decoration:none; cursor:pointer; font-family:'Manrope',sans-serif; white-space:nowrap; border:none; font-weight:600; font-size:14px; border-radius:2px; padding:10px 20px; }
+  .btn-lang{ background:transparent; border:1px solid var(--iron); color:var(--ash); padding:8px 14px; }
+  .btn-lang:hover{ border-color:var(--copper); color:var(--copper); }
+  .btn-ember{ background:var(--ember); color:var(--bone); }
+  .btn-ember:hover{ filter:brightness(1.08); }
+  .btn-menu{ background:transparent; border:1px solid var(--iron); color:var(--bone); display:flex; align-items:center; gap:10px; padding:9px 16px; }
+  .burger{ display:flex; flex-direction:column; gap:4px; width:16px; }
+  .burger span{ display:block; height:1.5px; background:var(--bone); }
+
+  .menu-overlay{ position:fixed; inset:0; z-index:95; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; }
+  .menu-overlay.open{ opacity:1; pointer-events:auto; }
+  .menu-links{ display:flex; flex-direction:column; gap:6px; max-width:1200px; margin:60px auto 0; padding:0 24px; }
+  .menu-link{ font-family:'Oswald',sans-serif; font-size:clamp(32px,6vw,56px); font-weight:500; text-decoration:none; color:var(--bone); padding:10px 0; border-bottom:1px solid var(--iron); text-transform:uppercase; }
+  .menu-link:hover{ color:var(--copper); }
+  .menu-link.accent{ color:var(--ember); }
+  .menu-social{ max-width:1200px; margin:32px auto 0; padding:0 24px; display:flex; gap:20px; flex-wrap:wrap; }
+  .menu-social a{ text-decoration:none; color:var(--ash); font-size:14px; border-bottom:1px solid var(--iron); padding-bottom:2px; }
+  .menu-social a:hover{ color:var(--copper); }
+
+  [data-lang="en"]{ display:none; }
+  html.lang-en [data-lang="ua"]{ display:none; }
+  html.lang-en [data-lang="en"]{ display:inherit; }
+  html.lang-en .menu-links a[data-lang="en"]{ display:inline; }
+
+  /* ==================== СТОРІНКА-ЗАГЛУШКА ==================== */
+  .empty-hero{ min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:80px 24px; }
+  .empty-hero .eyebrow{ font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--copper); margin-bottom:18px; }
+  .empty-hero h1{ font-family:'Oswald',sans-serif; font-size:clamp(36px,6vw,64px); font-weight:600; text-transform:uppercase; margin:0 0 20px; }
+  .empty-hero p{ color:var(--ash); font-size:16px; max-width:520px; line-height:1.6; }
+  .bg-layer{ position:fixed; inset:0; z-index:-2; background-position:center; background-size:cover; opacity:0; transition:opacity 2.5s ease-in-out; animation:kenburns 24s ease-in-out infinite alternate; }
+  .bg-layer.visible{ opacity:.28; }
+  .bg-layer#bgB{ animation-delay:-12s; }
+  .bg-vignette{ position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg, var(--graphite) 0%, rgba(14,14,15,.6) 40%, var(--graphite) 100%); }
+  @keyframes kenburns{ 0%{ transform:scale(1); } 100%{ transform:scale(1.06); } }
+
+  /* ==================== FOOTER ==================== */
+  footer{ border-top:1px solid var(--iron); margin-top:60px; }
+  .footer-inner{ max-width:1200px; margin:0 auto; padding:56px 24px 32px; display:flex; justify-content:space-between; gap:40px; flex-wrap:wrap; }
+  .footer-brand{ max-width:320px; }
+  .footer-desc{ color:var(--ash); font-size:14px; margin-top:12px; line-height:1.6; }
+  .footer-cols{ display:flex; gap:56px; flex-wrap:wrap; }
+  .footer-col{ display:flex; flex-direction:column; gap:10px; }
+  #footerSocialBox{ display:flex; flex-direction:column; gap:10px; }
+  .footer-col-title{ font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--ash); margin-bottom:6px; }
+  .footer-col a{ color:var(--bone); font-size:14px; text-decoration:none; }
+  .footer-col a:hover{ color:var(--copper); }
+  .footer-bottom{ text-align:center; padding:20px 24px; color:var(--ash); font-size:12px; border-top:1px solid var(--iron); }
+
+  @media (max-width:680px){ .nav-actions .btn-ember{ display:none; } }
+</style>
+</head>
+<body>
+
+<div class="bg-layer visible" id="bgA" style="background-image:url('bg1.jpg');"></div>
+<div class="bg-layer" id="bgB"></div>
+<div class="bg-vignette"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="wordmark">Svarog Team</a>
+    <div class="nav-actions">
+      <button class="btn btn-lang" id="langToggle">EN</button>
+      <a href="support.html" class="btn btn-ember"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+      <button class="btn btn-menu" id="menuToggle">
+        <span><span data-lang="ua">меню</span><span data-lang="en">menu</span></span>
+        <span class="burger"><span></span><span></span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="menu-overlay" id="menuOverlay">
+  <div class="nav-inner">
+    <div class="wordmark">Svarog Team</div>
+    <button class="btn btn-menu" id="menuClose"><span data-lang="ua">Закрити ✕</span><span data-lang="en">Close ✕</span></button>
+  </div>
+  <div class="menu-links">
+    <a href="index.html" class="menu-link"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a>
+    <a href="news.html" class="menu-link"><span data-lang="ua">Новини</span><span data-lang="en">News</span></a>
+    <a href="shop.html" class="menu-link"><span data-lang="ua">Мерч</span><span data-lang="en">Merch</span></a>
+    <a href="about.html" class="menu-link"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a>
+    <a href="support.html" class="menu-link accent"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+    <a href="recruiting.html" class="menu-link"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></a>
+    <a href="contacts.html" class="menu-link"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></a>
+  </div>
+  <div class="menu-social" id="menuSocialBox"></div>
+</div>
+
+<!-- ПУСТА СТОРІНКА (наповнення додамо пізніше) -->
+<section class="empty-hero">
+  <div class="eyebrow"><span data-lang="ua">35-й полк НГУ</span><span data-lang="en">35th Regiment NGU</span></div>
+  <h1><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></h1>
+  <p><span data-lang="ua">Ця сторінка в розробці — наповнення додамо найближчим часом.</span><span data-lang="en">This page is under construction — content will be added soon.</span></p>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="wordmark">Svarog Team</div>
+      <p class="footer-desc"><span data-lang="ua">35-й окремий полк Національної гвардії України.</span><span data-lang="en">35th separate regiment of the National Guard of Ukraine.</span></p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <div class="footer-col-title"><span data-lang="ua">Розділи</span><span data-lang="en">Sections</span></div>
+        <a href="index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a>
+        <a href="news.html"><span data-lang="ua">Новини</span><span data-lang="en">News</span></a>
+        <a href="shop.html"><span data-lang="ua">Мерч</span><span data-lang="en">Merch</span></a>
+        <a href="about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a>
+        <a href="support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+        <a href="recruiting.html"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></a>
+        <a href="contacts.html"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title"><span data-lang="ua">Ми в мережі</span><span data-lang="en">Follow us</span></div>
+        <div id="footerSocialBox"></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 SVAROG TEAM</div>
+</footer>
+
+<script>
+(function(){
+  // Плавна зміна фону
+  var bgImages = ['bg1.jpg','bg2.jpg','bg3.jpg']; var bgIdx=0; var showingA=true;
+  var layerA=document.getElementById('bgA'), layerB=document.getElementById('bgB');
+  setInterval(function(){
+    bgIdx = (bgIdx+1) % bgImages.length;
+    var next = showingA ? layerB : layerA, cur = showingA ? layerA : layerB;
+    next.style.backgroundImage = "url('"+bgImages[bgIdx]+"')";
+    next.classList.add('visible'); cur.classList.remove('visible');
+    showingA = !showingA;
+  }, 6000);
+
+  // Меню
+  var menuToggle=document.getElementById('menuToggle'), menuClose=document.getElementById('menuClose'), menuOverlay=document.getElementById('menuOverlay');
+  menuToggle.addEventListener('click', function(){ menuOverlay.classList.add('open'); });
+  menuClose.addEventListener('click', function(){ menuOverlay.classList.remove('open'); });
+
+  // Мова
+  var langToggle=document.getElementById('langToggle');
+  function setLang(lang){
+    localStorage.setItem('selectedLang', lang);
+    document.documentElement.classList.toggle('lang-en', lang==='en');
+    langToggle.textContent = lang==='ua' ? 'EN':'UA';
+    document.querySelectorAll('[data-lang="en"]').forEach(function(el){ el.style.display = lang==='en' ? 'inline':'none'; });
+    document.querySelectorAll('[data-lang="ua"]').forEach(function(el){ el.style.display = lang==='ua' ? 'inline':'none'; });
+  }
+  setLang(localStorage.getItem('selectedLang') || 'ua');
+  langToggle.addEventListener('click', function(){ setLang(document.documentElement.classList.contains('lang-en') ? 'ua':'en'); });
+})();
+
+// Соцмережі з бази
+db.collection("config").doc("socials").onSnapshot(function(doc){
+    var list = (doc.exists && doc.data().list) || [];
+    var menuBox = document.getElementById('menuSocialBox');
+    var footerBox = document.getElementById('footerSocialBox');
+    var html = list.map(function(n){ return '<a href="'+n.url+'" target="_blank" rel="noopener">'+n.name+'</a>'; }).join('');
+    if (menuBox) menuBox.innerHTML = html;
+    if (footerBox) footerBox.innerHTML = html;
+});
+</script>
+</body>
+</html>
