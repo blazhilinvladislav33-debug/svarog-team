@@ -279,16 +279,29 @@
 
 <script>
 (function(){
-  // Плавна зміна фону
-  var bgImages = ['bg1.jpg','bg2.jpg','bg3.jpg']; var bgIdx=0; var showingA=true;
+  // Фон: спершу перевіряємо, чи адмін завантажив своє фото для цієї сторінки
   var layerA=document.getElementById('bgA'), layerB=document.getElementById('bgB');
-  setInterval(function(){
-    bgIdx = (bgIdx+1) % bgImages.length;
-    var next = showingA ? layerB : layerA, cur = showingA ? layerA : layerB;
-    next.style.backgroundImage = "url('"+bgImages[bgIdx]+"')";
-    next.classList.add('visible'); cur.classList.remove('visible');
-    showingA = !showingA;
-  }, 6000);
+  db.collection("config").doc("pageBackgrounds").get().then(function(doc){
+      var customBg = doc.exists ? doc.data().contacts : null;
+      if (customBg) {
+          layerA.style.backgroundImage = "url('" + customBg + "')";
+          layerA.classList.add('visible');
+      } else {
+          startDefaultBgRotation();
+      }
+  }).catch(function(){ startDefaultBgRotation(); });
+
+  function startDefaultBgRotation() {
+      var bgImages = ['bg1.jpg','bg2.jpg','bg3.jpg']; var bgIdx=0; var showingA=true;
+      layerA.style.backgroundImage = "url('" + bgImages[0] + "')"; layerA.classList.add('visible');
+      setInterval(function(){
+        bgIdx = (bgIdx+1) % bgImages.length;
+        var next = showingA ? layerB : layerA, cur = showingA ? layerA : layerB;
+        next.style.backgroundImage = "url('"+bgImages[bgIdx]+"')";
+        next.classList.add('visible'); cur.classList.remove('visible');
+        showingA = !showingA;
+      }, 6000);
+  }
 
   // Меню
   var menuToggle=document.getElementById('menuToggle'), menuClose=document.getElementById('menuClose'), menuOverlay=document.getElementById('menuOverlay');
