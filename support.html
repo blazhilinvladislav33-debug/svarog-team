@@ -126,6 +126,19 @@
         .report-modal-links { display: flex; flex-direction: column; gap: 10px; }
         .report-modal-links a { color: var(--copper); text-decoration: underline; font-size: 15px; }
 
+        /* ==================== БЛОКИ КОНСТРУКТОРА ==================== */
+        .abl { position: absolute; box-sizing: border-box; }
+        .abl-text { color: var(--ash); font-size: 16px; line-height: 1.7; white-space: pre-wrap; overflow: auto; }
+        .abl-photo { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
+        .abl-quote { background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-left: 4px solid var(--copper); border-radius: 8px; padding: 20px; overflow: auto; }
+        .abl-quote-text { color: var(--bone); font-size: 16px; font-style: italic; line-height: 1.5; margin-bottom: 10px; }
+        .abl-quote-author { color: var(--copper); font-weight: 700; font-size: 14px; }
+        .abl-quote-role { color: var(--ash); font-size: 12px; }
+        .abl-video { width: 100%; height: 100%; position: relative; border-radius: 6px; overflow: hidden; background: #000; cursor: pointer; }
+        .abl-video img { width: 100%; height: 100%; object-fit: cover; }
+        .abl-video-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; border-radius: 50%; background: rgba(217,102,61,0.9); display: flex; align-items: center; justify-content: center; }
+        .abl-video-play svg { width: 22px; height: 22px; fill: #fff; margin-left: 3px; }
+
         .load-more-btn { display: block; margin: 0 auto; padding: 12px 32px; background: transparent; border: 1px solid var(--ash); color: var(--bone); font-family: 'Oswald'; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
         .load-more-btn:hover { border-color: var(--brand-yellow); color: var(--brand-yellow); }
 
@@ -457,7 +470,8 @@
     <div class="report-modal-box">
         <div class="report-modal-close"><button onclick="closeReportModal()">✕</button></div>
         <div class="report-modal-media" id="reportModalMedia"></div>
-        <div class="report-modal-body">
+        <div class="report-modal-constructor" id="reportModalConstructor" style="display:none; position:relative; width:100%; min-height:300px; padding:20px 30px 0;"></div>
+        <div class="report-modal-body" id="reportModalBodyWrap">
             <p id="reportModalBody"></p>
             <div class="report-modal-links" id="reportModalLinks"></div>
         </div>
@@ -737,12 +751,46 @@ function initReportsStream() {
     }, err => console.error("Помилка звітів: ", err));
 }
 
+function getYouTubeIdReport(url) {
+    if (!url) return '';
+    if (url.includes('youtube.com/watch?v=')) return url.split('v=')[1].split('&')[0];
+    if (url.includes('youtube.com/shorts/')) return url.split('shorts/')[1].split('?')[0];
+    if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split('?')[0];
+    return '';
+}
+function renderReportBlocks(canvasEl, blocks) {
+    canvasEl.innerHTML = '';
+    blocks.forEach(block => {
+        const el = document.createElement('div');
+        el.className = 'abl';
+        el.style.left = block.x + '%'; el.style.top = block.y + '%'; el.style.width = block.width + '%'; el.style.height = block.height + '%';
+        if (block.type === 'text') { el.innerHTML = `<div class="abl-text auto-translate">${(block.content || '').replace(/\n/g, '<br>')}</div>`; }
+        else if (block.type === 'photo') { el.innerHTML = block.src ? `<img class="abl-photo" src="${block.src}" loading="lazy" onclick="openLightbox('${block.src}')" style="cursor:zoom-in;">` : ''; }
+        else if (block.type === 'quote') { el.innerHTML = `<div class="abl-quote"><div class="abl-quote-text auto-translate">${block.text || ''}</div><div class="abl-quote-author auto-translate">${block.author || ''}</div><div class="abl-quote-role auto-translate">${block.role || ''}</div></div>`; }
+        else if (block.type === 'video') { const vidId = getYouTubeIdReport(block.videoUrl); if (vidId) { el.innerHTML = `<div class="abl-video" onclick="this.innerHTML='<iframe src=\\'https://www.youtube.com/embed/${vidId}?autoplay=1\\' allow=\\'autoplay; encrypted-media\\' allowfullscreen></iframe>'"><img src="https://img.youtube.com/vi/${vidId}/hqdefault.jpg" loading="lazy"><div class="abl-video-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>`; } }
+        canvasEl.appendChild(el);
+    });
+    let deepestPct = blocks.length > 0 ? Math.max(...blocks.map(b => b.y + b.height), 40) : 40;
+    canvasEl.style.minHeight = Math.max(300, deepestPct * 5) + 'px';
+    applyTranslationsToDOM(currentLang);
+}
+
 function openReportModal(idx) {
     const data = currentReportsData[idx]; if (!data) return;
     const overlay = document.getElementById('reportModalOverlay');
     const mediaBox = document.getElementById('reportModalMedia');
     const bodyText = document.getElementById('reportModalBody');
     const linksBox = document.getElementById('reportModalLinks');
+    const constructorBox = document.getElementById('reportModalConstructor');
+    const bodyWrap = document.getElementById('reportModalBodyWrap');
+
+    if (data.bodyMode === 'constructor' && Array.isArray(data.blocks) && data.blocks.length > 0) {
+        mediaBox.innerHTML = ''; bodyWrap.style.display = 'none'; constructorBox.style.display = 'block';
+        renderReportBlocks(constructorBox, data.blocks);
+        overlay.classList.add('open');
+        return;
+    }
+    constructorBox.style.display = 'none'; constructorBox.innerHTML = ''; bodyWrap.style.display = 'block';
 
     let mediaHtml = '';
     const images = Array.isArray(data.images) && data.images.length > 0 ? data.images : (data.image ? [data.image] : []);
