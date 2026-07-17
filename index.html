@@ -61,10 +61,10 @@
   .menu-open .burger span:first-child{ transform:translateY(2px) rotate(45deg); }
   .menu-open .burger span:last-child{ transform:translateY(-2px) rotate(-45deg); }
 
-  .menu-overlay{ position:fixed; inset:0; z-index:80; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; }
+  .menu-overlay{ position:fixed; inset:0; z-index:80; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; overflow-y:auto; }
   .menu-overlay.open{ opacity:1; pointer-events:auto; }
   .menu-links{ max-width:var(--max-w); margin:0 auto; padding:64px 24px; display:flex; flex-direction:column; gap:28px; }
-  .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); text-decoration:none; font-weight:600; }
+  .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(22px, min(6vw, 7vh), 56px); color:var(--bone); text-decoration:none; font-weight:600; }
   .menu-links a:hover, .menu-links a.active-link{ color:var(--copper); }
   .menu-links a.accent{ color:var(--copper); }
   .menu-social{ max-width:var(--max-w); margin:0 auto; padding:24px; display:flex; gap:24px; border-top:1px solid var(--iron); font-size:14px; }
@@ -137,7 +137,7 @@
   .news-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1px; background:var(--iron); }
   .news-card{ background:var(--graphite); text-decoration:none; display:block; }
   .news-card:hover{ background:#1a1b1e; }
-  .news-img{ aspect-ratio:16/10; background:repeating-linear-gradient(115deg, var(--iron) 0px, var(--iron) 14px, var(--plate) 14px, var(--plate) 16px); display:flex; align-items:center; justify-content:center; }
+  .news-img{ aspect-ratio:3/4; background:repeating-linear-gradient(115deg, var(--iron) 0px, var(--iron) 14px, var(--plate) 14px, var(--plate) 16px); display:flex; align-items:center; justify-content:center; }
   .news-img span{ font-family:monospace; font-size:11px; color:var(--ash); opacity:.5; text-transform:uppercase; }
   .news-body{ padding:24px; }
   .news-stub{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ash); margin-bottom:10px; }
@@ -305,7 +305,7 @@
     <a href="news.html" class="menu-link"><span data-lang="ua">Новини</span><span data-lang="en">News</span></a>
     <a href="shop.html" class="menu-link"><span data-lang="ua">Мерч</span><span data-lang="en">Merch</span></a>
     <a href="about.html" class="menu-link"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a>
-    <a href="support.html" class="menu-link accent"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+    <a href="support.html" class="menu-link"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
     <a href="recruiting.html" class="menu-link"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></a>
     <a href="contacts.html" class="menu-link"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></a>
   </div>
@@ -442,6 +442,7 @@
       <a href="news.html" class="accent" style="text-decoration:none; border-bottom:1px solid rgba(232,168,138,.4); font-size:14px;"><span data-lang="ua">Всі новини →</span><span data-lang="en">All news →</span></a>
     </div>
     <div class="news-grid" id="newsGrid" style="margin-top:48px;">
+      <a href="news.html" class="news-card"><div class="news-img"><span data-lang="ua">фото новини</span><span data-lang="en">news photo</span></div><div class="news-body"><div class="news-stub"><span data-lang="ua">Заглушка · дата</span><span data-lang="en">Placeholder · date</span></div><h4 class="news-title"><span data-lang="ua">Заголовок новини — підставте матеріал</span><span data-lang="en">News headline — add material</span></h4></div></a>
       <a href="news.html" class="news-card"><div class="news-img"><span data-lang="ua">фото новини</span><span data-lang="en">news photo</span></div><div class="news-body"><div class="news-stub"><span data-lang="ua">Заглушка · дата</span><span data-lang="en">Placeholder · date</span></div><h4 class="news-title"><span data-lang="ua">Заголовок новини — підставте матеріал</span><span data-lang="en">News headline — add material</span></h4></div></a>
       <a href="news.html" class="news-card"><div class="news-img"><span data-lang="ua">фото новини</span><span data-lang="en">news photo</span></div><div class="news-body"><div class="news-stub"><span data-lang="ua">Заглушка · дата</span><span data-lang="en">Placeholder · date</span></div><h4 class="news-title"><span data-lang="ua">Заголовок новини — підставте матеріал</span><span data-lang="en">News headline — add material</span></h4></div></a>
       <a href="news.html" class="news-card"><div class="news-img"><span data-lang="ua">фото новини</span><span data-lang="en">news photo</span></div><div class="news-body"><div class="news-stub"><span data-lang="ua">Заглушка · дата</span><span data-lang="en">Placeholder · date</span></div><h4 class="news-title"><span data-lang="ua">Заголовок новини — підставте матеріал</span><span data-lang="en">News headline — add material</span></h4></div></a>
@@ -734,7 +735,7 @@ async function submitApplyForm(e) {
 }
 
 // ==================== ОСТАННІ НОВИНИ ====================
-db.collection("news").orderBy("date", "desc").limit(3).get().then(snapshot => {
+db.collection("news").orderBy("date", "desc").limit(4).get().then(snapshot => {
     if (snapshot.empty) return;
     const grid = document.getElementById('newsGrid'); if (!grid) return;
     grid.innerHTML = snapshot.docs.map(doc => {
