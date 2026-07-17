@@ -1,151 +1,273 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Рекрутинг | Svarog Team</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
-        authDomain: "svarog-team.firebaseapp.com",
-        projectId: "svarog-team",
-        storageBucket: "svarog-team.firebasestorage.app",
-        messagingSenderId: "311449325528",
-        appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
-        measurementId: "G-56T1VN72PF"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-</script>
-<link rel="preload" href="SvarogTeam-Regular.woff" as="font" type="font/woff" crossorigin="anonymous">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --graphite:#0E0E0F; --plate:#16171A; --iron:#26282D; --bone:#F2EFE9;
-    --ash:#C4C7CC; --ember:#D9663D; --copper:#E8A88A; --olive:#7A8450;
-    --brand-yellow: #f0ca28;
-    --text-muted: #8e8e93;
-  }
-  *{ box-sizing:border-box; }
-  body{ margin:0; background:var(--graphite); color:var(--bone); font-family:'Manrope',sans-serif; overflow-x: hidden; }
-  a{ color:inherit; }
-  .wordmark{ font-family:'Oswald',sans-serif; font-weight:600; font-size:14px; letter-spacing:.14em; text-transform:uppercase; flex-shrink:0; color:var(--bone);}
-  @font-face{ font-family:'SvarogDisplay'; src:url('SvarogTeam-Regular.woff') format('woff'); font-weight:400; font-style:normal; font-display:block; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVAROG TEAM | Новини</title>
+    <meta name="description" content="Новини SVAROG TEAM — 35-й Полк НГУ. Актуальні події та хроніка діяльності підрозділу.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SVAROG TEAM | Новини">
+    <meta property="og:description" content="Актуальні новини та хроніка діяльності підрозділу SVAROG TEAM.">
+    <meta property="og:image" content="https://svarogteam.com/SvarogTeam.png">
+    <meta property="og:url" content="https://svarogteam.com/news.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SVAROG TEAM | Новини">
+    <meta name="twitter:image" content="https://svarogteam.com/SvarogTeam.png">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+            authDomain: "svarog-team.firebaseapp.com",
+            projectId: "svarog-team",
+            storageBucket: "svarog-team.firebasestorage.app",
+            messagingSenderId: "311449325528",
+            appId: "1:311449325528:web:b254c6aed4fea56fe96cad",
+            measurementId: "G-56T1VN72PF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 
-  /* ==================== NAV ==================== */
-  .nav{ position:fixed; top:0; left:0; right:0; z-index:90; background:rgba(14,14,15,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--iron); }
-  .nav-inner{ max-width:1200px; margin:0 auto; padding:0 24px; height:64px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-  .nav-inner a.wordmark{ text-decoration:none; color:var(--bone); }
-  .nav-actions{ display:flex; align-items:center; gap:16px; flex-shrink:0; }
-  .btn-lang{ background:none; border:1px solid var(--iron); color:var(--ash); font-size:13px; letter-spacing:.08em; padding:9px 14px; transition:0.3s; cursor:pointer;}
-  .btn-lang:hover, .btn-lang.active { border-color:var(--ash); color:var(--bone); }
-  .btn-ember{ background:var(--ember); color:var(--bone); font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:10px 18px; transition:0.3s; border:none; text-decoration:none;}
-  .btn-ember:hover{ background:#c65a34; }
-  .btn-menu{ background:none; border:1px solid var(--iron); color:var(--bone); font-size:13px; letter-spacing:.08em; text-transform:uppercase; padding:9px 16px; display:flex; align-items:center; gap:10px; transition:0.3s; cursor:pointer;}
-  .btn-menu:hover{ border-color:var(--ash); }
-  .burger{ display:flex; flex-direction:column; gap:3px; width:16px; }
-  .burger span{ display:block; height:1px; background:var(--bone); width:100%; transition:transform 160ms ease-out; }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root{
+            --graphite:#0E0E0F; --plate:#16171A; --iron:#26282D; --bone:#F2EFE9;
+            --ash:#C4C7CC; --ember:#D9663D; --copper:#E8A88A; --olive:#7A8450;
+            --brand-yellow: #f0ca28;
+            --text-muted: #8e8e93;
+            --max-w: 1440px; /* Збільшена ширина сайту */
+        }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        html,body{ background:var(--graphite); color:var(--bone); font-family:'Manrope',sans-serif; overflow-x:hidden; scroll-behavior: smooth;}
+        a { color:var(--copper); text-decoration:none; }
+        a:hover { color:var(--bone); }
+        button { font-family:'Manrope',sans-serif; cursor: pointer; border:none; background:none; }
 
-  .menu-overlay{ position:fixed; inset:0; z-index:95; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; overflow-y:auto; }
-  .menu-overlay.open{ opacity:1; pointer-events:auto; }
-  .menu-links{ max-width:1200px; margin:0 auto; padding:64px 24px; display:flex; flex-direction:column; gap:28px; }
-  .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); font-weight:600; text-decoration:none;}
-  .menu-links a:hover, .menu-links a.active-link{ color:var(--copper); }
+        /* ================= НАВІГАЦІЯ ================= */
+        .nav{ position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(14,14,15,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--iron); }
+        .nav-inner{ max-width:var(--max-w); margin:0 auto; padding:0 24px; height:64px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+        .wordmark{ font-family:'Oswald',sans-serif; font-weight:600; font-size:14px; letter-spacing:.14em; text-transform:uppercase; flex-shrink:0; color:var(--bone); }
+        .nav-actions{ display:flex; align-items:center; gap:16px; flex-shrink:0; }
+        .btn-lang{ border:1px solid var(--iron); color:var(--ash); font-size:13px; letter-spacing:.08em; padding:9px 14px; transition:0.3s; }
+        .btn-lang:hover, .btn-lang.active { border-color:var(--ash); color:var(--bone); }
+        .btn-ember{ background:var(--ember); color:var(--bone); font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:10px 18px; transition:0.3s;}
+        .btn-ember:hover{ background:#c65a34; }
+        .btn-menu{ border:1px solid var(--iron); color:var(--bone); font-size:13px; letter-spacing:.08em; text-transform:uppercase; padding:9px 16px; display:flex; align-items:center; gap:10px; transition:0.3s; }
+        .btn-menu:hover{ border-color:var(--ash); }
+        .burger{ display:flex; flex-direction:column; gap:3px; width:16px; }
+        .burger span{ height:1px; background:var(--bone); width:100%; transition:transform 160ms ease-out; }
+        
+        .menu-overlay{ position:fixed; inset:0; z-index:80; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; }
+        .menu-overlay.open{ opacity:1; pointer-events:auto; }
+        .menu-links{ max-width:var(--max-w); margin:0 auto; padding:64px 24px; display:flex; flex-direction:column; gap:28px; }
+        .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); font-weight:600; }
+        .menu-links a:hover, .menu-links a.active-link{ color:var(--copper); }
+        
+        /* ================= ОСНОВНИЙ КОНТЕНТ ================= */
+        .page-wrapper { max-width: var(--max-w); margin: 100px auto 40px; padding: 0 24px; min-height: 70vh; }
+        
+        /* Гігантський заголовок */
+        .page-title { 
+            font-family: 'Oswald', sans-serif; 
+            font-size: clamp(60px, 15vw, 180px); 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            text-align: center; 
+            margin-bottom: 60px; 
+            color: rgba(255, 255, 255, 0.95);
+            letter-spacing: -3px; 
+            line-height: 1;
+            text-shadow: 0 10px 40px rgba(0,0,0,0.6); 
+        }
 
-  [data-lang="en"]{ display:none; }
-  html.lang-en [data-lang="ua"]{ display:none; }
-  html.lang-en [data-lang="en"]{ display:inline; }
-  html.lang-en div[data-lang="en"], html.lang-en h1[data-lang="en"], html.lang-en p[data-lang="en"] { display:block; }
+        /* --- В'Ю 1: СПИСОК НОВИН --- */
+        #view-list { display: block; animation: fadeIn 0.4s ease-out; }
+        
+        .news-grid { 
+            display: grid; 
+            /* Збільшена ширина карток */
+            grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); 
+            gap: 50px; 
+            margin-bottom: 80px; 
+        }
+        
+        .news-card { 
+            cursor: pointer; 
+            opacity: 0;
+            transform: translateY(50px);
+            animation: cardReveal 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        
+        @keyframes cardReveal { to { opacity: 1; transform: translateY(0); } }
 
-  /* ==================== ФОН ==================== */
-  .bg-layer{ position:fixed; inset:0; z-index:-2; background-position:center; background-size:cover; opacity:0; transition:opacity 2.5s ease-in-out; animation:kenburns 24s ease-in-out infinite alternate; }
-  .bg-layer.visible{ opacity:.28; }
-  .bg-layer#bgB{ animation-delay:-12s; }
-  .bg-vignette{ position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg, var(--graphite) 0%, rgba(14,14,15,.6) 40%, var(--graphite) 100%); }
-  @keyframes kenburns{ 0%{ transform:scale(1); } 100%{ transform:scale(1.06); } }
+        /* ТАКТИЧНА СТИЛІЗАЦІЯ ФОТО */
+        .news-img-box { 
+            width: 100%; 
+            aspect-ratio: 16/10; 
+            overflow: hidden; 
+            background: var(--iron); 
+            position: relative; 
+            /* Зрізані кути */
+            clip-path: polygon(25px 0, 100% 0, 100% calc(100% - 25px), calc(100% - 25px) 100%, 0 100%, 0 25px);
+        }
+        
+        /* Анімація зуму */
+        .news-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .news-card:hover .news-img-box img { transform: scale(1.1); }
 
-  /* ==================== FOOTER ==================== */
-  footer{ background:var(--graphite); border-top:1px solid var(--iron); margin-top: auto;}
-  .footer-inner{ max-width:1200px; margin:0 auto; padding:64px 24px 32px; display:flex; flex-wrap:wrap; gap:48px; justify-content:space-between; }
-  .footer-brand{ flex:1 1 240px; }
-  .footer-brand .wordmark{ margin-bottom:12px; display:block; text-decoration:none;}
-  .footer-desc{ font-size:14px; line-height:1.6; color:var(--ash); max-width:280px; margin:0; }
-  .footer-cols{ display:flex; gap:64px; flex-wrap:wrap; }
-  .footer-col{ display:flex; flex-direction:column; gap:10px; }
-  .footer-col-title{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ash); margin-bottom:6px; }
-  .footer-col a{ color:var(--bone); font-size:14px; transition:0.3s; text-decoration:none;}
-  .footer-col a:hover{ color:var(--brand-yellow); }
-  .footer-bottom{ max-width:1200px; margin:0 auto; padding:24px; border-top:1px solid var(--iron); font-size:12px; color:var(--ash); text-align:left;}
+        /* Градієнтне затемнення по боках */
+        .news-img-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(14,14,15,0.8) 0%, transparent 15%, transparent 85%, rgba(14,14,15,0.8) 100%);
+            pointer-events: none;
+            z-index: 2;
+            transition: background 0.4s;
+        }
+        .news-card:hover .news-img-box::after {
+            background: linear-gradient(90deg, rgba(14,14,15,0.95) 0%, transparent 20%, transparent 80%, rgba(14,14,15,0.95) 100%);
+        }
 
-  @media (max-width:680px){ .nav-actions .btn-ember{ display:none; } }
+        /* Зашурованість (штриховка) ТІЛЬКИ по боках через маску */
+        .news-img-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.7) 0, rgba(0,0,0,0.7) 2px, transparent 2px, transparent 8px);
+            -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 15%, rgba(0,0,0,0) 85%, rgba(0,0,0,1) 100%);
+            mask-image: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 15%, rgba(0,0,0,0) 85%, rgba(0,0,0,1) 100%);
+            pointer-events: none;
+            z-index: 3;
+            transition: opacity 0.4s;
+        }
+        .news-card:hover .news-img-box::before { opacity: 0.4; }
+        
+        /* Тексти новини */
+        .news-date { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; color: var(--brand-yellow); text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 10px; }
+        .news-title { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 600; line-height: 1.2; text-transform: uppercase; transition: color 0.3s; }
+        .news-card:hover .news-title { color: var(--brand-yellow); }
 
-  /* ==================== ВІКНО ЧАТУ ==================== */
-  .user-chat-modal { display: none; position: fixed; bottom: 30px; right: 30px; width: 340px; height: 450px; background: var(--plate); border: 1px solid var(--iron); border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; }
-  .chat-header { background: rgba(255,255,255,0.02); padding: 16px 20px; font-size: 1rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--iron); color: var(--bone); font-family: 'Oswald', sans-serif; text-transform: uppercase; }
-  .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; scrollbar-width: none;}
-  .chat-messages::-webkit-scrollbar { display: none; }
-  .chat-bubble { padding: 10px 14px; border-radius: 8px; max-width: 80%; word-wrap: break-word; line-height: 1.45; }
-  .chat-bubble.user { background: var(--olive); align-self: flex-end; color: #fff; font-weight: 500; }
-  .chat-bubble.admin { background: rgba(255,255,255,0.04); border: 1px solid var(--iron); align-self: flex-start; color: var(--bone); }
-  .chat-bubble img { max-width: 100%; max-height: 150px; border-radius: 6px; cursor: pointer; margin-top: 4px; }
-  .chat-bubble.system { background: rgba(217, 102, 61, 0.1); border: 1px solid rgba(217, 102, 61, 0.2); align-self: center; text-align: center; font-size: 0.8rem; max-width: 95%; color: var(--ember); border-radius: 6px; }
-  .chat-input-area { padding: 12px 16px; display: flex; gap: 8px; background: rgba(0,0,0,0.2); align-items: center; border-top: 1px solid var(--iron); flex-wrap: nowrap; }
-  .chat-input-area input { flex: 1; min-width: 0; height: 42px; padding: 0 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 30px; color: var(--bone); outline: none; font-size: 0.9rem; }
-  .chat-send-btn, .user-clip-btn { width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
-  .chat-send-btn { background: var(--brand-yellow); border: none; }
-  .chat-send-btn svg { width: 18px; height: 18px; fill: var(--graphite); margin-left: 2px; }
-  .user-clip-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--iron); }
-  .user-clip-btn svg { width: 18px; height: 18px; fill: var(--ash); }
-  @media (max-width: 768px) { .user-chat-modal { width: calc(100% - 32px); left: 16px; right: 16px; bottom: 16px; height: 400px; } }
+        .pagination-mock { display: flex; justify-content: center; gap: 15px; font-family: 'Oswald', sans-serif; font-weight: 600; color: var(--brand-yellow); margin: 60px 0; font-size: 18px; border-top: 1px dashed var(--iron); border-bottom: 1px dashed var(--iron); padding: 20px 0;}
+        .pagination-mock span { cursor: pointer; color: var(--ash); transition: 0.3s; }
+        .pagination-mock span.active, .pagination-mock span:hover { color: var(--brand-yellow); }
 
-  /* ==================== КОНТЕНТ СТОРІНКИ РЕКРУТИНГУ ==================== */
-  .page-wrapper { max-width: 1200px; margin: 120px auto 40px; padding: 0 24px; min-height: 70vh; }
-  .recruit-title { font-family: 'Oswald', sans-serif; font-size: clamp(64px, 16vw, 160px); font-weight: 800; text-transform: uppercase; text-align: center; margin: 20px 0 50px; color: var(--copper); letter-spacing: -2px; line-height: 1; }
-  .recruit-intro { max-width: 860px; margin: 0 auto 80px; text-align: center; }
-  .recruit-intro h2 { font-family: 'Oswald', sans-serif; font-size: 26px; text-transform: uppercase; color: var(--bone); margin-bottom: 24px; letter-spacing: .04em; }
-  .recruit-intro p { color: var(--ash); font-size: 18px; line-height: 1.7; margin-bottom: 20px; }
+        .subscribe-block { text-align: center; max-width: 600px; margin: 0 auto 80px; }
+        .subscribe-title { font-family: 'Oswald', sans-serif; font-size: 32px; text-transform: uppercase; margin-bottom: 10px; }
+        .subscribe-desc { color: var(--ash); font-size: 14px; margin-bottom: 24px; }
+        .subscribe-form { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap;}
+        .subscribe-form input[type="email"] { flex: 1; min-width: 250px; background: rgba(255,255,255,0.05); border: 1px solid var(--iron); padding: 12px 16px; color: #fff; font-family: 'Manrope'; }
+        .subscribe-form button { background: var(--iron); color: var(--bone); border: 1px solid var(--ash); padding: 12px 24px; text-transform: uppercase; font-family: 'Oswald'; font-weight: 600; letter-spacing: 1px; transition: 0.3s;}
+        .subscribe-form button:hover { background: var(--bone); color: var(--graphite); }
+        .subscribe-agree { font-size: 12px; color: var(--ash); display: flex; align-items: center; justify-content: center; gap: 8px;}
 
-  .recruit-join-wrap { text-align: center; margin-bottom: 100px; }
-  .btn-join { display: inline-block; background: var(--ember); color: var(--bone); font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; font-size: 20px; padding: 22px 60px; border: none; cursor: pointer; transition: all .25s; }
-  .btn-join:hover { background: #c65a34; transform: translateY(-2px); box-shadow: 0 14px 30px rgba(217,102,61,.35); }
+        .tags-block { border-top: 1px solid var(--iron); border-bottom: 1px solid var(--iron); padding: 40px 0; text-align: center; margin-bottom: 40px; }
+        .tags-title { font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-bottom: 20px; font-size: 18px; letter-spacing: 1px; }
+        .tags-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 14px; text-transform: uppercase;}
+        .tags-list span { color: var(--bone); cursor: pointer; transition: 0.3s; }
+        .tags-list span:hover { color: var(--brand-yellow); }
 
-  .process-block { max-width: 860px; margin: 0 auto 120px; }
-  .process-title { font-family: 'Oswald', sans-serif; font-size: clamp(32px, 5vw, 48px); text-transform: uppercase; text-align: center; margin-bottom: 50px; color: var(--bone); letter-spacing: .02em; }
-  .process-step { display: flex; align-items: flex-start; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--iron); }
-  .process-step:last-child { border-bottom: none; }
-  .process-num { font-family: 'Oswald', sans-serif; font-size: 36px; font-weight: 800; color: var(--ember); flex-shrink: 0; width: 60px; }
-  .process-text { font-size: 18px; color: var(--ash); line-height: 1.6; padding-top: 6px; }
-  .process-text b { color: var(--bone); }
+        /* --- В'Ю 2: ЧИТАННЯ СТАТТІ --- */
+        #view-article { display: none; animation: fadeIn 0.4s ease-out; max-width: 900px; margin: 0 auto; }
+        .btn-back { display: inline-flex; align-items: center; gap: 8px; color: var(--ash); font-size: 14px; text-transform: uppercase; font-weight: 700; margin-bottom: 30px; transition: 0.3s; }
+        .btn-back:hover { color: var(--brand-yellow); }
+        
+        .article-date { font-family: 'Oswald', sans-serif; font-size: 14px; color: var(--brand-yellow); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .article-title { font-family: 'Oswald', sans-serif; font-size: clamp(28px, 4vw, 48px); line-height: 1.1; text-transform: uppercase; margin-bottom: 30px; }
+        .article-hero-img { width: 100%; max-height: 500px; object-fit: cover; margin-bottom: 40px; background: var(--iron); clip-path: polygon(25px 0, 100% 0, 100% calc(100% - 25px), calc(100% - 25px) 100%, 0 100%, 0 25px);}
+        .article-body { font-size: 17px; line-height: 1.7; color: #d1d1d1; white-space: pre-line; margin-bottom: 30px; }
+        
+        /* СТИЛІ ЦИТАТИ */
+        .article-quote { background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-left: 4px solid var(--brand-yellow); border-radius: 8px; padding: 30px; margin: 40px 0; position: relative; display: none;}
+        .article-quote-icon { position: absolute; top: 10px; right: 20px; font-size: 80px; font-family: serif; color: rgba(255,255,255,0.05); line-height: 1; pointer-events: none;}
+        .article-quote-text { font-size: 20px; line-height: 1.5; color: var(--bone); font-style: italic; font-weight: 500; margin-bottom: 20px; position: relative; z-index: 2;}
+        .article-quote-author { font-family: 'Oswald', sans-serif; font-size: 16px; color: var(--brand-yellow); text-transform: uppercase; margin-bottom: 5px; }
+        .article-quote-role { font-size: 13px; color: var(--text-muted); }
 
-  /* ==================== ОВЕРЛЕЙ ФОРМИ ПРИЄДНАННЯ ==================== */
-  .join-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(14,14,15,.9); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 250ms ease; }
-  .join-overlay.open { opacity: 1; pointer-events: auto; }
-  .join-modal { background: var(--plate); border: 1px solid var(--iron); width: 100%; max-width: 480px; max-height: 88vh; overflow-y: auto; padding: 36px; transform: translateY(16px); transition: transform 250ms ease; }
-  .join-overlay.open .join-modal { transform: translateY(0); }
-  .join-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-  .join-modal-head h3 { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 600; color: var(--bone); text-transform: uppercase; }
-  .join-close { background: none; border: 1px solid var(--iron); color: var(--ash); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 15px; transition: all .2s; }
-  .join-close:hover { border-color: var(--ember); color: var(--ember); }
-  .join-field { margin-bottom: 18px; }
-  .join-field label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ash); margin-bottom: 8px; }
-  .join-field input, .join-field textarea { width: 100%; background: var(--graphite); border: 1px solid var(--iron); border-radius: 3px; padding: 12px 14px; color: var(--bone); font-family: 'Manrope', sans-serif; font-size: 15px; outline: none; transition: border-color .2s; resize: vertical; }
-  .join-field input:focus, .join-field textarea:focus { border-color: var(--olive); }
-  .join-success { display: none; text-align: center; padding: 20px 0; }
-  .join-success-icon { font-size: 40px; margin-bottom: 14px; }
-  .join-success p { color: var(--ash); font-size: 15px; line-height: 1.5; }
-</style>
+        .article-nav { display: flex; justify-content: space-between; border-top: 1px solid var(--iron); padding-top: 20px; margin-top: 40px; }
+        .article-nav button { color: var(--ash); font-family: 'Oswald', sans-serif; font-size: 16px; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .article-nav button:hover:not(:disabled) { color: var(--bone); }
+        .article-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Адаптивність під телефони */
+        @media (max-width: 768px) {
+            .news-grid { grid-template-columns: 1fr; gap: 40px; }
+            .page-title { font-size: 60px; letter-spacing: 0; margin-bottom: 40px;}
+            /* Маска штриховки на телефоні трохи ширша */
+            .news-img-box::before { -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,1) 100%); }
+        }
+
+        /* ================= ФУТЕР ================= */
+        footer{ background:var(--graphite); border-top:1px solid var(--iron); margin-top: auto;}
+        .footer-inner{ max-width:var(--max-w); margin:0 auto; padding:64px 24px 32px; display:flex; flex-wrap:wrap; gap:48px; justify-content:space-between; }
+        .footer-brand{ flex:1 1 240px; }
+        .footer-brand .wordmark{ margin-bottom:12px; }
+        .footer-desc{ font-size:14px; line-height:1.6; color:var(--ash); max-width:280px; margin:0; }
+        .footer-cols{ display:flex; gap:64px; flex-wrap:wrap; }
+        .footer-col{ display:flex; flex-direction:column; gap:10px; }
+        .footer-col-title{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ash); margin-bottom:6px; }
+        .footer-col a{ color:var(--bone); font-size:14px; transition:0.3s; }
+        .footer-col a:hover{ color:var(--brand-yellow); }
+        .footer-bottom{ max-width:var(--max-w); margin:0 auto; padding:24px; border-top:1px solid var(--iron); font-size:12px; color:var(--ash); }
+
+        /* Утиліти мови */
+        [data-lang="en"]{ display:none; }
+        html.lang-en [data-lang="ua"]{ display:none; }
+        html.lang-en [data-lang="en"]{ display:inline; }
+        html.lang-en div[data-lang="en"], html.lang-en h1[data-lang="en"], html.lang-en p[data-lang="en"] { display:block; }
+
+        /* ==================== РЕАЛЬНА ПАГІНАЦІЯ ==================== */
+        .pagination-mock button { color: var(--ash); font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 16px; text-transform: uppercase; transition: 0.3s; }
+        .pagination-mock button:hover:not(:disabled) { color: var(--brand-yellow); }
+        .pagination-mock button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .pagination-mock span#page-current-label { color: var(--bone); }
+
+        /* ==================== ТЕГИ — АКТИВНИЙ СТАН ==================== */
+        .tags-list span.active-tag { color: var(--brand-yellow); text-decoration: underline; }
+
+        /* ==================== ЛАЙТБОКС ==================== */
+        .lightbox-overlay { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(5,5,7,0.95); backdrop-filter: blur(10px); justify-content: center; align-items: center; cursor: zoom-out; }
+        .lightbox-content { max-width: 90%; max-height: 90vh; object-fit: contain; box-shadow: 0 30px 60px rgba(0,0,0,0.8); }
+        .lightbox-close { position: absolute; top: 25px; right: 35px; color: #fff; font-size: 40px; font-family: sans-serif; cursor: pointer; opacity: 0.6; }
+        .lightbox-close:hover { opacity: 1; color: var(--brand-yellow); }
+        .article-hero-img { cursor: zoom-in; }
+
+        /* ==================== КНОПКА "НАГОРУ" ==================== */
+        .back-to-top { position: fixed; bottom: 30px; left: 30px; width: 48px; height: 48px; border-radius: 50%; background: rgba(20,20,25,0.85); backdrop-filter: blur(10px); border: 1px solid var(--iron); color: var(--bone); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1400; opacity: 0; pointer-events: none; transition: all 0.3s ease; font-size: 1.3rem; }
+        .back-to-top.visible { opacity: 1; pointer-events: auto; }
+        .back-to-top:hover { background: var(--brand-yellow); color: var(--graphite); transform: translateY(-3px); }
+        @media (max-width: 768px) { .back-to-top { left: 20px; bottom: 20px; width: 42px; height: 42px; } }
+
+        /* ==================== АНОНІМНИЙ ЧАТ ==================== */
+        .user-chat-modal { display: none; position: fixed; bottom: 30px; right: 30px; width: 340px; height: 450px; background: var(--plate); border: 1px solid var(--iron); border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 2000; flex-direction: column; overflow: hidden; }
+        .chat-header { background: rgba(255,255,255,0.02); padding: 16px 20px; font-size: 1rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--iron); color: var(--bone); font-family: 'Oswald', sans-serif; text-transform: uppercase; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; scrollbar-width: none;}
+        .chat-messages::-webkit-scrollbar { display: none; }
+        .chat-bubble { padding: 10px 14px; border-radius: 8px; max-width: 80%; word-wrap: break-word; line-height: 1.45; }
+        .chat-bubble.user { background: var(--olive); align-self: flex-end; color: #fff; font-weight: 500; }
+        .chat-bubble.admin { background: rgba(255,255,255,0.04); border: 1px solid var(--iron); align-self: flex-start; color: var(--bone); }
+        .chat-bubble img { max-width: 100%; max-height: 150px; border-radius: 6px; cursor: pointer; margin-top: 4px; }
+        .chat-bubble.system { background: rgba(217, 102, 61, 0.1); border: 1px solid rgba(217, 102, 61, 0.2); align-self: center; text-align: center; font-size: 0.8rem; max-width: 95%; color: var(--ember); border-radius: 6px; }
+        .chat-input-area { padding: 16px; display: flex; gap: 10px; background: rgba(0,0,0,0.2); align-items: center; border-top: 1px solid var(--iron); }
+        .chat-input-area input { flex: 1; height: 42px; padding: 0 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 30px; color: var(--bone); outline: none; font-size: 0.9rem; }
+        .chat-send-btn, .user-clip-btn { width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
+        .chat-send-btn { background: var(--brand-yellow); border: none; }
+        .chat-send-btn svg { width: 18px; height: 18px; fill: var(--graphite); margin-left: 2px; }
+        .user-clip-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--iron); }
+        .user-clip-btn svg { width: 18px; height: 18px; fill: var(--ash); }
+        .menu-chat-link { display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; }
+        @media (max-width: 768px) { .user-chat-modal { width: calc(100% - 32px); left: 16px; right: 16px; bottom: 16px; height: 400px; } }
+    </style>
 </head>
 <body>
 
-<div class="bg-layer visible" id="bgA" style="background-image:url('bg1.jpg');"></div>
-<div class="bg-layer" id="bgB"></div>
-<div class="bg-vignette"></div>
-
-<!-- NAV -->
 <nav class="nav">
     <div class="nav-inner">
         <a href="index.html" class="wordmark">Svarog Team</a>
@@ -167,86 +289,76 @@
     </div>
     <div class="menu-links">
         <a href="index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a>
-        <a href="news.html"><span data-lang="ua">Новини</span><span data-lang="en">News</span></a>
+        <a href="news.html" class="active-link"><span data-lang="ua">Новини</span><span data-lang="en">News</span></a>
         <a href="shop.html"><span data-lang="ua">Мерч</span><span data-lang="en">Merch</span></a>
         <a href="about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a>
         <a href="support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
-        <a href="recruiting.html" class="active-link"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></a>
+        <a href="recruiting.html"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></a>
         <a href="contacts.html"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></a>
         <a href="#" onclick="openUserChat(event)" style="color: var(--brand-yellow);"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a>
     </div>
 </div>
 
 <div class="page-wrapper">
-    <h1 class="recruit-title"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></h1>
+    
+    <div id="view-list">
+        <h1 class="page-title"><span data-lang="ua">Новини</span><span data-lang="en">News</span></h1>
+        
+        <div class="news-grid" id="news-grid">
+            <div style="color:var(--ash);">Завантаження новин...</div>
+        </div>
 
-    <div class="recruit-intro">
-        <h2><span data-lang="ua">Що таке рекрутинг?</span><span data-lang="en">What is recruiting?</span></h2>
-        <p><span data-lang="ua">Рекрутинг — це професійний відбір кандидатів на військову службу за досвідом, освітою та особистими якостями. На відміну від загального набору, він дає можливість самому обрати напрямок служби відповідно до своїх умінь — розвідка, ударні системи, інженерне забезпечення чи інша спеціалізація підрозділу.</span><span data-lang="en">Recruiting is the professional selection of candidates for military service based on experience, education, and personal qualities. Unlike general conscription, it lets you choose your service direction according to your own skills — reconnaissance, strike systems, engineering support, or another unit specialization.</span></p>
-        <p><span data-lang="ua">Головна перевага рекрутингу — усвідомлений вибір замість випадкового розподілу. Ви проходите базову підготовку і приєднуєтесь саме до того підрозділу, де ваші навички принесуть найбільше користі.</span><span data-lang="en">The main advantage of recruiting is a conscious choice instead of random assignment. You complete basic training and join the exact unit where your skills will be most valuable.</span></p>
+        <div class="pagination-mock" id="pagination-bar" style="display:none;">
+            <button type="button" id="page-prev-btn" onclick="goToPrevPage()">← <span data-lang="ua">Попередня</span><span data-lang="en">Previous</span></button>
+            <span id="page-current-label"><span data-lang="ua">Сторінка</span><span data-lang="en">Page</span> 1</span>
+            <button type="button" id="page-next-btn" onclick="goToNextPage()"><span data-lang="ua">Наступна</span><span data-lang="en">Next</span> →</button>
+        </div>
+
+        <div class="subscribe-block">
+            <h3 class="subscribe-title"><span data-lang="ua">Творимо історію разом!</span><span data-lang="en">Make history with us!</span></h3>
+            <p class="subscribe-desc"><span data-lang="ua">Підписуйтесь на розсилку SVAROG TEAM: ділимось важливими новинами, розповідаємо, як долучитися.</span><span data-lang="en">Subscribe to the SVAROG TEAM newsletter: we share important news and tell you how to join.</span></p>
+            <form class="subscribe-form" id="subscribe-form" onsubmit="submitSubscribe(event)">
+                <input type="text" id="subscribe-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px; opacity:0; height:0; width:0;" aria-hidden="true">
+                <input type="email" id="subscribe-email" placeholder="Введіть електронну пошту" required>
+                <button type="submit" id="subscribe-btn"><span data-lang="ua">Підписатися ✉</span><span data-lang="en">Subscribe ✉</span></button>
+            </form>
+            <label class="subscribe-agree">
+                <input type="checkbox" required> 
+                <span data-lang="ua">Так, я даю згоду на обробку моїх персональних даних.</span>
+                <span data-lang="en">Yes, I agree to the processing of my personal data.</span>
+            </label>
+        </div>
+
+        <div class="tags-block" id="tags-block" style="display:none;">
+            <div class="tags-title"><span data-lang="ua">Шукайте схожі новини за тегами</span><span data-lang="en">Search related news by tags</span></div>
+            <div class="tags-list" id="tags-list"></div>
+        </div>
     </div>
 
-    <div class="recruit-join-wrap">
-        <button type="button" class="btn-join" onclick="openJoinOverlay()"><span data-lang="ua">Долучитися до команди</span><span data-lang="en">Join the team</span></button>
+    <div id="view-article">
+        <button class="btn-back" onclick="closeArticle()">
+            ← <span data-lang="ua">До всіх новин</span><span data-lang="en">Back to news</span>
+        </button>
+
+        <div class="article-date" id="art-date"></div>
+        <h1 class="article-title auto-translate" id="art-title"></h1>
+        <img src="" alt="" class="article-hero-img" id="art-img" onclick="openLightbox(this.src)">
+        
+        <div class="article-body auto-translate" id="art-body"></div>
+
+        <div class="article-quote" id="art-quote-container">
+            <div class="article-quote-icon">"</div>
+            <div class="article-quote-text auto-translate" id="art-quote-text"></div>
+            <div class="article-quote-author auto-translate" id="art-quote-author"></div>
+            <div class="article-quote-role auto-translate" id="art-quote-role"></div>
+        </div>
+
+        <div class="article-nav">
+            <button id="btn-prev-art" onclick="navigateArticle(1)">← <span data-lang="ua">Попередня</span><span data-lang="en">Previous</span></button>
+            <button id="btn-next-art" onclick="navigateArticle(-1)"><span data-lang="ua">Наступна</span><span data-lang="en">Next</span> →</button>
+        </div>
     </div>
 
-    <div class="process-block">
-        <h2 class="process-title"><span data-lang="ua">Процес приєднання</span><span data-lang="en">Joining process</span></h2>
-        <div class="process-step">
-            <div class="process-num">01</div>
-            <div class="process-text"><span data-lang="ua">Заповни заявку.</span><span data-lang="en">Submit your application.</span></div>
-        </div>
-        <div class="process-step">
-            <div class="process-num">02</div>
-            <div class="process-text"><span data-lang="ua">Прийми дзвінок з нашого рекрутинг-центру.</span><span data-lang="en">Take a call from our recruiting center.</span></div>
-        </div>
-        <div class="process-step">
-            <div class="process-num">03</div>
-            <div class="process-text"><span data-lang="ua">Подай необхідні документи.</span><span data-lang="en">Submit the required documents.</span></div>
-        </div>
-        <div class="process-step">
-            <div class="process-num">04</div>
-            <div class="process-text"><span data-lang="ua">Пройди базовий курс військової підготовки.</span><span data-lang="en">Complete basic military training.</span></div>
-        </div>
-        <div class="process-step">
-            <div class="process-num">05</div>
-            <div class="process-text"><span data-lang="ua">Приєднайся до бажаного підрозділу.</span><span data-lang="en">Join your chosen unit.</span></div>
-        </div>
-        <div class="process-step">
-            <div class="process-num">06</div>
-            <div class="process-text"><span data-lang="ua">Стань частиною Svarog Team.</span><span data-lang="en">Become part of Svarog Team.</span></div>
-        </div>
-    </div>
-</div>
-
-<!-- ОВЕРЛЕЙ ФОРМИ ПРИЄДНАННЯ -->
-<div class="join-overlay" id="joinOverlay">
-    <div class="join-modal">
-        <div class="join-modal-head">
-            <h3><span data-lang="ua">Заявка на долучення</span><span data-lang="en">Application to join</span></h3>
-            <button type="button" class="join-close" onclick="closeJoinOverlay()">✕</button>
-        </div>
-        <div class="join-success" id="joinSuccess">
-            <div class="join-success-icon">✅</div>
-            <p><span data-lang="ua">Дякуємо! Заявку надіслано, наш рекрутинг-центр зв'яжеться з вами найближчим часом.</span><span data-lang="en">Thank you! Your application has been sent, our recruiting center will contact you shortly.</span></p>
-        </div>
-        <form id="joinForm" onsubmit="submitJoinForm(event)">
-            <input type="text" id="join-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px; opacity:0; height:0; width:0;" aria-hidden="true">
-            <div class="join-field">
-                <label><span data-lang="ua">Ім'я та прізвище</span><span data-lang="en">Full name</span></label>
-                <input type="text" id="join-name" required autocomplete="off">
-            </div>
-            <div class="join-field">
-                <label><span data-lang="ua">Телефон</span><span data-lang="en">Phone</span></label>
-                <input type="tel" id="join-phone" required autocomplete="off">
-            </div>
-            <div class="join-field">
-                <label><span data-lang="ua">Коментар (необов'язково)</span><span data-lang="en">Comment (optional)</span></label>
-                <textarea id="join-message" rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn-join" id="joinSubmitBtn" style="width:100%; text-align:center;"><span data-lang="ua">Надіслати заявку</span><span data-lang="en">Submit application</span></button>
-        </form>
-    </div>
 </div>
 
 <footer>
@@ -275,6 +387,13 @@
     <div class="footer-bottom">© 2026 SVAROG TEAM</div>
 </footer>
 
+<div id="image-lightbox" class="lightbox-overlay" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <img class="lightbox-content" id="lightbox-img">
+</div>
+
+<div class="back-to-top" id="back-to-top-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</div>
+
 <div class="user-chat-modal" id="user-chat-window">
     <div class="chat-header">
         <span data-lang="ua">Анонімна розмова</span><span data-lang="en">Anonymous Chat</span>
@@ -294,71 +413,90 @@
 </div>
 
 <script>
-(function(){
-  // Плавна зміна фону
-  var bgImages = ['bg1.jpg','bg2.jpg','bg3.jpg']; var bgIdx=0; var showingA=true;
-  var layerA=document.getElementById('bgA'), layerB=document.getElementById('bgB');
-  setInterval(function(){
-    bgIdx = (bgIdx+1) % bgImages.length;
-    var next = showingA ? layerB : layerA, cur = showingA ? layerA : layerB;
-    next.style.backgroundImage = "url('"+bgImages[bgIdx]+"')";
-    next.classList.add('visible'); cur.classList.remove('visible');
-    showingA = !showingA;
-  }, 6000);
-
-  // Меню
-  var menuToggle=document.getElementById('menuToggle'), menuClose=document.getElementById('menuClose'), menuOverlay=document.getElementById('menuOverlay');
-  menuToggle.addEventListener('click', function(){ menuOverlay.classList.add('open'); });
-  menuClose.addEventListener('click', function(){ menuOverlay.classList.remove('open'); });
-
-  // Мова
-  var langToggle=document.getElementById('langToggle');
-  function setLang(lang){
-    localStorage.setItem('selectedLang', lang);
-    document.documentElement.classList.toggle('lang-en', lang==='en');
-    langToggle.textContent = lang==='ua' ? 'EN':'UA';
-  }
-  setLang(localStorage.getItem('selectedLang') || 'ua');
-  langToggle.addEventListener('click', function(){ setLang(document.documentElement.classList.contains('lang-en') ? 'ua':'en'); });
-})();
-
-// ==================== ФОРМА ПРИЄДНАННЯ ====================
-function openJoinOverlay() {
-    document.getElementById('joinOverlay').classList.add('open');
-    document.getElementById('joinForm').style.display = 'block';
-    document.getElementById('joinSuccess').style.display = 'none';
-}
-function closeJoinOverlay() { document.getElementById('joinOverlay').classList.remove('open'); }
-async function submitJoinForm(e) {
-    e.preventDefault();
-    if (document.getElementById('join-website').value.trim() !== '') return; // honeypot
-    const name = document.getElementById('join-name').value.trim();
-    const phone = document.getElementById('join-phone').value.trim();
-    const message = document.getElementById('join-message').value.trim();
-    const btn = document.getElementById('joinSubmitBtn');
-    btn.disabled = true;
+// --- АВТОПЕРЕКЛАДАЧ GOOGLE ---
+async function autoTranslateText(text, targetLang) {
+    if (!text || text.trim() === '') return text;
+    if (targetLang === 'ua') return text;
     try {
-        await db.collection("recruiting_applications").add({
-            name, phone, message,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            time: new Date().toLocaleString('uk-UA')
-        });
-        document.getElementById('joinForm').style.display = 'none';
-        document.getElementById('joinSuccess').style.display = 'block';
-    } catch (err) {
-        alert((document.documentElement.classList.contains('lang-en') ? 'Error: ' : 'Помилка: ') + err.message);
-    } finally { btn.disabled = false; }
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=uk&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data[0].map(item => item[0]).join('');
+    } catch (e) {
+        console.error("Translation error:", e);
+        return text;
+    }
 }
 
-// Соцмережі з бази
-db.collection("config").doc("socials").onSnapshot(function(doc){
-    var list = (doc.exists && doc.data().list) || [];
-    var footerBox = document.getElementById('footerSocialBox');
-    var html = list.map(function(n){ return '<a href="'+n.url+'" target="_blank" rel="noopener">'+n.name+'</a>'; }).join('');
-    if (footerBox) footerBox.innerHTML = html;
+async function applyTranslationsToDOM(lang) {
+    const elements = document.querySelectorAll('.auto-translate');
+    for (let el of elements) {
+        if (!el.hasAttribute('data-orig-ua')) {
+            el.setAttribute('data-orig-ua', el.innerHTML);
+        }
+
+        if (lang === 'en') {
+            if (el.hasAttribute('data-trans-en')) {
+                el.innerHTML = el.getAttribute('data-trans-en');
+            } else {
+                let rawText = el.getAttribute('data-orig-ua').replace(/<br\s*[\/]?>/gi, "\n");
+                const translated = await autoTranslateText(rawText, 'en');
+                const formattedTranslation = translated.replace(/\n/g, "<br>");
+
+                el.setAttribute('data-trans-en', formattedTranslation);
+                el.innerHTML = formattedTranslation;
+            }
+        } else {
+            el.innerHTML = el.getAttribute('data-orig-ua');
+        }
+    }
+}
+
+// --- УПРАВЛІННЯ МОВОЮ ---
+let currentLang = localStorage.getItem('selectedLang') || 'ua';
+document.documentElement.classList.toggle('lang-en', currentLang === 'en');
+document.getElementById('langToggle').textContent = currentLang === 'ua' ? 'EN' : 'UA';
+
+document.getElementById('langToggle').addEventListener('click', () => {
+    currentLang = currentLang === 'ua' ? 'en' : 'ua';
+    localStorage.setItem('selectedLang', currentLang);
+    document.documentElement.classList.toggle('lang-en', currentLang === 'en');
+    document.getElementById('langToggle').textContent = currentLang === 'ua' ? 'EN' : 'UA';
+    applyTranslationsToDOM(currentLang);
 });
 
-// ==================== АНОНІМНИЙ ЧАТ ====================
+// --- МЕНЮ ---
+const menuOverlay = document.getElementById('menuOverlay');
+document.getElementById('menuToggle').addEventListener('click', () => menuOverlay.classList.add('open'));
+document.getElementById('menuClose').addEventListener('click', () => menuOverlay.classList.remove('open'));
+
+// --- ЛАЙТБОКС ---
+function openLightbox(src) { if (!src) return; document.getElementById('lightbox-img').src = src; document.getElementById('image-lightbox').style.display = 'flex'; }
+function closeLightbox() { document.getElementById('image-lightbox').style.display = 'none'; }
+
+// --- КНОПКА "НАГОРУ" ---
+window.addEventListener('scroll', () => {
+    const backBtn = document.getElementById('back-to-top-btn');
+    if (backBtn) backBtn.classList.toggle('visible', window.scrollY > 600);
+});
+
+// --- ПІДПИСКА НА РОЗСИЛКУ ---
+async function submitSubscribe(e) {
+    e.preventDefault();
+    if (document.getElementById('subscribe-website').value.trim() !== '') return; // honeypot
+    const email = document.getElementById('subscribe-email').value.trim();
+    const btn = document.getElementById('subscribe-btn');
+    btn.disabled = true;
+    try {
+        await db.collection("newsletter_subscribers").add({ email, timestamp: firebase.firestore.FieldValue.serverTimestamp(), time: new Date().toLocaleString('uk-UA') });
+        document.getElementById('subscribe-form').innerHTML = `<p style="color:var(--brand-yellow); font-family:'Oswald',sans-serif; text-transform:uppercase;">${currentLang === 'ua' ? 'Дякуємо за підписку! ✅' : 'Thanks for subscribing! ✅'}</p>`;
+    } catch (err) {
+        alert((currentLang === 'ua' ? 'Помилка: ' : 'Error: ') + err.message);
+        btn.disabled = false;
+    }
+}
+
+// --- АНОНІМНИЙ ЧАТ ---
 let userChatSessionId = localStorage.getItem('userChatSessionId');
 let unsubscribeUserChat = null;
 
@@ -368,7 +506,7 @@ function initUserChat() {
 }
 function openUserChat(e) {
     if (e) e.preventDefault();
-    document.getElementById('menuOverlay').classList.remove('open');
+    menuOverlay.classList.remove('open');
     document.getElementById('user-chat-window').style.display = 'flex';
     localStorage.setItem('svarogChatIsOpen', 'true');
     renderUserChat();
@@ -376,12 +514,11 @@ function openUserChat(e) {
 function closeUserChat() { document.getElementById('user-chat-window').style.display = 'none'; localStorage.setItem('svarogChatIsOpen', 'false'); }
 function startRealtimeChatListener() {
     if (unsubscribeUserChat) unsubscribeUserChat();
-    unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(function(doc) { renderUserChat(doc.exists ? doc.data() : { messages: [], status: 'active' }); }, function(err) { console.error("Помилка чату:", err); });
+    unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(doc => { renderUserChat(doc.exists ? doc.data() : { messages: [], status: 'active' }); }, err => console.error("Помилка чату:", err));
 }
 function renderUserChat(myChatData) {
     const messagesBox = document.getElementById('user-chat-messages'); const inputBlock = document.getElementById('user-chat-input-block');
     let myChat = myChatData || { messages: [], status: 'active' };
-
     if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
         const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
         if (Date.now() > clearTime) {
@@ -390,18 +527,16 @@ function renderUserChat(myChatData) {
             messagesBox.innerHTML = ""; inputBlock.style.display = 'flex'; startRealtimeChatListener(); return;
         }
     }
-
     messagesBox.innerHTML = "";
-    (myChat.messages || []).forEach(function(msg) {
-        const bubble = document.createElement('div'); bubble.className = 'chat-bubble ' + msg.sender;
-        if (msg.type === 'image') bubble.innerHTML = '<img src="' + msg.text + '">'; else bubble.innerText = msg.text;
+    myChat.messages.forEach(msg => {
+        const bubble = document.createElement('div'); bubble.className = `chat-bubble ${msg.sender}`;
+        if (msg.type === 'image') bubble.innerHTML = `<img src="${msg.text}" onclick="openLightbox('${msg.text}')">`; else bubble.innerText = msg.text;
         messagesBox.appendChild(bubble);
     });
-
     if (myChat.status === 'closed') {
         inputBlock.style.display = 'none';
         const sysMsg = document.createElement('div'); sysMsg.className = 'chat-bubble system';
-        sysMsg.innerText = (document.documentElement.classList.contains('lang-en')) ? 'Administrator has closed the session. Chat will automatically clear in 5 minutes.' : 'Адміністратор завершив сесію. Чат автоматично очиститься через 5 хвилин.';
+        sysMsg.innerText = currentLang === 'ua' ? 'Адміністратор завершив сесію. Чат автоматично очиститься через 5 хвилин.' : 'Administrator has closed the session. Chat will automatically clear in 5 minutes.';
         messagesBox.appendChild(sysMsg);
         if (!localStorage.getItem('clearChatTime_' + userChatSessionId)) localStorage.setItem('clearChatTime_' + userChatSessionId, Date.now() + 5 * 60 * 1000);
     } else { inputBlock.style.display = 'flex'; }
@@ -410,12 +545,12 @@ function renderUserChat(myChatData) {
 async function sendUserChatMessage() {
     const input = document.getElementById('user-chat-input'); const text = input.value.trim(); if (!text) return;
     input.value = "";
-    try { await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'user', text: text, type: 'text', time: Date.now() }) }, { merge: true }); } catch(e) { console.error(e); }
+    try { await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'user', text, type: 'text', time: Date.now() }) }, { merge: true }); } catch(e) { console.error(e); }
 }
 function getBase64Image(file) {
-    return new Promise(function(resolve, reject) {
-        const reader = new FileReader(); reader.onload = function(e) {
-            const img = new Image(); img.onload = function() {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader(); reader.onload = (e) => {
+            const img = new Image(); img.onload = () => {
                 const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let w = img.width, h = img.height;
                 if (w > MAX_WIDTH) { h = Math.round((h * MAX_WIDTH) / w); w = MAX_WIDTH; }
                 canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); resolve(canvas.toDataURL('image/jpeg', 0.6));
@@ -428,12 +563,167 @@ async function sendUserChatPhoto(input) {
     try {
         const base64 = await getBase64Image(input.files[0]);
         await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'user', text: base64, type: 'image', time: Date.now() }) }, { merge: true });
-    } catch(e) { alert(document.documentElement.classList.contains('lang-en') ? "Error sending photo." : "Помилка надсилання фото."); } finally { input.value = ''; }
+    } catch(e) { alert(currentLang === 'en' ? "Error sending photo." : "Помилка надсилання фото."); } finally { input.value = ''; }
 }
-document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
 
-initUserChat();
-if (localStorage.getItem('svarogChatIsOpen') === 'true') openUserChat();
+// --- СОЦМЕРЕЖІ З FIREBASE (повний динамічний список) ---
+db.collection("config").doc("socials").onSnapshot(doc => {
+    const list = (doc.exists && doc.data().list) || [];
+    const box = document.getElementById('footerSocialBox');
+    if (box) box.innerHTML = list.map(n => `<a href="${n.url}" target="_blank" rel="noopener">${n.name}</a>`).join('');
+});
+
+// --- ЛОГІКА НОВИН ---
+let allNews = []; 
+let currentArticleIndex = -1;
+const viewList = document.getElementById('view-list');
+const viewArticle = document.getElementById('view-article');
+
+const PAGE_SIZE = 12;
+let currentPageIndex = 0;
+let pageCursors = [null]; // pageCursors[i] = документ, після якого починається сторінка i
+let activeTagFilter = null;
+let knownTags = new Set();
+
+function buildNewsQuery(pageIndex) {
+    let q = db.collection("news").orderBy("date", "desc");
+    if (activeTagFilter) q = q.where("tags", "array-contains", activeTagFilter);
+    if (pageIndex > 0 && pageCursors[pageIndex]) q = q.startAfter(pageCursors[pageIndex]);
+    return q.limit(PAGE_SIZE);
+}
+
+function loadNewsPage(pageIndex) {
+    const grid = document.getElementById('news-grid');
+    grid.innerHTML = `<div style="color:var(--ash);">${currentLang === 'ua' ? 'Завантаження новин...' : 'Loading news...'}</div>`;
+    buildNewsQuery(pageIndex).get().then(snapshot => {
+        currentPageIndex = pageIndex;
+        allNews = [];
+        grid.innerHTML = '';
+
+        if (snapshot.empty) {
+            grid.innerHTML = `<div style="color:var(--ash);">${currentLang === 'ua' ? 'Немає новин.' : 'No news.'}</div>`;
+            document.getElementById('pagination-bar').style.display = pageIndex > 0 ? 'flex' : 'none';
+        } else {
+            snapshot.forEach(doc => { allNews.push({ id: doc.id, ...doc.data() }); (doc.data().tags || []).forEach(t => knownTags.add(t)); });
+            pageCursors[pageIndex + 1] = snapshot.docs[snapshot.docs.length - 1];
+
+            allNews.forEach((item, index) => {
+                let displayDate = item.date;
+                try { const d = new Date(item.date); if(!isNaN(d)) displayDate = d.toLocaleDateString('uk-UA', {day:'numeric', month:'long', year:'numeric'}); } catch(e){}
+                const imgSrc = item.image || 'logo.png';
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.onclick = () => openArticle(index);
+                card.innerHTML = `
+                    <div class="news-img-box"><img src="${imgSrc}" loading="lazy" onerror="this.src='logo.png'" style="object-position:${item.imagePosition || '50% 50%'};"></div>
+                    <div class="news-date">${displayDate || ''}</div>
+                    <div class="news-title auto-translate">${item.title || 'Новина'}</div>
+                `;
+                grid.appendChild(card);
+            });
+
+            document.getElementById('pagination-bar').style.display = (pageIndex > 0 || snapshot.size >= PAGE_SIZE) ? 'flex' : 'none';
+        }
+
+        document.getElementById('page-prev-btn').disabled = pageIndex === 0;
+        document.getElementById('page-next-btn').disabled = snapshot.size < PAGE_SIZE;
+        document.getElementById('page-current-label').lastChild.textContent = ' ' + (pageIndex + 1);
+
+        renderTagsList();
+        applyTranslationsToDOM(currentLang);
+        window.scrollTo({ top: document.getElementById('view-list').offsetTop - 90, behavior: 'smooth' });
+    }).catch(err => {
+        console.error("Помилка завантаження новин:", err);
+        grid.innerHTML = `<div style="color:var(--ash);">${currentLang === 'ua' ? 'Помилка завантаження.' : 'Failed to load.'}</div>`;
+    });
+}
+
+function goToNextPage() { loadNewsPage(currentPageIndex + 1); }
+function goToPrevPage() { if (currentPageIndex > 0) loadNewsPage(currentPageIndex - 1); }
+
+function renderTagsList() {
+    const block = document.getElementById('tags-block'); const list = document.getElementById('tags-list');
+    if (knownTags.size === 0) { block.style.display = 'none'; return; }
+    block.style.display = 'block';
+    list.innerHTML = [...knownTags].map(tag => `<span class="${activeTagFilter === tag ? 'active-tag' : ''}" onclick="filterByTag('${tag}')">${tag}</span>`).join(' ');
+    if (activeTagFilter) list.innerHTML += ` <span onclick="filterByTag(null)" style="color:var(--ember);">✕ ${currentLang === 'ua' ? 'Скинути' : 'Clear'}</span>`;
+}
+function filterByTag(tag) {
+    activeTagFilter = activeTagFilter === tag ? null : tag;
+    pageCursors = [null];
+    loadNewsPage(0);
+}
+
+// Перше завантаження
+loadNewsPage(0);
+
+// Допоміжна функція для очищення кешу перекладу
+function setTextForTranslation(elementId, text) {
+    const el = document.getElementById(elementId);
+    el.removeAttribute('data-orig-ua');
+    el.removeAttribute('data-trans-en');
+    el.innerHTML = text || '';
+}
+
+// Відкриття статті
+function openArticle(index) {
+    if(index < 0 || index >= allNews.length) return;
+    
+    currentArticleIndex = index;
+    const item = allNews[index];
+
+    let displayDate = item.date;
+    try { const d = new Date(item.date); if(!isNaN(d)) displayDate = d.toLocaleDateString('uk-UA', {day:'numeric', month:'long', year:'numeric'}); } catch(e){}
+
+    document.getElementById('art-date').textContent = displayDate;
+    document.getElementById('art-img').src = item.image || 'logo.png';
+    document.getElementById('art-img').style.objectPosition = item.imagePosition || '50% 50%';
+    
+    setTextForTranslation('art-title', item.title);
+    setTextForTranslation('art-body', item.body);
+
+    const quoteContainer = document.getElementById('art-quote-container');
+    if (item.quote && item.quote.text) {
+        setTextForTranslation('art-quote-text', item.quote.text);
+        setTextForTranslation('art-quote-author', item.quote.author || '');
+        setTextForTranslation('art-quote-role', item.quote.role || '');
+        quoteContainer.style.display = 'block';
+    } else {
+        quoteContainer.style.display = 'none';
+    }
+
+    viewList.style.display = 'none';
+    viewArticle.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    document.getElementById('btn-prev-art').disabled = (currentArticleIndex === 0);
+    document.getElementById('btn-next-art').disabled = (currentArticleIndex === allNews.length - 1);
+
+    applyTranslationsToDOM(currentLang);
+}
+
+// Закриття статті
+function closeArticle() {
+    viewArticle.style.display = 'none';
+    viewList.style.display = 'block';
+    window.scrollTo({ top: 50, behavior: 'smooth' });
+}
+
+// Навігація
+function navigateArticle(direction) {
+    const targetIndex = currentArticleIndex - direction;
+    openArticle(targetIndex);
+}
+
+// Перший запуск
+window.addEventListener('DOMContentLoaded', () => {
+    applyTranslationsToDOM(currentLang);
+    initUserChat();
+    if (localStorage.getItem('svarogChatIsOpen') === 'true') openUserChat();
+});
 </script>
+
 </body>
 </html>
