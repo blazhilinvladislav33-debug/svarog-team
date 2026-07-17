@@ -61,10 +61,10 @@
         .burger{ display:flex; flex-direction:column; gap:3px; width:16px; }
         .burger span{ height:1px; background:var(--bone); width:100%; transition:transform 160ms ease-out; }
         
-        .menu-overlay{ position:fixed; inset:0; z-index:80; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; }
+        .menu-overlay{ position:fixed; inset:0; z-index:80; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; overflow-y:auto; }
         .menu-overlay.open{ opacity:1; pointer-events:auto; }
         .menu-links{ max-width:var(--max-w); margin:0 auto; padding:64px 24px; display:flex; flex-direction:column; gap:28px; }
-        .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); font-weight:600; }
+        .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(22px, min(6vw, 7vh), 56px); color:var(--bone); font-weight:600; }
         .menu-links a:hover, .menu-links a.active-link{ color:var(--copper); }
 
         /* ================= ОСНОВНИЙ КОНТЕНТ ================= */
@@ -108,6 +108,23 @@
         .report-card:hover .report-img img { transform: scale(1.05); }
         .report-img iframe { width: 100%; height: 100%; border: none; position: absolute; inset: 0; }
         .report-desc { padding: 20px; font-size: 15px; color: var(--ash); line-height: 1.6; white-space: pre-wrap; flex-grow: 1; border-top: 1px solid rgba(255,255,255,0.05); }
+        .report-card { cursor: pointer; }
+        .report-desc-short { padding: 20px; font-size: 15px; color: var(--ash); line-height: 1.6; flex-grow: 1; border-top: 1px solid rgba(255,255,255,0.05); }
+        .report-read-more { color: var(--copper); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; display: inline-block; margin-top: 8px; }
+
+        /* ==================== МОДАЛЬНЕ ВІКНО ЗВІТУ (повний перегляд) ==================== */
+        .report-modal-overlay { position: fixed; inset: 0; z-index: 3000; background: rgba(10,10,12,0.95); backdrop-filter: blur(10px); display: none; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 40px 20px; }
+        .report-modal-overlay.open { display: flex; }
+        .report-modal-box { max-width: 720px; width: 100%; background: var(--plate); border: 1px solid var(--iron); margin-top: 20px; }
+        .report-modal-close { position: sticky; top: 0; display: flex; justify-content: flex-end; padding: 16px; background: var(--plate); z-index: 2; }
+        .report-modal-close button { background: none; border: 1px solid var(--iron); color: var(--ash); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 16px; }
+        .report-modal-close button:hover { border-color: var(--ember); color: var(--ember); }
+        .report-modal-media { width: 100%; }
+        .report-modal-media img { width: 100%; display: block; max-height: 70vh; object-fit: contain; background: #000; margin-bottom: 4px; cursor: zoom-in; }
+        .report-modal-body { padding: 30px; }
+        .report-modal-body p { color: var(--ash); font-size: 16px; line-height: 1.75; white-space: pre-wrap; margin-bottom: 20px; }
+        .report-modal-links { display: flex; flex-direction: column; gap: 10px; }
+        .report-modal-links a { color: var(--copper); text-decoration: underline; font-size: 15px; }
 
         .load-more-btn { display: block; margin: 0 auto; padding: 12px 32px; background: transparent; border: 1px solid var(--ash); color: var(--bone); font-family: 'Oswald'; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
         .load-more-btn:hover { border-color: var(--brand-yellow); color: var(--brand-yellow); }
@@ -436,6 +453,17 @@
     <span id="toast-text">Сповіщення</span>
 </div>
 
+<div class="report-modal-overlay" id="reportModalOverlay" onclick="if(event.target===this) closeReportModal()">
+    <div class="report-modal-box">
+        <div class="report-modal-close"><button onclick="closeReportModal()">✕</button></div>
+        <div class="report-modal-media" id="reportModalMedia"></div>
+        <div class="report-modal-body">
+            <p id="reportModalBody"></p>
+            <div class="report-modal-links" id="reportModalLinks"></div>
+        </div>
+    </div>
+</div>
+
 <footer>
     <div class="footer-inner">
         <div class="footer-brand">
@@ -664,6 +692,7 @@ function getYouTubeEmbedUrl(url) {
 
 let reportsLimit = 6;
 let unsubscribeReports = null;
+let currentReportsData = [];
 function initReportsStream() {
     if (unsubscribeReports) unsubscribeReports();
     unsubscribeReports = db.collection("reports").orderBy("timestamp", "desc").limit(reportsLimit).onSnapshot(snapshot => {
@@ -671,6 +700,7 @@ function initReportsStream() {
         const loadMoreBtn = document.getElementById('reports-load-more-btn');
         if(!grid) return;
         grid.innerHTML = "";
+        currentReportsData = [];
         
         if(snapshot.empty) {
             grid.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; color:var(--ash);">${currentLang === 'ua' ? 'Звітів поки немає...' : 'No reports yet...'}</div>`;
@@ -680,19 +710,23 @@ function initReportsStream() {
         
         snapshot.docs.forEach((doc, idx) => {
             const data = doc.data();
+            currentReportsData.push(data);
             let mediaHtml = '';
             
             if (data.mediaType === 'video' && data.videoUrl) {
                 const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
                 mediaHtml = `<div class="report-img"><iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
             } else if (data.image) {
-                mediaHtml = `<div class="report-img"><img src="${data.image}" loading="lazy" style="object-position:${data.imagePosition || '50% 50%'};" onclick="openLightbox('${data.image}')" alt="Report Image"></div>`;
+                mediaHtml = `<div class="report-img"><img src="${data.image}" loading="lazy" style="object-position:${data.imagePosition || '50% 50%'};" alt="Report Image"></div>`;
             }
             
+            const desc = data.description || '';
+            const shortDesc = desc.length > 90 ? desc.slice(0, 90) + '…' : desc;
+
             grid.innerHTML += `
-                <div class="report-card" style="animation: fadeIn 0.5s ease forwards; animation-delay:${(idx % 6) * 0.1}s; opacity:0;">
+                <div class="report-card" style="animation: fadeIn 0.5s ease forwards; animation-delay:${(idx % 6) * 0.1}s; opacity:0;" onclick="openReportModal(${idx})">
                     ${mediaHtml}
-                    <div class="report-desc auto-translate">${data.description}</div>
+                    <div class="report-desc-short"><span class="auto-translate">${shortDesc}</span><br><span class="report-read-more">${currentLang === 'ua' ? 'Читати повністю →' : 'Read more →'}</span></div>
                 </div>
             `;
         });
@@ -702,6 +736,33 @@ function initReportsStream() {
 
     }, err => console.error("Помилка звітів: ", err));
 }
+
+function openReportModal(idx) {
+    const data = currentReportsData[idx]; if (!data) return;
+    const overlay = document.getElementById('reportModalOverlay');
+    const mediaBox = document.getElementById('reportModalMedia');
+    const bodyText = document.getElementById('reportModalBody');
+    const linksBox = document.getElementById('reportModalLinks');
+
+    let mediaHtml = '';
+    const images = Array.isArray(data.images) && data.images.length > 0 ? data.images : (data.image ? [data.image] : []);
+    if (data.mediaType === 'video' && data.videoUrl) {
+        const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
+        mediaHtml = `<iframe src="${embedUrl}" style="width:100%; aspect-ratio:16/9; border:none; display:block;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    } else {
+        mediaHtml = images.map(src => `<img src="${src}" style="object-position:${data.imagePosition || '50% 50%'};" onclick="openLightbox('${src}')">`).join('');
+    }
+    mediaBox.innerHTML = mediaHtml;
+    bodyText.textContent = data.description || '';
+
+    const links = Array.isArray(data.links) ? data.links : [];
+    linksBox.innerHTML = links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.title || l.url}</a>`).join('');
+    linksBox.style.display = links.length > 0 ? 'flex' : 'none';
+
+    overlay.classList.add('open');
+    applyTranslationsToDOM(currentLang);
+}
+function closeReportModal() { document.getElementById('reportModalOverlay').classList.remove('open'); }
 
 function loadMoreReports() {
     reportsLimit += 6;
