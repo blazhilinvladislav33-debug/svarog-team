@@ -62,11 +62,11 @@
         .burger{ display:flex; flex-direction:column; gap:3px; width:16px; }
         .burger span{ height:1px; background:var(--bone); width:100%; transition:transform 160ms ease-out; }
         
-        .menu-overlay{ position:fixed; inset:0; z-index:80; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; }
+        .menu-overlay{ position:fixed; inset:0; z-index:80; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; overflow-y:auto; }
         .menu-overlay.open{ opacity:1; pointer-events:auto; }
         .menu-links{ max-width:var(--max-w); margin:0 auto; padding:64px 24px; display:flex; flex-direction:column; gap:28px; }
-        .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); font-weight:600; }
-        .menu-links a:hover, .menu-links a.active-link{ color:var(--brand-yellow); }
+        .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(22px, min(6vw, 7vh), 56px); color:var(--bone); font-weight:600; }
+        .menu-links a:hover, .menu-links a.active-link{ color:var(--copper); }
 
         /* ================= ГОЛОВНИЙ БАНЕР ================= */
         .hero-banner { 
@@ -208,7 +208,7 @@
         .pm-buy-btn:hover:not(:disabled) { background: var(--brand-yellow); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(240, 202, 40, 0.3);}
 
         /* КОШИК (ІКОНКА) */
-        .cart-fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--brand-yellow); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: 0.3s; z-index: 1500; }
+        .cart-fab { position: fixed; bottom: 100px; right: 28px; width: 60px; height: 60px; background: var(--brand-yellow); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: 0.3s; z-index: 1500; }
         .cart-fab:hover { transform: scale(1.05); }
         .cart-fab svg { width: 24px; height: 24px; fill: #121212; }
         .cart-badge { position: absolute; top: -2px; right: -2px; background: #ff4a4a; color: #fff; font-size: 0.75rem; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--graphite); }
