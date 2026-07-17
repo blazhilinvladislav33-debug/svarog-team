@@ -184,6 +184,22 @@
         
         /* СТИЛІ ЦИТАТИ */
         .article-quote { background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-left: 4px solid var(--brand-yellow); border-radius: 8px; padding: 30px; margin: 40px 0; position: relative; display: none;}
+
+        /* ==================== БЛОКИ КОНСТРУКТОРА ==================== */
+        .abl { position: absolute; box-sizing: border-box; }
+        .abl-text { color: var(--ash); font-size: 16px; line-height: 1.7; white-space: pre-wrap; overflow: auto; }
+        .abl-photo { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
+        .abl-quote { background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-left: 4px solid var(--brand-yellow); border-radius: 8px; padding: 20px; overflow: auto; }
+        .abl-quote-text { color: var(--bone); font-size: 16px; font-style: italic; line-height: 1.5; margin-bottom: 10px; }
+        .abl-quote-author { color: var(--brand-yellow); font-weight: 700; font-size: 14px; }
+        .abl-quote-role { color: var(--ash); font-size: 12px; }
+        .abl-video { width: 100%; height: 100%; position: relative; border-radius: 6px; overflow: hidden; background: #000; cursor: pointer; }
+        .abl-video img { width: 100%; height: 100%; object-fit: cover; }
+        .abl-video-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; border-radius: 50%; background: rgba(217,102,61,0.9); display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+        .abl-video:hover .abl-video-play { transform: translate(-50%, -50%) scale(1.1); }
+        .abl-video-play svg { width: 22px; height: 22px; fill: #fff; margin-left: 3px; }
+        .abl-video iframe { width: 100%; height: 100%; border: none; position: absolute; inset: 0; }
+        @media (max-width: 768px) { .article-constructor-canvas { transform: scale(1); } }
         .article-quote-icon { position: absolute; top: 10px; right: 20px; font-size: 80px; font-family: serif; color: rgba(255,255,255,0.05); line-height: 1; pointer-events: none;}
         .article-quote-text { font-size: 20px; line-height: 1.5; color: var(--bone); font-style: italic; font-weight: 500; margin-bottom: 20px; position: relative; z-index: 2;}
         .article-quote-author { font-family: 'Oswald', sans-serif; font-size: 16px; color: var(--brand-yellow); text-transform: uppercase; margin-bottom: 5px; }
@@ -370,6 +386,7 @@
         <img src="" alt="" class="article-hero-img" id="art-img" onclick="openLightbox(this.src)">
         
         <div class="article-body auto-translate" id="art-body"></div>
+        <div class="article-constructor-canvas" id="art-constructor-canvas" style="display:none; position:relative; width:100%; min-height:400px;"></div>
 
         <div class="article-quote" id="art-quote-container">
             <div class="article-quote-icon">"</div>
@@ -635,6 +652,41 @@ function setTextForTranslation(elementId, text) {
 }
 
 // Відкриття статті
+function getYouTubeId(url) {
+    if (!url) return '';
+    if (url.includes('youtube.com/watch?v=')) return url.split('v=')[1].split('&')[0];
+    if (url.includes('youtube.com/shorts/')) return url.split('shorts/')[1].split('?')[0];
+    if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split('?')[0];
+    return '';
+}
+
+function renderArticleBlocks(canvasEl, blocks) {
+    canvasEl.innerHTML = '';
+    blocks.forEach(block => {
+        const el = document.createElement('div');
+        el.className = 'abl';
+        el.style.left = block.x + '%'; el.style.top = block.y + '%'; el.style.width = block.width + '%'; el.style.height = block.height + '%';
+
+        if (block.type === 'text') {
+            el.innerHTML = `<div class="abl-text auto-translate">${(block.content || '').replace(/\n/g, '<br>')}</div>`;
+        } else if (block.type === 'photo') {
+            el.innerHTML = block.src ? `<img class="abl-photo" src="${block.src}" loading="lazy" onclick="openLightbox('${block.src}')" style="cursor:zoom-in;">` : '';
+        } else if (block.type === 'quote') {
+            el.innerHTML = `<div class="abl-quote"><div class="abl-quote-text auto-translate">${block.text || ''}</div><div class="abl-quote-author auto-translate">${block.author || ''}</div><div class="abl-quote-role auto-translate">${block.role || ''}</div></div>`;
+        } else if (block.type === 'video') {
+            const vidId = getYouTubeId(block.videoUrl);
+            if (vidId) {
+                el.innerHTML = `<div class="abl-video" onclick="this.innerHTML='<iframe src=\\'https://www.youtube.com/embed/${vidId}?autoplay=1\\' allow=\\'autoplay; encrypted-media\\' allowfullscreen></iframe>'"><img src="https://img.youtube.com/vi/${vidId}/hqdefault.jpg" loading="lazy"><div class="abl-video-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>`;
+            }
+        }
+        canvasEl.appendChild(el);
+    });
+    // Гарантуємо, що контейнер достатньо високий, щоб вмістити найнижчий блок
+    let deepestPct = blocks.length > 0 ? Math.max(...blocks.map(b => b.y + b.height), 40) : 40;
+    canvasEl.style.minHeight = Math.max(400, deepestPct * 6) + 'px';
+    applyTranslationsToDOM(currentLang);
+}
+
 function openArticle(index) {
     if(index < 0 || index >= allNews.length) return;
     
@@ -649,16 +701,29 @@ function openArticle(index) {
     document.getElementById('art-img').style.objectPosition = item.imagePosition || '50% 50%';
     
     setTextForTranslation('art-title', item.title);
-    setTextForTranslation('art-body', item.body);
 
+    const bodyEl = document.getElementById('art-body');
+    const canvasEl = document.getElementById('art-constructor-canvas');
     const quoteContainer = document.getElementById('art-quote-container');
-    if (item.quote && item.quote.text) {
-        setTextForTranslation('art-quote-text', item.quote.text);
-        setTextForTranslation('art-quote-author', item.quote.author || '');
-        setTextForTranslation('art-quote-role', item.quote.role || '');
-        quoteContainer.style.display = 'block';
-    } else {
+
+    if (item.bodyMode === 'constructor' && Array.isArray(item.blocks) && item.blocks.length > 0) {
+        bodyEl.style.display = 'none';
         quoteContainer.style.display = 'none';
+        canvasEl.style.display = 'block';
+        renderArticleBlocks(canvasEl, item.blocks);
+    } else {
+        canvasEl.style.display = 'none';
+        canvasEl.innerHTML = '';
+        bodyEl.style.display = 'block';
+        setTextForTranslation('art-body', item.body);
+        if (item.quote && item.quote.text) {
+            setTextForTranslation('art-quote-text', item.quote.text);
+            setTextForTranslation('art-quote-author', item.quote.author || '');
+            setTextForTranslation('art-quote-role', item.quote.role || '');
+            quoteContainer.style.display = 'block';
+        } else {
+            quoteContainer.style.display = 'none';
+        }
     }
 
     viewList.style.display = 'none';
