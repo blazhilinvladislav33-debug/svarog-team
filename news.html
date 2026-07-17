@@ -62,10 +62,10 @@
         .burger{ display:flex; flex-direction:column; gap:3px; width:16px; }
         .burger span{ height:1px; background:var(--bone); width:100%; transition:transform 160ms ease-out; }
         
-        .menu-overlay{ position:fixed; inset:0; z-index:80; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; }
+        .menu-overlay{ position:fixed; inset:0; z-index:80; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; overflow-y:auto; }
         .menu-overlay.open{ opacity:1; pointer-events:auto; }
         .menu-links{ max-width:var(--max-w); margin:0 auto; padding:64px 24px; display:flex; flex-direction:column; gap:28px; }
-        .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(32px,6vw,56px); color:var(--bone); font-weight:600; }
+        .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(22px, min(6vw, 7vh), 56px); color:var(--bone); font-weight:600; }
         .menu-links a:hover, .menu-links a.active-link{ color:var(--copper); }
         
         /* ================= ОСНОВНИЙ КОНТЕНТ ================= */
@@ -108,7 +108,7 @@
         /* ТАКТИЧНА СТИЛІЗАЦІЯ ФОТО */
         .news-img-box { 
             width: 100%; 
-            aspect-ratio: 16/10; 
+            aspect-ratio: 3/4; 
             overflow: hidden; 
             background: var(--iron); 
             position: relative; 
