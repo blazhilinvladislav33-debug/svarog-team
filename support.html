@@ -535,17 +535,29 @@
 
 <script>
 // --- ПЛАВНИЙ ФОН ---
-const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
-let bgIndex = 0; let bgShowingA = true;
 const bgLayerA = document.getElementById('bg-layer-a'); const bgLayerB = document.getElementById('bg-layer-b');
-bgLayerA.style.setProperty('--layer-img', `url('${images[0]}')`);
-setInterval(() => {
-    bgIndex = (bgIndex + 1) % images.length;
-    const nextLayer = bgShowingA ? bgLayerB : bgLayerA; const curLayer = bgShowingA ? bgLayerA : bgLayerB;
-    nextLayer.style.setProperty('--layer-img', `url('${images[bgIndex]}')`);
-    nextLayer.classList.add('visible'); curLayer.classList.remove('visible');
-    bgShowingA = !bgShowingA;
-}, 6000);
+db.collection("config").doc("pageBackgrounds").get().then(doc => {
+    const customBg = doc.exists ? doc.data().support : null;
+    if (customBg) {
+        bgLayerA.style.setProperty('--layer-img', `url('${customBg}')`);
+        bgLayerA.classList.add('visible');
+    } else {
+        startDefaultBgRotation();
+    }
+}).catch(() => startDefaultBgRotation());
+
+function startDefaultBgRotation() {
+    const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
+    let bgIndex = 0; let bgShowingA = true;
+    bgLayerA.style.setProperty('--layer-img', `url('${images[0]}')`); bgLayerA.classList.add('visible');
+    setInterval(() => {
+        bgIndex = (bgIndex + 1) % images.length;
+        const nextLayer = bgShowingA ? bgLayerB : bgLayerA; const curLayer = bgShowingA ? bgLayerA : bgLayerB;
+        nextLayer.style.setProperty('--layer-img', `url('${images[bgIndex]}')`);
+        nextLayer.classList.add('visible'); curLayer.classList.remove('visible');
+        bgShowingA = !bgShowingA;
+    }, 6000);
+}
 
 // --- ПЕРЕМИКАННЯ ЕКРАНІВ (VIEW) ---
 function toggleDonateView(show) {
