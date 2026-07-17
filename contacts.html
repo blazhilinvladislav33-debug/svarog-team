@@ -69,7 +69,7 @@
   .empty-hero .eyebrow{ font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--copper); margin-bottom:18px; }
   .empty-hero h1{ font-family:'Oswald',sans-serif; font-size:clamp(36px,6vw,64px); font-weight:600; text-transform:uppercase; margin:0 0 20px; }
   .empty-hero p{ color:var(--ash); font-size:16px; max-width:520px; line-height:1.6; }
-  .contacts-title { font-family: 'Oswald', sans-serif; font-size: clamp(72px, 17vw, 220px); font-weight: 800; text-transform: uppercase; text-align: center; margin: 0 0 30px; color: rgba(255,255,255,0.95); letter-spacing: -4px; line-height: 0.95; text-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: contactsTitleIn 0.9s ease both; }
+  .empty-hero h1.contacts-title { font-family: 'Oswald', sans-serif; font-size: clamp(72px, 17vw, 220px); font-weight: 800; text-transform: uppercase; text-align: center; margin: 0 0 30px; color: rgba(255,255,255,0.95); letter-spacing: -4px; line-height: 0.95; text-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: contactsTitleIn 0.9s ease both; }
   @keyframes contactsTitleIn { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
   .bg-layer{ position:fixed; inset:0; z-index:-2; background-position:center; background-size:cover; opacity:0; transition:opacity 2.5s ease-in-out; animation:kenburns 24s ease-in-out infinite alternate; }
   .bg-layer.visible{ opacity:.28; }
@@ -226,6 +226,7 @@
     <div class="footer-brand">
       <div class="wordmark">Svarog Team</div>
       <p class="footer-desc"><span data-lang="ua">35 полк Національної гвардії України.</span><span data-lang="en">35th separate regiment of the National Guard of Ukraine.</span></p>
+      <a href="support.html" class="btn btn-ember" style="display:inline-block; margin-top:18px;"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
     </div>
     <div class="footer-cols">
       <div class="footer-col">
