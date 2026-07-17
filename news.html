@@ -44,6 +44,10 @@
         }
         * { box-sizing:border-box; margin:0; padding:0; }
         html,body{ background:var(--graphite); color:var(--bone); font-family:'Manrope',sans-serif; overflow-x:hidden; scroll-behavior: smooth;}
+        .bg-layer-news { position: fixed; inset: 0; z-index: -2; background-position: center; background-size: cover; opacity: 0; transition: opacity 2s ease-in-out; }
+        .bg-layer-news.visible { opacity: 0.22; }
+        .bg-layer-news-overlay { position: fixed; inset: 0; z-index: -1; background: linear-gradient(180deg, var(--graphite) 0%, rgba(14,14,15,.75) 30%, var(--graphite) 100%); display: none; }
+        .bg-layer-news-overlay.visible { display: block; }
         a { color:var(--copper); text-decoration:none; }
         a:hover { color:var(--bone); }
         button { font-family:'Manrope',sans-serif; cursor: pointer; border:none; background:none; }
@@ -309,6 +313,9 @@
 </head>
 <body>
 
+<div class="bg-layer-news" id="newsBgLayer"></div>
+<div class="bg-layer-news-overlay" id="newsBgOverlay"></div>
+
 <nav class="nav">
     <div class="nav-inner">
         <a href="index.html" class="wordmark">Svarog Team</a>
@@ -550,6 +557,16 @@ async function submitSubscribe(e) {
 }
 
 
+
+// --- ФОН СТОРІНКИ (опційно, завантажується з адмінки) ---
+db.collection("config").doc("pageBackgrounds").get().then(doc => {
+    const customBg = doc.exists ? doc.data().news : null;
+    if (customBg) {
+        const layer = document.getElementById('newsBgLayer'); const overlay = document.getElementById('newsBgOverlay');
+        layer.style.backgroundImage = `url('${customBg}')`;
+        layer.classList.add('visible'); overlay.classList.add('visible');
+    }
+}).catch(err => console.error("Фон сторінки:", err));
 
 // --- СОЦМЕРЕЖІ З FIREBASE (повний динамічний список) ---
 db.collection("config").doc("socials").onSnapshot(doc => {
