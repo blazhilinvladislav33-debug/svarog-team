@@ -45,8 +45,8 @@
         * { box-sizing:border-box; margin:0; padding:0; }
         html,body{ background:var(--graphite); color:var(--bone); font-family:'Manrope',sans-serif; overflow-x:hidden; scroll-behavior: smooth;}
         .bg-layer-news { position: fixed; inset: 0; z-index: -2; background-position: center; background-size: cover; opacity: 0; transition: opacity 2s ease-in-out; }
-        .bg-layer-news.visible { opacity: 1; }
-        .bg-layer-news-overlay { position: fixed; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(14,14,15,.88) 0%, rgba(14,14,15,.55) 30%, rgba(14,14,15,.75) 70%, rgba(14,14,15,.95) 100%); display: none; }
+        .bg-layer-news.visible { opacity: 0.2; }
+        .bg-layer-news-overlay { position: fixed; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(14,14,15,.7) 0%, rgba(14,14,15,.4) 30%, rgba(14,14,15,.6) 70%, rgba(14,14,15,.85) 100%); display: none; }
         .bg-layer-news-overlay.visible { display: block; }
         a { color:var(--copper); text-decoration:none; }
         a:hover { color:var(--bone); }
@@ -780,6 +780,8 @@ function isEnLang() { return document.documentElement.classList.contains('lang-e
 
 function initUserChat() {
     if (!userChatSessionId) { userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId); }
+    const cachedChat = localStorage.getItem('chatCache_' + userChatSessionId);
+    if (cachedChat) { try { renderUserChat(JSON.parse(cachedChat)); } catch(e) {} }
     startRealtimeChatListener();
 }
 function openUserChat(e) {
@@ -803,6 +805,7 @@ async function renderUserChat(myChatData) {
     const messagesBox = document.getElementById('user-chat-messages'); const inputBlock = document.getElementById('user-chat-input-block');
     const isOpen = document.getElementById('user-chat-window').style.display === 'flex';
     let myChat = myChatData || { messages: [], status: 'active' };
+    try { localStorage.setItem('chatCache_' + userChatSessionId, JSON.stringify(myChat)); } catch(e) {}
 
     if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
         const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
