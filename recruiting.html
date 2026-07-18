@@ -86,12 +86,11 @@
   .footer-col a:hover{ color:var(--copper); }
   .footer-bottom{ max-width:var(--max-w); margin:0 auto; padding:24px; border-top:1px solid var(--iron); font-size:12px; color:var(--ash); }
 
-  @media (max-width:680px){ .nav-actions .btn-ember{ display:none; } }
 
 
   /* ==================== КОНТЕНТ СТОРІНКИ РЕКРУТИНГУ ==================== */
-  .page-wrapper { max-width: var(--max-w, 1440px); margin: 120px auto 40px; padding: 0 24px; min-height: 70vh; }
-  .recruit-title { font-family: 'Oswald', sans-serif; font-size: clamp(72px, 17vw, 220px); font-weight: 800; text-transform: uppercase; text-align: center; margin: 20px 0 50px; color: rgba(255,255,255,0.95); letter-spacing: -4px; line-height: 0.95; text-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: recruitTitleIn 0.9s ease both; }
+  .page-wrapper { max-width: var(--max-w, 1440px); margin: 100px auto 40px; padding: 0 24px; min-height: 70vh; }
+  .recruit-title { font-family: 'Oswald', sans-serif; font-size: clamp(72px, 17vw, 220px); font-weight: 800; text-transform: uppercase; text-align: center; margin: 0 0 50px; color: rgba(255,255,255,0.95); letter-spacing: -4px; line-height: 0.95; text-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: recruitTitleIn 0.9s ease both; }
   @keyframes recruitTitleIn { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
   .recruit-intro { max-width: 860px; margin: 0 auto 80px; text-align: center; }
   .recruit-intro h2 { font-family: 'Oswald', sans-serif; font-size: 26px; text-transform: uppercase; color: var(--bone); margin-bottom: 24px; letter-spacing: .04em; }
@@ -204,7 +203,6 @@
         <a href="support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
         <a href="recruiting.html" class="active-link"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></a>
         <a href="contacts.html"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></a>
-        <a href="#" onclick="openUserChat(event)" style="color: var(--brand-yellow);"><span data-lang="ua">💬 Анонімний чат</span><span data-lang="en">💬 Anonymous Chat</span></a>
     </div>
     <div class="menu-social" id="menuSocialBox"></div>
 </div>
