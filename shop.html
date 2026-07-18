@@ -581,7 +581,24 @@
                             <div class="payment-tile" id="tile-cod" onclick="selectPaymentTile('cod')">Накладений</div>
                         </div>
                         <input type="hidden" id="selected-payment-method" value="" required>
-                        <div id="bank-payment-info" style="display: none; margin-bottom: 15px; color:#aaa; font-size: 0.9rem;"></div>
+                        <div id="bank-payment-info" style="display: none; margin-bottom: 15px;">
+                            <div id="bank-info-bank" style="display:none; color:#ddd; font-size:0.9rem; margin-bottom:10px;">
+                                <span data-lang="ua">Перекажіть суму на Банку:</span><span data-lang="en">Transfer the amount to the Jar:</span>
+                                <a id="bank-jar-link" href="#" target="_blank" style="display:block; margin-top:6px; color:var(--brand-yellow); font-weight:700; word-break:break-all;"></a>
+                            </div>
+                            <div id="bank-info-card" style="display:none; color:#ddd; font-size:0.9rem; margin-bottom:10px;">
+                                <span data-lang="ua">Номер картки для переказу:</span><span data-lang="en">Card number for transfer:</span>
+                                <div style="display:flex; align-items:center; gap:10px; margin-top:6px;">
+                                    <span id="bank-card-number" style="font-weight:700; color:#fff; font-size:1.05rem; letter-spacing:0.5px;"></span>
+                                    <button type="button" onclick="copyCardNumberShop()" style="background:none; border:1px solid var(--iron); color:var(--ash); border-radius:6px; padding:4px 10px; cursor:pointer; font-size:0.8rem;"><span data-lang="ua">Копіювати</span><span data-lang="en">Copy</span></button>
+                                </div>
+                            </div>
+                            <div style="margin-top:12px;">
+                                <label style="display:block; font-size:0.85rem; color:#aaa; margin-bottom:6px;"><span data-lang="ua">Прикріпіть скріншот чеку (обов'язково):</span><span data-lang="en">Attach payment receipt (required):</span></label>
+                                <input type="file" id="order-receipt-file" accept="image/*" onchange="previewOrderReceipt(this)" style="color:#aaa; font-size:0.85rem;">
+                                <img id="order-receipt-preview" src="" style="display:none; max-width:120px; max-height:120px; border-radius:6px; margin-top:8px;">
+                            </div>
+                        </div>
                         <div class="step-nav-row">
                             <button type="button" class="step-back-btn" onclick="goToCheckoutStep(2)">←</button>
                             <button type="submit" class="confirm-btn" id="confirm-order-btn">
@@ -1142,19 +1159,47 @@
             if (!document.getElementById('order-name').value || !document.getElementById('order-phone').value || !document.getElementById('order-address').value) { alert(currentLang === 'ua' ? "Заповніть всі поля!" : "Fill in all fields!"); return; }
             goToCheckoutStep(3);
         }
+        let shopPaymentBankUrl = "https://send.monobank.ua/jar/default"; let shopPaymentCardNumber = ""; let orderReceiptBase64 = "";
+        db.collection("config").doc("payment").onSnapshot(doc => {
+            if (doc.exists) { if (doc.data().bankUrl) shopPaymentBankUrl = doc.data().bankUrl; if (doc.data().cardNumber) shopPaymentCardNumber = doc.data().cardNumber; }
+            const jarLink = document.getElementById('bank-jar-link'); if (jarLink) { jarLink.href = shopPaymentBankUrl; jarLink.innerText = shopPaymentBankUrl; }
+            const cardEl = document.getElementById('bank-card-number'); if (cardEl) cardEl.innerText = shopPaymentCardNumber || '—';
+        });
+        function copyCardNumberShop() {
+            navigator.clipboard.writeText(shopPaymentCardNumber.replace(/\s/g, '')).then(() => showToast(currentLang === 'ua' ? "Скопійовано!" : "Copied!"));
+        }
+        async function previewOrderReceipt(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas'); const MAX_WIDTH = 900; let w = img.width, h = img.height;
+                        if (w > MAX_WIDTH) { h = Math.round((h * MAX_WIDTH) / w); w = MAX_WIDTH; }
+                        canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        orderReceiptBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                        const prev = document.getElementById('order-receipt-preview'); prev.src = orderReceiptBase64; prev.style.display = 'block';
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
         function selectPaymentTile(method) {
             document.querySelectorAll('.payment-tile').forEach(t => t.classList.remove('active')); 
             document.getElementById(`tile-${method}`).classList.add('active');
             document.getElementById('selected-payment-method').value = method;
             document.getElementById('bank-payment-info').style.display = method !== 'cod' ? 'block' : 'none';
-            if(method === 'bank') document.getElementById('bank-payment-info').innerText = currentLang === 'ua' ? "Після підтвердження ви отримаєте посилання на Банку." : "You will receive a Jar link after confirmation.";
-            if(method === 'card') document.getElementById('bank-payment-info').innerText = currentLang === 'ua' ? "Після підтвердження ви отримаєте номер картки." : "You will receive card details after confirmation.";
+            document.getElementById('bank-info-bank').style.display = method === 'bank' ? 'block' : 'none';
+            document.getElementById('bank-info-card').style.display = method === 'card' ? 'block' : 'none';
         }
 
         async function submitOrder(e) {
             e.preventDefault(); if(shoppingCart.length === 0) return;
             if (document.getElementById('order-website') && document.getElementById('order-website').value.trim() !== '') return; // honeypot
             const method = document.getElementById('selected-payment-method').value; if(!method) { alert(currentLang === 'ua' ? "Оберіть спосіб оплати!" : "Choose payment method!"); return; }
+            if ((method === 'bank' || method === 'card') && !orderReceiptBase64) { alert(currentLang === 'ua' ? "Прикріпіть скріншот чеку — без нього замовлення не підтвердити." : "Please attach a payment receipt — required to confirm the order."); return; }
             const btn = document.getElementById('confirm-order-btn');
             btn.innerText = currentLang === 'ua' ? "Обробка..." : "Processing..."; btn.disabled = true;
             
@@ -1196,12 +1241,12 @@
                     transaction.set(orderRef, {
                         name, phone, address,
                         items: shoppingCart.map(i => ({ ...i, image: '' })),
-                        totalPrice: finalSum, promoCode: appliedPromo ? appliedPromo.code : null, paymentMethod: method, status: 'new',
+                        totalPrice: finalSum, promoCode: appliedPromo ? appliedPromo.code : null, paymentMethod: method, paymentProof: orderReceiptBase64 || null, status: 'new',
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
                     });
                 });
-                shoppingCart = []; appliedPromo = null; saveCart(); updateCartUI();
+                shoppingCart = []; appliedPromo = null; orderReceiptBase64 = ''; const receiptInput = document.getElementById('order-receipt-file'); if(receiptInput) receiptInput.value = ''; const receiptPrev = document.getElementById('order-receipt-preview'); if(receiptPrev) receiptPrev.style.display = 'none'; saveCart(); updateCartUI();
                 ['checkout-step-1', 'checkout-step-2', 'checkout-form', 'checkout-steps-indicator'].forEach(id => document.getElementById(id).style.display = 'none');
                 document.getElementById('order-success-screen').style.display = 'flex';
             } catch (err) { alert(err.message); } 
