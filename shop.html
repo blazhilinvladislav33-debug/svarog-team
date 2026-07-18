@@ -236,6 +236,8 @@
 
         .cart-total-box { display: flex; justify-content: space-between; padding: 15px 0; border-top: 1px solid var(--iron); margin-bottom: 20px; font-weight: 700; font-size: 1.2rem; }
         .cart-total-price { color: var(--brand-yellow); }
+        .cart-total-price .old-total { color: var(--ash); font-weight: 400; font-size: 0.85rem; text-decoration: line-through; margin-right: 8px; }
+        .promo-code-box { padding: 15px 0; border-top: 1px solid var(--iron); }
 
         .form-group { margin-bottom: 15px; }
         .form-input { width: 100%; height: 44px; padding: 0 15px; background: var(--graphite); border: 1px solid var(--iron); color: #fff; border-radius: 8px; outline: none; transition: 0.3s; }
@@ -537,6 +539,16 @@
                 <!-- КРОК 1 -->
                 <div id="checkout-step-1">
                     <div class="cart-items-list" id="cart-items-container"></div>
+                    <div class="promo-code-box" id="promo-code-box" style="display:none;">
+                        <div id="promo-input-row" style="display:flex; gap:8px;">
+                            <input type="text" id="promo-code-input-field" class="form-input" placeholder="Промокод" style="text-transform:uppercase;" onkeypress="if(event.key==='Enter'){event.preventDefault(); applyPromoCode();}">
+                            <button type="button" class="confirm-btn" style="width:auto; padding:0 20px; margin:0;" onclick="applyPromoCode()"><span data-lang="ua">Застосувати</span><span data-lang="en">Apply</span></button>
+                        </div>
+                        <div id="promo-applied-row" style="display:none; align-items:center; justify-content:space-between; color:var(--brand-yellow); font-weight:600; font-size:0.9rem;">
+                            <span id="promo-applied-label"></span>
+                            <span style="cursor:pointer; color:var(--ash); text-decoration:underline;" onclick="removePromoCode()"><span data-lang="ua">Прибрати</span><span data-lang="en">Remove</span></span>
+                        </div>
+                    </div>
                     <div class="cart-total-box" id="cart-total-section" style="display:none;">
                         <div><span data-lang="ua">Разом:</span><span data-lang="en">Total:</span></div>
                         <div class="cart-total-price" id="cart-total-sum">0 ₴</div>
@@ -720,6 +732,7 @@
         let activeCategory = 'Всі товари';
         let activeSubcategory = 'Всі';
         let shoppingCart = JSON.parse(localStorage.getItem('svarog_shop_cart')) || []; 
+        let appliedPromo = null; // { code, type, discount, fiatValue }
         window.selectedVariants = {}; 
         let shopSearchTerm = ''; let shopSortMode = 'default'; let showFavoritesOnly = false;
         function toggleFavoritesFilter() { showFavoritesOnly = !showFavoritesOnly; document.getElementById('fav-filter-btn').classList.toggle('active', showFavoritesOnly); renderShopGrid(); }
@@ -1077,16 +1090,45 @@
             container.innerHTML = ""; 
             if(shoppingCart.length === 0) { 
                 container.innerHTML = `<div style="text-align:center; color:var(--ash);">${currentLang === 'ua' ? 'Кошик порожній' : 'Cart is empty'}</div>`; 
-                document.getElementById('cart-total-section').style.display = 'none'; document.getElementById('step1-nav-wrap').style.display = 'none'; return; 
+                document.getElementById('cart-total-section').style.display = 'none'; document.getElementById('step1-nav-wrap').style.display = 'none'; document.getElementById('promo-code-box').style.display = 'none'; return; 
             }
             let baseTotalSum = 0;
             shoppingCart.forEach(item => {
                 baseTotalSum += item.totalPrice;
                 container.innerHTML += `<div class="cart-item"><img src="${item.image || 'logo.png'}" class="cart-item-img"><div class="cart-item-info"><div class="cart-item-title">${item.merchTitle}</div><div class="cart-item-meta">${currentLang === 'ua' ? 'Розмір' : 'Size'}: ${item.size}</div><div class="cart-qty-control"><button type="button" onclick="adjustCartItemQty('${item.cartId}', -1)">-</button><span>${item.quantity}</span><button type="button" onclick="adjustCartItemQty('${item.cartId}', 1)">+</button></div><div class="cart-item-price">${item.totalPrice} ₴</div></div><button class="cart-item-remove" onclick="removeFromCart('${item.cartId}')">✖</button></div>`;
             });
-            document.getElementById('cart-total-sum').innerText = `${baseTotalSum} ₴`; 
+            
+            document.getElementById('promo-code-box').style.display = 'block';
+            let finalSum = baseTotalSum;
+            if (appliedPromo) {
+                if (appliedPromo.type === 'certificate') finalSum = Math.max(0, baseTotalSum - appliedPromo.fiatValue);
+                else finalSum = Math.round(baseTotalSum * (1 - appliedPromo.discount / 100));
+                document.getElementById('cart-total-sum').innerHTML = `<span class="old-total">${baseTotalSum} ₴</span>${finalSum} ₴`;
+                document.getElementById('promo-input-row').style.display = 'none';
+                document.getElementById('promo-applied-row').style.display = 'flex';
+                document.getElementById('promo-applied-label').innerText = `✓ ${appliedPromo.code}`;
+            } else {
+                document.getElementById('cart-total-sum').innerText = `${baseTotalSum} ₴`;
+                document.getElementById('promo-input-row').style.display = 'flex';
+                document.getElementById('promo-applied-row').style.display = 'none';
+            }
             document.getElementById('cart-total-section').style.display = 'flex'; document.getElementById('step1-nav-wrap').style.display = 'block'; 
         }
+
+        async function applyPromoCode() {
+            const input = document.getElementById('promo-code-input-field');
+            const code = input.value.trim().toUpperCase();
+            if (!code) return;
+            try {
+                const doc = await db.collection("promocodes").doc(code).get();
+                if (!doc.exists || doc.data().active !== true) { showToast(currentLang === 'ua' ? "Промокод недійсний" : "Invalid promo code"); return; }
+                const data = doc.data();
+                appliedPromo = { code, type: data.isCertificate ? 'certificate' : 'promo', discount: data.discount || 0, fiatValue: data.fiatValue || 0 };
+                showToast(currentLang === 'ua' ? "Промокод застосовано!" : "Promo code applied!");
+                renderCartModalContent();
+            } catch (err) { showToast(err.message); }
+        }
+        function removePromoCode() { appliedPromo = null; document.getElementById('promo-code-input-field').value = ''; renderCartModalContent(); }
 
         function removeFromCart(cartId) { shoppingCart = shoppingCart.filter(item => item.cartId !== cartId); saveCart(); updateCartUI(); }
         function adjustCartItemQty(cartId, amount) { const item = shoppingCart.find(i => i.cartId === cartId); if (!item) return; let newQty = item.quantity + amount; if (newQty < 1) { removeFromCart(cartId); return; } item.quantity = newQty; item.totalPrice = item.price * newQty; saveCart(); updateCartUI(); }
@@ -1117,7 +1159,9 @@
             btn.innerText = currentLang === 'ua' ? "Обробка..." : "Processing..."; btn.disabled = true;
             
             const name = document.getElementById('order-name').value; const phone = document.getElementById('order-phone').value; const address = document.getElementById('order-address').value;
-            const finalSum = shoppingCart.reduce((s, i) => s + i.totalPrice, 0);
+            const baseSum = shoppingCart.reduce((s, i) => s + i.totalPrice, 0);
+            let finalSum = baseSum;
+            if (appliedPromo) { if (appliedPromo.type === 'certificate') finalSum = Math.max(0, baseSum - appliedPromo.fiatValue); else finalSum = Math.round(baseSum * (1 - appliedPromo.discount / 100)); }
 
             try {
                 await db.runTransaction(async (transaction) => {
@@ -1126,6 +1170,12 @@
                         let ref = db.collection('merch').doc(cartItem.merchId); let doc = await transaction.get(ref);
                         if (!doc.exists) throw new Error(currentLang === 'ua' ? `Товар "${cartItem.merchTitle}" більше не існує!` : `Item "${cartItem.merchTitle}" no longer exists!`);
                         merchRefsAndData.push({ ref, data: doc.data(), cartItem });
+                    }
+                    let promoRef = null;
+                    if (appliedPromo) {
+                        promoRef = db.collection('promocodes').doc(appliedPromo.code);
+                        let promoDoc = await transaction.get(promoRef);
+                        if (!promoDoc.exists || promoDoc.data().active !== true) throw new Error(currentLang === 'ua' ? "Промокод більше не дійсний!" : "Promo code is no longer valid!");
                     }
                     for (let obj of merchRefsAndData) {
                         if (obj.cartItem.isPreorder) continue;
@@ -1140,17 +1190,18 @@
                         if (isVariant && variantIndex > -1) obj.data.variants[variantIndex].stock = stockObj; else obj.data.stock = stockObj;
                     }
                     for (let obj of merchRefsAndData) { if (!obj.cartItem.isPreorder) transaction.update(obj.ref, { stock: obj.data.stock, variants: obj.data.variants || [] }); }
+                    if (promoRef) transaction.update(promoRef, { active: false, usedAt: firebase.firestore.FieldValue.serverTimestamp() });
 
                     const orderRef = db.collection('orders').doc();
                     transaction.set(orderRef, {
                         name, phone, address,
                         items: shoppingCart.map(i => ({ ...i, image: '' })),
-                        totalPrice: finalSum, paymentMethod: method, status: 'new',
+                        totalPrice: finalSum, promoCode: appliedPromo ? appliedPromo.code : null, paymentMethod: method, status: 'new',
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
                     });
                 });
-                shoppingCart = []; saveCart(); updateCartUI();
+                shoppingCart = []; appliedPromo = null; saveCart(); updateCartUI();
                 ['checkout-step-1', 'checkout-step-2', 'checkout-form', 'checkout-steps-indicator'].forEach(id => document.getElementById(id).style.display = 'none');
                 document.getElementById('order-success-screen').style.display = 'flex';
             } catch (err) { alert(err.message); } 
