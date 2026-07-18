@@ -1269,6 +1269,8 @@ function isEnLang() { return document.documentElement.classList.contains('lang-e
 
 function initUserChat() {
     if (!userChatSessionId) { userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId); }
+    const cachedChat = localStorage.getItem('chatCache_' + userChatSessionId);
+    if (cachedChat) { try { renderUserChat(JSON.parse(cachedChat)); } catch(e) {} }
     startRealtimeChatListener();
 }
 function openUserChat(e) {
@@ -1292,6 +1294,7 @@ async function renderUserChat(myChatData) {
     const messagesBox = document.getElementById('user-chat-messages'); const inputBlock = document.getElementById('user-chat-input-block');
     const isOpen = document.getElementById('user-chat-window').style.display === 'flex';
     let myChat = myChatData || { messages: [], status: 'active' };
+    try { localStorage.setItem('chatCache_' + userChatSessionId, JSON.stringify(myChat)); } catch(e) {}
 
     if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
         const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
