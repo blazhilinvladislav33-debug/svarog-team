@@ -689,7 +689,7 @@ function renderArticleBlocks(canvasEl, blocks) {
         } else if (block.type === 'photo') {
             el.innerHTML = block.src ? `<img class="abl-photo" src="${block.src}" loading="lazy" onclick="openLightbox('${block.src}')" style="cursor:zoom-in;">` : '';
         } else if (block.type === 'quote') {
-            el.innerHTML = `<div class="abl-quote"><div class="abl-quote-text auto-translate">${block.text || ''}</div><div class="abl-quote-author auto-translate">${block.author || ''}</div><div class="abl-quote-role auto-translate">${block.role || ''}</div></div>`;
+            el.innerHTML = `<div class="abl-quote"><div class="abl-quote-text auto-translate">${block.text || ''}</div><div class="abl-quote-author auto-translate">${block.author || ''}</div>${block.role ? `<div class="abl-quote-role auto-translate">${block.role}</div>` : ''}</div>`;
         } else if (block.type === 'video') {
             const vidId = getYouTubeId(block.videoUrl);
             if (vidId) {
