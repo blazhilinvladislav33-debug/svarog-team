@@ -67,7 +67,7 @@
 
   /* ==================== ФОН ==================== */
   .bg-layer{ position:fixed; inset:0; z-index:-2; background-position:center; background-size:cover; opacity:0; transition:opacity 2.5s ease-in-out; animation:kenburns 24s ease-in-out infinite alternate; }
-  .bg-layer.visible{ opacity:.28; }
+  .bg-layer.visible{ opacity:.2; }
   .bg-layer#bgB{ animation-delay:-12s; }
   .bg-vignette{ position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg, var(--graphite) 0%, rgba(14,14,15,.6) 40%, var(--graphite) 100%); }
   @keyframes kenburns{ 0%{ transform:scale(1); } 100%{ transform:scale(1.06); } }
@@ -426,6 +426,8 @@ function isEnLang() { return document.documentElement.classList.contains('lang-e
 
 function initUserChat() {
     if (!userChatSessionId) { userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId); }
+    const cachedChat = localStorage.getItem('chatCache_' + userChatSessionId);
+    if (cachedChat) { try { renderUserChat(JSON.parse(cachedChat)); } catch(e) {} }
     startRealtimeChatListener();
 }
 function openUserChat(e) {
@@ -449,6 +451,7 @@ async function renderUserChat(myChatData) {
     const messagesBox = document.getElementById('user-chat-messages'); const inputBlock = document.getElementById('user-chat-input-block');
     const isOpen = document.getElementById('user-chat-window').style.display === 'flex';
     let myChat = myChatData || { messages: [], status: 'active' };
+    try { localStorage.setItem('chatCache_' + userChatSessionId, JSON.stringify(myChat)); } catch(e) {}
 
     if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
         const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
