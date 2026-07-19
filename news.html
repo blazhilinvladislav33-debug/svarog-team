@@ -678,10 +678,18 @@ function getYouTubeId(url) {
 
 function renderArticleBlocks(canvasEl, blocks) {
     canvasEl.innerHTML = '';
-    blocks.forEach(block => {
+    const isMobile = window.innerWidth <= 768;
+    const sortedBlocks = isMobile ? [...blocks].sort((a, b) => a.y - b.y || a.x - b.x) : blocks;
+    sortedBlocks.forEach(block => {
         const el = document.createElement('div');
         el.className = 'abl';
-        el.style.left = block.x + '%'; el.style.top = block.y + '%'; el.style.width = block.width + '%'; el.style.height = block.height + '%';
+        if (isMobile) {
+            el.style.position = 'static'; el.style.width = '100%'; el.style.marginBottom = '20px';
+            if (block.type === 'photo' || block.type === 'video') el.style.height = '220px';
+            else el.style.height = 'auto'; el.style.minHeight = '40px';
+        } else {
+            el.style.left = block.x + '%'; el.style.top = block.y + '%'; el.style.width = block.width + '%'; el.style.height = block.height + '%';
+        }
 
         if (block.type === 'text') {
             el.innerHTML = `<div class="abl-text auto-translate">${(block.content || '').replace(/\n/g, '<br>')}</div>`;
@@ -697,6 +705,7 @@ function renderArticleBlocks(canvasEl, blocks) {
         }
         canvasEl.appendChild(el);
     });
+    if (isMobile) { canvasEl.style.minHeight = 'auto'; applyTranslationsToDOM(currentLang); return; }
     // Гарантуємо, що контейнер достатньо високий, щоб вмістити найнижчий блок
     let deepestPct = blocks.length > 0 ? Math.max(...blocks.map(b => b.y + b.height), 40) : 40;
     canvasEl.style.minHeight = Math.max(400, deepestPct * 6) + 'px';
