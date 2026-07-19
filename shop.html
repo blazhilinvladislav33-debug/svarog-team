@@ -41,13 +41,6 @@
         a { color: var(--brand-yellow); text-decoration: none; }
         button { font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; border: none; background: none; }
 
-        /* ПЛАВНИЙ ФОН */
-        .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
-            background-image: linear-gradient(rgba(10, 10, 12, 0.85), rgba(10, 10, 12, 0.98)), var(--layer-img);
-            background-position: center; background-repeat: no-repeat; background-size: cover;
-            opacity: 0; transition: opacity 2.5s ease-in-out; }
-        .bg-layer.visible { opacity: 1; }
-
         /* ================= НАВІГАЦІЯ ================= */
         .nav{ position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(14,14,15,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--iron); }
         .nav-inner{ max-width:var(--max-w); margin:0 auto; padding:0 24px; height:64px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
@@ -123,6 +116,24 @@
         /* СІТКА ТОВАРІВ */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; margin-bottom: 60px; }
         .merch-card { display: flex; flex-direction: column; transition: all 0.3s ease; }
+        .recently-viewed-card { cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 8px; overflow: hidden; transition: 0.2s; }
+        .recently-viewed-card:hover { border-color: var(--copper); transform: translateY(-3px); }
+        .recently-viewed-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+        .recently-viewed-card .rv-title { font-size: 0.8rem; padding: 8px 10px 2px; color: var(--ash); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .recently-viewed-card .rv-price { font-size: 0.85rem; padding: 0 10px 10px; color: var(--brand-yellow); font-weight: 700; }
+        .bundle-card { background: rgba(62,207,106,0.05); border: 1px solid rgba(62,207,106,0.3); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+        .bundle-imgs { display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .bundle-imgs img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
+        .bundle-plus { color: #3ecf6a; font-weight: 800; font-size: 1.2rem; }
+        .bundle-name { font-weight: 700; text-align: center; }
+        .bundle-price { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .bundle-old { color: #888; text-decoration: line-through; font-size: 0.85rem; }
+        .bundle-new { color: #3ecf6a; font-weight: 800; font-size: 1.1rem; }
+        .bundle-badge { background: #3ecf6a; color: #0a0a0c; font-weight: 800; font-size: 0.75rem; padding: 2px 8px; border-radius: 20px; }
+        .review-card { background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 10px; overflow: hidden; }
+        .review-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block; cursor: zoom-in; }
+        .review-card .review-name { padding: 10px 12px 4px; font-weight: 700; font-size: 0.9rem; }
+        .review-card .review-text { padding: 0 12px 12px; font-size: 0.8rem; color: var(--ash); font-style: italic; line-height: 1.4; }
         
         .merch-img-box { width: 100%; aspect-ratio: 4/5; background: var(--plate); border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; border: 1px solid transparent; transition: 0.3s; cursor: pointer;}
         .merch-card:hover .merch-img-box { border-color: var(--iron); box-shadow: 0 10px 25px rgba(0,0,0,0.4);}
@@ -356,12 +367,15 @@
 </style>
 </head>
 <body>
-    <div class="bg-layer visible" id="bg-layer-a"></div>
-    <div class="bg-layer" id="bg-layer-b"></div>
 
-    <div id="shop-announcement-banner" style="display:none; background:#ffaa00; color:#1a1a1a; text-align:center; padding:12px 20px; font-size:0.9rem; font-weight:600; position:relative;">
-        <span id="shop-announcement-text-el"></span>
-        <span onclick="dismissShopAnnouncement()" style="position:absolute; right:16px; top:50%; transform:translateY(-50%); cursor:pointer; font-weight:800; font-size:1.1rem;">✕</span>
+
+    <div id="shop-announcement-overlay" style="display:none; position:fixed; inset:0; z-index:5000; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;" onclick="if(event.target===this) dismissShopAnnouncement()">
+        <div style="background:#16171A; border:1px solid #ffaa00; border-radius:12px; padding:32px; max-width:440px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+            <div style="font-size:2.5rem; margin-bottom:14px;">📢</div>
+            <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.15rem; color:#ffaa00; margin-bottom:14px;"><span data-lang="ua">Важливо</span><span data-lang="en">Important</span></h3>
+            <p id="shop-announcement-text-el" style="color:#ddd; font-size:0.95rem; line-height:1.6; margin-bottom:22px;"></p>
+            <button onclick="dismissShopAnnouncement()" class="confirm-btn" style="margin:0;"><span data-lang="ua">Зрозуміло</span><span data-lang="en">Got it</span></button>
+        </div>
     </div>
 
     <!-- НАВІГАЦІЯ -->
@@ -580,7 +594,8 @@
                 <div id="checkout-step-2" style="display:none;">
                     <input type="text" id="order-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px; opacity:0; height:0; width:0;" aria-hidden="true">
                     <div class="form-group"><input type="text" id="order-name" class="form-input" placeholder="Ваше ПІБ" required></div>
-                    <div class="form-group"><input type="tel" id="order-phone" class="form-input" placeholder="Номер телефону" required></div>
+                    <div class="form-group"><input type="tel" id="order-phone" class="form-input" placeholder="Номер телефону" required onblur="checkRepeatCustomer()"></div>
+                    <div id="repeat-discount-notice" style="display:none; background:rgba(74,158,255,0.1); border:1px solid rgba(74,158,255,0.3); border-radius:8px; padding:10px 14px; margin-bottom:14px; font-size:0.85rem; color:#4a9eff;"></div>
                     <div class="form-group"><input type="text" id="order-address" class="form-input" placeholder="Місто та № відділення НП" required></div>
                     <div class="step-nav-row">
                         <button type="button" class="step-back-btn" onclick="goToCheckoutStep(1)">←</button>
@@ -645,6 +660,21 @@
     <div class="toast-notification" id="toast-msg"><span id="toast-text"></span></div>
 
     <!-- ФУТЕР -->
+    <section id="reviews-section" style="display:none; max-width:var(--max-w); margin:0 auto; padding:0 24px 50px;">
+        <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;">⭐ <span data-lang="ua">Наші люди в мерчі</span><span data-lang="en">Our people wearing the gear</span></h3>
+        <div id="reviews-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:18px;"></div>
+    </section>
+
+    <section id="bundles-section" style="display:none; max-width:var(--max-w); margin:0 auto; padding:0 24px 50px;">
+        <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;">🎁 <span data-lang="ua">Комплекти зі знижкою</span><span data-lang="en">Discounted bundles</span></h3>
+        <div id="bundles-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:20px;"></div>
+    </section>
+
+    <section id="recently-viewed-section" style="display:none; max-width:var(--max-w); margin:0 auto; padding:0 24px 50px;">
+        <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;"><span data-lang="ua">Ви дивились</span><span data-lang="en">Recently viewed</span></h3>
+        <div id="recently-viewed-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:16px;"></div>
+    </section>
+
     <section class="order-check-section" style="max-width:var(--max-w); margin:0 auto; padding:0 24px 60px; text-align:center;">
         <div style="max-width:480px; margin:0 auto; background:rgba(255,255,255,0.03); border:1px solid var(--iron); border-radius:12px; padding:30px 24px;">
             <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.1rem; margin-bottom:8px;"><span data-lang="ua">Перевірити статус замовлення</span><span data-lang="en">Check order status</span></h3>
@@ -713,19 +743,6 @@
 
 
     <script>
-        // --- ПЛАВНИЙ ФОН ---
-        const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
-        let bgIndex = 0; let bgShowingA = true;
-        const bgLayerA = document.getElementById('bg-layer-a'); const bgLayerB = document.getElementById('bg-layer-b');
-        bgLayerA.style.setProperty('--layer-img', `url('${images[0]}')`);
-        setInterval(() => {
-            bgIndex = (bgIndex + 1) % images.length;
-            const nextLayer = bgShowingA ? bgLayerB : bgLayerA; const curLayer = bgShowingA ? bgLayerA : bgLayerB;
-            nextLayer.style.setProperty('--layer-img', `url('${images[bgIndex]}')`);
-            nextLayer.classList.add('visible'); curLayer.classList.remove('visible');
-            bgShowingA = !bgShowingA;
-        }, 6000);
-
         // --- МЕНЮ ТА ЛАЙТБОКС ---
         const menuOverlay = document.getElementById('menuOverlay');
         document.getElementById('menuToggle').addEventListener('click', () => menuOverlay.classList.add('open'));
@@ -784,6 +801,24 @@
         let activeSubcategory = 'Всі';
         let shoppingCart = JSON.parse(localStorage.getItem('svarog_shop_cart')) || []; 
         let appliedPromo = null; // { code, type, discount, fiatValue }
+        let repeatDiscountPercent = 0; let repeatDiscountApplied = false;
+        db.collection("config").doc("shop").onSnapshot(doc => { repeatDiscountPercent = (doc.exists && doc.data().repeatCustomerDiscount) || 0; });
+        async function checkRepeatCustomer() {
+            const phone = document.getElementById('order-phone').value.trim();
+            const notice = document.getElementById('repeat-discount-notice');
+            if (!phone || repeatDiscountPercent <= 0) { repeatDiscountApplied = false; notice.style.display = 'none'; return; }
+            try {
+                const snap = await db.collection("orders").where("phone", "==", phone).limit(1).get();
+                if (!snap.empty) {
+                    repeatDiscountApplied = true;
+                    notice.style.display = 'block';
+                    notice.innerHTML = currentLang === 'ua' ? `🎉 Ви наш постійний клієнт! Знижка ${repeatDiscountPercent}% застосована автоматично.` : `🎉 You're a returning customer! ${repeatDiscountPercent}% discount applied automatically.`;
+                } else {
+                    repeatDiscountApplied = false; notice.style.display = 'none';
+                }
+                renderCartModalContent();
+            } catch (e) { console.error("Перевірка повторного клієнта:", e); }
+        }
         window.selectedVariants = {}; 
         let shopSearchTerm = ''; let shopSortMode = 'default'; let showFavoritesOnly = false;
         function toggleFavoritesFilter() { showFavoritesOnly = !showFavoritesOnly; document.getElementById('fav-filter-btn').classList.toggle('active', showFavoritesOnly); renderShopGrid(); }
@@ -870,27 +905,27 @@
         // --- СПОВІЩЕННЯ ДЛЯ КЛІЄНТІВ (керується з адмінки) ---
         db.collection("config").doc("announcement").onSnapshot(doc => {
             const data = doc.exists ? doc.data() : {};
-            const banner = document.getElementById('shop-announcement-banner');
+            const overlay = document.getElementById('shop-announcement-overlay');
             const textEl = document.getElementById('shop-announcement-text-el');
             const dismissedText = sessionStorage.getItem('svarog_announcement_dismissed');
             if (data.enabled && data.text && data.text !== dismissedText) {
                 textEl.innerText = data.text;
-                banner.style.display = 'block';
+                overlay.style.display = 'flex';
             } else {
-                banner.style.display = 'none';
+                overlay.style.display = 'none';
             }
         });
         function dismissShopAnnouncement() {
             const textEl = document.getElementById('shop-announcement-text-el');
             sessionStorage.setItem('svarog_announcement_dismissed', textEl.innerText);
-            document.getElementById('shop-announcement-banner').style.display = 'none';
+            document.getElementById('shop-announcement-overlay').style.display = 'none';
         }
         db.collection("sizeCharts").onSnapshot(snapshot => { globalSizeChartsMap = {}; snapshot.forEach(doc => { globalSizeChartsMap[doc.id] = doc.data().image; }); });
 
         db.collection("merch").onSnapshot(snapshot => { 
             globalMerchList = []; 
             snapshot.forEach(doc => { globalMerchList.push({ id: doc.id, ...doc.data() }); }); 
-            renderShopGrid(); updateCartUI(); 
+            renderShopGrid(); updateCartUI(); renderRecentlyViewed(); renderBundles();
         });
 
         // --- РЕНДЕР КАТЕГОРІЙ І ПІДКАТЕГОРІЙ ---
@@ -1057,6 +1092,32 @@
         }
 
         // ================= ДЕТАЛЬНА СТОРІНКА ТОВАРУ (МОДАЛКА) =================
+        // --- НЕЩОДАВНО ПЕРЕГЛЯНУТІ ТОВАРИ ---
+        function trackRecentlyViewed(itemId) {
+            let viewed = JSON.parse(localStorage.getItem('svarog_recently_viewed') || '[]');
+            viewed = viewed.filter(id => id !== itemId);
+            viewed.unshift(itemId);
+            viewed = viewed.slice(0, 8);
+            localStorage.setItem('svarog_recently_viewed', JSON.stringify(viewed));
+        }
+        function renderRecentlyViewed() {
+            const section = document.getElementById('recently-viewed-section');
+            const grid = document.getElementById('recently-viewed-grid');
+            if (!section || !grid) return;
+            let viewed = JSON.parse(localStorage.getItem('svarog_recently_viewed') || '[]');
+            const items = viewed.map(id => globalMerchList.find(m => m.id === id)).filter(Boolean).slice(0, 6);
+            if (items.length === 0) { section.style.display = 'none'; return; }
+            section.style.display = 'block';
+            grid.innerHTML = items.map(item => {
+                const img = item.image || (item.images && item.images[0]) || 'logo.png';
+                return `<div class="recently-viewed-card" onclick="openProductModal('${item.id}')">
+                    <img src="${img}" loading="lazy">
+                    <div class="rv-title">${item.title}</div>
+                    <div class="rv-price">${item.discountPrice || item.price} ₴</div>
+                </div>`;
+            }).join('');
+        }
+
         let currentPmItem = null;
         let pmGalleryImages = [];
         let pmCurrentImgIndex = 0;
@@ -1064,6 +1125,7 @@
         window.openProductModal = function(itemId) {
             currentPmItem = globalMerchList.find(m => m.id === itemId);
             if(!currentPmItem) return;
+            trackRecentlyViewed(itemId);
 
             let isVariant = currentPmItem.variants && currentPmItem.variants.length > 0; 
             let activeVarIdx = window.selectedVariants[currentPmItem.id] || 0;
@@ -1183,6 +1245,71 @@
         }
 
         // ================= КОШИК І ОФОРМЛЕННЯ =================
+        // --- ВІДГУКИ ПОКУПЦІВ ---
+        db.collection("reviews").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+            const section = document.getElementById('reviews-section');
+            const grid = document.getElementById('reviews-grid');
+            if (!section || !grid) return;
+            if (snapshot.empty) { section.style.display = 'none'; return; }
+            section.style.display = 'block';
+            grid.innerHTML = snapshot.docs.map(doc => {
+                const r = doc.data();
+                return `<div class="review-card">
+                    <img src="${r.photo}" loading="lazy" onclick="openLightbox('${r.photo}')">
+                    <div class="review-name">${r.name}</div>
+                    ${r.text ? `<div class="review-text">"${r.text}"</div>` : ''}
+                </div>`;
+            }).join('');
+        });
+
+        // --- КОМПЛЕКТИ ЗІ ЗНИЖКОЮ ---
+        let globalBundles = [];
+        db.collection("bundles").onSnapshot(snapshot => {
+            globalBundles = []; snapshot.forEach(doc => { globalBundles.push({ id: doc.id, ...doc.data() }); });
+            renderBundles();
+        });
+        function renderBundles() {
+            const section = document.getElementById('bundles-section');
+            const grid = document.getElementById('bundles-grid');
+            if (!section || !grid) return;
+            if (globalBundles.length === 0 || globalMerchList.length === 0) { section.style.display = 'none'; return; }
+            const validBundles = globalBundles.filter(b => b.itemIds.every(id => globalMerchList.find(m => m.id === id)));
+            if (validBundles.length === 0) { section.style.display = 'none'; return; }
+            section.style.display = 'block';
+            grid.innerHTML = validBundles.map(bundle => {
+                const items = bundle.itemIds.map(id => globalMerchList.find(m => m.id === id));
+                const basePrices = items.map(item => (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price);
+                const originalTotal = basePrices.reduce((a, b) => a + b, 0);
+                const discountedTotal = Math.round(originalTotal * (1 - bundle.discountPercent / 100));
+                const imgs = items.map(item => item.image || (item.images && item.images[0]) || 'logo.png');
+                return `<div class="bundle-card">
+                    <div class="bundle-imgs">${imgs.slice(0, 3).map(src => `<img src="${src}">`).join('<span class="bundle-plus">+</span>')}</div>
+                    <div class="bundle-name">${bundle.name}</div>
+                    <div class="bundle-price"><span class="bundle-old">${originalTotal} ₴</span> <span class="bundle-new">${discountedTotal} ₴</span> <span class="bundle-badge">-${bundle.discountPercent}%</span></div>
+                    <button class="buy-btn" onclick="addBundleToCart('${bundle.id}')"><span data-lang="ua">Додати комплект в кошик</span><span data-lang="en">Add bundle to cart</span></button>
+                </div>`;
+            }).join('');
+            applyTranslationsToDOM(currentLang);
+        }
+        function addBundleToCart(bundleId) {
+            const bundle = globalBundles.find(b => b.id === bundleId); if (!bundle) return;
+            let addedCount = 0;
+            bundle.itemIds.forEach(itemId => {
+                const item = globalMerchList.find(m => m.id === itemId); if (!item) return;
+                const basePrice = (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price;
+                const discountedPrice = Math.round(basePrice * (1 - bundle.discountPercent / 100));
+                let size = "Універсальний";
+                if (item.sizes && item.sizes.length > 0) size = item.sizes[0];
+                else if (item.stock && typeof item.stock === 'object') { const keys = Object.keys(item.stock); if (keys.length > 0) size = keys[0]; }
+                const img = item.image || (item.images && item.images[0]) || null;
+                shoppingCart.push({ cartId: Date.now().toString() + Math.random().toString(36).substr(2,5), merchId: item.id, merchTitle: `${item.title} (${bundle.name})`, image: img, price: discountedPrice, size, color: null, quantity: 1, totalPrice: discountedPrice, isPreorder: item.isPreorder || false });
+                addedCount++;
+            });
+            saveCart(); updateCartUI();
+            showToast(currentLang === 'ua' ? `Комплект додано в кошик 🎁` : `Bundle added to cart 🎁`);
+            const fab = document.querySelector('.cart-fab'); if (fab) { fab.classList.remove('pulse'); void fab.offsetWidth; fab.classList.add('pulse'); }
+        }
+
         function addToCart(merchId) {
             const item = globalMerchList.find(m => m.id === merchId); if(!item) return;
             let isVariant = item.variants && item.variants.length > 0; let activeVarIdx = window.selectedVariants[item.id] || 0;
@@ -1241,6 +1368,11 @@
                 document.getElementById('promo-input-row').style.display = 'none';
                 document.getElementById('promo-applied-row').style.display = 'flex';
                 document.getElementById('promo-applied-label').innerText = `✓ ${appliedPromo.code}`;
+            } else if (repeatDiscountApplied && repeatDiscountPercent > 0) {
+                finalSum = Math.round(baseTotalSum * (1 - repeatDiscountPercent / 100));
+                document.getElementById('cart-total-sum').innerHTML = `<span class="old-total">${baseTotalSum} ₴</span>${finalSum} ₴`;
+                document.getElementById('promo-input-row').style.display = 'flex';
+                document.getElementById('promo-applied-row').style.display = 'none';
             } else {
                 document.getElementById('cart-total-sum').innerText = `${baseTotalSum} ₴`;
                 document.getElementById('promo-input-row').style.display = 'flex';
@@ -1324,6 +1456,7 @@
             const baseSum = shoppingCart.reduce((s, i) => s + i.totalPrice, 0);
             let finalSum = baseSum;
             if (appliedPromo) { if (appliedPromo.type === 'certificate') finalSum = Math.max(0, baseSum - appliedPromo.fiatValue); else finalSum = Math.round(baseSum * (1 - appliedPromo.discount / 100)); }
+            else if (repeatDiscountApplied && repeatDiscountPercent > 0) { finalSum = Math.round(baseSum * (1 - repeatDiscountPercent / 100)); }
 
             let newOrderId = '';
             try {
@@ -1365,7 +1498,7 @@
                         time: new Date().toLocaleString('uk-UA')
                     });
                 });
-                shoppingCart = []; appliedPromo = null; orderReceiptBase64 = ''; const receiptInput = document.getElementById('order-receipt-file'); if(receiptInput) receiptInput.value = ''; const receiptPrev = document.getElementById('order-receipt-preview'); if(receiptPrev) receiptPrev.style.display = 'none'; saveCart(); updateCartUI();
+                shoppingCart = []; appliedPromo = null; repeatDiscountApplied = false; orderReceiptBase64 = ''; const receiptInput = document.getElementById('order-receipt-file'); if(receiptInput) receiptInput.value = ''; const receiptPrev = document.getElementById('order-receipt-preview'); if(receiptPrev) receiptPrev.style.display = 'none'; saveCart(); updateCartUI();
                 ['checkout-step-1', 'checkout-step-2', 'checkout-form', 'checkout-steps-indicator'].forEach(id => document.getElementById(id).style.display = 'none');
                 document.getElementById('order-success-number').innerText = newOrderId;
                 document.getElementById('order-success-screen').style.display = 'flex';
