@@ -131,6 +131,7 @@
     .chat-fab-label { display: inline-block; color: var(--bone); font-family: 'Oswald', sans-serif; font-size: 12.5px; text-transform: uppercase; letter-spacing: .03em; }
     .chat-fab-badge { top: -4px; right: -4px; }
     .user-chat-modal { width: calc(100% - 32px); left: 16px; right: 16px; bottom: 100px; height: 60vh; max-height: 460px; }
+    .about-mission-grid { grid-template-columns: 1fr !important; }
   }
 
 </style>
@@ -173,10 +174,50 @@
   <div class="menu-social" id="menuSocialBox"></div>
 </div>
 
-<!-- ПУСТА СТОРІНКА (наповнення додамо пізніше) -->
 <section class="empty-hero">
   <h1 class="about-title"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></h1>
-  <p><span data-lang="ua">Ця сторінка в розробці — наповнення додамо найближчим часом.</span><span data-lang="en">This page is under construction — content will be added soon.</span></p>
+  <p><span data-lang="ua">Ми — SVAROG TEAM. Ті, хто тримає лінію не заради слів, а заради тих, хто за спиною.</span><span data-lang="en">We are SVAROG TEAM. Holding the line not for words, but for those behind us.</span></p>
+</section>
+
+<section class="about-mission-grid" style="max-width:1100px; margin:0 auto; padding:20px 24px 80px; display:grid; grid-template-columns:1fr 1.4fr; gap:50px; align-items:start;">
+  <div>
+    <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--copper); font-weight:700; margin-bottom:14px;"><span data-lang="ua">Місія</span><span data-lang="en">Mission</span></div>
+    <h2 style="font-family:'Oswald',sans-serif; font-size:clamp(24px,3vw,34px); font-weight:600; text-transform:uppercase; margin:0; line-height:1.2;"><span data-lang="ua">Стояти там, де потрібно. Тоді, коли потрібно.</span><span data-lang="en">Standing where it's needed. When it's needed.</span></h2>
+  </div>
+  <div style="color:var(--ash); font-size:16px; line-height:1.85;">
+    <p style="margin:0 0 18px;"><span data-lang="ua">Підрозділ формувався у відповідь на пряму загрозу — з добровольців, які пройшли шлях від цивільного життя до бойових позицій. Дисципліна, взаємна довіра та бойовий досвід — те, на чому тримається команда.</span><span data-lang="en">The unit was formed in response to a direct threat — volunteers who went from civilian life to combat positions. Discipline, mutual trust, and combat experience hold the team together.</span></p>
+    <p style="margin:0;"><span data-lang="ua">Кожен новий боєць проходить підготовку поруч із тими, хто вже пройшов бій, і залишається у строю доти, доки триває завдання.</span><span data-lang="en">Every new fighter trains alongside those who've already been through combat, and stays in the ranks for as long as the mission continues.</span></p>
+  </div>
+</section>
+
+<section style="max-width:1100px; margin:0 auto; padding:0 24px 90px;">
+  <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--copper); font-weight:700; margin-bottom:14px;"><span data-lang="ua">Структура</span><span data-lang="en">Structure</span></div>
+  <h2 style="font-family:'Oswald',sans-serif; font-size:clamp(24px,3vw,34px); font-weight:600; text-transform:uppercase; margin:0 0 34px;"><span data-lang="ua">Напрямки підрозділу</span><span data-lang="en">Unit divisions</span></h2>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:1px; background:var(--iron); border:1px solid var(--iron);">
+    <div style="background:var(--graphite); padding:28px 24px;">
+      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Командування</span><span data-lang="en">Command</span></div>
+      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Загальне керівництво та координація з вищим командуванням.</span><span data-lang="en">Overall leadership and coordination with higher command.</span></div>
+    </div>
+    <div style="background:var(--graphite); padding:28px 24px;">
+      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Штурмова група</span><span data-lang="en">Assault group</span></div>
+      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Виконання завдань у зоні бойових дій.</span><span data-lang="en">Operations in the combat zone.</span></div>
+    </div>
+    <div style="background:var(--graphite); padding:28px 24px;">
+      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Розвідка</span><span data-lang="en">Reconnaissance</span></div>
+      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Розвідувальне забезпечення та аналіз.</span><span data-lang="en">Reconnaissance support and analysis.</span></div>
+    </div>
+    <div style="background:var(--graphite); padding:28px 24px;">
+      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Забезпечення</span><span data-lang="en">Support</span></div>
+      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Логістика, техобслуговування, медицина.</span><span data-lang="en">Logistics, maintenance, medical support.</span></div>
+    </div>
+  </div>
+</section>
+
+<section style="max-width:1440px; margin:0 auto 60px; padding:70px 24px; text-align:center; background:var(--plate); border-top:1px solid var(--iron); border-bottom:1px solid var(--iron);">
+  <div style="font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--copper); margin-bottom:16px; font-weight:600;"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></div>
+  <h2 style="font-family:'Oswald',sans-serif; font-size:clamp(26px,4vw,46px); font-weight:700; text-transform:uppercase; margin:0 0 18px;"><span data-lang="ua">Приєднуйся до підрозділу</span><span data-lang="en">Join the unit</span></h2>
+  <p style="color:var(--ash); font-size:15px; max-width:520px; margin:0 auto 30px; line-height:1.6;"><span data-lang="ua">Нам потрібні ті, хто готовий тримати позицію.</span><span data-lang="en">We need those ready to hold the line.</span></p>
+  <a href="recruiting.html" style="text-decoration:none; display:inline-block; background:var(--ember); color:var(--bone); font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:.05em; border-radius:2px; padding:15px 36px;"><span data-lang="ua">Подати заявку</span><span data-lang="en">Apply now</span></a>
 </section>
 
 <footer>
