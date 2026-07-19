@@ -100,6 +100,11 @@
         /* ЗВІТИ ПО ДОНАТАХ */
         .reports-section { border-top: 1px solid var(--iron); padding-top: 60px; }
         .reports-title { font-family: 'Oswald', sans-serif; font-size: 36px; text-transform: uppercase; text-align: center; margin-bottom: 40px; }
+        .partner-card { background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; text-decoration: none; transition: 0.3s; }
+        .partner-card:hover { border-color: var(--copper); transform: translateY(-4px); }
+        .partner-card img { width: 64px; height: 64px; object-fit: contain; border-radius: 6px; background: #fff; padding: 6px; }
+        .partner-card .partner-name { color: var(--bone); font-size: 0.9rem; font-weight: 600; }
+        .partner-card .partner-visit { color: var(--copper); font-size: 0.75rem; text-transform: uppercase; letter-spacing: .04em; }
         
         .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; margin-bottom: 40px; }
         .report-card { background: rgba(22, 23, 26, 0.6); border: 1px solid var(--iron); display: flex; flex-direction: column; transition: transform 0.3s, border-color 0.3s; }
@@ -371,6 +376,11 @@
                 <span data-lang="ua">Показати ще звіти</span><span data-lang="en">Show more reports</span>
             </button>
         </div>
+
+        <div id="partners-section" style="display:none; max-width:var(--max-w); margin:80px auto 0; padding:0 24px;">
+            <h2 class="reports-title"><span data-lang="ua">Партнери та фонди</span><span data-lang="en">Partners & Funds</span></h2>
+            <div id="partners-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:20px;"></div>
+        </div>
     </div>
 
     <div id="view-donate">
@@ -503,7 +513,7 @@
             </div>
         </div>
     </div>
-    <div class="footer-bottom">© 2026 SVAROG TEAM</div>
+    <div class="footer-bottom">© 2026 SVAROG TEAM · <a href="privacy.html" style="color:inherit; text-decoration:underline; opacity:.8;"><span data-lang="ua">Політика конфіденційності</span><span data-lang="en">Privacy Policy</span></a></div>
 </footer>
 
 <!-- КНОПКА АНОНІМНОГО ЧАТУ -->
@@ -721,6 +731,23 @@ function getYouTubeEmbedUrl(url) {
 let reportsLimit = 6;
 let unsubscribeReports = null;
 let currentReportsData = [];
+// --- ПАРТНЕРИ ТА ФОНДИ ---
+db.collection("partners").orderBy("order", "asc").onSnapshot(snapshot => {
+    const section = document.getElementById('partners-section');
+    const grid = document.getElementById('partners-grid');
+    if (snapshot.empty) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    grid.innerHTML = snapshot.docs.map(doc => {
+        const p = doc.data();
+        return `<a href="${p.url}" target="_blank" rel="noopener" class="partner-card">
+            <img src="${p.logo}" alt="${p.name}">
+            <div class="partner-name">${p.name}</div>
+            <div class="partner-visit"><span data-lang="ua">Перейти →</span><span data-lang="en">Visit →</span></div>
+        </a>`;
+    }).join('');
+    applyTranslationsToDOM(currentLang);
+}, err => console.error("Партнери:", err));
+
 function initReportsStream() {
     if (unsubscribeReports) unsubscribeReports();
     unsubscribeReports = db.collection("reports").orderBy("timestamp", "desc").limit(reportsLimit).onSnapshot(snapshot => {
