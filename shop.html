@@ -7,6 +7,7 @@
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <script>
         const firebaseConfig = {
@@ -40,6 +41,13 @@
         html, body { width: 100%; min-height: 100%; scroll-behavior: smooth; background: var(--graphite); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
         a { color: var(--brand-yellow); text-decoration: none; }
         button { font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; border: none; background: none; }
+
+        /* ПЛАВНИЙ ФОН */
+        .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background-image: linear-gradient(rgba(10, 10, 12, 0.85), rgba(10, 10, 12, 0.98)), var(--layer-img);
+            background-position: center; background-repeat: no-repeat; background-size: cover;
+            opacity: 0; transition: opacity 2.5s ease-in-out; }
+        .bg-layer.visible { opacity: 1; }
 
         /* ================= НАВІГАЦІЯ ================= */
         .nav{ position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(14,14,15,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--iron); }
@@ -116,24 +124,6 @@
         /* СІТКА ТОВАРІВ */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; margin-bottom: 60px; }
         .merch-card { display: flex; flex-direction: column; transition: all 0.3s ease; }
-        .recently-viewed-card { cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 8px; overflow: hidden; transition: 0.2s; }
-        .recently-viewed-card:hover { border-color: var(--copper); transform: translateY(-3px); }
-        .recently-viewed-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
-        .recently-viewed-card .rv-title { font-size: 0.8rem; padding: 8px 10px 2px; color: var(--ash); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .recently-viewed-card .rv-price { font-size: 0.85rem; padding: 0 10px 10px; color: var(--brand-yellow); font-weight: 700; }
-        .bundle-card { background: rgba(62,207,106,0.05); border: 1px solid rgba(62,207,106,0.3); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
-        .bundle-imgs { display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .bundle-imgs img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
-        .bundle-plus { color: #3ecf6a; font-weight: 800; font-size: 1.2rem; }
-        .bundle-name { font-weight: 700; text-align: center; }
-        .bundle-price { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
-        .bundle-old { color: #888; text-decoration: line-through; font-size: 0.85rem; }
-        .bundle-new { color: #3ecf6a; font-weight: 800; font-size: 1.1rem; }
-        .bundle-badge { background: #3ecf6a; color: #0a0a0c; font-weight: 800; font-size: 0.75rem; padding: 2px 8px; border-radius: 20px; }
-        .review-card { background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 10px; overflow: hidden; }
-        .review-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block; cursor: zoom-in; }
-        .review-card .review-name { padding: 10px 12px 4px; font-weight: 700; font-size: 0.9rem; }
-        .review-card .review-text { padding: 0 12px 12px; font-size: 0.8rem; color: var(--ash); font-style: italic; line-height: 1.4; }
         
         .merch-img-box { width: 100%; aspect-ratio: 4/5; background: var(--plate); border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; border: 1px solid transparent; transition: 0.3s; cursor: pointer;}
         .merch-card:hover .merch-img-box { border-color: var(--iron); box-shadow: 0 10px 25px rgba(0,0,0,0.4);}
@@ -367,15 +357,12 @@
 </style>
 </head>
 <body>
+    <div class="bg-layer visible" id="bg-layer-a"></div>
+    <div class="bg-layer" id="bg-layer-b"></div>
 
-
-    <div id="shop-announcement-overlay" style="display:none; position:fixed; inset:0; z-index:5000; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;" onclick="if(event.target===this) dismissShopAnnouncement()">
-        <div style="background:#16171A; border:1px solid #ffaa00; border-radius:12px; padding:32px; max-width:440px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-            <div style="font-size:2.5rem; margin-bottom:14px;">📢</div>
-            <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.15rem; color:#ffaa00; margin-bottom:14px;"><span data-lang="ua">Важливо</span><span data-lang="en">Important</span></h3>
-            <p id="shop-announcement-text-el" style="color:#ddd; font-size:0.95rem; line-height:1.6; margin-bottom:22px;"></p>
-            <button onclick="dismissShopAnnouncement()" class="confirm-btn" style="margin:0;"><span data-lang="ua">Зрозуміло</span><span data-lang="en">Got it</span></button>
-        </div>
+    <div id="shop-announcement-banner" style="display:none; background:#ffaa00; color:#1a1a1a; text-align:center; padding:12px 20px; font-size:0.9rem; font-weight:600; position:relative;">
+        <span id="shop-announcement-text-el"></span>
+        <span onclick="dismissShopAnnouncement()" style="position:absolute; right:16px; top:50%; transform:translateY(-50%); cursor:pointer; font-weight:800; font-size:1.1rem;">✕</span>
     </div>
 
     <!-- НАВІГАЦІЯ -->
@@ -384,6 +371,7 @@
             <a href="index.html" class="wordmark">Svarog Team</a>
             <div class="nav-actions">
                 <button class="btn-lang" id="langToggle">EN</button>
+                <button id="account-nav-btn" onclick="openAccountModal()" style="background:none; border:1px solid var(--iron); color:var(--bone); border-radius:2px; padding:0 16px; height:38px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">👤 <span id="account-nav-label" data-lang="ua">Увійти</span><span id="account-nav-label-en" data-lang="en">Log in</span></button>
                 <a href="support.html" class="btn-ember"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
                 <button class="btn-menu" id="menuToggle">
                     <span><span data-lang="ua">меню</span><span data-lang="en">menu</span></span>
@@ -541,6 +529,46 @@
         </div>
     </div>
 
+    <div id="account-modal-overlay" style="display:none; position:fixed; inset:0; z-index:9997; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;" onclick="if(event.target===this) closeAccountModal()">
+        <div style="background:var(--plate, #16171A); border:1px solid var(--iron); border-radius:12px; padding:32px; max-width:400px; width:100%;">
+
+            <!-- ЕКРАН: ВХІД -->
+            <div id="account-view-login">
+                <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.1rem; margin-bottom:20px; text-align:center;"><span data-lang="ua">Вхід в акаунт</span><span data-lang="en">Log in</span></h3>
+                <div class="form-group"><input type="email" id="login-email-input" class="form-input" placeholder="Email" autocomplete="email"></div>
+                <div class="form-group"><input type="password" id="login-password-input" class="form-input" placeholder="Пароль" autocomplete="current-password" onkeypress="if(event.key==='Enter') doLogin();"></div>
+                <div id="login-error-msg" style="display:none; color:#ff4a4a; font-size:0.85rem; margin-bottom:12px;"></div>
+                <button type="button" class="confirm-btn" style="margin:0 0 14px;" onclick="doLogin()"><span data-lang="ua">Увійти</span><span data-lang="en">Log in</span></button>
+                <div style="text-align:center; font-size:0.85rem; color:#888; margin-bottom:8px;"><span data-lang="ua">Ще немає акаунту?</span><span data-lang="en">No account yet?</span> <a href="#" onclick="event.preventDefault(); switchAccountView('register');" style="color:var(--brand-yellow);"><span data-lang="ua">Зареєструватись</span><span data-lang="en">Sign up</span></a></div>
+                <div style="text-align:center; font-size:0.8rem;"><a href="#" onclick="event.preventDefault(); doPasswordReset();" style="color:#888;"><span data-lang="ua">Забули пароль?</span><span data-lang="en">Forgot password?</span></a></div>
+            </div>
+
+            <!-- ЕКРАН: РЕЄСТРАЦІЯ -->
+            <div id="account-view-register" style="display:none;">
+                <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.1rem; margin-bottom:20px; text-align:center;"><span data-lang="ua">Реєстрація</span><span data-lang="en">Sign up</span></h3>
+                <div class="form-group"><input type="text" id="register-name-input" class="form-input" placeholder="Ім'я" autocomplete="name"></div>
+                <div class="form-group"><input type="email" id="register-email-input" class="form-input" placeholder="Email" autocomplete="email"></div>
+                <div class="form-group"><input type="password" id="register-password-input" class="form-input" placeholder="Пароль (мінімум 6 символів)" autocomplete="new-password"></div>
+                <div id="register-error-msg" style="display:none; color:#ff4a4a; font-size:0.85rem; margin-bottom:12px;"></div>
+                <button type="button" class="confirm-btn" style="margin:0 0 14px;" onclick="doRegister()"><span data-lang="ua">Створити акаунт</span><span data-lang="en">Create account</span></button>
+                <div style="text-align:center; font-size:0.85rem; color:#888;"><span data-lang="ua">Вже є акаунт?</span><span data-lang="en">Already have an account?</span> <a href="#" onclick="event.preventDefault(); switchAccountView('login');" style="color:var(--brand-yellow);"><span data-lang="ua">Увійти</span><span data-lang="en">Log in</span></a></div>
+            </div>
+
+            <!-- ЕКРАН: КАБІНЕТ (залогінений) -->
+            <div id="account-view-dashboard" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                    <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.1rem;"><span data-lang="ua">Мій акаунт</span><span data-lang="en">My account</span></h3>
+                    <span onclick="closeAccountModal()" style="cursor:pointer; font-size:1.3rem; color:#888;">✕</span>
+                </div>
+                <div id="account-user-email" style="color:#888; font-size:0.85rem; margin-bottom:20px;"></div>
+                <h4 style="font-size:0.9rem; text-transform:uppercase; color:var(--copper); margin-bottom:12px;"><span data-lang="ua">Історія замовлень</span><span data-lang="en">Order history</span></h4>
+                <div id="account-orders-list" style="display:flex; flex-direction:column; gap:10px; max-height:320px; overflow-y:auto; margin-bottom:20px;"></div>
+                <button type="button" onclick="doLogout()" style="width:100%; background:none; border:1px solid #ff4a4a; color:#ff4a4a; border-radius:4px; padding:12px; cursor:pointer; font-weight:600;"><span data-lang="ua">Вийти з акаунту</span><span data-lang="en">Log out</span></button>
+            </div>
+
+        </div>
+    </div>
+
     <div id="image-lightbox" class="lightbox-overlay" style="z-index: 9999;" onclick="closeLightbox()">
         <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
         <img class="lightbox-content" id="lightbox-img">
@@ -594,8 +622,7 @@
                 <div id="checkout-step-2" style="display:none;">
                     <input type="text" id="order-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px; opacity:0; height:0; width:0;" aria-hidden="true">
                     <div class="form-group"><input type="text" id="order-name" class="form-input" placeholder="Ваше ПІБ" required></div>
-                    <div class="form-group"><input type="tel" id="order-phone" class="form-input" placeholder="Номер телефону" required onblur="checkRepeatCustomer()"></div>
-                    <div id="repeat-discount-notice" style="display:none; background:rgba(74,158,255,0.1); border:1px solid rgba(74,158,255,0.3); border-radius:8px; padding:10px 14px; margin-bottom:14px; font-size:0.85rem; color:#4a9eff;"></div>
+                    <div class="form-group"><input type="tel" id="order-phone" class="form-input" placeholder="Номер телефону" required></div>
                     <div class="form-group"><input type="text" id="order-address" class="form-input" placeholder="Місто та № відділення НП" required></div>
                     <div class="step-nav-row">
                         <button type="button" class="step-back-btn" onclick="goToCheckoutStep(1)">←</button>
@@ -660,21 +687,6 @@
     <div class="toast-notification" id="toast-msg"><span id="toast-text"></span></div>
 
     <!-- ФУТЕР -->
-    <section id="reviews-section" style="display:none; max-width:var(--max-w); margin:0 auto; padding:0 24px 50px;">
-        <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;">⭐ <span data-lang="ua">Наші люди в мерчі</span><span data-lang="en">Our people wearing the gear</span></h3>
-        <div id="reviews-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:18px;"></div>
-    </section>
-
-    <section id="bundles-section" style="display:none; max-width:var(--max-w); margin:0 auto; padding:0 24px 50px;">
-        <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;">🎁 <span data-lang="ua">Комплекти зі знижкою</span><span data-lang="en">Discounted bundles</span></h3>
-        <div id="bundles-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:20px;"></div>
-    </section>
-
-    <section id="recently-viewed-section" style="display:none; max-width:var(--max-w); margin:0 auto; padding:0 24px 50px;">
-        <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;"><span data-lang="ua">Ви дивились</span><span data-lang="en">Recently viewed</span></h3>
-        <div id="recently-viewed-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:16px;"></div>
-    </section>
-
     <section class="order-check-section" style="max-width:var(--max-w); margin:0 auto; padding:0 24px 60px; text-align:center;">
         <div style="max-width:480px; margin:0 auto; background:rgba(255,255,255,0.03); border:1px solid var(--iron); border-radius:12px; padding:30px 24px;">
             <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.1rem; margin-bottom:8px;"><span data-lang="ua">Перевірити статус замовлення</span><span data-lang="en">Check order status</span></h3>
@@ -743,6 +755,19 @@
 
 
     <script>
+        // --- ПЛАВНИЙ ФОН ---
+        const images = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
+        let bgIndex = 0; let bgShowingA = true;
+        const bgLayerA = document.getElementById('bg-layer-a'); const bgLayerB = document.getElementById('bg-layer-b');
+        bgLayerA.style.setProperty('--layer-img', `url('${images[0]}')`);
+        setInterval(() => {
+            bgIndex = (bgIndex + 1) % images.length;
+            const nextLayer = bgShowingA ? bgLayerB : bgLayerA; const curLayer = bgShowingA ? bgLayerA : bgLayerB;
+            nextLayer.style.setProperty('--layer-img', `url('${images[bgIndex]}')`);
+            nextLayer.classList.add('visible'); curLayer.classList.remove('visible');
+            bgShowingA = !bgShowingA;
+        }, 6000);
+
         // --- МЕНЮ ТА ЛАЙТБОКС ---
         const menuOverlay = document.getElementById('menuOverlay');
         document.getElementById('menuToggle').addEventListener('click', () => menuOverlay.classList.add('open'));
@@ -801,24 +826,6 @@
         let activeSubcategory = 'Всі';
         let shoppingCart = JSON.parse(localStorage.getItem('svarog_shop_cart')) || []; 
         let appliedPromo = null; // { code, type, discount, fiatValue }
-        let repeatDiscountPercent = 0; let repeatDiscountApplied = false;
-        db.collection("config").doc("shop").onSnapshot(doc => { repeatDiscountPercent = (doc.exists && doc.data().repeatCustomerDiscount) || 0; });
-        async function checkRepeatCustomer() {
-            const phone = document.getElementById('order-phone').value.trim();
-            const notice = document.getElementById('repeat-discount-notice');
-            if (!phone || repeatDiscountPercent <= 0) { repeatDiscountApplied = false; notice.style.display = 'none'; return; }
-            try {
-                const snap = await db.collection("orders").where("phone", "==", phone).limit(1).get();
-                if (!snap.empty) {
-                    repeatDiscountApplied = true;
-                    notice.style.display = 'block';
-                    notice.innerHTML = currentLang === 'ua' ? `🎉 Ви наш постійний клієнт! Знижка ${repeatDiscountPercent}% застосована автоматично.` : `🎉 You're a returning customer! ${repeatDiscountPercent}% discount applied automatically.`;
-                } else {
-                    repeatDiscountApplied = false; notice.style.display = 'none';
-                }
-                renderCartModalContent();
-            } catch (e) { console.error("Перевірка повторного клієнта:", e); }
-        }
         window.selectedVariants = {}; 
         let shopSearchTerm = ''; let shopSortMode = 'default'; let showFavoritesOnly = false;
         function toggleFavoritesFilter() { showFavoritesOnly = !showFavoritesOnly; document.getElementById('fav-filter-btn').classList.toggle('active', showFavoritesOnly); renderShopGrid(); }
@@ -838,6 +845,107 @@
                     );
                 }
                 renderCategoryBar();
+            }
+        });
+
+        // --- АКАУНТИ КЛІЄНТІВ (Email + пароль) ---
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        let currentAccountUser = null;
+
+        function openAccountModal() {
+            document.getElementById('account-modal-overlay').style.display = 'flex';
+            if (currentAccountUser) { switchAccountView('dashboard'); } else { switchAccountView('login'); }
+        }
+        function closeAccountModal() { document.getElementById('account-modal-overlay').style.display = 'none'; }
+        function switchAccountView(view) {
+            document.getElementById('account-view-login').style.display = view === 'login' ? 'block' : 'none';
+            document.getElementById('account-view-register').style.display = view === 'register' ? 'block' : 'none';
+            document.getElementById('account-view-dashboard').style.display = view === 'dashboard' ? 'block' : 'none';
+            document.getElementById('login-error-msg').style.display = 'none';
+            document.getElementById('register-error-msg').style.display = 'none';
+            if (view === 'dashboard') loadAccountOrders();
+        }
+
+        const authErrorMessages = {
+            'auth/invalid-email': currentLang === 'ua' ? 'Некоректний email.' : 'Invalid email.',
+            'auth/user-not-found': currentLang === 'ua' ? 'Акаунт з таким email не знайдено.' : 'No account with this email.',
+            'auth/wrong-password': currentLang === 'ua' ? 'Неправильний пароль.' : 'Wrong password.',
+            'auth/invalid-credential': currentLang === 'ua' ? 'Неправильний email або пароль.' : 'Wrong email or password.',
+            'auth/email-already-in-use': currentLang === 'ua' ? 'Цей email уже зареєстровано.' : 'This email is already registered.',
+            'auth/weak-password': currentLang === 'ua' ? 'Пароль має бути не менше 6 символів.' : 'Password must be at least 6 characters.'
+        };
+        function authErrorText(err) { return authErrorMessages[err.code] || err.message; }
+
+        async function doLogin() {
+            const email = document.getElementById('login-email-input').value.trim();
+            const password = document.getElementById('login-password-input').value;
+            const errEl = document.getElementById('login-error-msg');
+            errEl.style.display = 'none';
+            if (!email || !password) return;
+            try {
+                await firebase.auth().signInWithEmailAndPassword(email, password);
+                closeAccountModal();
+                showToast(currentLang === 'ua' ? 'Ви увійшли в акаунт!' : 'Logged in!');
+            } catch (err) { errEl.innerText = authErrorText(err); errEl.style.display = 'block'; }
+        }
+
+        async function doRegister() {
+            const name = document.getElementById('register-name-input').value.trim();
+            const email = document.getElementById('register-email-input').value.trim();
+            const password = document.getElementById('register-password-input').value;
+            const errEl = document.getElementById('register-error-msg');
+            errEl.style.display = 'none';
+            if (!name || !email || !password) { errEl.innerText = currentLang === 'ua' ? 'Заповніть усі поля.' : 'Fill in all fields.'; errEl.style.display = 'block'; return; }
+            try {
+                const cred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                await db.collection('customers').doc(cred.user.uid).set({ name, email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                closeAccountModal();
+                showToast(currentLang === 'ua' ? 'Акаунт створено!' : 'Account created!');
+            } catch (err) { errEl.innerText = authErrorText(err); errEl.style.display = 'block'; }
+        }
+
+        function doLogout() { firebase.auth().signOut(); closeAccountModal(); }
+
+        async function doPasswordReset() {
+            const email = document.getElementById('login-email-input').value.trim();
+            if (!email) { showToast(currentLang === 'ua' ? 'Спочатку введіть email вище' : 'Enter your email above first'); return; }
+            try { await firebase.auth().sendPasswordResetEmail(email); showToast(currentLang === 'ua' ? 'Лист для скидання пароля надіслано' : 'Password reset email sent'); }
+            catch (err) { showToast(authErrorText(err)); }
+        }
+
+        async function loadAccountOrders() {
+            const listEl = document.getElementById('account-orders-list');
+            if (!currentAccountUser) return;
+            listEl.innerHTML = `<div style="color:#888; text-align:center; font-size:0.85rem;">${currentLang === 'ua' ? 'Завантаження...' : 'Loading...'}</div>`;
+            try {
+                const snap = await db.collection('orders').where('userId', '==', currentAccountUser.uid).orderBy('timestamp', 'desc').get();
+                if (snap.empty) { listEl.innerHTML = `<div style="color:#888; text-align:center; font-size:0.85rem;">${currentLang === 'ua' ? 'Замовлень ще немає' : 'No orders yet'}</div>`; return; }
+                listEl.innerHTML = snap.docs.map(doc => {
+                    const data = doc.data();
+                    const statusInfo = orderStatusLabels[data.status] || { ua: data.status, en: data.status, color: '#888' };
+                    const statusLabel = currentLang === 'ua' ? statusInfo.ua : statusInfo.en;
+                    return `<div style="background:rgba(255,255,255,0.03); border:1px solid var(--iron); border-radius:8px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <span style="font-weight:700; font-size:0.9rem;">${data.totalPrice} ₴</span>
+                            <span style="color:${statusInfo.color}; font-size:0.78rem; font-weight:700;">${statusLabel}</span>
+                        </div>
+                        <div style="color:#888; font-size:0.75rem; font-family:monospace;">${doc.id}</div>
+                    </div>`;
+                }).join('');
+            } catch (err) { listEl.innerHTML = `<div style="color:#ff4a4a; text-align:center; font-size:0.85rem;">${currentLang === 'ua' ? 'Помилка завантаження' : 'Failed to load'}</div>`; }
+        }
+
+        firebase.auth().onAuthStateChanged(user => {
+            currentAccountUser = user;
+            const navLabelUa = document.getElementById('account-nav-label');
+            const navLabelEn = document.getElementById('account-nav-label-en');
+            if (user) {
+                navLabelUa.innerText = 'Акаунт';
+                navLabelEn.innerText = 'Account';
+                document.getElementById('account-user-email').innerText = user.email;
+            } else {
+                navLabelUa.innerText = 'Увійти';
+                navLabelEn.innerText = 'Log in';
             }
         });
 
@@ -905,27 +1013,27 @@
         // --- СПОВІЩЕННЯ ДЛЯ КЛІЄНТІВ (керується з адмінки) ---
         db.collection("config").doc("announcement").onSnapshot(doc => {
             const data = doc.exists ? doc.data() : {};
-            const overlay = document.getElementById('shop-announcement-overlay');
+            const banner = document.getElementById('shop-announcement-banner');
             const textEl = document.getElementById('shop-announcement-text-el');
             const dismissedText = sessionStorage.getItem('svarog_announcement_dismissed');
             if (data.enabled && data.text && data.text !== dismissedText) {
                 textEl.innerText = data.text;
-                overlay.style.display = 'flex';
+                banner.style.display = 'block';
             } else {
-                overlay.style.display = 'none';
+                banner.style.display = 'none';
             }
         });
         function dismissShopAnnouncement() {
             const textEl = document.getElementById('shop-announcement-text-el');
             sessionStorage.setItem('svarog_announcement_dismissed', textEl.innerText);
-            document.getElementById('shop-announcement-overlay').style.display = 'none';
+            document.getElementById('shop-announcement-banner').style.display = 'none';
         }
         db.collection("sizeCharts").onSnapshot(snapshot => { globalSizeChartsMap = {}; snapshot.forEach(doc => { globalSizeChartsMap[doc.id] = doc.data().image; }); });
 
         db.collection("merch").onSnapshot(snapshot => { 
             globalMerchList = []; 
             snapshot.forEach(doc => { globalMerchList.push({ id: doc.id, ...doc.data() }); }); 
-            renderShopGrid(); updateCartUI(); renderRecentlyViewed(); renderBundles();
+            renderShopGrid(); updateCartUI(); 
         });
 
         // --- РЕНДЕР КАТЕГОРІЙ І ПІДКАТЕГОРІЙ ---
@@ -1092,32 +1200,6 @@
         }
 
         // ================= ДЕТАЛЬНА СТОРІНКА ТОВАРУ (МОДАЛКА) =================
-        // --- НЕЩОДАВНО ПЕРЕГЛЯНУТІ ТОВАРИ ---
-        function trackRecentlyViewed(itemId) {
-            let viewed = JSON.parse(localStorage.getItem('svarog_recently_viewed') || '[]');
-            viewed = viewed.filter(id => id !== itemId);
-            viewed.unshift(itemId);
-            viewed = viewed.slice(0, 8);
-            localStorage.setItem('svarog_recently_viewed', JSON.stringify(viewed));
-        }
-        function renderRecentlyViewed() {
-            const section = document.getElementById('recently-viewed-section');
-            const grid = document.getElementById('recently-viewed-grid');
-            if (!section || !grid) return;
-            let viewed = JSON.parse(localStorage.getItem('svarog_recently_viewed') || '[]');
-            const items = viewed.map(id => globalMerchList.find(m => m.id === id)).filter(Boolean).slice(0, 6);
-            if (items.length === 0) { section.style.display = 'none'; return; }
-            section.style.display = 'block';
-            grid.innerHTML = items.map(item => {
-                const img = item.image || (item.images && item.images[0]) || 'logo.png';
-                return `<div class="recently-viewed-card" onclick="openProductModal('${item.id}')">
-                    <img src="${img}" loading="lazy">
-                    <div class="rv-title">${item.title}</div>
-                    <div class="rv-price">${item.discountPrice || item.price} ₴</div>
-                </div>`;
-            }).join('');
-        }
-
         let currentPmItem = null;
         let pmGalleryImages = [];
         let pmCurrentImgIndex = 0;
@@ -1125,7 +1207,6 @@
         window.openProductModal = function(itemId) {
             currentPmItem = globalMerchList.find(m => m.id === itemId);
             if(!currentPmItem) return;
-            trackRecentlyViewed(itemId);
 
             let isVariant = currentPmItem.variants && currentPmItem.variants.length > 0; 
             let activeVarIdx = window.selectedVariants[currentPmItem.id] || 0;
@@ -1245,71 +1326,6 @@
         }
 
         // ================= КОШИК І ОФОРМЛЕННЯ =================
-        // --- ВІДГУКИ ПОКУПЦІВ ---
-        db.collection("reviews").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-            const section = document.getElementById('reviews-section');
-            const grid = document.getElementById('reviews-grid');
-            if (!section || !grid) return;
-            if (snapshot.empty) { section.style.display = 'none'; return; }
-            section.style.display = 'block';
-            grid.innerHTML = snapshot.docs.map(doc => {
-                const r = doc.data();
-                return `<div class="review-card">
-                    <img src="${r.photo}" loading="lazy" onclick="openLightbox('${r.photo}')">
-                    <div class="review-name">${r.name}</div>
-                    ${r.text ? `<div class="review-text">"${r.text}"</div>` : ''}
-                </div>`;
-            }).join('');
-        });
-
-        // --- КОМПЛЕКТИ ЗІ ЗНИЖКОЮ ---
-        let globalBundles = [];
-        db.collection("bundles").onSnapshot(snapshot => {
-            globalBundles = []; snapshot.forEach(doc => { globalBundles.push({ id: doc.id, ...doc.data() }); });
-            renderBundles();
-        });
-        function renderBundles() {
-            const section = document.getElementById('bundles-section');
-            const grid = document.getElementById('bundles-grid');
-            if (!section || !grid) return;
-            if (globalBundles.length === 0 || globalMerchList.length === 0) { section.style.display = 'none'; return; }
-            const validBundles = globalBundles.filter(b => b.itemIds.every(id => globalMerchList.find(m => m.id === id)));
-            if (validBundles.length === 0) { section.style.display = 'none'; return; }
-            section.style.display = 'block';
-            grid.innerHTML = validBundles.map(bundle => {
-                const items = bundle.itemIds.map(id => globalMerchList.find(m => m.id === id));
-                const basePrices = items.map(item => (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price);
-                const originalTotal = basePrices.reduce((a, b) => a + b, 0);
-                const discountedTotal = Math.round(originalTotal * (1 - bundle.discountPercent / 100));
-                const imgs = items.map(item => item.image || (item.images && item.images[0]) || 'logo.png');
-                return `<div class="bundle-card">
-                    <div class="bundle-imgs">${imgs.slice(0, 3).map(src => `<img src="${src}">`).join('<span class="bundle-plus">+</span>')}</div>
-                    <div class="bundle-name">${bundle.name}</div>
-                    <div class="bundle-price"><span class="bundle-old">${originalTotal} ₴</span> <span class="bundle-new">${discountedTotal} ₴</span> <span class="bundle-badge">-${bundle.discountPercent}%</span></div>
-                    <button class="buy-btn" onclick="addBundleToCart('${bundle.id}')"><span data-lang="ua">Додати комплект в кошик</span><span data-lang="en">Add bundle to cart</span></button>
-                </div>`;
-            }).join('');
-            applyTranslationsToDOM(currentLang);
-        }
-        function addBundleToCart(bundleId) {
-            const bundle = globalBundles.find(b => b.id === bundleId); if (!bundle) return;
-            let addedCount = 0;
-            bundle.itemIds.forEach(itemId => {
-                const item = globalMerchList.find(m => m.id === itemId); if (!item) return;
-                const basePrice = (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price;
-                const discountedPrice = Math.round(basePrice * (1 - bundle.discountPercent / 100));
-                let size = "Універсальний";
-                if (item.sizes && item.sizes.length > 0) size = item.sizes[0];
-                else if (item.stock && typeof item.stock === 'object') { const keys = Object.keys(item.stock); if (keys.length > 0) size = keys[0]; }
-                const img = item.image || (item.images && item.images[0]) || null;
-                shoppingCart.push({ cartId: Date.now().toString() + Math.random().toString(36).substr(2,5), merchId: item.id, merchTitle: `${item.title} (${bundle.name})`, image: img, price: discountedPrice, size, color: null, quantity: 1, totalPrice: discountedPrice, isPreorder: item.isPreorder || false });
-                addedCount++;
-            });
-            saveCart(); updateCartUI();
-            showToast(currentLang === 'ua' ? `Комплект додано в кошик 🎁` : `Bundle added to cart 🎁`);
-            const fab = document.querySelector('.cart-fab'); if (fab) { fab.classList.remove('pulse'); void fab.offsetWidth; fab.classList.add('pulse'); }
-        }
-
         function addToCart(merchId) {
             const item = globalMerchList.find(m => m.id === merchId); if(!item) return;
             let isVariant = item.variants && item.variants.length > 0; let activeVarIdx = window.selectedVariants[item.id] || 0;
@@ -1343,7 +1359,15 @@
             document.getElementById('cart-badge-count').style.display = totalItems > 0 ? 'flex' : 'none'; 
             if(document.getElementById('order-modal-wrapper').style.display === 'flex') renderCartModalContent(); 
         }
-        function openCartModal() { document.getElementById('order-modal-wrapper').style.display = 'flex'; goToCheckoutStep(1); renderCartModalContent(); }
+        function openCartModal() {
+            document.getElementById('order-modal-wrapper').style.display = 'flex'; goToCheckoutStep(1); renderCartModalContent();
+            if (currentAccountUser) {
+                const nameInput = document.getElementById('order-name');
+                if (nameInput && !nameInput.value) {
+                    db.collection('customers').doc(currentAccountUser.uid).get().then(doc => { if (doc.exists && doc.data().name && !nameInput.value) nameInput.value = doc.data().name; }).catch(()=>{});
+                }
+            }
+        }
         function closeOrderModal() { document.getElementById('order-modal-wrapper').style.display = 'none'; }
 
         function renderCartModalContent() {
@@ -1368,11 +1392,6 @@
                 document.getElementById('promo-input-row').style.display = 'none';
                 document.getElementById('promo-applied-row').style.display = 'flex';
                 document.getElementById('promo-applied-label').innerText = `✓ ${appliedPromo.code}`;
-            } else if (repeatDiscountApplied && repeatDiscountPercent > 0) {
-                finalSum = Math.round(baseTotalSum * (1 - repeatDiscountPercent / 100));
-                document.getElementById('cart-total-sum').innerHTML = `<span class="old-total">${baseTotalSum} ₴</span>${finalSum} ₴`;
-                document.getElementById('promo-input-row').style.display = 'flex';
-                document.getElementById('promo-applied-row').style.display = 'none';
             } else {
                 document.getElementById('cart-total-sum').innerText = `${baseTotalSum} ₴`;
                 document.getElementById('promo-input-row').style.display = 'flex';
@@ -1456,7 +1475,6 @@
             const baseSum = shoppingCart.reduce((s, i) => s + i.totalPrice, 0);
             let finalSum = baseSum;
             if (appliedPromo) { if (appliedPromo.type === 'certificate') finalSum = Math.max(0, baseSum - appliedPromo.fiatValue); else finalSum = Math.round(baseSum * (1 - appliedPromo.discount / 100)); }
-            else if (repeatDiscountApplied && repeatDiscountPercent > 0) { finalSum = Math.round(baseSum * (1 - repeatDiscountPercent / 100)); }
 
             let newOrderId = '';
             try {
@@ -1493,12 +1511,12 @@
                     transaction.set(orderRef, {
                         name, phone, address,
                         items: shoppingCart.map(i => ({ ...i, image: '' })),
-                        totalPrice: finalSum, promoCode: appliedPromo ? appliedPromo.code : null, paymentMethod: method, paymentProof: orderReceiptBase64 || null, status: 'new',
+                        totalPrice: finalSum, promoCode: appliedPromo ? appliedPromo.code : null, paymentMethod: method, paymentProof: orderReceiptBase64 || null, userId: currentAccountUser ? currentAccountUser.uid : null, status: 'new',
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
                     });
                 });
-                shoppingCart = []; appliedPromo = null; repeatDiscountApplied = false; orderReceiptBase64 = ''; const receiptInput = document.getElementById('order-receipt-file'); if(receiptInput) receiptInput.value = ''; const receiptPrev = document.getElementById('order-receipt-preview'); if(receiptPrev) receiptPrev.style.display = 'none'; saveCart(); updateCartUI();
+                shoppingCart = []; appliedPromo = null; orderReceiptBase64 = ''; const receiptInput = document.getElementById('order-receipt-file'); if(receiptInput) receiptInput.value = ''; const receiptPrev = document.getElementById('order-receipt-preview'); if(receiptPrev) receiptPrev.style.display = 'none'; saveCart(); updateCartUI();
                 ['checkout-step-1', 'checkout-step-2', 'checkout-form', 'checkout-steps-indicator'].forEach(id => document.getElementById(id).style.display = 'none');
                 document.getElementById('order-success-number').innerText = newOrderId;
                 document.getElementById('order-success-screen').style.display = 'flex';
