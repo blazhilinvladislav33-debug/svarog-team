@@ -442,6 +442,8 @@ function startRealtimeChatListener() {
     if (unsubscribeUserChat) unsubscribeUserChat();
     unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(function(doc) { renderUserChat(doc.exists ? doc.data() : { messages: [], status: 'active' }); }, function(err) { console.error("Помилка чату:", err); });
 }
+// Мобільні браузери "приспають" фонові з'єднання при згортанні/блокуванні екрана — примусово перепідключаємось, коли сторінка знову видима
+document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'visible' && userChatSessionId) { startRealtimeChatListener(); } });
 async function getAdminName(email) {
     if (!email) return '';
     if (adminNamesCache[email]) return adminNamesCache[email];
