@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Контакти | Svarog Team</title>
+<title>Рекрутинг | Svarog Team</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
@@ -27,50 +27,45 @@
   :root{
     --graphite:#0E0E0F; --plate:#16171A; --iron:#26282D; --bone:#F2EFE9;
     --ash:#C4C7CC; --ember:#D9663D; --copper:#E8A88A; --olive:#7A8450;
+    --brand-yellow: #f0ca28;
     --max-w: 1440px;
+    --text-muted: #8e8e93;
   }
   *{ box-sizing:border-box; }
-  body{ margin:0; background:var(--graphite); color:var(--bone); font-family:'Manrope',sans-serif; }
+  body{ margin:0; background:var(--graphite); color:var(--bone); font-family:'Manrope',sans-serif; overflow-x: hidden; }
   a{ color:inherit; }
-  .wordmark{ font-family:'Oswald',sans-serif; font-weight:600; font-size:14px; letter-spacing:.14em; text-transform:uppercase; flex-shrink:0; }
+  .wordmark{ font-family:'Oswald',sans-serif; font-weight:600; font-size:14px; letter-spacing:.14em; text-transform:uppercase; flex-shrink:0; color:var(--bone);}
   @font-face{ font-family:'SvarogDisplay'; src:url('SvarogTeam-Regular.woff') format('woff'); font-weight:400; font-style:normal; font-display:block; }
 
   /* ==================== NAV ==================== */
-  .nav{ position:sticky; top:0; z-index:90; background:rgba(14,14,15,.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--iron); }
-  .nav-inner{ max-width:var(--max-w); margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:18px 24px; }
+  .nav{ position:fixed; top:0; left:0; right:0; z-index:90; background:rgba(14,14,15,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--iron); }
+  .nav-inner{ max-width:var(--max-w); margin:0 auto; padding:0 24px; height:64px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
   .nav-inner a.wordmark{ text-decoration:none; color:var(--bone); }
-  .nav-actions{ display:flex; align-items:center; gap:12px; }
-  .btn{ text-decoration:none; cursor:pointer; font-family:'Manrope',sans-serif; white-space:nowrap; border:none; font-weight:600; font-size:14px; border-radius:2px; padding:10px 20px; }
-  .btn-lang{ background:transparent; border:1px solid var(--iron); color:var(--ash); padding:8px 14px; }
-  .btn-lang:hover{ border-color:var(--copper); color:var(--copper); }
-  .btn-ember{ background:var(--ember); color:var(--bone); }
-  .btn-ember:hover{ filter:brightness(1.08); }
-  .btn-menu{ background:transparent; border:1px solid var(--iron); color:var(--bone); display:flex; align-items:center; gap:10px; padding:9px 16px; }
-  .burger{ display:flex; flex-direction:column; gap:4px; width:16px; }
-  .burger span{ display:block; height:1.5px; background:var(--bone); }
+  .nav-actions{ display:flex; align-items:center; gap:16px; flex-shrink:0; }
+  .btn-lang{ background:none; border:1px solid var(--iron); color:var(--ash); font-size:13px; letter-spacing:.08em; padding:9px 14px; transition:0.3s; cursor:pointer;}
+  .btn-lang:hover, .btn-lang.active { border-color:var(--ash); color:var(--bone); }
+  .btn-ember{ background:var(--ember); color:var(--bone); font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:10px 18px; transition:0.3s; border:none; text-decoration:none;}
+  .btn-ember:hover{ background:#c65a34; }
+  .btn-menu{ background:none; border:1px solid var(--iron); color:var(--bone); font-size:13px; letter-spacing:.08em; text-transform:uppercase; padding:9px 16px; display:flex; align-items:center; gap:10px; transition:0.3s; cursor:pointer;}
+  .btn-menu:hover{ border-color:var(--ash); }
+  .burger{ display:flex; flex-direction:column; gap:3px; width:16px; }
+  .burger span{ display:block; height:1px; background:var(--bone); width:100%; transition:transform 160ms ease-out; }
 
   .menu-overlay{ position:fixed; inset:0; z-index:95; background:var(--graphite); opacity:0; pointer-events:none; transition:opacity 200ms ease-out; overflow-y:auto; }
   .menu-overlay.open{ opacity:1; pointer-events:auto; }
-  .menu-links{ display:flex; flex-direction:column; gap:6px; max-width:var(--max-w); margin:60px auto 0; padding:0 24px; }
-  .menu-link{ font-family:'Oswald',sans-serif; font-size:clamp(22px, min(6vw, 7vh), 56px); font-weight:500; text-decoration:none; color:var(--bone); padding:10px 0; border-bottom:1px solid var(--iron); text-transform:uppercase; }
-  .menu-link:hover, .menu-link.active-link{ color:var(--copper); }
-  .menu-link.accent{ color:var(--ember); }
-  .menu-social{ max-width:var(--max-w); margin:32px auto 0; padding:0 24px; display:flex; gap:20px; flex-wrap:wrap; }
-  .menu-social a{ text-decoration:none; color:var(--ash); font-size:14px; border-bottom:1px solid var(--iron); padding-bottom:2px; }
-  .menu-social a:hover{ color:var(--copper); }
+  .menu-links{ max-width:var(--max-w); margin:0 auto; padding:64px 24px; display:flex; flex-direction:column; gap:28px; }
+  .menu-links a{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; font-size:clamp(22px, min(6vw, 7vh), 56px); color:var(--bone); font-weight:600; text-decoration:none;}
+  .menu-links a:hover, .menu-links a.active-link{ color:var(--copper); }
+  .menu-social{ max-width:var(--max-w); margin:0 auto; padding:24px; display:flex; gap:24px; border-top:1px solid var(--iron); font-size:14px; }
+  .menu-social a{ color:var(--ash); text-decoration:none; }
+  .menu-social a:hover{ color:var(--bone); }
 
   [data-lang="en"]{ display:none; }
   html.lang-en [data-lang="ua"]{ display:none; }
-  html.lang-en [data-lang="en"]{ display:inherit; }
-  html.lang-en .menu-links a[data-lang="en"]{ display:inline; }
+  html.lang-en [data-lang="en"]{ display:inline; }
+  html.lang-en div[data-lang="en"], html.lang-en h1[data-lang="en"], html.lang-en p[data-lang="en"] { display:block; }
 
-  /* ==================== СТОРІНКА-ЗАГЛУШКА ==================== */
-  .empty-hero{ display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center; margin:100px auto 40px; padding:0 24px 80px; max-width:var(--max-w, 1440px); min-height:50vh; }
-  .empty-hero .eyebrow{ font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--copper); margin-bottom:18px; }
-  .empty-hero h1{ font-family:'Oswald',sans-serif; font-size:clamp(36px,6vw,64px); font-weight:600; text-transform:uppercase; margin:0 0 20px; }
-  .empty-hero p{ color:var(--ash); font-size:16px; max-width:520px; line-height:1.6; }
-  .empty-hero h1.contacts-title { font-family: 'Oswald', sans-serif; font-size: clamp(72px, 17vw, 220px); font-weight: 800; text-transform: uppercase; text-align: center; margin: 0 0 30px; color: rgba(255,255,255,0.95); letter-spacing: -4px; line-height: 0.95; text-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: contactsTitleIn 0.9s ease both; }
-  @keyframes contactsTitleIn { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  /* ==================== ФОН ==================== */
   .bg-layer{ position:fixed; inset:0; z-index:-2; background-position:center; background-size:cover; opacity:0; transition:opacity 2.5s ease-in-out; animation:kenburns 24s ease-in-out infinite alternate; }
   .bg-layer.visible{ opacity:.2; }
   .bg-layer#bgB{ animation-delay:-12s; }
@@ -78,34 +73,57 @@
   @keyframes kenburns{ 0%{ transform:scale(1); } 100%{ transform:scale(1.06); } }
 
   /* ==================== FOOTER ==================== */
-  footer{ border-top:1px solid var(--iron); margin-top:60px; }
-  .footer-inner{ max-width:var(--max-w); margin:0 auto; padding:56px 24px 32px; display:flex; justify-content:space-between; gap:40px; flex-wrap:wrap; }
-  .footer-brand{ max-width:320px; }
-  .footer-desc{ color:var(--ash); font-size:14px; margin-top:12px; line-height:1.6; }
-  .footer-cols{ display:flex; gap:56px; flex-wrap:wrap; }
+  footer{ background:var(--graphite); border-top:1px solid var(--iron); }
+  .footer-inner{ max-width:var(--max-w); margin:0 auto; padding:64px 24px 32px; display:flex; flex-wrap:wrap; gap:48px; justify-content:space-between; }
+  .footer-brand{ flex:1 1 240px; }
+  .footer-brand .wordmark{ margin-bottom:12px; }
+  .footer-desc{ font-size:14px; line-height:1.6; color:var(--ash); max-width:280px; margin:0; }
+  .footer-cols{ display:flex; gap:64px; flex-wrap:wrap; }
   .footer-col{ display:flex; flex-direction:column; gap:10px; }
   #footerSocialBox{ display:flex; flex-direction:column; gap:10px; }
-  .footer-col-title{ font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--ash); margin-bottom:6px; }
+  .footer-col-title{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ash); margin-bottom:6px; }
   .footer-col a{ color:var(--bone); font-size:14px; text-decoration:none; }
   .footer-col a:hover{ color:var(--copper); }
-  .footer-bottom{ text-align:center; padding:20px 24px; color:var(--ash); font-size:12px; border-top:1px solid var(--iron); }
+  .footer-bottom{ max-width:var(--max-w); margin:0 auto; padding:24px; border-top:1px solid var(--iron); font-size:12px; color:var(--ash); }
 
 
-  /* ==================== ФОРМА ЗВОРОТНОГО ЗВ'ЯЗКУ ==================== */
-  .contact-wrap{ max-width:var(--max-w); margin:0 auto; padding:20px 24px 80px; display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:start; }
-  @media (max-width:860px){ .contact-wrap{ grid-template-columns:1fr; gap:40px; } }
-  .contact-form-box{ background:var(--plate); border:1px solid var(--iron); border-radius:4px; padding:32px; }
-  .apply-field{ margin-bottom:18px; }
-  .apply-field label{ display:block; font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--ash); margin-bottom:8px; }
-  .apply-field input, .apply-field textarea{ width:100%; background:var(--graphite); border:1px solid var(--iron); border-radius:3px; padding:12px 14px; color:var(--bone); font-family:'Manrope',sans-serif; font-size:15px; outline:none; transition:border-color .2s; resize:vertical; }
-  .apply-field input:focus, .apply-field textarea:focus{ border-color:var(--olive); }
-  .contact-success{ display:none; text-align:center; padding:30px 0; }
-  .contact-success-icon{ font-size:40px; margin-bottom:14px; }
-  .contact-success p{ color:var(--ash); font-size:15px; line-height:1.5; }
-  .social-showcase{ display:flex; flex-direction:column; gap:14px; }
-  .social-showcase-item{ display:flex; align-items:center; justify-content:space-between; padding:18px 22px; background:var(--plate); border:1px solid var(--iron); border-radius:4px; text-decoration:none; color:var(--bone); font-family:'Oswald',sans-serif; font-size:18px; text-transform:uppercase; letter-spacing:.02em; transition:all .2s; }
-  .social-showcase-item:hover{ border-color:var(--copper); color:var(--copper); transform:translateX(4px); }
-  .social-showcase-item span.arrow{ font-family:'Manrope',sans-serif; font-size:14px; }
+
+  /* ==================== КОНТЕНТ СТОРІНКИ РЕКРУТИНГУ ==================== */
+  .page-wrapper { max-width: var(--max-w, 1440px); margin: 100px auto 40px; padding: 0 24px; min-height: 70vh; }
+  .recruit-title { font-family: 'Oswald', sans-serif; font-size: clamp(72px, 17vw, 220px); font-weight: 800; text-transform: uppercase; text-align: center; margin: 0 0 50px; color: rgba(255,255,255,0.95); letter-spacing: -4px; line-height: 0.95; text-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: recruitTitleIn 0.9s ease both; }
+  @keyframes recruitTitleIn { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  .recruit-intro { max-width: 860px; margin: 0 auto 80px; text-align: center; }
+  .recruit-intro h2 { font-family: 'Oswald', sans-serif; font-size: 26px; text-transform: uppercase; color: var(--bone); margin-bottom: 24px; letter-spacing: .04em; }
+  .recruit-intro p { color: var(--ash); font-size: 18px; line-height: 1.7; margin-bottom: 20px; }
+
+  .recruit-join-wrap { text-align: center; margin-bottom: 100px; }
+  .btn-join { display: inline-block; background: var(--ember); color: var(--bone); font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; font-size: 20px; padding: 22px 60px; border: none; cursor: pointer; transition: all .25s; }
+  .btn-join:hover { background: #c65a34; transform: translateY(-2px); box-shadow: 0 14px 30px rgba(217,102,61,.35); }
+
+  .process-block { max-width: 860px; margin: 0 auto 120px; }
+  .process-title { font-family: 'Oswald', sans-serif; font-size: clamp(32px, 5vw, 48px); text-transform: uppercase; text-align: center; margin-bottom: 50px; color: var(--bone); letter-spacing: .02em; }
+  .process-step { display: flex; align-items: flex-start; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--iron); }
+  .process-step:last-child { border-bottom: none; }
+  .process-num { font-family: 'Oswald', sans-serif; font-size: 36px; font-weight: 800; color: var(--ember); flex-shrink: 0; width: 60px; }
+  .process-text { font-size: 18px; color: var(--ash); line-height: 1.6; padding-top: 6px; }
+  .process-text b { color: var(--bone); }
+
+  /* ==================== ОВЕРЛЕЙ ФОРМИ ПРИЄДНАННЯ ==================== */
+  .join-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(14,14,15,.9); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 250ms ease; }
+  .join-overlay.open { opacity: 1; pointer-events: auto; }
+  .join-modal { background: var(--plate); border: 1px solid var(--iron); width: 100%; max-width: 480px; max-height: 88vh; overflow-y: auto; padding: 36px; transform: translateY(16px); transition: transform 250ms ease; }
+  .join-overlay.open .join-modal { transform: translateY(0); }
+  .join-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .join-modal-head h3 { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 600; color: var(--bone); text-transform: uppercase; }
+  .join-close { background: none; border: 1px solid var(--iron); color: var(--ash); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 15px; transition: all .2s; }
+  .join-close:hover { border-color: var(--ember); color: var(--ember); }
+  .join-field { margin-bottom: 18px; }
+  .join-field label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ash); margin-bottom: 8px; }
+  .join-field input, .join-field textarea { width: 100%; background: var(--graphite); border: 1px solid var(--iron); border-radius: 3px; padding: 12px 14px; color: var(--bone); font-family: 'Manrope', sans-serif; font-size: 15px; outline: none; transition: border-color .2s; resize: vertical; }
+  .join-field input:focus, .join-field textarea:focus { border-color: var(--olive); }
+  .join-success { display: none; text-align: center; padding: 20px 0; }
+  .join-success-icon { font-size: 40px; margin-bottom: 14px; }
+  .join-success p { color: var(--ash); font-size: 15px; line-height: 1.5; }
 
   /* ==================== АНОНІМНИЙ ЧАТ: КНОПКА + ВІКНО ==================== */
   .chat-fab { position: fixed; bottom: 28px; right: 28px; width: 60px; height: 60px; border-radius: 50%; background: var(--ember); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1500; box-shadow: 0 10px 30px rgba(217,102,61,0.4); transition: transform 0.3s ease, box-shadow 0.3s ease; }
@@ -158,69 +176,110 @@
 <div class="bg-vignette"></div>
 
 <!-- NAV -->
-<nav class="nav" id="nav">
-  <div class="nav-inner">
-    <a href="index.html" class="wordmark">Svarog Team</a>
-    <div class="nav-actions">
-      <button class="btn btn-lang" id="langToggle">EN</button>
-      <a href="support.html" class="btn btn-ember"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
-      <button class="btn btn-menu" id="menuToggle">
-        <span><span data-lang="ua">меню</span><span data-lang="en">menu</span></span>
-        <span class="burger"><span></span><span></span></span>
-      </button>
+<nav class="nav">
+    <div class="nav-inner">
+        <a href="index.html" class="wordmark">Svarog Team</a>
+        <div class="nav-actions">
+            <button class="btn-lang" id="langToggle">EN</button>
+            <a href="support.html" class="btn-ember"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+            <button class="btn-menu" id="menuToggle">
+                <span><span data-lang="ua">меню</span><span data-lang="en">menu</span></span>
+                <span class="burger"><span></span><span></span></span>
+            </button>
+        </div>
     </div>
-  </div>
 </nav>
 
 <div class="menu-overlay" id="menuOverlay">
-  <div class="nav-inner">
-    <div class="wordmark">Svarog Team</div>
-    <button class="btn btn-menu" id="menuClose"><span data-lang="ua">Закрити ✕</span><span data-lang="en">Close ✕</span></button>
-  </div>
-  <div class="menu-links">
-    <a href="index.html" class="menu-link"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a>
-    <a href="news.html" class="menu-link"><span data-lang="ua">Новини</span><span data-lang="en">News</span></a>
-    <a href="shop.html" class="menu-link"><span data-lang="ua">Мерч</span><span data-lang="en">Merch</span></a>
-    <a href="about.html" class="menu-link"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a>
-    <a href="support.html" class="menu-link"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
-    <a href="recruiting.html" class="menu-link"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></a>
-    <a href="contacts.html" class="menu-link active-link"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></a>
-  </div>
-  <div class="menu-social" id="menuSocialBox"></div>
-</div>
-
-<!-- ПУСТА СТОРІНКА (наповнення додамо пізніше) -->
-<section class="empty-hero" style="padding-bottom:20px;">
-  <h1 class="contacts-title"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></h1>
-  <p><span data-lang="ua">Залиште повідомлення — ми відповімо найближчим часом, або напишіть напряму в соцмережах.</span><span data-lang="en">Leave a message — we'll reply shortly, or write to us directly on social media.</span></p>
-</section>
-
-<div class="contact-wrap">
-  <div class="contact-form-box">
-    <div class="contact-success" id="contactSuccess">
-      <div class="contact-success-icon">✅</div>
-      <p><span data-lang="ua">Дякуємо! Повідомлення надіслано.</span><span data-lang="en">Thank you! Your message has been sent.</span></p>
+    <div class="nav-inner">
+        <div class="wordmark">Svarog Team</div>
+        <button class="btn-menu" id="menuClose"><span data-lang="ua">Закрити ✕</span><span data-lang="en">Close ✕</span></button>
     </div>
-    <form id="contactForm" onsubmit="submitContactForm(event)">
-      <input type="text" id="contact-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px; opacity:0; height:0; width:0;" aria-hidden="true">
-      <div class="apply-field">
-        <label><span data-lang="ua">Ім'я</span><span data-lang="en">Name</span></label>
-        <input type="text" id="contact-name" required autocomplete="off">
-      </div>
-      <div class="apply-field">
-        <label><span data-lang="ua">Контакт (телефон / email / Telegram)</span><span data-lang="en">Contact (phone / email / Telegram)</span></label>
-        <input type="text" id="contact-info" required autocomplete="off">
-      </div>
-      <div class="apply-field">
-        <label><span data-lang="ua">Повідомлення</span><span data-lang="en">Message</span></label>
-        <textarea id="contact-message" rows="5" required></textarea>
-      </div>
-      <button type="submit" class="btn btn-ember" id="contactSubmitBtn" style="width:100%;"><span data-lang="ua">Надіслати</span><span data-lang="en">Send</span></button>
-    </form>
-  </div>
-  <div class="social-showcase" id="socialShowcase"></div>
+    <div class="menu-links">
+        <a href="index.html"><span data-lang="ua">Головна</span><span data-lang="en">Home</span></a>
+        <a href="news.html"><span data-lang="ua">Новини</span><span data-lang="en">News</span></a>
+        <a href="shop.html"><span data-lang="ua">Мерч</span><span data-lang="en">Merch</span></a>
+        <a href="about.html"><span data-lang="ua">Про нас</span><span data-lang="en">About us</span></a>
+        <a href="support.html"><span data-lang="ua">Підтримати</span><span data-lang="en">Support</span></a>
+        <a href="recruiting.html" class="active-link"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></a>
+        <a href="contacts.html"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></a>
+    </div>
+    <div class="menu-social" id="menuSocialBox"></div>
 </div>
 
+<div class="page-wrapper">
+    <h1 class="recruit-title"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></h1>
+
+    <div class="recruit-intro">
+        <h2><span data-lang="ua">Що таке рекрутинг?</span><span data-lang="en">What is recruiting?</span></h2>
+        <p><span data-lang="ua">Рекрутинг — це професійний відбір кандидатів на військову службу за досвідом, освітою та особистими якостями. На відміну від загального набору, він дає можливість самому обрати напрямок служби відповідно до своїх умінь — розвідка, ударні системи, інженерне забезпечення чи інша спеціалізація підрозділу.</span><span data-lang="en">Recruiting is the professional selection of candidates for military service based on experience, education, and personal qualities. Unlike general conscription, it lets you choose your service direction according to your own skills — reconnaissance, strike systems, engineering support, or another unit specialization.</span></p>
+        <p><span data-lang="ua">Головна перевага рекрутингу — усвідомлений вибір замість випадкового розподілу. Ви проходите базову підготовку і приєднуєтесь саме до того підрозділу, де ваші навички принесуть найбільше користі.</span><span data-lang="en">The main advantage of recruiting is a conscious choice instead of random assignment. You complete basic training and join the exact unit where your skills will be most valuable.</span></p>
+    </div>
+
+    <div class="recruit-join-wrap">
+        <button type="button" class="btn-join" onclick="openJoinOverlay()"><span data-lang="ua">Долучитися до команди</span><span data-lang="en">Join the team</span></button>
+    </div>
+
+    <div class="process-block">
+        <h2 class="process-title"><span data-lang="ua">Процес приєднання</span><span data-lang="en">Joining process</span></h2>
+        <div class="process-step">
+            <div class="process-num">01</div>
+            <div class="process-text"><span data-lang="ua">Заповни заявку.</span><span data-lang="en">Submit your application.</span></div>
+        </div>
+        <div class="process-step">
+            <div class="process-num">02</div>
+            <div class="process-text"><span data-lang="ua">Прийми дзвінок з нашого рекрутинг-центру.</span><span data-lang="en">Take a call from our recruiting center.</span></div>
+        </div>
+        <div class="process-step">
+            <div class="process-num">03</div>
+            <div class="process-text"><span data-lang="ua">Подай необхідні документи.</span><span data-lang="en">Submit the required documents.</span></div>
+        </div>
+        <div class="process-step">
+            <div class="process-num">04</div>
+            <div class="process-text"><span data-lang="ua">Пройди базовий курс військової підготовки.</span><span data-lang="en">Complete basic military training.</span></div>
+        </div>
+        <div class="process-step">
+            <div class="process-num">05</div>
+            <div class="process-text"><span data-lang="ua">Приєднайся до бажаного підрозділу.</span><span data-lang="en">Join your chosen unit.</span></div>
+        </div>
+        <div class="process-step">
+            <div class="process-num">06</div>
+            <div class="process-text"><span data-lang="ua">Стань частиною Svarog Team.</span><span data-lang="en">Become part of Svarog Team.</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ОВЕРЛЕЙ ФОРМИ ПРИЄДНАННЯ -->
+<div class="join-overlay" id="joinOverlay">
+    <div class="join-modal">
+        <div class="join-modal-head">
+            <h3><span data-lang="ua">Заявка на долучення</span><span data-lang="en">Application to join</span></h3>
+            <button type="button" class="join-close" onclick="closeJoinOverlay()">✕</button>
+        </div>
+        <div class="join-success" id="joinSuccess">
+            <div class="join-success-icon">✅</div>
+            <p><span data-lang="ua">Дякуємо! Заявку надіслано, наш рекрутинг-центр зв'яжеться з вами найближчим часом.</span><span data-lang="en">Thank you! Your application has been sent, our recruiting center will contact you shortly.</span></p>
+        </div>
+        <form id="joinForm" onsubmit="submitJoinForm(event)">
+            <input type="text" id="join-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px; opacity:0; height:0; width:0;" aria-hidden="true">
+            <div class="join-field">
+                <label><span data-lang="ua">Ім'я та прізвище</span><span data-lang="en">Full name</span></label>
+                <input type="text" id="join-name" required autocomplete="off">
+            </div>
+            <div class="join-field">
+                <label><span data-lang="ua">Телефон</span><span data-lang="en">Phone</span></label>
+                <input type="tel" id="join-phone" required autocomplete="off">
+            </div>
+            <div class="join-field">
+                <label><span data-lang="ua">Коментар (необов'язково)</span><span data-lang="en">Comment (optional)</span></label>
+                <textarea id="join-message" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn-join" id="joinSubmitBtn" style="width:100%; text-align:center;"><span data-lang="ua">Надіслати заявку</span><span data-lang="en">Submit application</span></button>
+        </form>
+    </div>
+</div>
+
+<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
@@ -238,7 +297,7 @@
         <a href="recruiting.html"><span data-lang="ua">Рекрутинг</span><span data-lang="en">Recruiting</span></a>
         <a href="contacts.html"><span data-lang="ua">Контакти</span><span data-lang="en">Contacts</span></a>
       </div>
-      <div class="footer-col">
+      <div class="footer-col" id="footerSocialCol">
         <div class="footer-col-title"><span data-lang="ua">Ми в мережі</span><span data-lang="en">Follow us</span></div>
         <div id="footerSocialBox"></div>
       </div>
@@ -275,13 +334,12 @@
     </div>
 </div>
 
-
 <script>
 (function(){
   // Фон: спершу перевіряємо, чи адмін завантажив своє фото для цієї сторінки
   var layerA=document.getElementById('bgA'), layerB=document.getElementById('bgB');
   db.collection("config").doc("pageBackgrounds").get().then(function(doc){
-      var customBg = doc.exists ? doc.data().contacts : null;
+      var customBg = doc.exists ? doc.data().recruiting : null;
       if (customBg) {
           layerA.style.backgroundImage = "url('" + customBg + "')";
           layerA.classList.add('visible');
@@ -313,14 +371,40 @@
     localStorage.setItem('selectedLang', lang);
     document.documentElement.classList.toggle('lang-en', lang==='en');
     langToggle.textContent = lang==='ua' ? 'EN':'UA';
-    document.querySelectorAll('[data-lang="en"]').forEach(function(el){ el.style.display = lang==='en' ? 'inline':'none'; });
-    document.querySelectorAll('[data-lang="ua"]').forEach(function(el){ el.style.display = lang==='ua' ? 'inline':'none'; });
   }
   setLang(localStorage.getItem('selectedLang') || 'ua');
   langToggle.addEventListener('click', function(){ setLang(document.documentElement.classList.contains('lang-en') ? 'ua':'en'); });
 })();
 
-// Соцмережі з бази
+// ==================== ФОРМА ПРИЄДНАННЯ ====================
+function openJoinOverlay() {
+    document.getElementById('joinOverlay').classList.add('open');
+    document.getElementById('joinForm').style.display = 'block';
+    document.getElementById('joinSuccess').style.display = 'none';
+}
+function closeJoinOverlay() { document.getElementById('joinOverlay').classList.remove('open'); }
+async function submitJoinForm(e) {
+    e.preventDefault();
+    if (document.getElementById('join-website').value.trim() !== '') return; // honeypot
+    const name = document.getElementById('join-name').value.trim();
+    const phone = document.getElementById('join-phone').value.trim();
+    const message = document.getElementById('join-message').value.trim();
+    const btn = document.getElementById('joinSubmitBtn');
+    btn.disabled = true;
+    try {
+        await db.collection("recruiting_applications").add({
+            name, phone, message,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            time: new Date().toLocaleString('uk-UA')
+        });
+        document.getElementById('joinForm').style.display = 'none';
+        document.getElementById('joinSuccess').style.display = 'block';
+    } catch (err) {
+        alert((document.documentElement.classList.contains('lang-en') ? 'Error: ' : 'Помилка: ') + err.message);
+    } finally { btn.disabled = false; }
+}
+
+// ==================== СОЦМЕРЕЖІ ====================
 db.collection("config").doc("socials").onSnapshot(function(doc){
     var list = (doc.exists && doc.data().list) || [];
     var menuBox = document.getElementById('menuSocialBox');
@@ -328,31 +412,8 @@ db.collection("config").doc("socials").onSnapshot(function(doc){
     var html = list.map(function(n){ return '<a href="'+n.url+'" target="_blank" rel="noopener">'+n.name+'</a>'; }).join('');
     if (menuBox) menuBox.innerHTML = html;
     if (footerBox) footerBox.innerHTML = html;
-    var showcase = document.getElementById('socialShowcase');
-    if (showcase) showcase.innerHTML = list.map(function(n){ return '<a href="'+n.url+'" target="_blank" rel="noopener" class="social-showcase-item">'+n.name+'<span class="arrow">→</span></a>'; }).join('');
 });
 
-async function submitContactForm(e) {
-    e.preventDefault();
-    if (document.getElementById('contact-website').value.trim() !== '') return;
-    const name = document.getElementById('contact-name').value.trim();
-    const contact = document.getElementById('contact-info').value.trim();
-    const message = document.getElementById('contact-message').value.trim();
-    const btn = document.getElementById('contactSubmitBtn');
-    btn.disabled = true;
-    try {
-        await db.collection("feedback").add({
-            name, contact, message,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            time: new Date().toLocaleString('uk-UA')
-        });
-        document.getElementById('contactForm').style.display = 'none';
-        document.getElementById('contactSuccess').style.display = 'block';
-    } catch (err) {
-        console.error("Форма зв'язку:", err);
-        alert(document.documentElement.classList.contains('lang-en') ? 'Error sending. Try again.' : 'Помилка надсилання. Спробуйте ще раз.');
-    } finally { btn.disabled = false; }
-}
 
 
 // ==================== АНОНІМНИЙ ЧАТ (уніфікована версія) ====================
@@ -381,6 +442,8 @@ function startRealtimeChatListener() {
     if (unsubscribeUserChat) unsubscribeUserChat();
     unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(function(doc) { renderUserChat(doc.exists ? doc.data() : { messages: [], status: 'active' }); }, function(err) { console.error("Помилка чату:", err); });
 }
+// Мобільні браузери "приспають" фонові з'єднання при згортанні/блокуванні екрана — примусово перепідключаємось, коли сторінка знову видима
+document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'visible' && userChatSessionId) { startRealtimeChatListener(); } });
 async function getAdminName(email) {
     if (!email) return '';
     if (adminNamesCache[email]) return adminNamesCache[email];
