@@ -359,6 +359,11 @@
     <div class="bg-layer visible" id="bg-layer-a"></div>
     <div class="bg-layer" id="bg-layer-b"></div>
 
+    <div id="shop-announcement-banner" style="display:none; background:#ffaa00; color:#1a1a1a; text-align:center; padding:12px 20px; font-size:0.9rem; font-weight:600; position:relative;">
+        <span id="shop-announcement-text-el"></span>
+        <span onclick="dismissShopAnnouncement()" style="position:absolute; right:16px; top:50%; transform:translateY(-50%); cursor:pointer; font-weight:800; font-size:1.1rem;">✕</span>
+    </div>
+
     <!-- НАВІГАЦІЯ -->
     <nav class="nav">
         <div class="nav-inner">
@@ -773,6 +778,25 @@
         });
 
         let globalSizeChartsMap = {};
+
+        // --- СПОВІЩЕННЯ ДЛЯ КЛІЄНТІВ (керується з адмінки) ---
+        db.collection("config").doc("announcement").onSnapshot(doc => {
+            const data = doc.exists ? doc.data() : {};
+            const banner = document.getElementById('shop-announcement-banner');
+            const textEl = document.getElementById('shop-announcement-text-el');
+            const dismissedText = sessionStorage.getItem('svarog_announcement_dismissed');
+            if (data.enabled && data.text && data.text !== dismissedText) {
+                textEl.innerText = data.text;
+                banner.style.display = 'block';
+            } else {
+                banner.style.display = 'none';
+            }
+        });
+        function dismissShopAnnouncement() {
+            const textEl = document.getElementById('shop-announcement-text-el');
+            sessionStorage.setItem('svarog_announcement_dismissed', textEl.innerText);
+            document.getElementById('shop-announcement-banner').style.display = 'none';
+        }
         db.collection("sizeCharts").onSnapshot(snapshot => { globalSizeChartsMap = {}; snapshot.forEach(doc => { globalSizeChartsMap[doc.id] = doc.data().image; }); });
 
         db.collection("merch").onSnapshot(snapshot => { 
