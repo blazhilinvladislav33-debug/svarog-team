@@ -774,16 +774,25 @@ function getYouTubeIdReport(url) {
 }
 function renderReportBlocks(canvasEl, blocks) {
     canvasEl.innerHTML = '';
-    blocks.forEach(block => {
+    const isMobile = window.innerWidth <= 768;
+    const sortedBlocks = isMobile ? [...blocks].sort((a, b) => a.y - b.y || a.x - b.x) : blocks;
+    sortedBlocks.forEach(block => {
         const el = document.createElement('div');
         el.className = 'abl';
-        el.style.left = block.x + '%'; el.style.top = block.y + '%'; el.style.width = block.width + '%'; el.style.height = block.height + '%';
+        if (isMobile) {
+            el.style.position = 'static'; el.style.width = '100%'; el.style.marginBottom = '20px';
+            if (block.type === 'photo' || block.type === 'video') el.style.height = '220px';
+            else { el.style.height = 'auto'; el.style.minHeight = '40px'; }
+        } else {
+            el.style.left = block.x + '%'; el.style.top = block.y + '%'; el.style.width = block.width + '%'; el.style.height = block.height + '%';
+        }
         if (block.type === 'text') { el.innerHTML = `<div class="abl-text auto-translate">${(block.content || '').replace(/\n/g, '<br>')}</div>`; }
         else if (block.type === 'photo') { el.innerHTML = block.src ? `<img class="abl-photo" src="${block.src}" loading="lazy" onclick="openLightbox('${block.src}')" style="cursor:zoom-in;">` : ''; }
         else if (block.type === 'quote') { el.innerHTML = `<div class="abl-quote"><div class="abl-quote-text auto-translate">${block.text || ''}</div><div class="abl-quote-author auto-translate">${block.author || ''}</div>${block.role ? `<div class="abl-quote-role auto-translate">${block.role}</div>` : ''}</div>`; }
         else if (block.type === 'video') { const vidId = getYouTubeIdReport(block.videoUrl); if (vidId) { el.innerHTML = `<div class="abl-video" onclick="this.innerHTML='<iframe src=\\'https://www.youtube.com/embed/${vidId}?autoplay=1\\' allow=\\'autoplay; encrypted-media\\' allowfullscreen></iframe>'"><img src="https://img.youtube.com/vi/${vidId}/hqdefault.jpg" loading="lazy"><div class="abl-video-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>`; } }
         canvasEl.appendChild(el);
     });
+    if (isMobile) { canvasEl.style.minHeight = 'auto'; applyTranslationsToDOM(currentLang); return; }
     let deepestPct = blocks.length > 0 ? Math.max(...blocks.map(b => b.y + b.height), 40) : 40;
     canvasEl.style.minHeight = Math.max(300, deepestPct * 5) + 'px';
     applyTranslationsToDOM(currentLang);
