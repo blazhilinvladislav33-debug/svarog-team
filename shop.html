@@ -38,7 +38,8 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { width: 100%; min-height: 100%; scroll-behavior: smooth; background: var(--graphite); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        /* Виправлено overflow-x: hidden на clip, щоб не ламався скрол на iOS */
+        html, body { width: 100%; min-height: 100%; scroll-behavior: smooth; background: var(--graphite); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: clip; }
         a { color: var(--brand-yellow); text-decoration: none; }
         button { font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; border: none; background: none; }
 
@@ -113,15 +114,20 @@
         .sort-select option { background: var(--graphite); }
         #fav-filter-btn.active { border-color: #ff4a4a; color: #ff4a4a; background: rgba(255,74,74,0.08); }
 
-        /* СІТКА ТОВАРІВ */
+        /* СІТКА ТОВАРІВ (Фікс рендерингу на iOS) */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; margin-bottom: 60px; }
-        .merch-card { display: flex; flex-direction: column; transition: all 0.3s ease; }
+        .merch-card { display: flex; flex-direction: column; transition: all 0.3s ease; -webkit-transform: translateZ(0); transform: translateZ(0); }
+        .merch-img-box { width: 100%; aspect-ratio: 4/5; background: var(--plate); border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; border: 1px solid transparent; transition: 0.3s; cursor: pointer; -webkit-transform: translateZ(0); transform: translateZ(0);}
+        .merch-card:hover .merch-img-box { border-color: var(--iron); box-shadow: 0 10px 25px rgba(0,0,0,0.4);}
+        .merch-gallery { display: flex; width: 100%; height: 100%; }
+        .merch-gallery img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .merch-card:hover .merch-gallery img { transform: scale(1.05); }
+
         .recently-viewed-card { cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 8px; overflow: hidden; transition: 0.2s; }
         .recently-viewed-card:hover { border-color: var(--copper); transform: translateY(-3px); }
         .recently-viewed-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
         .recently-viewed-card .rv-title { font-size: 0.8rem; padding: 8px 10px 2px; color: var(--ash); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .recently-viewed-card .rv-price { font-size: 0.85rem; padding: 0 10px 10px; color: var(--brand-yellow); font-weight: 700; }
-        
         .bundle-card { background: rgba(62,207,106,0.05); border: 1px solid rgba(62,207,106,0.3); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
         .bundle-imgs { display: flex; align-items: center; justify-content: center; gap: 6px; }
         .bundle-imgs img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
@@ -131,17 +137,10 @@
         .bundle-old { color: #888; text-decoration: line-through; font-size: 0.85rem; }
         .bundle-new { color: #3ecf6a; font-weight: 800; font-size: 1.1rem; }
         .bundle-badge { background: #3ecf6a; color: #0a0a0c; font-weight: 800; font-size: 0.75rem; padding: 2px 8px; border-radius: 20px; }
-        
         .review-card { background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 10px; overflow: hidden; }
         .review-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block; cursor: zoom-in; }
         .review-card .review-name { padding: 10px 12px 4px; font-weight: 700; font-size: 0.9rem; }
         .review-card .review-text { padding: 0 12px 12px; font-size: 0.8rem; color: var(--ash); font-style: italic; line-height: 1.4; }
-        
-        .merch-img-box { width: 100%; aspect-ratio: 4/5; background: var(--plate); border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; border: 1px solid transparent; transition: 0.3s; cursor: pointer;}
-        .merch-card:hover .merch-img-box { border-color: var(--iron); box-shadow: 0 10px 25px rgba(0,0,0,0.4);}
-        .merch-gallery { display: flex; width: 100%; height: 100%; }
-        .merch-gallery img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-        .merch-card:hover .merch-gallery img { transform: scale(1.05); }
         
         .fav-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 5; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .fav-btn svg { width: 16px; height: 16px; fill: none; stroke: #121212; stroke-width: 2px; transition: 0.2s; }
@@ -152,7 +151,6 @@
         .new-badge { position: absolute; top: 40px; left: 12px; background: var(--olive); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 4px; z-index: 2; }
         .preorder-badge { position: absolute; top: 12px; left: 12px; background: var(--copper); color: var(--graphite); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 4px; z-index: 2; }
         .stock-badge-empty { position: absolute; top: 12px; right: 52px; background: rgba(10,10,12,0.85); color: #ff4a4a; border: 1px solid rgba(255,74,74,0.4); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 4px; z-index: 2; }
-        
         .merch-card.is-sold-out .merch-img-box { opacity: 0.45; filter: grayscale(0.5); }
         .merch-card.is-sold-out .merch-title { opacity: 0.6; }
         .low-stock-note { color: #ffaa00; font-size: 0.78rem; font-weight: 700; margin-bottom: 8px; }
@@ -453,7 +451,7 @@
             <!-- Генерується динамічно -->
         </div>
 
-        <!-- ПІДКАТЕГОРІЇ -->
+        <!-- ПІДКАТЕГОРІЇ (Сховані за замовчуванням) -->
         <div class="subcategories-bar" id="subcategory-bar">
             <!-- Генерується динамічно -->
         </div>
@@ -1086,7 +1084,7 @@
 
         let globalSizeChartsMap = {};
 
-        // --- СПОВІЩЕННЯ ДЛЯ КЛІЄНТІВ ---
+        // --- СПОВІЩЕННЯ ДЛЯ КЛІЄНТІВ (керується з адмінки) ---
         db.collection("config").doc("announcement").onSnapshot(doc => {
             const data = doc.exists ? doc.data() : {};
             const overlay = document.getElementById('shop-announcement-overlay');
@@ -1120,6 +1118,7 @@
             
             let activeCatObj = globalCategories.find(c => c.name === activeCategory);
             
+            // Основні категорії
             globalCategories.forEach(cat => {
                 let btn = document.createElement('div'); 
                 btn.className = `category-card ${activeCategory === cat.name ? 'active' : ''}`;
@@ -1136,6 +1135,7 @@
                 bar.appendChild(btn);
             });
 
+            // Підкатегорії (якщо є)
             if(activeCatObj && activeCatObj.subcats && activeCatObj.subcats.length > 0) {
                 subBar.style.display = 'flex';
                 let allSubcats = ['Всі', ...activeCatObj.subcats];
@@ -1149,6 +1149,7 @@
             } else {
                 subBar.style.display = 'none';
             }
+
             applyTranslationsToDOM(currentLang);
         }
 
@@ -1158,7 +1159,6 @@
             renderShopGrid();
         }
 
-        // ================= ОПТИМІЗОВАНИЙ РЕНДЕР СІТКИ ТОВАРІВ (Без мигання) =================
         function renderShopGrid() {
             const grid = document.getElementById('dynamic-shop-grid'); 
             let filteredList = globalMerchList; 
@@ -1177,7 +1177,7 @@
                 return; 
             }
 
-            let gridHTML = ""; // Збираємо весь HTML тут, щоб не навантажувати браузер
+            let gridHTML = ""; 
 
             filteredList.forEach((item, idx) => {
                 let isVariant = item.variants && item.variants.length > 0; 
@@ -1187,7 +1187,7 @@
                 let currentStockObj = isVariant ? (item.variants[activeVarIdx].stock || item.stock) : item.stock;
 
                 let posStyle = item.imagePosition ? ` style="object-position:${item.imagePosition};"` : '';
-                let galleryHtml = `<div class="merch-gallery">` + currentImagesArray.map((imgSrc, i) => `<img src="${imgSrc}" loading="lazy"${i===0?posStyle:''}>`).join('') + `</div>`;
+                let galleryHtml = `<div class="merch-gallery">` + currentImagesArray.map((imgSrc, i) => `<img src="${imgSrc}" ${i===0?posStyle:''}>`).join('') + `</div>`;
                 
                 let variantsHtml = ''; 
                 if (isVariant) { 
@@ -1213,7 +1213,7 @@
                 let currentSizes = isVariant ? (item.variants[activeVarIdx].sizes || item.sizes) : item.sizes;
                 let sizeSelectHtml = ''; 
                 if(currentSizes && currentSizes.length > 0) { 
-                    sizeSelectHtml = `<select id="size-${item.id}" class="merch-select" onclick="event.stopPropagation();" onchange="event.stopPropagation(); onGridSizeChange('${item.id}')">` + currentSizes.map(s => { let sStock = item.isPreorder ? 999 : (typeof currentStockObj === 'object' && currentStockObj ? (parseInt(currentStockObj[s]) || 0) : 0); return `<option value="${s}" ${(sStock<=0 && !item.isPreorder) ? 'disabled' : ''}>${s}${(sStock<=0 && !item.isPreorder) ? (currentLang==='ua'?' (немає)':' (out)') : ''}</option>`; }).join('') + `</select>`; 
+                    sizeSelectHtml = `<select id="size-${item.id}" class="merch-select" onclick="event.stopPropagation();" onchange="event.stopPropagation(); window.onGridSizeChange('${item.id}')">` + currentSizes.map(s => { let sStock = item.isPreorder ? 999 : (typeof currentStockObj === 'object' && currentStockObj ? (parseInt(currentStockObj[s]) || 0) : 0); return `<option value="${s}" ${(sStock<=0 && !item.isPreorder) ? 'disabled' : ''}>${s}${(sStock<=0 && !item.isPreorder) ? (currentLang==='ua'?' (немає)':' (out)') : ''}</option>`; }).join('') + `</select>`; 
                 }
 
                 let safeTitle = (item.title || '').replace(/'/g, "\\'");
@@ -1249,7 +1249,7 @@
                 `;
             });
 
-            grid.innerHTML = gridHTML; // Виводимо одним блоком, щоб не мигало
+            grid.innerHTML = gridHTML; 
             applyTranslationsToDOM(currentLang);
         }
 
