@@ -578,6 +578,7 @@
                     <span onclick="closeAccountModal()" style="cursor:pointer; font-size:1.3rem; color:#888;">✕</span>
                 </div>
                 <div id="account-user-email" style="color:#888; font-size:0.85rem; margin-bottom:20px;"></div>
+                <div id="account-telegram-zone" style="margin-bottom:20px;"></div>
                 <h4 style="font-size:0.9rem; text-transform:uppercase; color:var(--copper); margin-bottom:12px;"><span data-lang="ua">Історія замовлень</span><span data-lang="en">Order history</span></h4>
                 <div id="account-orders-list" style="display:flex; flex-direction:column; gap:10px; max-height:320px; overflow-y:auto; margin-bottom:20px;"></div>
                 <button type="button" onclick="doLogout()" style="width:100%; background:none; border:1px solid #ff4a4a; color:#ff4a4a; border-radius:4px; padding:12px; cursor:pointer; font-weight:600;"><span data-lang="ua">Вийти з акаунту</span><span data-lang="en">Log out</span></button>
@@ -780,6 +781,7 @@
             <span class="close-x" onclick="closeUserChat()">×</span>
         </div>
         <div class="chat-admin-status" id="chatAdminStatus"><span class="dot"></span><span id="chatAdminStatusText"></span></div>
+        <div id="chat-telegram-link-zone" style="padding:0 16px 10px;"></div>
     </div>
     <div class="chat-messages" id="user-chat-messages"></div>
     <div class="chat-input-area" id="user-chat-input-block">
@@ -897,6 +899,8 @@
         // --- АКАУНТИ КЛІЄНТІВ (Email + пароль) ---
         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         let currentAccountUser = null;
+        let siteTelegramBotUsername = null;
+        db.collection("config").doc("telegram").get().then(doc => { if (doc.exists) siteTelegramBotUsername = doc.data().username; }).catch(()=>{});
 
         function openAccountModal() {
             document.getElementById('account-modal-overlay').style.display = 'flex';
@@ -909,7 +913,20 @@
             document.getElementById('account-view-dashboard').style.display = view === 'dashboard' ? 'block' : 'none';
             document.getElementById('login-error-msg').style.display = 'none';
             document.getElementById('register-error-msg').style.display = 'none';
-            if (view === 'dashboard') loadAccountOrders();
+            if (view === 'dashboard') { loadAccountOrders(); renderAccountTelegramZone(); }
+        }
+        async function renderAccountTelegramZone() {
+            const zone = document.getElementById('account-telegram-zone');
+            if (!zone || !currentAccountUser) return;
+            if (!siteTelegramBotUsername) { zone.innerHTML = ''; return; }
+            try {
+                const doc = await db.collection('customers').doc(currentAccountUser.uid).get();
+                if (doc.exists && doc.data().telegramChatId) {
+                    zone.innerHTML = `<div style="background:rgba(62,207,106,0.1); border:1px solid rgba(62,207,106,0.3); border-radius:8px; padding:10px 14px; font-size:0.85rem; color:#3ecf6a;">✅ Telegram підключено — сповіщення про статус замовлень надходитимуть туди</div>`;
+                } else {
+                    zone.innerHTML = `<a href="https://t.me/${siteTelegramBotUsername}?start=cust_${currentAccountUser.uid}" target="_blank" style="display:block; text-align:center; text-decoration:none; background:#29a9eb; color:#fff; border-radius:6px; padding:10px 14px; font-size:0.85rem; font-weight:600;">📱 Прив'язати Telegram для сповіщень</a>`;
+                }
+            } catch(e) { zone.innerHTML = ''; }
         }
 
         const authErrorMessages = {
@@ -1708,6 +1725,12 @@ function initUserChat() {
     const cachedChat = localStorage.getItem('chatCache_' + userChatSessionId);
     if (cachedChat) { try { renderUserChat(JSON.parse(cachedChat)); } catch(e) {} }
     startRealtimeChatListener();
+    renderChatTelegramLink();
+}
+function renderChatTelegramLink() {
+    const zone = document.getElementById('chat-telegram-link-zone');
+    if (!zone || typeof siteTelegramBotUsername === 'undefined' || !siteTelegramBotUsername) return;
+    zone.innerHTML = `<a href="https://t.me/${siteTelegramBotUsername}?start=chat_${userChatSessionId}" target="_blank" style="display:block; text-align:center; text-decoration:none; background:rgba(41,169,235,0.15); border:1px solid rgba(41,169,235,0.4); color:#29a9eb; border-radius:6px; padding:7px 10px; font-size:0.78rem; font-weight:600;">📱 Продовжити в Telegram</a>`;
 }
 function openUserChat(e) {
     if (e) e.preventDefault();
