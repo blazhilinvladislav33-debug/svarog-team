@@ -262,6 +262,7 @@
             <span class="close-x" onclick="closeUserChat()">×</span>
         </div>
         <div class="chat-admin-status" id="chatAdminStatus"><span class="dot"></span><span id="chatAdminStatusText"></span></div>
+        <div id="chat-telegram-link-zone" style="padding:0 16px 10px;"></div>
     </div>
     <div class="chat-messages" id="user-chat-messages"></div>
     <div class="chat-input-area" id="user-chat-input-block">
@@ -339,11 +340,19 @@ let adminNamesCache = {};
 
 function isEnLang() { return document.documentElement.classList.contains('lang-en'); }
 
+let siteTelegramBotUsername = null;
+db.collection("config").doc("telegram").get().then(doc => { if (doc.exists) siteTelegramBotUsername = doc.data().username; }).catch(()=>{});
 function initUserChat() {
     if (!userChatSessionId) { userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId); }
     const cachedChat = localStorage.getItem('chatCache_' + userChatSessionId);
     if (cachedChat) { try { renderUserChat(JSON.parse(cachedChat)); } catch(e) {} }
     startRealtimeChatListener();
+    renderChatTelegramLink();
+}
+function renderChatTelegramLink() {
+    const zone = document.getElementById('chat-telegram-link-zone');
+    if (!zone || !siteTelegramBotUsername) return;
+    zone.innerHTML = `<a href="https://t.me/${siteTelegramBotUsername}?start=chat_${userChatSessionId}" target="_blank" style="display:block; text-align:center; text-decoration:none; background:rgba(41,169,235,0.15); border:1px solid rgba(41,169,235,0.4); color:#29a9eb; border-radius:6px; padding:7px 10px; font-size:0.78rem; font-weight:600;">📱 Продовжити в Telegram</a>`;
 }
 function openUserChat(e) {
     if (e) e.preventDefault();
