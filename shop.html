@@ -557,10 +557,15 @@
                 <div style="text-align:center; font-size:0.8rem;"><a href="#" onclick="event.preventDefault(); doPasswordReset();" style="color:#888;"><span data-lang="ua">Забули пароль?</span><span data-lang="en">Forgot password?</span></a></div>
             </div>
 
-            <div id="account-view-register" style="display:none;">
+            <div id="account-view-register" style="display:none; max-height:80vh; overflow-y:auto;">
                 <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.1rem; margin-bottom:20px; text-align:center;"><span data-lang="ua">Реєстрація</span><span data-lang="en">Sign up</span></h3>
-                <div class="form-group"><input type="text" id="register-name-input" class="form-input" placeholder="Ім'я" autocomplete="name"></div>
+                <div style="display:flex; gap:10px;">
+                    <div class="form-group" style="flex:1;"><input type="text" id="register-lastname-input" class="form-input" placeholder="Прізвище" autocomplete="family-name"></div>
+                    <div class="form-group" style="flex:1;"><input type="text" id="register-name-input" class="form-input" placeholder="Ім'я" autocomplete="given-name"></div>
+                </div>
+                <div class="form-group"><input type="tel" id="register-phone-input" class="form-input" placeholder="Номер телефону" autocomplete="tel"></div>
                 <div class="form-group"><input type="email" id="register-email-input" class="form-input" placeholder="Email" autocomplete="email"></div>
+                <div class="form-group"><input type="text" id="register-address-input" class="form-input" placeholder="Місто та № відділення Нової Пошти" autocomplete="off"></div>
                 <div class="form-group"><input type="password" id="register-password-input" class="form-input" placeholder="Пароль (мінімум 6 символів)" autocomplete="new-password"></div>
                 <div id="register-error-msg" style="display:none; color:#ff4a4a; font-size:0.85rem; margin-bottom:12px;"></div>
                 <button type="button" class="confirm-btn" style="margin:0 0 14px;" onclick="doRegister()"><span data-lang="ua">Створити акаунт</span><span data-lang="en">Create account</span></button>
@@ -706,7 +711,7 @@
     </section>
 
     <section id="bundles-section" style="display:none; max-width:var(--max-w); margin:0 auto; padding:0 24px 50px;">
-        <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;">🎁 <span data-lang="ua">Комплекти зі знижкою</span><span data-lang="en">Discounted bundles</span></h3>
+        <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;"><span data-lang="ua">Комплекти зі знижкою</span><span data-lang="en">Discounted bundles</span></h3>
         <div id="bundles-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:20px;"></div>
     </section>
 
@@ -931,15 +936,19 @@
         }
 
         async function doRegister() {
-            const name = document.getElementById('register-name-input').value.trim();
+            const lastName = document.getElementById('register-lastname-input').value.trim();
+            const firstName = document.getElementById('register-name-input').value.trim();
+            const phone = document.getElementById('register-phone-input').value.trim();
             const email = document.getElementById('register-email-input').value.trim();
+            const address = document.getElementById('register-address-input').value.trim();
             const password = document.getElementById('register-password-input').value;
             const errEl = document.getElementById('register-error-msg');
             errEl.style.display = 'none';
-            if (!name || !email || !password) { errEl.innerText = currentLang === 'ua' ? 'Заповніть усі поля.' : 'Fill in all fields.'; errEl.style.display = 'block'; return; }
+            if (!lastName || !firstName || !phone || !email || !address || !password) { errEl.innerText = currentLang === 'ua' ? 'Заповніть усі поля.' : 'Fill in all fields.'; errEl.style.display = 'block'; return; }
+            const fullName = `${lastName} ${firstName}`;
             try {
                 const cred = await firebase.auth().createUserWithEmailAndPassword(email, password);
-                await db.collection('customers').doc(cred.user.uid).set({ name, email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                await db.collection('customers').doc(cred.user.uid).set({ lastName, firstName, name: fullName, phone, email, novaPoshtaAddress: address, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
                 closeAccountModal();
                 showToast(currentLang === 'ua' ? 'Акаунт створено!' : 'Account created!');
             } catch (err) { errEl.innerText = authErrorText(err); errEl.style.display = 'block'; }
@@ -1459,7 +1468,8 @@
                 let size = "Універсальний";
                 if (item.sizes && item.sizes.length > 0) size = item.sizes[0];
                 else if (item.stock && typeof item.stock === 'object') { const keys = Object.keys(item.stock); if (keys.length > 0) size = keys[0]; }
-                const img = item.image || (item.images && item.images[0]) || null;
+                const firstVariant = item.variants && item.variants[0];
+                const img = item.image || (item.images && item.images[0]) || (firstVariant && (firstVariant.image || (firstVariant.images && firstVariant.images[0]))) || null;
                 shoppingCart.push({ cartId: Date.now().toString() + Math.random().toString(36).substr(2,5), merchId: item.id, merchTitle: `${item.title} (${bundle.name})`, image: img, price: discountedPrice, size, color: null, quantity: 1, totalPrice: discountedPrice, isPreorder: item.isPreorder || false });
                 addedCount++;
             });
@@ -1505,9 +1515,15 @@
             document.getElementById('order-modal-wrapper').style.display = 'flex'; goToCheckoutStep(1); renderCartModalContent();
             if (currentAccountUser) {
                 const nameInput = document.getElementById('order-name');
-                if (nameInput && !nameInput.value) {
-                    db.collection('customers').doc(currentAccountUser.uid).get().then(doc => { if (doc.exists && doc.data().name && !nameInput.value) nameInput.value = doc.data().name; }).catch(()=>{});
-                }
+                const phoneInput = document.getElementById('order-phone');
+                const addressInput = document.getElementById('order-address');
+                db.collection('customers').doc(currentAccountUser.uid).get().then(doc => {
+                    if (!doc.exists) return;
+                    const data = doc.data();
+                    if (nameInput && !nameInput.value && data.name) nameInput.value = data.name;
+                    if (phoneInput && !phoneInput.value && data.phone) phoneInput.value = data.phone;
+                    if (addressInput && !addressInput.value && data.novaPoshtaAddress) addressInput.value = data.novaPoshtaAddress;
+                }).catch(()=>{});
             }
         }
         function closeOrderModal() { document.getElementById('order-modal-wrapper').style.display = 'none'; }
