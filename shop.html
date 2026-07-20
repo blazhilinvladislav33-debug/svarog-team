@@ -38,8 +38,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        /* Виправлено overflow-x: hidden на clip, щоб не ламався скрол на iOS */
-        html, body { width: 100%; min-height: 100%; scroll-behavior: smooth; background: var(--graphite); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: clip; }
+        html, body { width: 100%; min-height: 100%; scroll-behavior: smooth; background: var(--graphite); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
         a { color: var(--brand-yellow); text-decoration: none; }
         button { font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; border: none; background: none; }
 
@@ -83,21 +82,24 @@
         .feature-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
         .feature-item svg { width: 24px; height: 24px; fill: none; stroke: var(--brand-yellow); stroke-width: 2; }
 
+        /* ВАЖЛИВО: дисплей тут none за замовчуванням, ми його змінюємо в JS, коли є фото */
         .hero-img-wrapper { position: absolute; right: 0; top: 0; width: 55%; height: 100%; z-index: 1; display: none; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%); mask-image: linear-gradient(to right, transparent 0%, black 35%, black 100%); }
         .hero-showcase-img { width: 100%; height: 100%; object-fit: cover; object-position: center right; }
 
-        /* ================= ОСНОВНИЙ КОНТЕНТ ================= */
+        /* ================= КАТАЛОГ ================= */
         .main-content { padding: 0 24px 60px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: var(--max-w); margin: 0 auto; }
         .section-title { width: 100%; text-align: left; font-family: 'Oswald', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 20px; color: #fff; text-transform: uppercase; }
 
         /* КАТЕГОРІЇ ТА ПІДКАТЕГОРІЇ */
-        .categories-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; width: 100%; margin-bottom: 20px; }
-        .category-card { background: var(--plate); border: 1px solid var(--iron); padding: 24px 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;}
-        .category-card:hover { border-color: var(--ash); transform: translateY(-3px); }
-        .category-card.active { background: rgba(240, 202, 40, 0.08); border-color: var(--brand-yellow); box-shadow: 0 5px 15px rgba(240, 202, 40, 0.1);}
-        .category-title { font-size: 1.1rem; font-weight: 700; color: var(--bone); z-index: 2;}
-        .category-subtitle { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; z-index: 2;}
-        .category-card.active .category-title { color: var(--brand-yellow); }
+        .categories-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; width: 100%; margin-bottom: 20px; }
+        .category-card { background: linear-gradient(160deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01)); border: 1px solid var(--iron); padding: 22px 20px 22px 24px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;}
+        .category-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--ember); transform: scaleY(0); transition: transform 0.25s; transform-origin: top; }
+        .category-card:hover { border-color: var(--copper); transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,0.3); }
+        .category-card.active { background: linear-gradient(160deg, rgba(217,102,61,0.14), rgba(217,102,61,0.02)); border-color: var(--ember); box-shadow: 0 10px 26px rgba(217,102,61,0.15); }
+        .category-card.active::before { transform: scaleY(1); }
+        .category-title { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: .02em; font-size: 1.05rem; font-weight: 700; color: var(--bone); z-index: 2;}
+        .category-subtitle { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; z-index: 2; transition: 0.25s;}
+        .category-card.active .category-title { color: var(--copper); }
 
         .subcategories-bar { display: none; width: 100%; gap: 10px; overflow-x: auto; padding: 10px 0 20px; border-bottom: 1px dashed var(--iron); margin-bottom: 30px; scrollbar-width: none; }
         .subcategories-bar::-webkit-scrollbar { display: none; }
@@ -114,15 +116,11 @@
         .sort-select option { background: var(--graphite); }
         #fav-filter-btn.active { border-color: #ff4a4a; color: #ff4a4a; background: rgba(255,74,74,0.08); }
 
-        /* СІТКА ТОВАРІВ (Фікс рендерингу на iOS) */
+        /* СІТКА ТОВАРІВ */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; margin-bottom: 60px; }
-        .merch-card { display: flex; flex-direction: column; transition: all 0.3s ease; -webkit-transform: translateZ(0); transform: translateZ(0); }
-        .merch-img-box { width: 100%; aspect-ratio: 4/5; background: var(--plate); border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; border: 1px solid transparent; transition: 0.3s; cursor: pointer; -webkit-transform: translateZ(0); transform: translateZ(0);}
-        .merch-card:hover .merch-img-box { border-color: var(--iron); box-shadow: 0 10px 25px rgba(0,0,0,0.4);}
-        .merch-gallery { display: flex; width: 100%; height: 100%; }
-        .merch-gallery img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-        .merch-card:hover .merch-gallery img { transform: scale(1.05); }
-
+        .merch-card { display: flex; flex-direction: column; transition: all 0.3s ease; }
+        .section-rule { width: 32px; height: 2px; background: var(--ember); margin: -10px 0 18px; }
+        .section-rule.centered { margin: -10px auto 18px; }
         .recently-viewed-card { cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 8px; overflow: hidden; transition: 0.2s; }
         .recently-viewed-card:hover { border-color: var(--copper); transform: translateY(-3px); }
         .recently-viewed-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
@@ -137,10 +135,17 @@
         .bundle-old { color: #888; text-decoration: line-through; font-size: 0.85rem; }
         .bundle-new { color: #3ecf6a; font-weight: 800; font-size: 1.1rem; }
         .bundle-badge { background: #3ecf6a; color: #0a0a0c; font-weight: 800; font-size: 0.75rem; padding: 2px 8px; border-radius: 20px; }
-        .review-card { background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 10px; overflow: hidden; }
+        .review-card { background: rgba(255,255,255,0.03); border: 1px solid var(--iron); border-radius: 10px; overflow: hidden; transition: 0.25s; }
+        .review-card:hover { border-color: var(--copper); transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,0.3); }
         .review-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block; cursor: zoom-in; }
         .review-card .review-name { padding: 10px 12px 4px; font-weight: 700; font-size: 0.9rem; }
         .review-card .review-text { padding: 0 12px 12px; font-size: 0.8rem; color: var(--ash); font-style: italic; line-height: 1.4; }
+        
+        .merch-img-box { width: 100%; aspect-ratio: 4/5; background: var(--plate); border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; border: 1px solid transparent; transition: 0.3s; cursor: pointer;}
+        .merch-card:hover .merch-img-box { border-color: var(--iron); box-shadow: 0 10px 25px rgba(0,0,0,0.4);}
+        .merch-gallery { display: flex; width: 100%; height: 100%; }
+        .merch-gallery img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .merch-card:hover .merch-gallery img { transform: scale(1.05); }
         
         .fav-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 5; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .fav-btn svg { width: 16px; height: 16px; fill: none; stroke: #121212; stroke-width: 2px; transition: 0.2s; }
@@ -371,6 +376,7 @@
 </head>
 <body>
 
+
     <div id="shop-announcement-overlay" style="display:none; position:fixed; inset:0; z-index:5000; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;" onclick="if(event.target===this) dismissShopAnnouncement()">
         <div style="background:#16171A; border:1px solid #ffaa00; border-radius:12px; padding:32px; max-width:440px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.6);">
             <div style="font-size:2.5rem; margin-bottom:14px;">📢</div>
@@ -460,7 +466,7 @@
             <div class="catalog-toolbar" id="catalog-toolbar">
                 <div class="search-input-wrap">
                     <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                    <input type="text" id="shop-search-input" data-placeholder-ua="Пошук товару..." data-placeholder-en="Search products..." placeholder="Пошук товару..." oninput="onShopSearchOrSort()">
+                    <input type="text" id="shop-search-input" data-placeholder-ua="Пошук товару..." data-placeholder-en="Search products..." placeholder="Пошук товару..." autocomplete="off" name="shop-product-search" oninput="onShopSearchOrSort()">
                 </div>
                 <select id="shop-sort-select" class="sort-select" onchange="onShopSearchOrSort()">
                     <option value="default" data-txt-ua="За порядком" data-txt-en="Default order">За порядком</option>
@@ -704,25 +710,29 @@
     <!-- ТОСТ -->
     <div class="toast-notification" id="toast-msg"><span id="toast-text"></span></div>
 
-    <!-- ФУТЕРНІ БЛОКИ -->
+    <!-- ФУТЕР -->
     <section id="reviews-section" style="display:none; max-width:var(--max-w); margin:0 auto; padding:0 24px 50px;">
         <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;">⭐ <span data-lang="ua">Наші люди в мерчі</span><span data-lang="en">Our people wearing the gear</span></h3>
+        <div class="section-rule"></div>
         <div id="reviews-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:18px;"></div>
     </section>
 
     <section id="bundles-section" style="display:none; max-width:var(--max-w); margin:0 auto; padding:0 24px 50px;">
         <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;"><span data-lang="ua">Комплекти зі знижкою</span><span data-lang="en">Discounted bundles</span></h3>
+        <div class="section-rule"></div>
         <div id="bundles-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:20px;"></div>
     </section>
 
     <section id="recently-viewed-section" style="display:none; max-width:var(--max-w); margin:0 auto; padding:0 24px 50px;">
         <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.2rem; margin-bottom:18px;"><span data-lang="ua">Ви дивились</span><span data-lang="en">Recently viewed</span></h3>
+        <div class="section-rule"></div>
         <div id="recently-viewed-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:16px;"></div>
     </section>
 
     <section class="order-check-section" style="max-width:var(--max-w); margin:0 auto; padding:0 24px 30px; text-align:center;">
         <div id="account-bottom-card" style="max-width:480px; margin:0 auto; background:rgba(255,255,255,0.03); border:1px solid var(--iron); border-radius:12px; padding:30px 24px;">
             <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.1rem; margin-bottom:8px;"><span data-lang="ua">Особистий кабінет</span><span data-lang="en">My account</span></h3>
+            <div class="section-rule centered"></div>
             <p id="account-bottom-desc" style="color:#888; font-size:0.85rem; margin-bottom:16px;"><span data-lang="ua">Увійдіть, щоб бачити історію замовлень без введення номера щоразу</span><span data-lang="en">Log in to see your order history without entering the number each time</span></p>
             <button type="button" id="account-bottom-btn" class="confirm-btn" style="margin:0;" onclick="openAccountModal()"><span id="account-bottom-label" data-lang="ua">Увійти / Зареєструватись</span><span id="account-bottom-label-en" data-lang="en">Log in / Sign up</span></button>
         </div>
@@ -731,6 +741,7 @@
     <section class="order-check-section" style="max-width:var(--max-w); margin:0 auto; padding:0 24px 60px; text-align:center;">
         <div style="max-width:480px; margin:0 auto; background:rgba(255,255,255,0.03); border:1px solid var(--iron); border-radius:12px; padding:30px 24px;">
             <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.1rem; margin-bottom:8px;"><span data-lang="ua">Перевірити статус замовлення</span><span data-lang="en">Check order status</span></h3>
+            <div class="section-rule centered"></div>
             <p style="color:#888; font-size:0.85rem; margin-bottom:16px;"><span data-lang="ua">Введіть номер замовлення, який ви отримали після оформлення</span><span data-lang="en">Enter the order number you received after checkout</span></p>
             <div style="display:flex; gap:8px;">
                 <input type="text" id="order-check-input" class="form-input" placeholder="Наприклад: aB3xY9..." style="flex:1;" onkeypress="if(event.key==='Enter'){event.preventDefault(); checkOrderStatus();}">
@@ -763,7 +774,7 @@
                 </div>
             </div>
         </div>
-        <div class="footer-bottom">© 2026 SVAROG TEAM · <a href="privacy.html" style="color:inherit; text-decoration:underline; opacity:.8;"><span data-lang="ua">Політика конфіденційності</span><span data-lang="en">Privacy Policy</span></a></div>
+        <div class="footer-bottom">© 2026 SVAROG TEAM · <a href="privacy.html" style="color:inherit; text-decoration:underline; opacity:.8;"><span data-lang="ua">Політика конфіденційності</span><span data-lang="en">Privacy Policy</span></a> · <a href="mailto:info@svarogteam.com" style="color:inherit; opacity:.8;">info@svarogteam.com</a></div>
     </footer>
 
 <!-- КНОПКА АНОНІМНОГО ЧАТУ -->
@@ -794,6 +805,7 @@
         </button>
     </div>
 </div>
+
 
     <script>
         // --- МЕНЮ ТА ЛАЙТБОКС ---
@@ -840,7 +852,7 @@
             renderShopGrid();
         });
 
-        // --- СОЦМЕРЕЖІ З FIREBASE ---
+        // --- СОЦМЕРЕЖІ З FIREBASE (повний динамічний список) ---
         db.collection("config").doc("socials").onSnapshot(doc => {
             const list = (doc.exists && doc.data().list) || [];
             const box = document.getElementById('footerSocialBox');
@@ -853,7 +865,7 @@
         let activeCategory = 'Всі товари';
         let activeSubcategory = 'Всі';
         let shoppingCart = JSON.parse(localStorage.getItem('svarog_shop_cart')) || []; 
-        let appliedPromo = null; 
+        let appliedPromo = null; // { code, type, discount, fiatValue }
         let repeatDiscountPercent = 0; let repeatDiscountApplied = false;
         db.collection("config").doc("shop").onSnapshot(doc => { repeatDiscountPercent = (doc.exists && doc.data().repeatCustomerDiscount) || 0; });
         async function checkRepeatCustomer() {
@@ -880,7 +892,7 @@
             if (doc.exists) {
                 if(doc.data().heroImage) {
                     document.getElementById('dynamic-hero-img').src = doc.data().heroImage;
-                    document.getElementById('dynamic-hero-wrapper').style.display = 'block'; 
+                    document.getElementById('dynamic-hero-wrapper').style.display = 'block'; // ВАЖЛИВО!
                 } else {
                     document.getElementById('dynamic-hero-wrapper').style.display = 'none';
                 }
@@ -894,7 +906,7 @@
             }
         });
 
-        // --- АКАУНТИ КЛІЄНТІВ ---
+        // --- АКАУНТИ КЛІЄНТІВ (Email + пароль) ---
         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         let currentAccountUser = null;
         let siteTelegramBotUsername = null;
@@ -1012,14 +1024,14 @@
             const btnLabelEn = document.getElementById('account-bottom-label-en');
             const descEl = document.getElementById('account-bottom-desc');
             if (user) {
-                if(btnLabelUa) btnLabelUa.innerText = 'Мій кабінет';
-                if(btnLabelEn) btnLabelEn.innerText = 'My account';
-                if(descEl) descEl.style.display = 'none';
-                if(document.getElementById('account-user-email')) document.getElementById('account-user-email').innerText = user.email;
+                btnLabelUa.innerText = 'Мій кабінет';
+                btnLabelEn.innerText = 'My account';
+                descEl.style.display = 'none';
+                document.getElementById('account-user-email').innerText = user.email;
             } else {
-                if(btnLabelUa) btnLabelUa.innerText = 'Увійти / Зареєструватись';
-                if(btnLabelEn) btnLabelEn.innerText = 'Log in / Sign up';
-                if(descEl) descEl.style.display = 'block';
+                btnLabelUa.innerText = 'Увійти / Зареєструватись';
+                btnLabelEn.innerText = 'Log in / Sign up';
+                descEl.style.display = 'block';
             }
         });
 
@@ -1061,7 +1073,7 @@
             }
         }
 
-        // --- СПОВІСТИТИ ПРО НАЯВНІСТЬ ---
+        // --- СПОВІСТИТИ, КОЛИ З'ЯВИТЬСЯ ---
         let notifyItemId = ''; let notifyItemTitle = '';
         function openNotifyModal(itemId, itemTitle) {
             notifyItemId = itemId; notifyItemTitle = itemTitle;
@@ -1160,7 +1172,7 @@
         }
 
         function renderShopGrid() {
-            const grid = document.getElementById('dynamic-shop-grid'); 
+            const grid = document.getElementById('dynamic-shop-grid'); grid.innerHTML = "";
             let filteredList = globalMerchList; 
             
             if(activeCategory !== 'Всі товари') filteredList = filteredList.filter(m => m.category === activeCategory);
@@ -1172,12 +1184,7 @@
             else if (shopSortMode === 'price_desc') filteredList = [...filteredList].sort((a, b) => (b.discountPrice || b.price) - (a.discountPrice || a.price));
             else { filteredList = [...filteredList].sort((a, b) => { const oa = (a.order !== undefined && a.order !== null) ? a.order : 999999; const ob = (b.order !== undefined && b.order !== null) ? b.order : 999999; return oa - ob; }); }
 
-            if(filteredList.length === 0) { 
-                grid.innerHTML = showFavoritesOnly ? `<div style="color:var(--ash);">${currentLang === 'ua' ? 'Немає улюблених товарів.' : 'No favorite items yet.'}</div>` : `<div style="color:var(--ash);">Немає товарів.</div>`; 
-                return; 
-            }
-
-            let gridHTML = ""; 
+            if(filteredList.length === 0) { grid.innerHTML = showFavoritesOnly ? `<div style="color:var(--ash);">${currentLang === 'ua' ? 'Немає улюблених товарів.' : 'No favorite items yet.'}</div>` : `<div style="color:var(--ash);">Немає товарів.</div>`; return; }
 
             filteredList.forEach((item, idx) => {
                 let isVariant = item.variants && item.variants.length > 0; 
@@ -1187,22 +1194,16 @@
                 let currentStockObj = isVariant ? (item.variants[activeVarIdx].stock || item.stock) : item.stock;
 
                 let posStyle = item.imagePosition ? ` style="object-position:${item.imagePosition};"` : '';
-                let galleryHtml = `<div class="merch-gallery">` + currentImagesArray.map((imgSrc, i) => `<img src="${imgSrc}" ${i===0?posStyle:''}>`).join('') + `</div>`;
+                let galleryHtml = `<div class="merch-gallery">` + currentImagesArray.map((imgSrc, i) => `<img src="${imgSrc}" loading="lazy"${i===0?posStyle:''}>`).join('') + `</div>`;
                 
-                let variantsHtml = ''; 
-                if (isVariant) { 
-                    variantsHtml = '<div class="color-options">'; 
-                    item.variants.forEach((varObj, vidx) => { 
-                        variantsHtml += `<button class="color-btn ${vidx===activeVarIdx?'active':''}" style="background-color: ${varObj.colorHex || '#ccc'};" onclick="event.stopPropagation(); window.changeVariant('${item.id}', ${vidx})"></button>`; 
-                    }); 
-                    variantsHtml += '</div>'; 
-                }
+                let variantsHtml = ''; if (isVariant) { variantsHtml = '<div class="color-options">'; item.variants.forEach((varObj, vidx) => { variantsHtml += `<button class="color-btn ${vidx===activeVarIdx?'active':''}" style="background-color: ${varObj.colorHex || '#ccc'};" onclick="event.stopPropagation(); window.changeVariant('${item.id}', ${vidx})"></button>`; }); variantsHtml += '</div>'; }
                 
                 let hasDiscount = item.discountPrice && item.discountPrice < item.price;
                 let priceHtml = hasDiscount ? `<span class="merch-price">${item.discountPrice} ₴</span> <span class="old-price">${item.price} ₴</span>` : `<span class="merch-price">${item.price} ₴</span>`;
                 let saleBadgeHtml = hasDiscount ? `<div class="sale-badge">SALE</div>` : ``;
                 let newBadgeHtml = item.isNew ? `<div class="new-badge">NEW</div>` : ``;
 
+                // ==== ЗАЛИШКИ / ПЕРЕДЗАМОВЛЕННЯ / РОЗПРОДАНО ====
                 let totalStock = typeof currentStockObj === 'object' && currentStockObj !== null ? Object.values(currentStockObj).reduce((a, b) => a + (parseInt(b) || 0), 0) : parseInt(currentStockObj || 0);
                 let isOutOfStock = !item.isPreorder && totalStock <= 0;
                 let isLowStock = !item.isPreorder && !isOutOfStock && totalStock <= 3;
@@ -1213,15 +1214,12 @@
                 let currentSizes = isVariant ? (item.variants[activeVarIdx].sizes || item.sizes) : item.sizes;
                 let sizeSelectHtml = ''; 
                 if(currentSizes && currentSizes.length > 0) { 
-                    sizeSelectHtml = `<select id="size-${item.id}" class="merch-select" onclick="event.stopPropagation();" onchange="event.stopPropagation(); window.onGridSizeChange('${item.id}')">` + currentSizes.map(s => { let sStock = item.isPreorder ? 999 : (typeof currentStockObj === 'object' && currentStockObj ? (parseInt(currentStockObj[s]) || 0) : 0); return `<option value="${s}" ${(sStock<=0 && !item.isPreorder) ? 'disabled' : ''}>${s}${(sStock<=0 && !item.isPreorder) ? (currentLang==='ua'?' (немає)':' (out)') : ''}</option>`; }).join('') + `</select>`; 
+                    sizeSelectHtml = `<select id="size-${item.id}" class="merch-select" onclick="event.stopPropagation();" onchange="event.stopPropagation(); onGridSizeChange('${item.id}')">` + currentSizes.map(s => { let sStock = item.isPreorder ? 999 : (typeof currentStockObj === 'object' && currentStockObj ? (parseInt(currentStockObj[s]) || 0) : 0); return `<option value="${s}" ${(sStock<=0 && !item.isPreorder) ? 'disabled' : ''}>${s}${(sStock<=0 && !item.isPreorder) ? (currentLang==='ua'?' (немає)':' (out)') : ''}</option>`; }).join('') + `</select>`; 
                 }
 
-                let safeTitle = (item.title || '').replace(/'/g, "\\'");
-                let buyBtnHtml = isOutOfStock 
-                    ? `<button class="buy-btn" onclick="event.stopPropagation(); openNotifyModal('${item.id}', '${safeTitle}')" style="background:transparent; border:1px solid var(--iron); color:var(--ash);">${currentLang === 'ua' ? '🔔 Сповістити мене' : '🔔 Notify me'}</button>` 
-                    : `<button class="buy-btn" onclick="event.stopPropagation(); addToCart('${item.id}')">${item.isPreorder ? (currentLang === 'ua' ? 'Передзамовити' : 'Pre-order') : (currentLang === 'ua' ? 'В кошик' : 'Add to cart')}</button>`;
+                let buyBtnHtml = isOutOfStock ? `<button class="buy-btn" onclick="event.stopPropagation(); openNotifyModal('${item.id}', '${(item.title || '').replace(/'/g, "\\'")}')" style="background:transparent; border:1px solid var(--iron); color:var(--ash);">${currentLang === 'ua' ? '🔔 Сповістити мене' : '🔔 Notify me'}</button>` : `<button class="buy-btn" onclick="event.stopPropagation(); addToCart('${item.id}')">${item.isPreorder ? (currentLang === 'ua' ? 'Передзамовити' : 'Pre-order') : (currentLang === 'ua' ? 'В кошик' : 'Add to cart')}</button>`;
 
-                gridHTML += `
+                grid.innerHTML += `
                     <div class="merch-card ${isOutOfStock ? 'is-sold-out' : ''}" data-item-id="${item.id}">
                         <div class="merch-img-box" onclick="openProductModal('${item.id}')">
                             <div class="fav-btn ${isFavorited(item.id) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFav(this, '${item.id}')">
@@ -1248,8 +1246,6 @@
                     </div>
                 `;
             });
-
-            grid.innerHTML = gridHTML; 
             applyTranslationsToDOM(currentLang);
         }
 
@@ -1263,6 +1259,7 @@
             valEl.innerText = newQty;
         }
 
+        // Максимальна кількість для поточного вибору розміру/варіанту на картці
         function getMaxQtyForItem(itemId) {
             const item = globalMerchList.find(m => m.id === itemId); if (!item) return 99;
             if (item.isPreorder) return 99;
@@ -1273,7 +1270,7 @@
             if (typeof stockObj === 'object' && stockObj) return parseInt(stockObj[size]) || 0;
             return parseInt(stockObj) || 0;
         }
-        window.onGridSizeChange = function(itemId) {
+        function onGridSizeChange(itemId) {
             const max = getMaxQtyForItem(itemId); const valEl = document.getElementById(`qty-val-${itemId}`);
             let cur = parseInt(valEl.innerText) || 1; if (cur > max) valEl.innerText = Math.max(max, 0) || 0; if (max > 0 && cur === 0) valEl.innerText = 1;
         }
@@ -1289,6 +1286,7 @@
         }
 
         // ================= ДЕТАЛЬНА СТОРІНКА ТОВАРУ (МОДАЛКА) =================
+        // --- НЕЩОДАВНО ПЕРЕГЛЯНУТІ ТОВАРИ ---
         function trackRecentlyViewed(itemId) {
             let viewed = JSON.parse(localStorage.getItem('svarog_recently_viewed') || '[]');
             viewed = viewed.filter(id => id !== itemId);
@@ -1364,7 +1362,7 @@
             let currentStockObj = isVariant ? (currentPmItem.variants[activeVarIdx].stock || currentPmItem.stock) : currentPmItem.stock;
             let sizeSelectHtml = ''; 
             if(currentSizes && currentSizes.length > 0) { 
-                sizeSelectHtml = `<select id="pm-size-select" class="merch-select" onchange="window.onPmSizeChange()">` + currentSizes.map(s => { let sStock = currentPmItem.isPreorder ? 999 : (typeof currentStockObj === 'object' && currentStockObj ? (parseInt(currentStockObj[s]) || 0) : 0); return `<option value="${s}" ${(sStock<=0 && !currentPmItem.isPreorder) ? 'disabled' : ''}>${s}${(sStock<=0 && !currentPmItem.isPreorder) ? (currentLang==='ua'?' (немає)':' (out)') : ''}</option>`; }).join('') + `</select>`; 
+                sizeSelectHtml = `<select id="pm-size-select" class="merch-select" onchange="onPmSizeChange()">` + currentSizes.map(s => { let sStock = currentPmItem.isPreorder ? 999 : (typeof currentStockObj === 'object' && currentStockObj ? (parseInt(currentStockObj[s]) || 0) : 0); return `<option value="${s}" ${(sStock<=0 && !currentPmItem.isPreorder) ? 'disabled' : ''}>${s}${(sStock<=0 && !currentPmItem.isPreorder) ? (currentLang==='ua'?' (немає)':' (out)') : ''}</option>`; }).join('') + `</select>`; 
             }
             document.getElementById('pm-size-select-wrapper').innerHTML = sizeSelectHtml;
             document.getElementById('pm-qty-val').innerText = '1';
@@ -1374,12 +1372,11 @@
             const pmBuyBtn = document.getElementById('pm-buy-btn');
             if (isOutOfStock) {
                 pmBuyBtn.disabled = false;
-                let safeTitle = (currentPmItem.title || '').replace(/'/g, "\\'");
-                pmBuyBtn.onclick = () => { closeProductModal(); openNotifyModal(currentPmItem.id, safeTitle); };
+                pmBuyBtn.onclick = () => openNotifyModal(currentPmItem.id, currentPmItem.title || '');
                 pmBuyBtn.innerHTML = currentLang === 'ua' ? '🔔 Сповістити мене' : '🔔 Notify me';
             } else {
                 pmBuyBtn.disabled = false;
-                pmBuyBtn.onclick = () => pmAddToCart();
+                pmBuyBtn.onclick = () => addToCart(currentPmItem.id);
                 pmBuyBtn.innerHTML = `<span data-lang="ua">${currentPmItem.isPreorder ? 'Передзамовити 🛒' : 'Додати в кошик 🛒'}</span><span data-lang="en">${currentPmItem.isPreorder ? 'Pre-order 🛒' : 'Add to cart 🛒'}</span>`;
             }
 
@@ -1387,7 +1384,7 @@
             applyTranslationsToDOM(currentLang);
         }
 
-        window.onPmSizeChange = function() {
+        function onPmSizeChange() {
             if (!currentPmItem) return;
             let isVariant = currentPmItem.variants && currentPmItem.variants.length > 0; let activeVarIdx = window.selectedVariants[currentPmItem.id] || 0;
             let stockObj = isVariant ? (currentPmItem.variants[activeVarIdx].stock || currentPmItem.stock) : currentPmItem.stock;
@@ -1397,7 +1394,10 @@
             let cur = parseInt(valEl.innerText) || 1; if (cur > max) valEl.innerText = Math.max(max, 1);
         }
 
-        window.closeProductModal = function() { document.getElementById('product-modal').style.display = 'none'; }
+        window.closeProductModal = function() {
+            document.getElementById('product-modal').style.display = 'none';
+        }
+
         window.pmScrollGallery = function(direction) {
             if(pmGalleryImages.length <= 1) return;
             pmCurrentImgIndex += direction;
@@ -1405,12 +1405,14 @@
             if(pmCurrentImgIndex >= pmGalleryImages.length) pmCurrentImgIndex = 0;
             document.getElementById('pm-main-img').src = pmGalleryImages[pmCurrentImgIndex];
         }
+
         window.pmChangeVariant = function(vIndex) {
             if(!currentPmItem) return;
             window.selectedVariants[currentPmItem.id] = vIndex;
             openProductModal(currentPmItem.id); 
             renderShopGrid(); 
         }
+
         window.pmAdjustQty = function(amount) {
             if (!currentPmItem) return;
             let isVariant = currentPmItem.variants && currentPmItem.variants.length > 0; let activeVarIdx = window.selectedVariants[currentPmItem.id] || 0;
@@ -1422,17 +1424,45 @@
             let newQty = current + amount; if (newQty < 1) newQty = 1; if (newQty > Math.min(max, 10)) newQty = Math.min(max, 10);
             valEl.innerText = newQty;
         }
+
         window.pmAddToCart = function() {
             if(!currentPmItem) return;
             let size = "Універсальний"; const sizeSelect = document.getElementById('pm-size-select'); if(sizeSelect) size = sizeSelect.value;
             let qty = parseInt(document.getElementById('pm-qty-val').innerText);
-            const gridQtyEl = document.getElementById(`qty-val-${currentPmItem.id}`); if(gridQtyEl) gridQtyEl.innerText = qty;
-            const gridSizeEl = document.getElementById(`size-${currentPmItem.id}`); if(gridSizeEl && sizeSelect) gridSizeEl.value = size;
+            
+            const gridQtyEl = document.getElementById(`qty-val-${currentPmItem.id}`);
+            if(gridQtyEl) gridQtyEl.innerText = qty;
+            const gridSizeEl = document.getElementById(`size-${currentPmItem.id}`);
+            if(gridSizeEl && sizeSelect) gridSizeEl.value = size;
+
             addToCart(currentPmItem.id);
             closeProductModal();
         }
 
         // ================= КОШИК І ОФОРМЛЕННЯ =================
+        // --- ВІДГУКИ ПОКУПЦІВ ---
+        db.collection("reviews").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+            const section = document.getElementById('reviews-section');
+            const grid = document.getElementById('reviews-grid');
+            if (!section || !grid) return;
+            if (snapshot.empty) { section.style.display = 'none'; return; }
+            section.style.display = 'block';
+            grid.innerHTML = snapshot.docs.map(doc => {
+                const r = doc.data();
+                return `<div class="review-card">
+                    <img src="${r.photo}" loading="lazy" onclick="openLightbox('${r.photo}')">
+                    <div class="review-name">${r.name}</div>
+                    ${r.text ? `<div class="review-text">"${r.text}"</div>` : ''}
+                </div>`;
+            }).join('');
+        });
+
+        // --- КОМПЛЕКТИ ЗІ ЗНИЖКОЮ ---
+        let globalBundles = [];
+        db.collection("bundles").onSnapshot(snapshot => {
+            globalBundles = []; snapshot.forEach(doc => { globalBundles.push({ id: doc.id, ...doc.data() }); });
+            renderBundles();
+        });
         function renderBundles() {
             const section = document.getElementById('bundles-section');
             const grid = document.getElementById('bundles-grid');
@@ -1456,11 +1486,9 @@
             }).join('');
             applyTranslationsToDOM(currentLang);
         }
-        let globalBundles = [];
-        db.collection("bundles").onSnapshot(snapshot => { globalBundles = []; snapshot.forEach(doc => { globalBundles.push({ id: doc.id, ...doc.data() }); }); renderBundles(); });
-        
-        window.addBundleToCart = function(bundleId) {
+        function addBundleToCart(bundleId) {
             const bundle = globalBundles.find(b => b.id === bundleId); if (!bundle) return;
+            let addedCount = 0;
             bundle.itemIds.forEach(itemId => {
                 const item = globalMerchList.find(m => m.id === itemId); if (!item) return;
                 const basePrice = (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price;
@@ -1471,8 +1499,10 @@
                 const firstVariant = item.variants && item.variants[0];
                 const img = item.image || (item.images && item.images[0]) || (firstVariant && (firstVariant.image || (firstVariant.images && firstVariant.images[0]))) || null;
                 shoppingCart.push({ cartId: Date.now().toString() + Math.random().toString(36).substr(2,5), merchId: item.id, merchTitle: `${item.title} (${bundle.name})`, image: img, price: discountedPrice, size, color: null, quantity: 1, totalPrice: discountedPrice, isPreorder: item.isPreorder || false });
+                addedCount++;
             });
-            saveCart(); updateCartUI(); showToast(currentLang === 'ua' ? `Комплект додано в кошик 🎁` : `Bundle added to cart 🎁`);
+            saveCart(); updateCartUI();
+            showToast(currentLang === 'ua' ? `Комплект додано в кошик 🎁` : `Bundle added to cart 🎁`);
             const fab = document.querySelector('.cart-fab'); if (fab) { fab.classList.remove('pulse'); void fab.offsetWidth; fab.classList.add('pulse'); }
         }
 
@@ -1574,30 +1604,30 @@
                 renderCartModalContent();
             } catch (err) { showToast(err.message); }
         }
-        window.removePromoCode = function() { appliedPromo = null; document.getElementById('promo-code-input-field').value = ''; renderCartModalContent(); }
+        function removePromoCode() { appliedPromo = null; document.getElementById('promo-code-input-field').value = ''; renderCartModalContent(); }
 
-        window.removeFromCart = function(cartId) { shoppingCart = shoppingCart.filter(item => item.cartId !== cartId); saveCart(); updateCartUI(); }
-        window.adjustCartItemQty = function(cartId, amount) { const item = shoppingCart.find(i => i.cartId === cartId); if (!item) return; let newQty = item.quantity + amount; if (newQty < 1) { removeFromCart(cartId); return; } item.quantity = newQty; item.totalPrice = item.price * newQty; saveCart(); updateCartUI(); }
+        function removeFromCart(cartId) { shoppingCart = shoppingCart.filter(item => item.cartId !== cartId); saveCart(); updateCartUI(); }
+        function adjustCartItemQty(cartId, amount) { const item = shoppingCart.find(i => i.cartId === cartId); if (!item) return; let newQty = item.quantity + amount; if (newQty < 1) { removeFromCart(cartId); return; } item.quantity = newQty; item.totalPrice = item.price * newQty; saveCart(); updateCartUI(); }
 
         function goToCheckoutStep(step) {
             [1, 2, 3].forEach(s => { const el = document.getElementById(s === 3 ? 'checkout-form' : `checkout-step-${s}`); if (el) el.style.display = s === step ? 'block' : 'none'; });
             document.querySelectorAll('.checkout-step-dot').forEach(dot => { const dStep = parseInt(dot.dataset.step); dot.classList.toggle('current', dStep === step); dot.classList.toggle('done', dStep < step); });
             document.querySelectorAll('.checkout-step-line').forEach(line => { line.classList.toggle('done', parseInt(line.dataset.line) < step); });
         }
-        window.validateStep2AndContinue = function() {
+        function validateStep2AndContinue() {
             if (!document.getElementById('order-name').value || !document.getElementById('order-phone').value || !document.getElementById('order-address').value) { alert(currentLang === 'ua' ? "Заповніть всі поля!" : "Fill in all fields!"); return; }
             goToCheckoutStep(3);
         }
-
         let shopPaymentBankUrl = "https://send.monobank.ua/jar/default"; let shopPaymentCardNumber = ""; let orderReceiptBase64 = "";
         db.collection("config").doc("payment").onSnapshot(doc => {
             if (doc.exists) { if (doc.data().bankUrl) shopPaymentBankUrl = doc.data().bankUrl; if (doc.data().cardNumber) shopPaymentCardNumber = doc.data().cardNumber; }
             const jarLink = document.getElementById('bank-jar-link'); if (jarLink) { jarLink.href = shopPaymentBankUrl; jarLink.innerText = shopPaymentBankUrl; }
             const cardEl = document.getElementById('bank-card-number'); if (cardEl) cardEl.innerText = shopPaymentCardNumber || '—';
         });
-        window.copyCardNumberShop = function() { navigator.clipboard.writeText(shopPaymentCardNumber.replace(/\s/g, '')).then(() => showToast(currentLang === 'ua' ? "Скопійовано!" : "Copied!")); }
-        
-        window.previewOrderReceipt = async function(input) {
+        function copyCardNumberShop() {
+            navigator.clipboard.writeText(shopPaymentCardNumber.replace(/\s/g, '')).then(() => showToast(currentLang === 'ua' ? "Скопійовано!" : "Copied!"));
+        }
+        async function previewOrderReceipt(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -1615,7 +1645,7 @@
             }
         }
 
-        window.selectPaymentTile = function(method) {
+        function selectPaymentTile(method) {
             document.querySelectorAll('.payment-tile').forEach(t => t.classList.remove('active')); 
             document.getElementById(`tile-${method}`).classList.add('active');
             document.getElementById('selected-payment-method').value = method;
@@ -1626,7 +1656,7 @@
 
         async function submitOrder(e) {
             e.preventDefault(); if(shoppingCart.length === 0) return;
-            if (document.getElementById('order-website') && document.getElementById('order-website').value.trim() !== '') return; 
+            if (document.getElementById('order-website') && document.getElementById('order-website').value.trim() !== '') return; // honeypot
             const method = document.getElementById('selected-payment-method').value; if(!method) { alert(currentLang === 'ua' ? "Оберіть спосіб оплати!" : "Choose payment method!"); return; }
             if ((method === 'bank' || method === 'card') && !orderReceiptBase64) { alert(currentLang === 'ua' ? "Прикріпіть скріншот чеку — без нього замовлення не підтвердити." : "Please attach a payment receipt — required to confirm the order."); return; }
             const btn = document.getElementById('confirm-order-btn');
@@ -1686,127 +1716,136 @@
             finally { btn.innerText = currentLang === 'ua' ? "Підтвердити" : "Confirm"; btn.disabled = false; }
         }
 
-        // --- АНОНІМНИЙ ЧАТ ---
-        let userChatSessionId = localStorage.getItem('userChatSessionId');
-        let unsubscribeUserChat = null;
-        let lastSeenMsgCount = parseInt(localStorage.getItem('chatLastSeenCount_' + userChatSessionId)) || 0;
-        let adminNamesCache = {};
-
-        function isEnLang() { return document.documentElement.classList.contains('lang-en'); }
-
-        function initUserChat() {
-            if (!userChatSessionId) { userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId); }
-            const cachedChat = localStorage.getItem('chatCache_' + userChatSessionId);
-            if (cachedChat) { try { renderUserChat(JSON.parse(cachedChat)); } catch(e) {} }
-            startRealtimeChatListener();
-            renderChatTelegramLink();
-        }
-        function renderChatTelegramLink() {
-            const zone = document.getElementById('chat-telegram-link-zone');
-            if (!zone || typeof siteTelegramBotUsername === 'undefined' || !siteTelegramBotUsername) return;
-            zone.innerHTML = `<a href="https://t.me/${siteTelegramBotUsername}?start=chat_${userChatSessionId}" target="_blank" style="display:block; text-align:center; text-decoration:none; background:rgba(41,169,235,0.15); border:1px solid rgba(41,169,235,0.4); color:#29a9eb; border-radius:6px; padding:7px 10px; font-size:0.78rem; font-weight:600;">📱 Продовжити в Telegram</a>`;
-        }
-        window.openUserChat = function(e) {
-            if (e) e.preventDefault();
-            const menuOv = document.getElementById('menuOverlay'); if (menuOv) menuOv.classList.remove('open');
-            document.getElementById('user-chat-window').style.display = 'flex';
-            localStorage.setItem('svarogChatIsOpen', 'true');
-            renderUserChat();
-        }
-        window.closeUserChat = function() { document.getElementById('user-chat-window').style.display = 'none'; localStorage.setItem('svarogChatIsOpen', 'false'); }
-        function startRealtimeChatListener() {
-            if (unsubscribeUserChat) unsubscribeUserChat();
-            unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(function(doc) { renderUserChat(doc.exists ? doc.data() : { messages: [], status: 'active' }); }, function(err) { console.error("Помилка чату:", err); });
-        }
-        document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'visible' && userChatSessionId) { startRealtimeChatListener(); } });
-        async function getAdminName(email) {
-            if (!email) return '';
-            if (adminNamesCache[email]) return adminNamesCache[email];
-            try { const doc = await db.collection("admins").doc(email).get(); const name = (doc.exists && doc.data().name) ? doc.data().name : email; adminNamesCache[email] = name; return name; } catch(e) { return email; }
-        }
-        async function renderUserChat(myChatData) {
-            const messagesBox = document.getElementById('user-chat-messages'); const inputBlock = document.getElementById('user-chat-input-block');
-            const isOpen = document.getElementById('user-chat-window').style.display === 'flex';
-            let myChat = myChatData || { messages: [], status: 'active' };
-            try { localStorage.setItem('chatCache_' + userChatSessionId, JSON.stringify(myChat)); } catch(e) {}
-
-            if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
-                const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
-                if (Date.now() > clearTime) {
-                    localStorage.removeItem('clearChatTime_' + userChatSessionId); localStorage.removeItem('userChatSessionId');
-                    userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId);
-                    messagesBox.innerHTML = ""; inputBlock.style.display = 'flex'; startRealtimeChatListener(); return;
-                }
-            }
-
-            messagesBox.innerHTML = "";
-            (myChat.messages || []).forEach(function(msg) {
-                const bubble = document.createElement('div'); bubble.className = 'chat-bubble ' + msg.sender;
-                if (msg.type === 'image') bubble.innerHTML = '<img src="' + msg.text + '" onclick="openLightbox(this.src)">'; else bubble.innerText = msg.text;
-                messagesBox.appendChild(bubble);
-            });
-
-            const adminStatusBox = document.getElementById('chatAdminStatus'); const adminStatusText = document.getElementById('chatAdminStatusText');
-            if (myChat.claimedBy && myChat.status !== 'closed') {
-                const name = await getAdminName(myChat.claimedBy);
-                adminStatusText.textContent = (isEnLang() ? 'Connected: ' : 'Підключився: ') + name;
-                adminStatusBox.classList.add('show');
-            } else { adminStatusBox.classList.remove('show'); }
-
-            if (myChat.status === 'closed') {
-                inputBlock.style.display = 'none';
-                const sysMsg = document.createElement('div'); sysMsg.className = 'chat-bubble system';
-                sysMsg.innerText = isEnLang() ? 'Administrator has closed the session. Chat will automatically clear in 5 minutes.' : 'Адміністратор завершив сесію. Чат автоматично очиститься через 5 хвилин.';
-                messagesBox.appendChild(sysMsg);
-                if (!localStorage.getItem('clearChatTime_' + userChatSessionId)) localStorage.setItem('clearChatTime_' + userChatSessionId, Date.now() + 5 * 60 * 1000);
-            } else { inputBlock.style.display = 'flex'; }
-            messagesBox.scrollTop = messagesBox.scrollHeight;
-
-            const msgCount = (myChat.messages || []).length;
-            const lastMsg = msgCount > 0 ? myChat.messages[msgCount - 1] : null;
-            const badge = document.getElementById('chatFabBadge');
-            if (!isOpen && lastMsg && lastMsg.sender === 'admin' && msgCount > lastSeenMsgCount) {
-                const unreadCount = myChat.messages.slice(lastSeenMsgCount).filter(function(m) { return m.sender === 'admin'; }).length;
-                badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
-                badge.classList.add('show');
-            } else if (isOpen) {
-                lastSeenMsgCount = msgCount;
-                localStorage.setItem('chatLastSeenCount_' + userChatSessionId, msgCount);
-                badge.classList.remove('show');
-            }
-        }
-        window.sendUserChatMessage = async function() {
-            const input = document.getElementById('user-chat-input'); const text = input.value.trim(); if (!text) return;
-            input.value = "";
-            try { await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'user', text: text, type: 'text', time: Date.now() }) }, { merge: true }); } catch(e) { console.error(e); }
-        }
-        function getBase64ImageFile(file) {
-            return new Promise(function(resolve, reject) {
-                const reader = new FileReader(); reader.onload = function(e) {
-                    const img = new Image(); img.onload = function() {
-                        const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let w = img.width, h = img.height;
-                        if (w > MAX_WIDTH) { h = Math.round((h * MAX_WIDTH) / w); w = MAX_WIDTH; }
-                        canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); resolve(canvas.toDataURL('image/jpeg', 0.6));
-                    }; img.onerror = reject; img.src = e.target.result;
-                }; reader.onerror = reject; reader.readAsDataURL(file);
-            });
-        }
-        window.sendUserChatPhoto = async function(input) {
-            if (!(input.files && input.files[0])) return;
-            try {
-                const base64 = await getBase64ImageFile(input.files[0]);
-                await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'user', text: base64, type: 'image', time: Date.now() }) }, { merge: true });
-            } catch(e) { alert(isEnLang() ? "Error sending photo." : "Помилка надсилання фото."); } finally { input.value = ''; }
-        }
-        document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
-
         // Запуск при завантаженні
         window.addEventListener('DOMContentLoaded', () => { 
             setLanguage(currentLang); 
             updateCartUI();
-            initUserChat();
-            if (localStorage.getItem('svarogChatIsOpen') === 'true') openUserChat();
         });
-    </script>
+    
+// ==================== АНОНІМНИЙ ЧАТ (уніфікована версія) ====================
+let userChatSessionId = localStorage.getItem('userChatSessionId');
+let unsubscribeUserChat = null;
+let lastSeenMsgCount = parseInt(localStorage.getItem('chatLastSeenCount_' + userChatSessionId)) || 0;
+let adminNamesCache = {};
+
+function isEnLang() { return document.documentElement.classList.contains('lang-en'); }
+
+function initUserChat() {
+    if (!userChatSessionId) { userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId); }
+    const cachedChat = localStorage.getItem('chatCache_' + userChatSessionId);
+    if (cachedChat) { try { renderUserChat(JSON.parse(cachedChat)); } catch(e) {} }
+    startRealtimeChatListener();
+    renderChatTelegramLink();
+}
+function renderChatTelegramLink() {
+    const zone = document.getElementById('chat-telegram-link-zone');
+    if (!zone || typeof siteTelegramBotUsername === 'undefined' || !siteTelegramBotUsername) return;
+    zone.innerHTML = `<a href="https://t.me/${siteTelegramBotUsername}?start=chat_${userChatSessionId}" target="_blank" style="display:block; text-align:center; text-decoration:none; background:rgba(41,169,235,0.15); border:1px solid rgba(41,169,235,0.4); color:#29a9eb; border-radius:6px; padding:7px 10px; font-size:0.78rem; font-weight:600;">📱 Продовжити в Telegram</a>`;
+}
+function openUserChat(e) {
+    if (e) e.preventDefault();
+    const menuOv = document.getElementById('menuOverlay'); if (menuOv) menuOv.classList.remove('open');
+    document.getElementById('user-chat-window').style.display = 'flex';
+    localStorage.setItem('svarogChatIsOpen', 'true');
+    renderUserChat();
+}
+function closeUserChat() { document.getElementById('user-chat-window').style.display = 'none'; localStorage.setItem('svarogChatIsOpen', 'false'); }
+function startRealtimeChatListener() {
+    if (unsubscribeUserChat) unsubscribeUserChat();
+    unsubscribeUserChat = db.collection("chats").doc(userChatSessionId).onSnapshot(function(doc) { renderUserChat(doc.exists ? doc.data() : { messages: [], status: 'active' }); }, function(err) { console.error("Помилка чату:", err); });
+}
+// Мобільні браузери "приспають" фонові з'єднання при згортанні/блокуванні екрана — примусово перепідключаємось, коли сторінка знову видима
+document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'visible' && userChatSessionId) { startRealtimeChatListener(); } });
+async function getAdminName(email) {
+    if (!email) return '';
+    if (adminNamesCache[email]) return adminNamesCache[email];
+    try { const doc = await db.collection("admins").doc(email).get(); const name = (doc.exists && doc.data().name) ? doc.data().name : email; adminNamesCache[email] = name; return name; } catch(e) { return email; }
+}
+async function renderUserChat(myChatData) {
+    const messagesBox = document.getElementById('user-chat-messages'); const inputBlock = document.getElementById('user-chat-input-block');
+    const isOpen = document.getElementById('user-chat-window').style.display === 'flex';
+    let myChat = myChatData || { messages: [], status: 'active' };
+    try { localStorage.setItem('chatCache_' + userChatSessionId, JSON.stringify(myChat)); } catch(e) {}
+
+    if (localStorage.getItem('clearChatTime_' + userChatSessionId)) {
+        const clearTime = parseInt(localStorage.getItem('clearChatTime_' + userChatSessionId));
+        if (Date.now() > clearTime) {
+            localStorage.removeItem('clearChatTime_' + userChatSessionId); localStorage.removeItem('userChatSessionId');
+            userChatSessionId = 'session_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('userChatSessionId', userChatSessionId);
+            messagesBox.innerHTML = ""; inputBlock.style.display = 'flex'; startRealtimeChatListener(); return;
+        }
+    }
+
+    messagesBox.innerHTML = "";
+    (myChat.messages || []).forEach(function(msg) {
+        const bubble = document.createElement('div'); bubble.className = 'chat-bubble ' + msg.sender;
+        if (msg.type === 'image') bubble.innerHTML = '<img src="' + msg.text + '" onclick="openUserChatLightbox(this.src)">'; else bubble.innerText = msg.text;
+        messagesBox.appendChild(bubble);
+    });
+
+    // --- Індикатор, що адміністратор взяв чат у роботу ---
+    const adminStatusBox = document.getElementById('chatAdminStatus'); const adminStatusText = document.getElementById('chatAdminStatusText');
+    if (myChat.claimedBy && myChat.status !== 'closed') {
+        const name = await getAdminName(myChat.claimedBy);
+        adminStatusText.textContent = (isEnLang() ? 'Connected: ' : 'Підключився: ') + name;
+        adminStatusBox.classList.add('show');
+    } else { adminStatusBox.classList.remove('show'); }
+
+    if (myChat.status === 'closed') {
+        inputBlock.style.display = 'none';
+        const sysMsg = document.createElement('div'); sysMsg.className = 'chat-bubble system';
+        sysMsg.innerText = isEnLang() ? 'Administrator has closed the session. Chat will automatically clear in 5 minutes.' : 'Адміністратор завершив сесію. Чат автоматично очиститься через 5 хвилин.';
+        messagesBox.appendChild(sysMsg);
+        if (!localStorage.getItem('clearChatTime_' + userChatSessionId)) localStorage.setItem('clearChatTime_' + userChatSessionId, Date.now() + 5 * 60 * 1000);
+    } else { inputBlock.style.display = 'flex'; }
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+
+    // --- Індикатор непрочитаного повідомлення на кнопці чату ---
+    const msgCount = (myChat.messages || []).length;
+    const lastMsg = msgCount > 0 ? myChat.messages[msgCount - 1] : null;
+    const badge = document.getElementById('chatFabBadge');
+    if (!isOpen && lastMsg && lastMsg.sender === 'admin' && msgCount > lastSeenMsgCount) {
+        const unreadCount = myChat.messages.slice(lastSeenMsgCount).filter(function(m) { return m.sender === 'admin'; }).length;
+        badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+        badge.classList.add('show');
+    } else if (isOpen) {
+        lastSeenMsgCount = msgCount;
+        localStorage.setItem('chatLastSeenCount_' + userChatSessionId, msgCount);
+        badge.classList.remove('show');
+    }
+}
+async function sendUserChatMessage() {
+    const input = document.getElementById('user-chat-input'); const text = input.value.trim(); if (!text) return;
+    input.value = "";
+    try { await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'user', text: text, type: 'text', time: Date.now() }) }, { merge: true }); } catch(e) { console.error(e); }
+}
+function getBase64Image(file) {
+    return new Promise(function(resolve, reject) {
+        const reader = new FileReader(); reader.onload = function(e) {
+            const img = new Image(); img.onload = function() {
+                const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let w = img.width, h = img.height;
+                if (w > MAX_WIDTH) { h = Math.round((h * MAX_WIDTH) / w); w = MAX_WIDTH; }
+                canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); resolve(canvas.toDataURL('image/jpeg', 0.6));
+            }; img.onerror = reject; img.src = e.target.result;
+        }; reader.onerror = reject; reader.readAsDataURL(file);
+    });
+}
+async function sendUserChatPhoto(input) {
+    if (!(input.files && input.files[0])) return;
+    try {
+        const base64 = await getBase64Image(input.files[0]);
+        await db.collection("chats").doc(userChatSessionId).set({ id: userChatSessionId, status: 'active', adminStatus: 'processing', lastUpdate: Date.now(), messages: firebase.firestore.FieldValue.arrayUnion({ sender: 'user', text: base64, type: 'image', time: Date.now() }) }, { merge: true });
+    } catch(e) { alert(isEnLang() ? "Error sending photo." : "Помилка надсилання фото."); } finally { input.value = ''; }
+}
+function openUserChatLightbox(src) {
+    const lb = document.getElementById('image-lightbox'); const img = document.getElementById('lightbox-img');
+    if (lb && img) { img.src = src; lb.style.display = 'flex'; } else { window.open(src, '_blank'); }
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.activeElement.id === 'user-chat-input') sendUserChatMessage(); });
+
+initUserChat();
+if (localStorage.getItem('svarogChatIsOpen') === 'true') openUserChat();
+
+</script>
 </body>
 </html>
