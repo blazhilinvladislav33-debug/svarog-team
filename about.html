@@ -125,6 +125,8 @@
   .user-clip-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--iron); }
   .user-clip-btn svg { width: 18px; height: 18px; fill: var(--ash); }
 
+  .tasks-grid > div:last-child { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+
   @media (max-width: 768px) {
     .nav-actions{ gap:6px; }
     .nav-actions .btn-lang{ padding:0 10px; font-size:12px; }
@@ -183,34 +185,39 @@
 
 <section class="about-mission-grid" style="max-width:1100px; margin:0 auto; padding:20px 24px 80px; display:grid; grid-template-columns:1fr 1.4fr; gap:50px; align-items:start;">
   <div>
-    <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--copper); font-weight:700; margin-bottom:14px;"><span data-lang="ua">Місія</span><span data-lang="en">Mission</span></div>
-    <h2 style="font-family:'Oswald',sans-serif; font-size:clamp(24px,3vw,34px); font-weight:600; text-transform:uppercase; margin:0; line-height:1.2;"><span data-lang="ua">Стояти там, де потрібно. Тоді, коли потрібно.</span><span data-lang="en">Standing where it's needed. When it's needed.</span></h2>
+    <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--copper); font-weight:700; margin-bottom:14px;"><span data-lang="ua">Хто ми</span><span data-lang="en">Who we are</span></div>
+    <h2 style="font-family:'Oswald',sans-serif; font-size:clamp(24px,3vw,34px); font-weight:600; text-transform:uppercase; margin:0; line-height:1.2;"><span data-lang="ua">Працюємо на випередження</span><span data-lang="en">Working ahead of the threat</span></h2>
   </div>
   <div style="color:var(--ash); font-size:16px; line-height:1.85;">
-    <p style="margin:0 0 18px;"><span data-lang="ua">Підрозділ формувався у відповідь на пряму загрозу — з добровольців, які пройшли шлях від цивільного життя до бойових позицій. Дисципліна, взаємна довіра та бойовий досвід — те, на чому тримається команда.</span><span data-lang="en">The unit was formed in response to a direct threat — volunteers who went from civilian life to combat positions. Discipline, mutual trust, and combat experience hold the team together.</span></p>
-    <p style="margin:0;"><span data-lang="ua">Кожен новий боєць проходить підготовку поруч із тими, хто вже пройшов бій, і залишається у строю доти, доки триває завдання.</span><span data-lang="en">Every new fighter trains alongside those who've already been through combat, and stays in the ranks for as long as the mission continues.</span></p>
+    <p style="margin:0 0 18px;"><span data-lang="ua">35-й полк Національної гвардії України тримає оборону Сумщини — прикордонного регіону, який щодня перебуває під тиском противника. У складі полку діє рота безпілотних систем SVAROG TEAM, що виконує одні з найскладніших і водночас найважливіших завдань на цьому напрямку.</span><span data-lang="en">The 35th regiment of the National Guard of Ukraine holds the defense of Sumy oblast — a border region under daily enemy pressure. Within the regiment operates the SVAROG TEAM unmanned systems company, carrying out some of the most difficult and critical tasks in this direction.</span></p>
+    <p style="margin:0 0 18px;"><span data-lang="ua">Ми знаходимо, фіксуємо та уражаємо противника ще до того, як він досягне наших позицій і мирних міст. Наш результат — це знищена ворожа техніка й логістика, зірвані наступальні дії та захищене небо над Сумщиною.</span><span data-lang="en">We find, track, and strike the enemy before they reach our positions and civilian cities. Our result: destroyed enemy equipment and logistics, disrupted offensive actions, and protected skies over Sumy oblast.</span></p>
+    <p style="margin:0;"><span data-lang="ua">Окремий напрямок нашої роботи — розробка та модернізація FPV-дронів, здатних вражати цілі далеко в тилу противника.</span><span data-lang="en">A separate focus of our work is developing and modernizing FPV drones capable of striking targets deep in enemy-held territory.</span></p>
   </div>
 </section>
 
 <section style="max-width:1100px; margin:0 auto; padding:0 24px 90px;">
-  <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--copper); font-weight:700; margin-bottom:14px;"><span data-lang="ua">Структура</span><span data-lang="en">Structure</span></div>
-  <h2 style="font-family:'Oswald',sans-serif; font-size:clamp(24px,3vw,34px); font-weight:600; text-transform:uppercase; margin:0 0 34px;"><span data-lang="ua">Напрямки підрозділу</span><span data-lang="en">Unit divisions</span></h2>
-  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:1px; background:var(--iron); border:1px solid var(--iron);">
-    <div style="background:var(--graphite); padding:28px 24px;">
-      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Командування</span><span data-lang="en">Command</span></div>
-      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Загальне керівництво та координація з вищим командуванням.</span><span data-lang="en">Overall leadership and coordination with higher command.</span></div>
-    </div>
-    <div style="background:var(--graphite); padding:28px 24px;">
-      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Штурмова група</span><span data-lang="en">Assault group</span></div>
-      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Виконання завдань у зоні бойових дій.</span><span data-lang="en">Operations in the combat zone.</span></div>
-    </div>
+  <div style="font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--copper); font-weight:700; margin-bottom:14px;"><span data-lang="ua">Завдання</span><span data-lang="en">Tasks</span></div>
+  <h2 style="font-family:'Oswald',sans-serif; font-size:clamp(24px,3vw,34px); font-weight:600; text-transform:uppercase; margin:0 0 34px;"><span data-lang="ua">Наші завдання</span><span data-lang="en">Our tasks</span></h2>
+  <div class="tasks-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:1px; background:var(--iron); border:1px solid var(--iron);">
     <div style="background:var(--graphite); padding:28px 24px;">
       <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Розвідка</span><span data-lang="en">Reconnaissance</span></div>
-      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Розвідувальне забезпечення та аналіз.</span><span data-lang="en">Reconnaissance support and analysis.</span></div>
+      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Розвідувальні операції в зоні відповідальності підрозділу.</span><span data-lang="en">Reconnaissance operations in the unit's area of responsibility.</span></div>
     </div>
     <div style="background:var(--graphite); padding:28px 24px;">
-      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Забезпечення</span><span data-lang="en">Support</span></div>
-      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Логістика, техобслуговування, медицина.</span><span data-lang="en">Logistics, maintenance, medical support.</span></div>
+      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Ураження</span><span data-lang="en">Strikes</span></div>
+      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Ураження живої сили та бойової техніки противника.</span><span data-lang="en">Striking enemy manpower and combat equipment.</span></div>
+    </div>
+    <div style="background:var(--graphite); padding:28px 24px;">
+      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Логістика ворога</span><span data-lang="en">Enemy logistics</span></div>
+      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Знищення ворожої логістики та ліній постачання.</span><span data-lang="en">Destroying enemy logistics and supply lines.</span></div>
+    </div>
+    <div style="background:var(--graphite); padding:28px 24px;">
+      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Інфраструктура</span><span data-lang="en">Infrastructure</span></div>
+      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Ураження критичної інфраструктури противника.</span><span data-lang="en">Striking enemy critical infrastructure.</span></div>
+    </div>
+    <div style="background:var(--graphite); padding:28px 24px;">
+      <div style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; text-transform:uppercase; margin-bottom:8px; color:var(--copper);"><span data-lang="ua">Захист неба</span><span data-lang="en">Air defense</span></div>
+      <div style="color:var(--ash); font-size:14px; line-height:1.6;"><span data-lang="ua">Захист повітряного простору Сумської області та міста Суми.</span><span data-lang="en">Defending the airspace over Sumy oblast and the city of Sumy.</span></div>
     </div>
   </div>
 </section>
