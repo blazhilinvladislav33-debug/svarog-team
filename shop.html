@@ -1594,7 +1594,7 @@ function rateLimit(key,ms){
             // з іменами, телефонами й адресами клієнтів.
             if (orderCheckMode === 'number') {
                 try {
-                    const doc = await db.collection('orders').doc(query).get();
+                    const doc = await db.collection('orders').doc(normalizeOrderNumber(query)).get();
                     if (!doc.exists || doc.data().deletedAt) {
                         resultBox.innerHTML = `<div style="color:#ff4a4a; text-align:center;">${currentLang === 'ua' ? 'Замовлення не знайдено. Перевірте номер.' : 'Order not found. Check the number.'}</div>`;
                         return;
@@ -2213,6 +2213,50 @@ function rateLimit(key,ms){
             document.getElementById('bank-info-bank').style.display = method === 'bank' ? 'block' : 'none';
             document.getElementById('bank-info-card').style.display = method === 'card' ? 'block' : 'none';
         }
+        // ═══════════════════════════════════════════════════════════════
+        //                    НОМЕР ЗАМОВЛЕННЯ
+        //
+        // Раніше номером був автоматичний ідентифікатор Firestore —
+        // 20 символів упереміш великими й малими, як aB3xY9kLmN2pQ4rS6tU8.
+        // Пошук по ньому працював ЛИШЕ при дослівному збігу з регістром,
+        // тому клієнт, що переписував номер з екрана, майже завжди
+        // отримував «не знайдено» — і на сайті, і в боті.
+        //
+        // Тепер номер короткий і читається вголос: SV-7K2M-9P4A.
+        // Він же є ідентифікатором документа — тому пошук лишається
+        // одним читанням (get) і НЕ потребує права переліку колекції.
+        //
+        // Алфавіт без схожих символів: немає I, O, 0, 1.
+        // 8 значущих знаків — це понад трильйон комбінацій, підібрати
+        // чужий номер перебором неможливо.
+        // ═══════════════════════════════════════════════════════════════
+        const ORDER_NUM_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+        function generateOrderNumber() {
+            let out = '';
+            const rnd = new Uint32Array(8);
+            (window.crypto || window.msCrypto).getRandomValues(rnd);
+            for (let i = 0; i < 8; i++) out += ORDER_NUM_ALPHABET[rnd[i] % ORDER_NUM_ALPHABET.length];
+            return 'SV-' + out.slice(0, 4) + '-' + out.slice(4);
+        }
+
+        // Приводить будь-яке написання до вигляду, під яким документ
+        // реально лежить у базі. Старі довгі номери повертає як є.
+        function normalizeOrderNumber(raw) {
+            const s = String(raw || '').trim();
+            if (!s) return '';
+
+            let core = s.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (core.startsWith('SV')) core = core.slice(2);
+
+            // Схоже на новий номер — збираємо канонічний вигляд
+            if (core.length === 8 && [...core].every(c => ORDER_NUM_ALPHABET.includes(c))) {
+                return 'SV-' + core.slice(0, 4) + '-' + core.slice(4);
+            }
+            // Старий автоматичний ідентифікатор — регістр там значущий
+            return s;
+        }
+
         async function submitOrder(e) {
             e.preventDefault(); if(shoppingCart.length === 0) return;
             if (document.getElementById('order-website') && document.getElementById('order-website').value.trim() !== '') return;
@@ -2228,6 +2272,13 @@ function rateLimit(key,ms){
             let newOrderId = '';
             try {
                 await db.runTransaction(async (transaction) => {
+                    // ⚠️ Firestore вимагає, щоб УСІ читання в транзакції йшли
+                    // до першого запису. Тому номер перевіряємо тут, на самому
+                    // початку, а не перед записом замовлення.
+                    const orderRef = db.collection('orders').doc(generateOrderNumber());
+                    const clash = await transaction.get(orderRef);
+                    if (clash.exists) throw new Error('order-number-clash');
+
                     let merchRefsAndData = [];
                     for (let cartItem of shoppingCart) {
                         let ref = db.collection('merch').doc(cartItem.merchId); let doc = await transaction.get(ref);
@@ -2254,7 +2305,6 @@ function rateLimit(key,ms){
                     }
                     for (let obj of merchRefsAndData) { if (!obj.cartItem.isPreorder) transaction.update(obj.ref, { stock: obj.data.stock, variants: obj.data.variants || [] }); }
                     if (promoRef) transaction.update(promoRef, { active: false, usedAt: firebase.firestore.FieldValue.serverTimestamp() });
-                    const orderRef = db.collection('orders').doc();
                     newOrderId = orderRef.id;
                     transaction.set(orderRef, {
                         name, phone, address,
