@@ -803,20 +803,20 @@ function rateLimit(key,ms){
         let repeatDiscountPercent = 0; let repeatDiscountApplied = false;
         db.collection("config").doc("shop").onSnapshot(doc => { repeatDiscountPercent = (doc.exists && doc.data().repeatCustomerDiscount) || 0; });
         async function checkRepeatCustomer() {
-            const phone = document.getElementById('order-phone').value.trim();
+            // Автоматична знижка постійним клієнтам ВИМКНЕНА.
+            //
+            // Щоб її порахувати, треба знайти попередні замовлення за
+            // телефоном — тобто перебрати всю колекцію orders. З браузера
+            // це означало б відкрити персональні дані всіх клієнтів
+            // будь-кому, хто відкриє консоль. Безпечно це робиться лише
+            // на сервері (Cloud Functions, тариф Blaze).
+            //
+            // Поки що менеджер додає знижку вручну при підтвердженні.
+            // Щоб увімкнути назад: підключити Blaze, розгорнути функцію
+            // checkRepeatCustomer і повернути виклик сюди.
+            repeatDiscountApplied = false;
             const notice = document.getElementById('repeat-discount-notice');
-            if (!phone || repeatDiscountPercent <= 0) { repeatDiscountApplied = false; notice.style.display = 'none'; return; }
-            try {
-                const snap = await db.collection("orders").where("phone", "==", phone).limit(1).get();
-                if (!snap.empty) {
-                    repeatDiscountApplied = true;
-                    notice.style.display = 'block';
-                    notice.innerHTML = currentLang === 'ua' ? `🎉 Ви наш постійний клієнт! Знижка ${repeatDiscountPercent}% застосована автоматично.` : `🎉 You're a returning customer! ${repeatDiscountPercent}% discount applied automatically.`;
-                } else {
-                    repeatDiscountApplied = false; notice.style.display = 'none';
-                }
-                renderCartModalContent();
-            } catch (e) { console.error("Перевірка повторного клієнта:", e); }
+            if (notice) notice.style.display = 'none';
         }
         window.selectedVariants = {}; 
         let shopSearchTerm = ''; let shopSortMode = 'default'; let showFavoritesOnly = false;
@@ -997,16 +997,55 @@ zone.innerHTML = ''; zone.appendChild(_tgCustA);
             if (digits.length > 9) digits = digits.slice(-9);
             return digits;
         }
-        function renderOneOrderResult(data, docId) {
-            const statusInfo = orderStatusLabels[data.status] || { ua: data.status, en: data.status, color: '#888' };
-            const statusLabel = currentLang === 'ua' ? statusInfo.ua : statusInfo.en;
+        const SITE_STATUS_LABELS = {
+            new:       ['🆕', 'Нове',        'Ми отримали замовлення і скоро підтвердимо.'],
+            on_review: ['👀', 'На розгляді', 'Менеджер опрацьовує ваше замовлення.'],
+            sent:      ['📦', 'Відправлено', 'Посилка вже в дорозі.'],
+            delivered: ['🎉', 'Доставлено',  'Замовлення отримано. Дякуємо!'],
+            cancelled: ['❌', 'Скасовано',   'Замовлення скасовано.'],
+            closed:    ['🔒', 'Закрито',     'Замовлення завершено.']
+        };
+
+        function renderOneOrderResult(o) {
+            const statusLabel = o.statusLabel || o.status;
+            const statusColor = ({
+                new: '#0a84ff', on_review: '#ffb020', sent: '#22c55e',
+                delivered: '#22c55e', cancelled: '#ff4a4a', closed: '#888'
+            })[o.status] || '#888';
+
             let html = `<div style="border:1px solid var(--iron); border-radius:8px; padding:14px; margin-bottom:10px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span style="font-family:monospace; font-size:0.78rem; color:#888;">${docId}</span>
-                    <span style="color:${statusInfo.color}; font-weight:700;">${statusLabel}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="color:#aaa; font-size:0.85rem;">${currentLang === 'ua' ? 'Сума' : 'Total'}:</span><span>${data.totalPrice} ₴</span></div>`;
-            if (data.ttn) html += `<div style="display:flex; justify-content:space-between;"><span style="color:#aaa; font-size:0.85rem;">${currentLang === 'ua' ? 'ТТН (Нова Пошта)' : 'Tracking (Nova Poshta)'}:</span><span style="font-family:monospace;">${data.ttn}</span></div>`;
+                    <span style="font-family:monospace; font-size:0.78rem; color:#888;">${o.id}</span>
+                    <span style="color:${statusColor}; font-weight:700;">${o.statusEmoji || ''} ${statusLabel}</span>
+                </div>`;
+
+            if (o.totalPrice) {
+                html += `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="color:#aaa; font-size:0.85rem;">${currentLang === 'ua' ? 'Сума' : 'Total'}:</span><span>${o.totalPrice} ₴</span></div>`;
+            }
+
+            if (o.createdAt) {
+                const d = new Date(o.createdAt);
+                html += `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="color:#aaa; font-size:0.85rem;">${currentLang === 'ua' ? 'Дата' : 'Date'}:</span><span>${d.toLocaleDateString(currentLang === 'ua' ? 'uk-UA' : 'en-GB')}</span></div>`;
+            }
+
+            // ТТН — окремим помітним блоком із посиланням на відстеження
+            if (o.ttn) {
+                html += `<div style="margin-top:10px; padding:10px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.3); border-radius:6px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <span style="color:#aaa; font-size:0.85rem;">📮 ${currentLang === 'ua' ? 'ТТН Нової Пошти' : 'Nova Poshta tracking'}:</span>
+                        <span style="font-family:monospace; font-weight:700; letter-spacing:0.5px;">${o.ttn}</span>
+                    </div>
+                    <a href="${o.ttnUrl}" target="_blank" rel="noopener"
+                       style="display:inline-block; margin-top:8px; color:#22c55e; font-size:0.85rem; text-decoration:none;">
+                        ${currentLang === 'ua' ? '🔗 Відстежити посилку →' : '🔗 Track parcel →'}
+                    </a>
+                </div>`;
+            }
+
+            if (o.statusHint) {
+                html += `<div style="margin-top:8px; color:#888; font-size:0.82rem;">${o.statusHint}</div>`;
+            }
+
             html += `</div>`;
             return html;
         }
@@ -1017,29 +1056,63 @@ zone.innerHTML = ''; zone.appendChild(_tgCustA);
             if (!query) return;
             resultBox.style.display = 'block';
             resultBox.innerHTML = `<div style="color:#888; text-align:center;">${currentLang === 'ua' ? 'Шукаємо...' : 'Searching...'}</div>`;
-            try {
-                if (orderCheckMode === 'number') {
+
+            // ПОШУК ЗА НОМЕРОМ ЗАМОВЛЕННЯ — читаємо один документ напряму.
+            // Правила дозволяють get (номер знає лише власник замовлення),
+            // але забороняють list — інакше будь-хто вивантажив би всю базу
+            // з іменами, телефонами й адресами клієнтів.
+            if (orderCheckMode === 'number') {
+                try {
                     const doc = await db.collection('orders').doc(query).get();
-                    if (!doc.exists) {
+                    if (!doc.exists || doc.data().deletedAt) {
                         resultBox.innerHTML = `<div style="color:#ff4a4a; text-align:center;">${currentLang === 'ua' ? 'Замовлення не знайдено. Перевірте номер.' : 'Order not found. Check the number.'}</div>`;
                         return;
                     }
-                    resultBox.innerHTML = renderOneOrderResult(doc.data(), doc.id);
-                } else {
-                    const searchDigits = normalizePhoneDigits(query);
-                    if (!searchDigits) { resultBox.innerHTML = `<div style="color:#ff4a4a; text-align:center;">${currentLang === 'ua' ? 'Введіть коректний номер телефону.' : 'Enter a valid phone number.'}</div>`; return; }
-                    const snap = await db.collection('orders').get();
-                    const matches = snap.docs.filter(d => normalizePhoneDigits(d.data().phone) === searchDigits);
-                    if (matches.length === 0) {
-                        resultBox.innerHTML = `<div style="color:#ff4a4a; text-align:center;">${currentLang === 'ua' ? 'За цим номером телефону замовлень не знайдено.' : 'No orders found for this phone number.'}</div>`;
-                        return;
+                    const d = doc.data();
+                    let created = null;
+                    const ts = d.timestamp || d.createdAt || d.date;
+                    if (ts) {
+                        if (typeof ts.toMillis === 'function') created = ts.toMillis();
+                        else if (typeof ts === 'number') created = ts < 1e11 ? ts * 1000 : ts;
+                        else if (ts.seconds) created = ts.seconds * 1000;
                     }
-                    matches.sort((a, b) => (b.data().timestamp ? b.data().timestamp.toMillis() : 0) - (a.data().timestamp ? a.data().timestamp.toMillis() : 0));
-                    resultBox.innerHTML = matches.map(d => renderOneOrderResult(d.data(), d.id)).join('');
+                    resultBox.innerHTML = renderOneOrderResult({
+                        id: doc.id,
+                        status: d.status || 'new',
+                        statusLabel: (SITE_STATUS_LABELS[d.status] || [null, d.status])[1],
+                        statusEmoji: (SITE_STATUS_LABELS[d.status] || ['📋'])[0],
+                        statusHint: (SITE_STATUS_LABELS[d.status] || [null, null, ''])[2],
+                        totalPrice: d.totalPrice || d.total || 0,
+                        ttn: d.ttn || null,
+                        ttnUrl: d.ttn ? `https://novaposhta.ua/tracking/?cargo_number=${encodeURIComponent(d.ttn)}` : null,
+                        createdAt: created
+                    });
+                } catch (err) {
+                    console.error('checkOrderStatus:', err);
+                    resultBox.innerHTML = `<div style="color:#ff4a4a; text-align:center;">${currentLang === 'ua' ? 'Помилка пошуку. Спробуйте пізніше.' : 'Search error. Try again later.'}</div>`;
                 }
-            } catch (err) {
-                resultBox.innerHTML = `<div style="color:#ff4a4a; text-align:center;">${currentLang === 'ua' ? 'Помилка перевірки.' : 'Check failed.'}</div>`;
+                return;
             }
+
+            // ПОШУК ЗА ТЕЛЕФОНОМ вимагає перебору всієї колекції, а це
+            // означало б відкрити персональні дані всіх клієнтів.
+            // Тому відправляємо в Telegram-бот — він працює через
+            // сервісний акаунт і шукає безпечно на сервері.
+            resultBox.innerHTML = `
+                <div style="border:1px solid var(--iron); border-radius:8px; padding:16px; text-align:center;">
+                    <div style="margin-bottom:10px;">${currentLang === 'ua'
+                        ? 'Пошук за телефоном доступний у нашому Telegram-боті.'
+                        : 'Search by phone is available in our Telegram bot.'}</div>
+                    <a href="https://t.me/${siteTelegramBotUsername || ''}"
+                       target="_blank" rel="noopener"
+                       style="display:inline-block; padding:10px 18px; background:#229ED9; color:#fff;
+                              border-radius:6px; text-decoration:none; font-weight:600;">
+                        ${currentLang === 'ua' ? '💬 Відкрити бот' : '💬 Open bot'}
+                    </a>
+                    <div style="margin-top:10px; font-size:0.82rem; color:#888;">${currentLang === 'ua'
+                        ? 'Там же приходитимуть сповіщення про статус і ТТН.'
+                        : 'You will also get status and tracking updates there.'}</div>
+                </div>`;
         }
         let notifyItemId = ''; let notifyItemTitle = '';
         function openNotifyModal(itemId, itemTitle) {
