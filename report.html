@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self' https://send.monobank.ua https://monobank.ua; frame-ancestors 'none';">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бойовий Звіт | SVAROG TEAM</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Підключаємо іконки (FontAwesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Підключаємо Firebase -->
+    <script>
+/* ===== SVAROG SECURITY HELPERS ===== */
+// Anti-clickjacking: якщо сайт завантажено в iframe — вихід
+(function(){
+  if(window.self !== window.top){
+    try{ window.top.location = window.self.location; }catch(e){}
+    document.documentElement.style.display = 'none';
+  }
+})();
+
+// Екранування HTML щоб уникнути XSS
+function esc(str){
+  if(str == null) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
+}
+
+// Безпечна перевірка URL для посилань (тільки http/https)
+// Відносні шляхи (без протоколу) теж пропускаються
+function safeURL(url){
+  if(!url) return '#';
+  const s = String(url).trim();
+  // Відносний шлях — безпечний (не містить двокрапки до слешу)
+  if(!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(s)) return s;
+  // Блокуємо небезпечні протоколи
+  const low = s.toLowerCase().replace(/\s/g,'');
+  if(low.startsWith('javascript:')||low.startsWith('vbscript:')) return '#';
+  try{
+    const u = new URL(s);
+    if(u.protocol==='http:'||u.protocol==='https:') return u.href;
+  }catch(e){}
+  return '#';
+}
+
+// Безпечний src для <img>: додатково дозволяє data: та blob: (для фото в чаті та Firebase Storage)
+function safeImgSrc(url){
+  if(!url) return 'logo.png';
+  const s = String(url).trim();
+  // Відносний шлях
+  if(!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(s)) return s;
+  const low = s.toLowerCase().replace(/\s/g,'');
+  if(low.startsWith('javascript:')||low.startsWith('vbscript:')) return 'logo.png';
+  try{
+    const u = new URL(s);
+    if(['http:','https:','data:','blob:'].includes(u.protocol)) return u.href;
+  }catch(e){}
+  return 'logo.png';
+}
+
+// Rate-limiter для форм/чату (повертає false якщо занадто швидко)
+const _rl={};
+function rateLimit(key,ms){
+  const now=Date.now();
+  if(_rl[key]&&now-_rl[key]<ms) return false;
+  _rl[key]=now; return true;
+}
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #0b0c0a;
+            --card-bg: #121510;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #e3ded2;
+            --text-muted: #8e8e93;
+            --cyan-glow: #00ffcc;
+            --theme-color: #798554;
+            --gold-icon: #dcb55c; /* Золотий колір іконок як на 1-му скриншоті */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body { height: 100%; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px 16px 60px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ==================== ТАКТИЧНИЙ ФОН ==================== */
+        .bg-grid {
+            position: fixed; inset: 0; z-index: -2; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(121,133,84,0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(121,133,84,0.07) 1px, transparent 1px);
+            background-size: 42px 42px;
+            mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, black 20%, transparent 75%);
+            -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, black 20%, transparent 75%);
+        }
+        .bg-sweep {
+            position: fixed; top: -30vw; left: 50%; width: 90vw; height: 90vw; z-index: -1; pointer-events: none;
+            transform: translateX(-50%);
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(0,255,204,0.05) 25deg, transparent 55deg, transparent 360deg);
+            border-radius: 50%;
+            animation: sweepRotate 14s linear infinite;
+        }
+        @keyframes sweepRotate { to { transform: translateX(-50%) rotate(360deg); } }
+        .bg-vignette { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(ellipse at 50% 0%, transparent 0%, var(--bg-main) 85%); }
+
+        .bg-scanlines {
+            position: fixed; inset: 0; z-index: 5; pointer-events: none; opacity: 0.35;
+            background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+        }
+
+        .particle {
+            position: fixed; bottom: -10px; z-index: -1; pointer-events: none; border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,255,204,0.7), transparent 70%);
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp { 0% { transform: translateY(0) translateX(0); opacity: 0; } 8% { opacity: 0.6; } 92% { opacity: 0.4; } 100% { transform: translateY(-105vh) translateX(var(--drift, 20px)); opacity: 0; } }
+
+        .hud-corners { position: absolute; inset: 0; pointer-events: none; }
+        .hud-corners::before, .hud-corners::after,
+        .hud-corners > .c2::before, .hud-corners > .c2::after { content: ""; position: absolute; width: 14px; height: 14px; border: 2px solid rgba(0,255,204,0.5); }
+        .hud-corners::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+        .hud-corners::after { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+        .hud-corners > .c2::before { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+        .hud-corners > .c2::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+        .wrapper {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Шапка */
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 10px;
+            opacity: 0; animation: dropIn 0.7s ease forwards;
+        }
+        
+        .logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(121, 133, 84, 0.4));
+            animation: logoPulse 3.5s ease-in-out infinite;
+        }
+        @keyframes logoPulse { 0%,100% { filter: drop-shadow(0 0 10px rgba(121,133,84,0.4)); } 50% { filter: drop-shadow(0 0 22px rgba(121,133,84,0.75)); } }
+
+        .title-box h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            position: relative;
+            display: inline-block;
+            animation: titleGlitchIn 1s ease 0.3s both;
+        }
+        @keyframes titleGlitchIn {
+            0% { opacity: 0; letter-spacing: 6px; filter: blur(4px); text-shadow: 2px 0 var(--cyan-glow), -2px 0 #ff4a4a; }
+            60% { opacity: 1; letter-spacing: 2px; filter: blur(0); text-shadow: 1px 0 var(--cyan-glow), -1px 0 #ff4a4a; }
+            100% { opacity: 1; letter-spacing: 1px; filter: blur(0); text-shadow: none; }
+        }
+        
+        .title-box p {
+            font-size: 12px;
+            color: var(--theme-color);
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .live-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 10px; padding: 5px 12px;
+            background: rgba(0,255,204,0.08); border: 1px solid rgba(0,255,204,0.3); border-radius: 20px;
+            font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--cyan-glow); text-transform: uppercase;
+        }
+        .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan-glow); animation: livePulse 1.6s ease-in-out infinite; }
+        @keyframes livePulse { 0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,204,0.5); } 50% { opacity: 0.5; box-shadow: 0 0 0 5px rgba(0,255,204,0); } }
+
+        /* Загальна статистика */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .sum-card {
+            background: rgba(121, 133, 84, 0.1);
+            border: 1px solid rgba(121, 133, 84, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            opacity: 0; transform: translateY(14px); animation: cardIn 0.6s ease forwards;
+            animation-delay: 0.15s;
+            transition: border-color 0.4s, box-shadow 0.4s;
+            position: relative;
+        }
+
+        .sum-card.dest {
+            background: rgba(0, 255, 204, 0.05);
+            border-color: rgba(0, 255, 204, 0.2);
+            animation-delay: 0.25s;
+        }
+        .sum-card.flash { animation: cardIn 0.6s ease forwards, flashGlow 1s ease; }
+
+        .sum-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .sum-value { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .sum-value.hit { color: var(--text-main); }
+        .sum-value.dest { color: var(--cyan-glow); }
+
+        .date-badge-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+            opacity: 0; transform: translateY(10px); animation: cardIn 0.6s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        .date-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+            background: rgba(121, 133, 84, 0.08);
+            border: 1px solid rgba(121, 133, 84, 0.25);
+            padding: 6px 16px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: inset 0 0 8px rgba(121, 133, 84, 0.05);
+        }
+
+        /* Таблиця цілей */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            opacity: 0; transform: translateY(14px); animation: cardIn 0.6s ease forwards;
+            animation-delay: 0.35s;
+            position: relative;
+        }
+
+        /* Кнопка фільтру */
+        .filter-row {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 15px;
+        }
+        .filter-toggle-btn {
+            font-size: 10.5px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase;
+            color: var(--text-muted); background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);
+            padding: 6px 12px; border-radius: 20px; cursor: pointer; transition: all 0.25s;
+        }
+        .filter-toggle-btn:hover { color: var(--cyan-glow); border-color: rgba(0,255,204,0.3); }
+        .filter-toggle-btn.active { color: var(--cyan-glow); border-color: rgba(0,255,204,0.45); background: rgba(0,255,204,0.08); box-shadow: 0 0 10px rgba(0, 255, 204, 0.1); }
+
+        /* Сітка для заголовків таблиці (Виправлено розбиття) */
+        .headers-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+        .header-col { display: flex; justify-content: flex-end; gap: 15px; }
+        .header-col.col-2 { display: none; } /* Приховано на мобільному */
+
+        .col-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--cyan-glow);
+            letter-spacing: 0.5px;
+            width: 60px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Сітка для списку цілей */
+        #targets-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0 30px;
+        }
+
+        .target-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            opacity: 0; transform: translateX(-10px);
+            animation: rowIn 0.45s ease forwards;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        @media (hover: hover) { .target-row:hover { background: rgba(255,255,255,0.02); } }
+        .target-row.is-zero { opacity: 0.4; }
+        .target-row.flash-update { animation: rowIn 0.45s ease forwards, flashRow 1.2s ease; }
+
+        .target-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Стилі для золотих іконок FontAwesome */
+        .target-icon {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background: linear-gradient(145deg, rgba(121,133,84,0.1), rgba(0,255,204,0.02));
+            border: 1px solid rgba(121,133,84,0.25);
+            position: relative;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+        }
+        .target-icon i {
+            color: var(--gold-icon);
+            font-size: 15px;
+            filter: drop-shadow(0 0 3px rgba(220, 181, 92, 0.3)); /* Легке золоте світіння */
+        }
+        
+        .target-row.has-count .target-icon {
+            border-color: rgba(0,255,204,0.35);
+            animation: chipBreathe 3.2s ease-in-out infinite;
+        }
+        .target-row:hover .target-icon { transform: scale(1.12) rotate(-4deg); }
+        @keyframes chipBreathe { 0%,100% { box-shadow: 0 0 0 0 rgba(0,255,204,0.15); } 50% { box-shadow: 0 0 10px 2px rgba(0,255,204,0.25); } }
+
+        .target-text { min-width: 0; flex: 1; }
+
+        .target-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #d1d1d1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .target-bar-track { height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+        .target-bar-fill { height: 100%; background: linear-gradient(90deg, var(--theme-color), var(--cyan-glow)); border-radius: 2px; width: 0%; transition: width 1s cubic-bezier(.2,.8,.2,1); position: relative; overflow: hidden; }
+        .target-bar-fill::after { content:""; position:absolute; inset:0; background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%); background-size: 200% 100%; animation: shimmerSlide 2.8s ease-in-out infinite; }
+        @keyframes shimmerSlide { 0% { background-position: 200% 0; } 100% { background-position: -50% 0; } }
+
+        .target-stats {
+            display: flex;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .stat-num {
+            width: 60px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-num.zero {
+            color: #444;
+        }
+
+        #loading {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 60px 0;
+            font-size: 14px;
+        }
+        .loading-spinner { width: 34px; height: 34px; margin: 0 auto 16px; border-radius: 50%; border: 2px solid rgba(0,255,204,0.15); border-top-color: var(--cyan-glow); animation: spin 0.9s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .last-update {
+            text-align: center;
+            font-size: 11px;
+            color: #555;
+            margin-top: -5px;
+            margin-bottom: 10px;
+        }
+
+        @keyframes dropIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
+        @keyframes rowIn { to { opacity: 1; transform: translateX(0); } }
+        @keyframes flashGlow { 0% { box-shadow: 0 0 0 0 rgba(0,255,204,0.5); } 40% { box-shadow: 0 0 25px 4px rgba(0,255,204,0.35); } 100% { box-shadow: 0 0 0 0 rgba(0,255,204,0); } }
+        @keyframes flashRow { 0% { background: rgba(0,255,204,0.14); } 100% { background: transparent; } }
+
+        /* ==================== ДЕСКТОП (Виправлено сітку) ==================== */
+        @media (min-width: 820px) {
+            body { padding: 50px 20px; align-items: flex-start; }
+            .wrapper { max-width: 760px; }
+            .header { margin-bottom: 20px; }
+            .logo { width: 88px; height: 88px; }
+            .title-box h1 { font-size: 30px; }
+            .table-container { padding: 25px 30px; }
+            
+            /* Тут сітка для заголовків і списку ідентична, тому вони не з'їжджають */
+            .headers-grid, #targets-list { 
+                grid-template-columns: 1fr 1fr; 
+            }
+            .header-col.col-2 { display: flex; } /* Показуємо другу шапку */
+            
+            /* Прибираємо нижні бордери у двох останніх елементів на десктопі */
+            .target-row:nth-last-child(-n+2) { border-bottom: none; }
+        }
+
+        @media (max-width: 400px) {
+            .target-name { font-size: 12px; }
+            .stat-num, .col-title { width: 48px; }
+            .header-col, .target-stats { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-sweep"></div>
+<div class="bg-vignette"></div>
+<div class="bg-scanlines"></div>
+<div id="particle-field"></div>
+
+<div class="wrapper">
+    <!-- Шапка -->
+    <div class="header">
+        <img src="logo.png" alt="SVAROG" class="logo">
+        <div class="title-box">
+            <h1>Результати роботи</h1>
+            <p>SVAROG TEAM</p>
+        </div>
+        <div class="live-badge"><span class="live-dot"></span> Наживо</div>
+    </div>
+
+    <div id="loading"><div class="loading-spinner"></div>📡 Синхронізація з базою даних...</div>
+
+    <div id="report-content" style="display: none;">
+        
+        <div class="summary-grid">
+            <div class="sum-card" id="sum-hit-card">
+                <div class="hud-corners"><div class="c2"></div></div>
+                <div class="sum-title">Усього уражено</div>
+                <div class="sum-value hit" id="sum-hit">0</div>
+            </div>
+            <div class="sum-card dest" id="sum-dest-card">
+                <div class="hud-corners"><div class="c2"></div></div>
+                <div class="sum-title">З них знищено</div>
+                <div class="sum-value dest" id="sum-dest">0</div>
+            </div>
+        </div>
+
+        <div class="date-badge-container">
+            <div class="date-badge">Дані від 01.07.2026 р.</div>
+        </div>
+
+        <div class="table-container">
+            <div class="hud-corners"><div class="c2"></div></div>
+            
+            <!-- Кнопка фільтру -->
+            <div class="filter-row">
+                <button class="filter-toggle-btn" id="filter-toggle-btn" onclick="toggleActiveOnlyFilter()">Лише активні</button>
+            </div>
+
+            <!-- Шапка таблиці (Виправлено розбиття на 2 колонки) -->
+            <div class="headers-grid">
+                <div class="header-col col-1">
+                    <div class="col-title">Уражено</div>
+                    <div class="col-title">В т.ч.<br>знищено</div>
+                </div>
+                <div class="header-col col-2">
+                    <div class="col-title">Уражено</div>
+                    <div class="col-title">В т.ч.<br>знищено</div>
+                </div>
+            </div>
+            
+            <!-- Список цілей -->
+            <div id="targets-list">
+                <!-- Рядки генеруватимуться автоматично -->
+            </div>
+        </div>
+
+        <div class="last-update" id="update-time">Останнє оновлення: ...</div>
+    </div>
+</div>
+
+<script>
+    // 1. ІНІЦІАЛІЗАЦІЯ FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyAz5vZlnI7XwGhSXlKkX3DNAL13ECNegNk",
+        authDomain: "svarog-team.firebaseapp.com",
+        projectId: "svarog-team",
+        storageBucket: "svarog-team.firebasestorage.app",
+        messagingSenderId: "311449325528",
+        appId: "1:311449325528:web:b254c6aed4fea56fe96cad"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // 2. КАТЕГОРІЇ + Професійні золоті мілітарі-іконки FontAwesome
+    const categoriesMap = [
+        { id: "os_rov", ua: "ОС РОВ", icon: "fa-solid fa-helmet-un" },
+        { id: "drone_points", ua: "Точки вильоту drones", icon: "fa-solid fa-location-crosshairs" },
+        { id: "antennas", ua: "Антени", icon: "fa-solid fa-satellite-dish" },
+        { id: "air_defense", ua: "ЗРК, ЗГРК", icon: "fa-solid fa-shield-halved" },
+        { id: "aviation", ua: "Літаки та гелікоптери", icon: "fa-solid fa-plane" },
+        { id: "fleet", ua: "Флот", icon: "fa-solid fa-ship" },
+        { id: "radar_complex", ua: "РЛС, РЕР та зв'язок", icon: "fa-solid fa-tower-broadcast" },
+        { id: "radar_port", ua: "РЛС (портативні)", icon: "fa-solid fa-walkie-talkie" },
+        { id: "ew_complex", ua: "РЕБ (комплекс)", icon: "fa-solid fa-truck-ramp-box" },
+        { id: "ew_auto", ua: "РЕБ (авто + портативні)", icon: "fa-solid fa-car-side" },
+        { id: "enemy_wings", ua: "Ворожі крила", icon: "fa-solid fa-plane-up" },
+        { id: "shaheds", ua: "Шахеди та Гербери", icon: "fa-solid fa-paper-plane" },
+        { id: "tanks", ua: "Танки", icon: "fa-solid fa-truck-monster" },
+        { id: "apc", ua: "ББМ, БМП, БТР", icon: "fa-solid fa-truck-front" },
+        { id: "artillery", ua: "Гармати, гаубиці", icon: "fa-solid fa-bullseye" },
+        { id: "spg", ua: "САУ", icon: "fa-solid fa-truck-fast" },
+        { id: "mortars", ua: "Міномети", icon: "fa-solid fa-bomb" },
+        { id: "mlrs", ua: "РСЗВ", icon: "fa-solid fa-meteor" },
+        { id: "vehicles", ua: "ЛАТ, ВАТ, спец. техніка", icon: "fa-solid fa-truck" },
+        { id: "moto", ua: "Мотоцикли та баггі", icon: "fa-solid fa-motorcycle" },
+        { id: "depots", ua: "Склади", icon: "fa-solid fa-warehouse" },
+        { id: "strat_infra", ua: "Стратегічна інфраструктура", icon: "fa-solid fa-bridge" },
+        { id: "tact_infra", ua: "Тактична інфраструктура", icon: "fa-solid fa-campground" },
+        { id: "trenches", ua: "Укриття та бліндажі", icon: "fa-solid fa-road-barrier" },
+        { id: "network", ua: "Мережа та камери", icon: "fa-solid fa-video" },
+        { id: "enemy_copters", ua: "Ворожі коптери", icon: "fa-solid fa-helicopter" },
+        { id: "enemy_npk", ua: "Ворожі НПК", icon: "fa-solid fa-robot" },
+        { id: "other", ua: "Інше", icon: "fa-solid fa-crosshairs" }
+    ];
+
+    function animateCount(el, newVal) {
+        const startVal = parseInt(el.innerText.replace(/\D/g, '')) || 0;
+        if (startVal === newVal) { el.innerText = newVal; return; }
+        const duration = 700; const startTime = performance.now();
+        function step(now) {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.innerText = Math.round(startVal + (newVal - startVal) * eased);
+            if (progress < 1) requestAnimationFrame(step);
+            else el.innerText = newVal;
+        }
+        requestAnimationFrame(step);
+    }
+
+    let previousDetails = null; let previousTotals = null; let showActiveOnly = (localStorage.getItem('reportActiveOnly') === '1'); let isFirstRender = true;
+
+    function toggleActiveOnlyFilter() {
+        showActiveOnly = !showActiveOnly;
+        localStorage.setItem('reportActiveOnly', showActiveOnly ? '1' : '0');
+        document.getElementById('filter-toggle-btn').classList.toggle('active', showActiveOnly);
+        document.querySelectorAll('.target-row').forEach(row => { row.style.display = (showActiveOnly && row.dataset.isZero === '1') ? 'none' : 'flex'; });
+    }
+
+    function spawnParticles(count) {
+        const field = document.getElementById('particle-field');
+        for (let i = 0; i < count; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = 2 + Math.random() * 3;
+            p.style.width = size + 'px'; p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.setProperty('--drift', (Math.random() * 60 - 30) + 'px');
+            const duration = 10 + Math.random() * 12;
+            p.style.animationDuration = duration + 's';
+            p.style.animationDelay = (Math.random() * duration) + 's';
+            field.appendChild(p);
+        }
+    }
+    spawnParticles(22);
+
+    db.collection("config").doc("combat_report").onSnapshot(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            renderReport(data);
+        }
+    });
+
+    function renderReport(data) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('report-content').style.display = 'block';
+
+        const newHit = data.totalHit || 0; const newDest = data.totalDest || 0;
+        animateCount(document.getElementById('sum-hit'), newHit);
+        animateCount(document.getElementById('sum-dest'), newDest);
+        if (previousTotals && !isFirstRender) {
+            if (newHit !== previousTotals.hit) { const c = document.getElementById('sum-hit-card'); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); }
+            if (newDest !== previousTotals.dest) { const c = document.getElementById('sum-dest-card'); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); }
+        }
+        previousTotals = { hit: newHit, dest: newDest };
+
+        if (data.lastUpdated) {
+            const date = new Date(data.lastUpdated.toMillis());
+            document.getElementById('update-time').innerText = `Останнє оновлення: ${date.toLocaleString('uk-UA')}`;
+        }
+
+        const listContainer = document.getElementById('targets-list');
+        const details = data.details || {};
+        const maxHit = Math.max(1, ...categoriesMap.map(cat => details[`${cat.id}_hit`] || 0));
+
+        listContainer.innerHTML = '';
+        categoriesMap.forEach((cat, idx) => {
+            const hitCount = details[`${cat.id}_hit`] || 0;
+            const destCount = details[`${cat.id}_dest`] || 0;
+            const isZero = hitCount === 0 && destCount === 0;
+
+            const hitClass = hitCount === 0 ? "stat-num zero" : "stat-num";
+            const destClass = destCount === 0 ? "stat-num zero" : "stat-num";
+
+            const changed = previousDetails && !isFirstRender && (previousDetails[`${cat.id}_hit`] !== hitCount || previousDetails[`${cat.id}_dest`] !== destCount);
+            const barPct = Math.round((hitCount / maxHit) * 100);
+
+            const row = document.createElement('div');
+            row.className = `target-row${isZero ? ' is-zero' : ''}${changed ? ' flash-update' : ''}${!isZero ? ' has-count' : ''}`;
+            row.dataset.isZero = isZero ? '1' : '0';
+            row.style.animationDelay = `${Math.min(idx, 14) * 0.035}s`;
+            if (showActiveOnly && isZero) row.style.display = 'none';
+            
+            // Замінили <img> на <i> з FontAwesome
+            // Safe render: static categoriesMap values + numeric counters from Firestore
+            row.innerHTML = `
+                <div class="target-info">
+                    <span class="target-icon"><i class="${esc(cat.icon)}"></i></span>
+                    <div class="target-text">
+                        <span class="target-name">${esc(cat.ua)}</span>
+                        <div class="target-bar-track"><div class="target-bar-fill" style="width:${isZero ? 0 : barPct}%"></div></div>
+                    </div>
+                </div>
+                <div class="target-stats">
+                    <span class="${hitClass}">${parseInt(hitCount)||0}</span>
+                    <span class="${destClass}">${parseInt(destCount)||0}</span>
+                </div>
+            `;
+            listContainer.appendChild(row);
+        });
+
+        document.getElementById('filter-toggle-btn').classList.toggle('active', showActiveOnly);
+        previousDetails = details;
+        isFirstRender = false;
+    }
+</script>
+
+</body>
+</html>
