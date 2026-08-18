@@ -2954,8 +2954,21 @@ function rateLimit(key,ms){
             } catch (err) { failOrder(err); }
             finally { btn.innerText = currentLang === 'ua' ? "Підтвердити" : "Confirm"; btn.disabled = false; }
         }
-        window.addEventListener('DOMContentLoaded', () => { 
-            setLanguage(currentLang); 
+        window.addEventListener('DOMContentLoaded', () => {
+            // ⚠️ setLanguage тут викликалась, але ніде в цьому файлі не
+            // оголошена — вона є лише в support.html. Виняток обривав
+            // увесь обробник, і updateCartUI() нижче ніколи не виконувався:
+            // лічильник кошика при завантаженні сторінки лишався порожнім.
+            //
+            // Баг був у файлі й до моїх правок. Тепер виклик захищений,
+            // а переклад робить applyTranslationsToDOM — вона в цьому
+            // файлі є і працює.
+            try {
+                if (typeof setLanguage === 'function') setLanguage(currentLang);
+                else applyTranslationsToDOM(currentLang);
+            } catch (e) {
+                console.warn('[SVAROG] переклад при завантаженні:', e);
+            }
             updateCartUI();
         });
 let userChatSessionId = localStorage.getItem('userChatSessionId');
