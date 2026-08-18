@@ -5,8 +5,20 @@
     <meta charset="UTF-8">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self' https://send.monobank.ua https://monobank.ua; frame-ancestors 'none';">
-<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://www.gstatic.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self' https://send.monobank.ua https://monobank.ua;">
+<script>
+    /* Захист від вбудовування сайту в чужий iframe (клікджекінг).
+     *
+     * Директива frame-ancestors, яка тут стояла раніше, у теґу <meta>
+     * НЕ ПРАЦЮЄ — браузери приймають її лише як HTTP-заголовок. Саме про
+     * це й попереджала консоль. А GitHub Pages свої заголовки задавати
+     * не дає, тож захисту фактично не було взагалі.
+     *
+     * Ці два рядки роблять те саме на практиці: якщо сторінку відкрито
+     * всередині чужого фрейму — виштовхуємо її нагору. */
+    if (window.top !== window.self) { window.top.location = window.self.location; }
+    </script>
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVAROG TEAM | Магазин</title>
     
