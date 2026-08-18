@@ -2842,7 +2842,28 @@ function rateLimit(key,ms){
                 ['checkout-step-1', 'checkout-step-2', 'checkout-form', 'checkout-steps-indicator'].forEach(id => document.getElementById(id).style.display = 'none');
                 document.getElementById('order-success-number').innerText = newOrderId;
                 document.getElementById('order-success-screen').style.display = 'flex';
-            } catch (err) { alert(err.message); } 
+            } catch (err) {
+                // Голе «Missing or insufficient permissions» нікому нічого не
+                // пояснює. Найчастіша причина цієї помилки саме тут — не
+                // опубліковані правила Firestore: оформлення замовлення в
+                // одній транзакції списує залишок товару, а старі правила
+                // дозволяли це лише адміну. Транзакція відкочується разом
+                // із самим замовленням.
+                console.error('submitOrder:', err);
+                const denied = (err.code === 'permission-denied') ||
+                               /permission|insufficient/i.test(err.message || '');
+                if (denied) {
+                    alert(currentLang === 'ua'
+                        ? 'Замовлення не вдалося оформити: база даних відхилила запис.\n\n' +
+                          'Адміністратору: опублікуйте актуальні firestore.rules — ' +
+                          'без них списання залишку товару блокується, і замовлення не створюється.\n\n' +
+                          'Вибачте за незручність, напишіть нам у Telegram — оформимо вручну.'
+                        : 'Could not place the order: the database rejected the write.\n\n' +
+                          'Admin: publish the current firestore.rules.');
+                } else {
+                    alert(err.message);
+                }
+            } 
             finally { btn.innerText = currentLang === 'ua' ? "Підтвердити" : "Confirm"; btn.disabled = false; }
         }
         window.addEventListener('DOMContentLoaded', () => { 
