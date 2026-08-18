@@ -2743,6 +2743,24 @@ function rateLimit(key,ms){
             return s;
         }
 
+        // Одне місце, яке показує людині зрозумілу причину і повертає
+        // кнопку в робочий стан. Раніше кнопка могла назавжди лишитись
+        // у стані «Обробка…», якщо помилка вилітала повз finally.
+        function failOrder(err) {
+            console.error('submitOrder:', err);
+            const denied = (err && err.code === 'permission-denied') ||
+                           /permission|insufficient/i.test((err && err.message) || '');
+            alert(denied
+                ? (currentLang === 'ua'
+                    ? 'Замовлення не вдалося оформити: база даних відхилила запис.\n\n' +
+                      'Адміністратору: опублікуйте актуальні firestore.rules.\n\n' +
+                      'Вибачте за незручність — напишіть нам у Telegram, оформимо вручну.'
+                    : 'Could not place the order: the database rejected the write.')
+                : ((err && err.message) || 'Невідома помилка'));
+            const b = document.getElementById('confirm-order-btn');
+            if (b) { b.disabled = false; b.innerText = currentLang === 'ua' ? 'Підтвердити' : 'Confirm'; }
+        }
+
         async function submitOrder(e) {
             e.preventDefault(); if(shoppingCart.length === 0) return;
             if (document.getElementById('order-website') && document.getElementById('order-website').value.trim() !== '') return;
@@ -2757,7 +2775,13 @@ function rateLimit(key,ms){
             const baseSum = T.base;
             const finalSum = T.final;
             let newOrderId = '';
+            let orderPayload = null;
+            let stockDeducted = true;   // чи вдалось списати залишок
             try {
+                // ── ОСНОВНИЙ ШЛЯХ ──
+                // Одна транзакція: перевірка залишків, списання, гасіння
+                // сертифіката, лічильники зборів і саме замовлення.
+                // Або все разом, або нічого.
                 await db.runTransaction(async (transaction) => {
                     // ⚠️ Firestore вимагає, щоб УСІ читання в транзакції йшли
                     // до першого запису. Тому номер перевіряємо тут, на самому
@@ -2830,40 +2854,59 @@ function rateLimit(key,ms){
                     });
                     if (promoRef) transaction.update(promoRef, { active: false, usedAt: firebase.firestore.FieldValue.serverTimestamp() });
                     newOrderId = orderRef.id;
-                    transaction.set(orderRef, {
+                    orderPayload = {
                         name, phone, address,
                         items: shoppingCart.map(i => ({ ...i, image: '' })),
                         totalPrice: finalSum, donation: T.donation || 0, promoCode: appliedPromo ? appliedPromo.code : null, paymentMethod: method, paymentProof: orderReceiptBase64 || null, userId: currentAccountUser ? currentAccountUser.uid : null, status: 'new',
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
-                    });
+                    };
+                    transaction.set(orderRef, orderPayload);
                 });
+            } catch (txErr) {
+                // ── ЗАПАСНИЙ ШЛЯХ ──
+                //
+                // Транзакція списує залишок товару, а це запис у merch.
+                // Якщо в Firebase опубліковані старі правила, покупцю
+                // такий запис заборонений — і транзакція відкочується
+                // РАЗОМ ІЗ ЗАМОВЛЕННЯМ. Клієнт лишався ні з чим.
+                //
+                // Тут ми ловимо саме цей випадок і зберігаємо замовлення
+                // окремо, без списання. Замовлення важливіше за лічильник:
+                // залишок адмін поправить, а втраченого покупця — ні.
+                //
+                // Позначка stockDeducted: false лишається в документі, щоб
+                // в адмінці було видно, що склад по ньому не зменшено.
+                const denied = (txErr.code === 'permission-denied') ||
+                               /permission|insufficient/i.test(txErr.message || '');
+
+                // Не про права або нема що зберігати — далі йти нема сенсу
+                if (!denied || !orderPayload) { failOrder(txErr); return; }
+
+                console.warn('[SVAROG] Транзакцію відхилено правилами — ' +
+                             'зберігаю замовлення без списання залишку.', txErr);
+                stockDeducted = false;
+                if (!newOrderId) newOrderId = generateOrderNumber();
+
+                try {
+                    await db.collection('orders').doc(newOrderId).set(Object.assign({}, orderPayload, {
+                        stockDeducted: false,
+                        needsStockFix: true
+                    }));
+                } catch (fallbackErr) {
+                    // Якщо навіть саме замовлення записати не можна —
+                    // це вже не напівбіда, і мовчати про це не можна.
+                    failOrder(fallbackErr);
+                    return;
+                }
+            }
+
+            try {
                 shoppingCart = []; appliedPromo = null; repeatDiscountApplied = false; donationEnabled = false; orderReceiptBase64 = ''; const receiptInput = document.getElementById('order-receipt-file'); if(receiptInput) receiptInput.value = ''; const receiptPrev = document.getElementById('order-receipt-preview'); if(receiptPrev) receiptPrev.style.display = 'none'; saveCart(); updateCartUI();
                 ['checkout-step-1', 'checkout-step-2', 'checkout-form', 'checkout-steps-indicator'].forEach(id => document.getElementById(id).style.display = 'none');
                 document.getElementById('order-success-number').innerText = newOrderId;
                 document.getElementById('order-success-screen').style.display = 'flex';
-            } catch (err) {
-                // Голе «Missing or insufficient permissions» нікому нічого не
-                // пояснює. Найчастіша причина цієї помилки саме тут — не
-                // опубліковані правила Firestore: оформлення замовлення в
-                // одній транзакції списує залишок товару, а старі правила
-                // дозволяли це лише адміну. Транзакція відкочується разом
-                // із самим замовленням.
-                console.error('submitOrder:', err);
-                const denied = (err.code === 'permission-denied') ||
-                               /permission|insufficient/i.test(err.message || '');
-                if (denied) {
-                    alert(currentLang === 'ua'
-                        ? 'Замовлення не вдалося оформити: база даних відхилила запис.\n\n' +
-                          'Адміністратору: опублікуйте актуальні firestore.rules — ' +
-                          'без них списання залишку товару блокується, і замовлення не створюється.\n\n' +
-                          'Вибачте за незручність, напишіть нам у Telegram — оформимо вручну.'
-                        : 'Could not place the order: the database rejected the write.\n\n' +
-                          'Admin: publish the current firestore.rules.');
-                } else {
-                    alert(err.message);
-                }
-            } 
+            } catch (err) { failOrder(err); }
             finally { btn.innerText = currentLang === 'ua' ? "Підтвердити" : "Confirm"; btn.disabled = false; }
         }
         window.addEventListener('DOMContentLoaded', () => { 
