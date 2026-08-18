@@ -2746,6 +2746,42 @@ function rateLimit(key,ms){
         // Одне місце, яке показує людині зрозумілу причину і повертає
         // кнопку в робочий стан. Раніше кнопка могла назавжди лишитись
         // у стані «Обробка…», якщо помилка вилітала повз finally.
+        // ═══════════════════════════════════════════════════════════════
+        //           ХТО САМЕ ВІДХИЛИВ ЗАПИС
+        //
+        // «Missing or insufficient permissions» не каже, на якій колекції
+        // все зламалось, а транзакція чіпає чотири. Тому коли її відхилено,
+        // пробуємо кожен запис окремо й запамʼятовуємо винного.
+        //
+        // Перевірка нешкідлива: товару прописується той самий залишок,
+        // який у ньому вже стоїть.
+        // ═══════════════════════════════════════════════════════════════
+        async function probeDeniedWrite(merchId) {
+            const denied = [];
+            const isDenied = (e) => (e && e.code === 'permission-denied') ||
+                                    /permission|insufficient/i.test((e && e.message) || '');
+
+            if (merchId) {
+                try {
+                    const snap = await db.collection('merch').doc(merchId).get();
+                    if (snap.exists) {
+                        const cur = snap.data();
+                        const patch = {};
+                        if (cur.stock !== undefined) patch.stock = cur.stock;
+                        patch.variants = cur.variants || [];
+                        await db.collection('merch').doc(merchId).update(patch);
+                    }
+                } catch (e) { if (isDenied(e)) denied.push('merch'); }
+            }
+
+            try { await db.collection('fundraisers').limit(1).get(); }
+            catch (e) { if (isDenied(e)) denied.push('fundraisers'); }
+
+            const result = denied.length ? denied.join(', ') : 'невідомо';
+            console.warn('[SVAROG] Записи, заборонені правилами: ' + result);
+            return result;
+        }
+
         function failOrder(err) {
             console.error('submitOrder:', err);
             const denied = (err && err.code === 'permission-denied') ||
@@ -2888,10 +2924,19 @@ function rateLimit(key,ms){
                 stockDeducted = false;
                 if (!newOrderId) newOrderId = generateOrderNumber();
 
+                // Зʼясовуємо, яка саме колекція не пустила — діагноз ляже
+                // в саме замовлення, і адмін побачить його в «Потребує уваги»
+                let deniedWrite = 'невідомо';
+                try {
+                    deniedWrite = await probeDeniedWrite(
+                        (shoppingCart[0] && shoppingCart[0].merchId) || null);
+                } catch (probeErr) { console.warn('probe:', probeErr); }
+
                 try {
                     await db.collection('orders').doc(newOrderId).set(Object.assign({}, orderPayload, {
                         stockDeducted: false,
-                        needsStockFix: true
+                        needsStockFix: true,
+                        deniedWrite: deniedWrite
                     }));
                 } catch (fallbackErr) {
                     // Якщо навіть саме замовлення записати не можна —
