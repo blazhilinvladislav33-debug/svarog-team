@@ -275,6 +275,29 @@ function rateLimit(key,ms){
         .cart-item-remove { color: #ff4a4a; font-size: 1.2rem; cursor: pointer;}
         .cart-qty-control { display: flex; gap: 8px; align-items: center; background: var(--iron); border-radius: 4px; padding: 2px 6px; width: fit-content; margin-top: 5px;}
         .cart-qty-control button { color: #fff; font-weight: bold;}
+        .review-rating { color:var(--brand-yellow, #f0ca28); font-size:0.85rem; letter-spacing:1px; }
+        .merch-rating { display:flex; align-items:center; gap:6px; color:var(--brand-yellow, #f0ca28); font-size:0.8rem; letter-spacing:1px; }
+        .merch-rating span { color:var(--ash, #888); letter-spacing:0; font-size:0.72rem; }
+        .acc-order-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px dashed rgba(255,255,255,0.08); }
+        .acc-act { background:rgba(255,255,255,0.07); border:none; color:#ddd; border-radius:6px; padding:7px 12px;
+            font-size:0.78rem; font-family:inherit; cursor:pointer; }
+        .acc-act:hover { background:rgba(255,255,255,0.15); }
+        .acc-act-danger { background:rgba(255,74,74,0.14); color:#ff7a7a; }
+        .acc-act-accent { background:rgba(240,202,40,0.16); color:var(--brand-yellow, #f0ca28); }
+        .review-stars { display:flex; gap:6px; font-size:1.7rem; margin-bottom:14px; }
+        .review-star { color:#444; cursor:pointer; line-height:1; }
+        .review-star.active { color:var(--brand-yellow, #f0ca28); }
+        .review-photo-btn { display:inline-block; background:rgba(255,255,255,0.07); border-radius:6px;
+            padding:9px 14px; font-size:0.82rem; cursor:pointer; }
+        .review-photo-btn:hover { background:rgba(255,255,255,0.14); }
+        .cart-donation-row { display:flex; align-items:center; gap:10px; padding:12px 0; cursor:pointer;
+            border-top:1px dashed var(--iron); font-size:0.88rem; color:#ccc; }
+        .cart-donation-row input { width:18px; height:18px; cursor:pointer; accent-color:var(--brand-yellow); }
+        .fund-bar { margin-top:8px; }
+        .fund-bar-label { font-size:0.72rem; color:var(--ash); margin-bottom:4px; display:flex; justify-content:space-between; gap:8px; }
+        .fund-bar-track { height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; }
+        .fund-bar-fill { height:100%; background:linear-gradient(90deg,#7A8450,#f0ca28); border-radius:3px; }
+        .batch-note { font-size:0.72rem; color:#f0ca28; margin-top:6px; }
         .cart-total-box { display: flex; justify-content: space-between; padding: 15px 0; border-top: 1px solid var(--iron); margin-bottom: 20px; font-weight: 700; font-size: 1.2rem; }
         .cart-total-price { color: var(--brand-yellow); }
         .cart-total-price .old-total { color: var(--ash); font-weight: 400; font-size: 0.85rem; text-decoration: line-through; margin-right: 8px; }
@@ -556,6 +579,30 @@ function rateLimit(key,ms){
             </div>
             <div id="notify-success-zone" style="display:none; color:#3ecf6a; font-size:0.9rem;">✅ <span data-lang="ua">Дякуємо! Напишемо, коли з'явиться.</span><span data-lang="en">Thanks! We'll email you when it's back.</span></div>
             <div style="margin-top:16px; cursor:pointer; color:#888; font-size:0.8rem;" onclick="closeNotifyModal()"><span data-lang="ua">Закрити</span><span data-lang="en">Close</span></div>
+        </div>
+    </div>
+    <div id="review-modal-overlay" style="display:none; position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,0.78); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;" onclick="if(event.target===this) closeReviewModal()">
+        <div style="background:var(--plate, #16171A); border:1px solid var(--iron); border-radius:12px; padding:28px; max-width:420px; width:100%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:1.05rem;"><span data-lang="ua">Ваш відгук</span><span data-lang="en">Your review</span></h3>
+                <span onclick="closeReviewModal()" style="cursor:pointer; font-size:1.3rem; color:#888;">✕</span>
+            </div>
+            <div class="review-stars" id="review-stars">
+                <span class="review-star active" id="review-star-1" onclick="setReviewRating(1)">★</span>
+                <span class="review-star active" id="review-star-2" onclick="setReviewRating(2)">★</span>
+                <span class="review-star active" id="review-star-3" onclick="setReviewRating(3)">★</span>
+                <span class="review-star active" id="review-star-4" onclick="setReviewRating(4)">★</span>
+                <span class="review-star active" id="review-star-5" onclick="setReviewRating(5)">★</span>
+            </div>
+            <div class="form-group"><textarea id="review-text-input" class="form-input" rows="4" placeholder="Що сподобалось, як сів розмір, якість тканини..." style="resize:vertical;"></textarea></div>
+            <label class="review-photo-btn">
+                <input type="file" id="review-photo-file" accept="image/*" style="display:none;" onchange="onReviewPhotoPicked(this)">
+                <span data-lang="ua">📷 Додати фото</span><span data-lang="en">📷 Add a photo</span>
+            </label>
+            <img id="review-photo-preview" style="display:none; max-width:100%; border-radius:8px; margin:12px 0;">
+            <div id="review-error-msg" style="display:none; color:#ff4a4a; font-size:0.85rem; margin-bottom:10px;"></div>
+            <p style="color:#888; font-size:0.78rem; margin-bottom:12px;"><span data-lang="ua">Відгук зʼявиться на сайті після перевірки.</span><span data-lang="en">Your review will appear after moderation.</span></p>
+            <button type="button" class="confirm-btn" style="margin:0;" onclick="submitReview()"><span data-lang="ua">Надіслати</span><span data-lang="en">Send</span></button>
         </div>
     </div>
     <div id="account-modal-overlay" style="display:none; position:fixed; inset:0; z-index:9997; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;" onclick="if(event.target===this) closeAccountModal()">
@@ -1312,6 +1359,164 @@ function rateLimit(key,ms){
         }
 
         // ─────────────── замовлення: актуальні / архів ───────────────
+        // ═══════════════════════════════════════════════════════════════
+        //        ДІЇ НАД ВЛАСНИМ ЗАМОВЛЕННЯМ У КАБІНЕТІ
+        // ═══════════════════════════════════════════════════════════════
+
+        // Скасувати можна, лише поки замовлення не взяли в роботу.
+        // Те саме обмеження продубльоване в правилах Firestore — кнопку
+        // можна сховати в інтерфейсі, але захист має бути на сервері.
+        const CANCELLABLE_STATUSES = ['new', 'on_review'];
+
+        async function cancelMyOrder(orderId) {
+            const ua = currentLang === 'ua';
+            if (!currentAccountUser) return;
+            const reason = prompt(ua ? 'Чому скасовуєте? (необовʼязково)' : 'Reason for cancelling? (optional)');
+            if (reason === null) return;
+
+            try {
+                await db.collection('orders').doc(orderId).update({
+                    status: 'cancelled',
+                    cancelledAt: Date.now(),
+                    cancelReason: (reason || '').slice(0, 300),
+                    cancelledBy: 'customer'
+                });
+                showToast(ua ? 'Замовлення скасовано' : 'Order cancelled');
+                loadAccountOrders();
+            } catch (err) {
+                showToast((ua ? 'Не вдалося скасувати: ' : 'Cancel failed: ') + (err.message || err.code));
+            }
+        }
+
+        // Повторити замовлення: складаємо той самий кошик, але звіряємось
+        // із поточним каталогом — ціни й наявність могли змінитись.
+        function reorder(orderId) {
+            const ua = currentLang === 'ua';
+            const src = accountOrdersCache.find(function (o) { return o.__id === orderId; });
+            if (!src) return;
+
+            const items = src.items || src.cart || [];
+            let added = 0, skipped = [];
+
+            items.forEach(function (it) {
+                const merchId = it.merchId || it.id;
+                const m = globalMerchList.find(function (x) { return x.id === merchId; });
+                if (!m || !isMerchVisible(m)) { skipped.push(it.merchTitle || it.title || ''); return; }
+
+                const price = m.discountPrice && m.discountPrice < m.price ? m.discountPrice : m.price;
+                const qty = Math.max(1, Number(it.quantity) || 1);
+
+                shoppingCart.push({
+                    merchId: merchId,
+                    merchTitle: m.title,
+                    size: it.size || '',
+                    color: it.color || '',
+                    quantity: qty,
+                    price: price,                       // ціна завжди свіжа з каталогу
+                    totalPrice: price * qty,
+                    image: (m.images && m.images[0]) || m.image || '',
+                    isPreorder: !!m.isPreorder
+                });
+                added++;
+            });
+
+            saveCart(); updateCartUI();
+
+            if (!added) {
+                showToast(ua ? 'Цих товарів більше немає в каталозі' : 'These items are no longer available');
+                return;
+            }
+            closeAccountModal();
+            openCartModal();
+            showToast(skipped.length
+                ? (ua ? `Додано ${added}, пропущено ${skipped.length} (немає в каталозі)`
+                      : `Added ${added}, skipped ${skipped.length} (unavailable)`)
+                : (ua ? 'Товари додано в кошик' : 'Items added to cart'));
+        }
+
+        // ─── відгук ───
+        let reviewOrderId = null;
+        let reviewPhotoBase64 = '';
+
+        function openReviewModal(orderId) {
+            reviewOrderId = orderId;
+            reviewPhotoBase64 = '';
+            const box = document.getElementById('review-modal-overlay');
+            document.getElementById('review-text-input').value = '';
+            document.getElementById('review-photo-preview').style.display = 'none';
+            document.getElementById('review-error-msg').style.display = 'none';
+            const f = document.getElementById('review-photo-file');
+            if (f) f.value = '';
+            setReviewRating(5);
+            box.style.display = 'flex';
+        }
+
+        function closeReviewModal() {
+            document.getElementById('review-modal-overlay').style.display = 'none';
+        }
+
+        let reviewRating = 5;
+        function setReviewRating(n) {
+            reviewRating = n;
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById('review-star-' + i);
+                if (el) el.classList.toggle('active', i <= n);
+            }
+        }
+
+        async function onReviewPhotoPicked(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            try {
+                // Той самий стиснювач, що й для чеків: фото лягає в документ
+                // Firestore, а там межа 1 МБ на документ.
+                reviewPhotoBase64 = await getBase64Image(file);
+                const prev = document.getElementById('review-photo-preview');
+                prev.src = reviewPhotoBase64;
+                prev.style.display = 'block';
+            } catch (e) {
+                showToast(currentLang === 'ua' ? 'Не вдалося прочитати фото' : 'Could not read the photo');
+            }
+        }
+
+        async function submitReview() {
+            const ua = currentLang === 'ua';
+            const errEl = document.getElementById('review-error-msg');
+            errEl.style.display = 'none';
+
+            const text = document.getElementById('review-text-input').value.trim();
+            if (!text && !reviewPhotoBase64) {
+                errEl.innerText = ua ? 'Напишіть кілька слів або додайте фото.' : 'Write a few words or attach a photo.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            const src = accountOrdersCache.find(function (o) { return o.__id === reviewOrderId; });
+            const items = (src && (src.items || src.cart)) || [];
+            const merchIds = items.map(function (i) { return i.merchId || i.id; }).filter(Boolean);
+
+            try {
+                await db.collection('reviews').add({
+                    name: (currentProfile && currentProfile.firstName)
+                        || (currentProfile && currentProfile.name)
+                        || (ua ? 'Покупець' : 'Customer'),
+                    text: text.slice(0, 600),
+                    photo: reviewPhotoBase64 || '',
+                    rating: reviewRating,
+                    merchIds: merchIds,
+                    orderId: reviewOrderId,
+                    userId: currentAccountUser ? currentAccountUser.uid : null,
+                    timestamp: Date.now(),
+                    approved: false          // публікується після перевірки адміном
+                });
+                closeReviewModal();
+                showToast(ua ? 'Дякуємо! Відгук зʼявиться після перевірки.' : 'Thank you! Your review will appear after moderation.');
+            } catch (err) {
+                errEl.innerText = (ua ? 'Не вдалося надіслати: ' : 'Could not submit: ') + (err.message || err.code);
+                errEl.style.display = 'block';
+            }
+        }
+
         function setOrdersTab(tab) {
             ordersTab = tab;
             document.getElementById('orders-tab-active').classList.toggle('active', tab === 'active');
@@ -1458,6 +1663,36 @@ function rateLimit(key,ms){
                     wrap.appendChild(box);
                 }
 
+                // Дії: скасувати (поки не в роботі), повторити, відгук
+                const actions = document.createElement('div');
+                actions.className = 'acc-order-actions';
+
+                if (CANCELLABLE_STATUSES.indexOf(data.status) !== -1) {
+                    const b = document.createElement('button');
+                    b.className = 'acc-act acc-act-danger';
+                    b.textContent = currentLang === 'ua' ? 'Скасувати' : 'Cancel';
+                    b.onclick = function () { cancelMyOrder(data.__id); };
+                    actions.appendChild(b);
+                }
+
+                if ((data.items || data.cart || []).length) {
+                    const b = document.createElement('button');
+                    b.className = 'acc-act';
+                    b.textContent = currentLang === 'ua' ? 'Замовити ще раз' : 'Order again';
+                    b.onclick = function () { reorder(data.__id); };
+                    actions.appendChild(b);
+                }
+
+                if (data.status === 'delivered' && !data.reviewLeft) {
+                    const b = document.createElement('button');
+                    b.className = 'acc-act acc-act-accent';
+                    b.textContent = currentLang === 'ua' ? 'Залишити відгук' : 'Leave a review';
+                    b.onclick = function () { openReviewModal(data.__id); };
+                    actions.appendChild(b);
+                }
+
+                if (actions.children.length) wrap.appendChild(actions);
+
                 listEl.appendChild(wrap);
             });
         }
@@ -1504,7 +1739,7 @@ function rateLimit(key,ms){
             }
         });
 
-        const orderStatusLabels = {
+        let orderStatusLabels = {
             new: { ua: 'Нове', en: 'New', color: '#888' },
             on_review: { ua: 'На перевірці', en: 'Under review', color: '#f0ca28' },
             accepted: { ua: 'Прийнято', en: 'Accepted', color: '#4a9eff' },
@@ -1513,6 +1748,38 @@ function rateLimit(key,ms){
             cancelled: { ua: 'Скасовано', en: 'Cancelled', color: '#ff4a4a' },
             archived: { ua: 'В архіві', en: 'Archived', color: '#888' }
         };
+
+        // ═══════════════════════════════════════════════════════════════
+        //             СПІЛЬНИЙ СЛОВНИК СТАТУСІВ
+        //
+        // Раніше підписи статусів жили в трьох місцях окремо: в адмінці,
+        // в боті й тут (ще й тут у двох копіях). Через це клієнти
+        // отримували «Ваше замовлення accepted» — статус додали в один
+        // список, а в підписи внести забули.
+        //
+        // Тепер джерело одне: документ config/statuses. Якщо його ще
+        // немає — працюють вбудовані значення, нічого не ламається.
+        // ═══════════════════════════════════════════════════════════════
+        function applySharedStatuses(map) {
+            if (!map || typeof map !== 'object') return;
+            Object.keys(map).forEach(function (code) {
+                const v = map[code] || {};
+                if (!v.ua && !v.label) return;
+                const ua = v.ua || v.label;
+                const en = v.en || ua;
+                const color = /^#[0-9a-fA-F]{3,6}$/.test(v.color || '') ? v.color : '#888';
+                orderStatusLabels[code] = { ua: ua, en: en, color: color };
+                SITE_STATUS_LABELS[code] = [v.emoji || '📋', ua, v.hint || ''];
+            });
+            try { if (typeof renderAccountOrders === 'function') renderAccountOrders(); } catch (e) {}
+        }
+
+        db.collection('config').doc('statuses').onSnapshot(function (doc) {
+            if (doc.exists) applySharedStatuses(doc.data());
+        }, function (err) {
+            console.warn('config/statuses:', err.code);
+        });
+
         let orderCheckMode = 'number';
         function setOrderCheckMode(mode) {
             orderCheckMode = mode;
@@ -1528,7 +1795,7 @@ function rateLimit(key,ms){
             if (digits.length > 9) digits = digits.slice(-9);
             return digits;
         }
-        const SITE_STATUS_LABELS = {
+        let SITE_STATUS_LABELS = {
             new:       ['🆕', 'Нове',        'Ми отримали замовлення і скоро підтвердимо.'],
             on_review: ['👀', 'На розгляді', 'Менеджер опрацьовує ваше замовлення.'],
             sent:      ['📦', 'Відправлено', 'Посилка вже в дорозі.'],
@@ -1747,9 +2014,93 @@ function rateLimit(key,ms){
             shopSortMode = document.getElementById('shop-sort-select').value;
             renderShopGrid();
         }
+        // ═══════════════════════════════════════════════════════════════
+        //          ЗБОРИ ТА ПАРТІЇ ЗА ПЕРЕДЗАМОВЛЕННЯМИ
+        //
+        // Мерч можна привʼязати до конкретного збору (поле fundraiserId
+        // у товарі). На картці зʼявляється смужка «зібрано X з Y».
+        // Сума росте прямо в транзакції замовлення: правила Firestore
+        // дозволяють покупцеві змінити рівно поле raised і рівно вгору.
+        //
+        // Партія: якщо в товарі задано batchGoal, показуємо, скільки
+        // замовлень зібрано з потрібних, щоб запустити пошив.
+        // ═══════════════════════════════════════════════════════════════
+        let globalFundraisers = {};
+
+        db.collection('fundraisers').onSnapshot(function (snap) {
+            globalFundraisers = {};
+            snap.forEach(function (doc) { globalFundraisers[doc.id] = doc.data() || {}; });
+            try { renderShopGrid(); } catch (e) {}
+        }, function (err) {
+            console.warn('fundraisers:', err.code);
+        });
+
+        function fundraiserFor(item) {
+            if (!item || !item.fundraiserId) return null;
+            const f = globalFundraisers[item.fundraiserId];
+            if (!f || f.active === false) return null;
+            const goal = Number(f.goal) || 0;
+            if (goal <= 0) return null;
+            const raised = Math.max(0, Number(f.raised) || 0);
+            return {
+                id: item.fundraiserId,
+                title: f.title || '',
+                goal: goal,
+                raised: raised,
+                percent: Math.min(100, Math.round(raised / goal * 100))
+            };
+        }
+
+        function fundraiserBarHtml(item) {
+            const f = fundraiserFor(item);
+            if (!f) return '';
+            const left = currentLang === 'ua'
+                ? `${f.raised.toLocaleString('uk-UA')} з ${f.goal.toLocaleString('uk-UA')} ₴`
+                : `${f.raised.toLocaleString('en-GB')} of ${f.goal.toLocaleString('en-GB')} ₴`;
+            return `<div class="fund-bar">
+                        <div class="fund-bar-label"><span>${escapeHtmlLite(f.title)}</span><span>${left}</span></div>
+                        <div class="fund-bar-track"><div class="fund-bar-fill" style="width:${f.percent}%"></div></div>
+                    </div>`;
+        }
+
+        function batchNoteHtml(item) {
+            const goal = Number(item && item.batchGoal) || 0;
+            if (goal <= 0) return '';
+            const have = Math.max(0, Number(item.batchCount) || 0);
+            if (have >= goal) {
+                return `<div class="batch-note">${currentLang === 'ua'
+                    ? '✅ Партію зібрано — запускаємо пошив'
+                    : '✅ Batch complete — production starting'}</div>`;
+            }
+            return `<div class="batch-note">${currentLang === 'ua'
+                ? `Зібрано ${have} з ${goal} замовлень для запуску партії`
+                : `${have} of ${goal} orders collected to start the batch`}</div>`;
+        }
+
+        function escapeHtmlLite(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function isMerchVisible(item) {
+            if (!item) return false;
+            if (item.isHidden === true) return false;
+            if (item.publishAt) {
+                const t = typeof item.publishAt === 'number'
+                    ? item.publishAt
+                    : Date.parse(item.publishAt);
+                if (!isNaN(t) && Date.now() < t) return false;
+            }
+            return true;
+        }
+
         function renderShopGrid() {
             const grid = document.getElementById('dynamic-shop-grid'); grid.innerHTML = "";
-            let filteredList = globalMerchList; 
+            // Сховані товари й ті, чия дата публікації ще не настала,
+            // на вітрину не потрапляють. Раніше прибрати товар з продажу
+            // можна було лише видаливши його — разом з історією замовлень.
+            let filteredList = globalMerchList.filter(isMerchVisible); 
             if(activeCategory !== 'Всі товари') filteredList = filteredList.filter(m => m.category === activeCategory);
             if(activeSubcategory !== 'Всі') filteredList = filteredList.filter(m => m.subcategory === activeSubcategory);
             if (shopSearchTerm) filteredList = filteredList.filter(m => (m.title || '').toLowerCase().includes(shopSearchTerm));
@@ -1795,7 +2146,10 @@ function rateLimit(key,ms){
                         <div class="merch-details">
                             <div class="merch-title auto-translate" onclick="openProductModal('${item.id}')">${item.title}</div>
                             <div class="merch-price-row">${priceHtml}</div>
+                            ${merchRatingHtml(item)}
                             ${variantsHtml}
+                            ${fundraiserBarHtml(item)}
+                            ${batchNoteHtml(item)}
                             ${lowStockHtml}
                             <div class="merch-controls">
                                 ${sizeSelectHtml}
@@ -1993,21 +2347,78 @@ function rateLimit(key,ms){
             addToCart(currentPmItem.id);
             closeProductModal();
         }
-        db.collection("reviews").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        // Відгуки. Ліміт стоїть свідомо: без нього колекція з часом
+        // з'їдала б квоту читань на кожному відкритті сторінки.
+        let globalReviews = [];
+
+        db.collection("reviews").orderBy("timestamp", "desc").limit(60).onSnapshot(snapshot => {
+            // approved !== false, а не approved === true: у старих відгуках
+            // цього поля немає взагалі, і суворе порівняння сховало б їх усі.
+            // Нові відгуки створюються з approved: false і чекають перевірки.
+            globalReviews = snapshot.docs
+                .map(doc => Object.assign({ __id: doc.id }, doc.data()))
+                .filter(r => r.approved !== false);
+
             const section = document.getElementById('reviews-section');
             const grid = document.getElementById('reviews-grid');
             if (!section || !grid) return;
-            if (snapshot.empty) { section.style.display = 'none'; return; }
+            if (!globalReviews.length) { section.style.display = 'none'; return; }
             section.style.display = 'block';
-            grid.innerHTML = snapshot.docs.map(doc => {
-                const r = doc.data();
-                return `<div class="review-card">
-                    <img src="${r.photo}" loading="lazy" onclick="openLightbox('${r.photo}')">
-                    <div class="review-name">${r.name}</div>
-                    ${r.text ? `<div class="review-text">"${r.text}"</div>` : ''}
-                </div>`;
-            }).join('');
-        });
+
+            grid.innerHTML = '';
+            globalReviews.forEach(r => grid.appendChild(buildReviewCard(r)));
+
+            try { renderShopGrid(); } catch (e) {}
+        }, err => console.warn('reviews:', err.code));
+
+        // Будуємо через DOM, а не рядком: у відгуку є текст і фото від
+        // сторонньої людини, і склеювання HTML тут було б дірою для XSS.
+        function buildReviewCard(r) {
+            const card = document.createElement('div');
+            card.className = 'review-card';
+
+            if (r.photo) {
+                const img = document.createElement('img');
+                img.src = r.photo;
+                img.loading = 'lazy';
+                img.onclick = function () { openLightbox(r.photo); };
+                card.appendChild(img);
+            }
+
+            if (r.rating) {
+                const stars = document.createElement('div');
+                stars.className = 'review-rating';
+                stars.textContent = '★'.repeat(Math.max(1, Math.min(5, r.rating)));
+                card.appendChild(stars);
+            }
+
+            const name = document.createElement('div');
+            name.className = 'review-name';
+            name.textContent = r.name || '';
+            card.appendChild(name);
+
+            if (r.text) {
+                const txt = document.createElement('div');
+                txt.className = 'review-text';
+                txt.textContent = '"' + r.text + '"';
+                card.appendChild(txt);
+            }
+            return card;
+        }
+
+        function reviewsForMerch(merchId) {
+            return globalReviews.filter(function (r) {
+                return Array.isArray(r.merchIds) && r.merchIds.indexOf(merchId) !== -1;
+            });
+        }
+
+        // Компактна позначка на картці товару: скільки відгуків і середня оцінка
+        function merchRatingHtml(item) {
+            const list = reviewsForMerch(item.id).filter(function (r) { return r.rating; });
+            if (!list.length) return '';
+            const avg = list.reduce(function (a, r) { return a + r.rating; }, 0) / list.length;
+            return `<div class="merch-rating">${'★'.repeat(Math.round(avg))}<span>${avg.toFixed(1)} · ${list.length}</span></div>`;
+        }
         let globalBundles = [];
         db.collection("bundles").onSnapshot(snapshot => {
             globalBundles = []; snapshot.forEach(doc => { globalBundles.push({ id: doc.id, ...doc.data() }); });
@@ -2100,6 +2511,81 @@ function rateLimit(key,ms){
             }
         }
         function closeOrderModal() { document.getElementById('order-modal-wrapper').style.display = 'none'; }
+        // ═══════════════════════════════════════════════════════════════
+        //                  ПІДСУМОК КОШИКА
+        //
+        // Раніше сума рахувалась двічі — окремо для показу в кошику й
+        // окремо при відправці замовлення. Дві копії однієї формули рано
+        // чи пізно розходяться, і клієнт бачить одне, а в базу лягає
+        // інше. Тепер обидва місця беруть результат звідси.
+        // ═══════════════════════════════════════════════════════════════
+        let donationEnabled = false;
+
+        function donationFor(sum) {
+            // Округлення вгору до сотні. Якщо сума вже рівна — додаємо 100,
+            // щоб кнопка не була порожньою обіцянкою.
+            if (!donationEnabled || sum <= 0) return 0;
+            const up = Math.ceil(sum / 100) * 100;
+            return up > sum ? up - sum : 100;
+        }
+
+        function computeCartTotals() {
+            const base = shoppingCart.reduce(function (acc, i) { return acc + i.totalPrice; }, 0);
+            let afterDiscount = base;
+
+            if (appliedPromo) {
+                afterDiscount = appliedPromo.type === 'certificate'
+                    ? Math.max(0, base - appliedPromo.fiatValue)
+                    : Math.round(base * (1 - appliedPromo.discount / 100));
+            } else if (repeatDiscountApplied && repeatDiscountPercent > 0) {
+                afterDiscount = Math.round(base * (1 - repeatDiscountPercent / 100));
+            }
+
+            const donation = donationFor(afterDiscount);
+            return {
+                base: base,
+                afterDiscount: afterDiscount,
+                donation: donation,
+                final: afterDiscount + donation,
+                hasDiscount: afterDiscount !== base
+            };
+        }
+
+        function toggleDonation(on) {
+            donationEnabled = !!on;
+            renderCartModalContent();
+        }
+
+        function renderDonationRow(T) {
+            let row = document.getElementById('cart-donation-row');
+            if (!row) {
+                const box = document.getElementById('cart-total-section');
+                if (!box || !box.parentNode) return;
+                row = document.createElement('label');
+                row.id = 'cart-donation-row';
+                row.className = 'cart-donation-row';
+                box.parentNode.insertBefore(row, box);
+            }
+            const add = donationFor(T.afterDiscount) || (T.donation || 0);
+            const preview = donationEnabled ? T.donation : donationFor(T.afterDiscount);
+            if (!preview) { row.style.display = 'none'; return; }
+            row.style.display = 'flex';
+            row.innerHTML = '';
+
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = donationEnabled;
+            cb.onchange = function () { toggleDonation(cb.checked); };
+
+            const label = document.createElement('span');
+            label.textContent = currentLang === 'ua'
+                ? `Додати ${preview} ₴ на потреби (округлити суму)`
+                : `Add ${preview} ₴ to support the cause (round up)`;
+
+            row.appendChild(cb);
+            row.appendChild(label);
+        }
+
         function renderCartModalContent() {
             const container = document.getElementById('cart-items-container');
             container.innerHTML = ""; 
@@ -2134,24 +2620,24 @@ function rateLimit(key,ms){
                 container.appendChild(_ci);
             });
             document.getElementById('promo-code-box').style.display = 'block';
-            let finalSum = baseTotalSum;
+            const T = computeCartTotals();
+
             if (appliedPromo) {
-                if (appliedPromo.type === 'certificate') finalSum = Math.max(0, baseTotalSum - appliedPromo.fiatValue);
-                else finalSum = Math.round(baseTotalSum * (1 - appliedPromo.discount / 100));
-                document.getElementById('cart-total-sum').innerHTML = `<span class="old-total">${baseTotalSum} ₴</span>${finalSum} ₴`;
                 document.getElementById('promo-input-row').style.display = 'none';
                 document.getElementById('promo-applied-row').style.display = 'flex';
                 document.getElementById('promo-applied-label').innerText = `✓ ${appliedPromo.code}`;
-            } else if (repeatDiscountApplied && repeatDiscountPercent > 0) {
-                finalSum = Math.round(baseTotalSum * (1 - repeatDiscountPercent / 100));
-                document.getElementById('cart-total-sum').innerHTML = `<span class="old-total">${baseTotalSum} ₴</span>${finalSum} ₴`;
-                document.getElementById('promo-input-row').style.display = 'flex';
-                document.getElementById('promo-applied-row').style.display = 'none';
             } else {
-                document.getElementById('cart-total-sum').innerText = `${baseTotalSum} ₴`;
                 document.getElementById('promo-input-row').style.display = 'flex';
                 document.getElementById('promo-applied-row').style.display = 'none';
             }
+
+            const sumEl = document.getElementById('cart-total-sum');
+            if (T.hasDiscount || T.donation) {
+                sumEl.innerHTML = `<span class="old-total">${T.base} ₴</span>${T.final} ₴`;
+            } else {
+                sumEl.innerText = `${T.final} ₴`;
+            }
+            renderDonationRow(T);
             document.getElementById('cart-total-section').style.display = 'flex'; document.getElementById('step1-nav-wrap').style.display = 'block'; 
         }
         async function applyPromoCode() {
@@ -2265,10 +2751,11 @@ function rateLimit(key,ms){
             const btn = document.getElementById('confirm-order-btn');
             btn.innerText = currentLang === 'ua' ? "Обробка..." : "Processing..."; btn.disabled = true;
             const name = document.getElementById('order-name').value; const phone = document.getElementById('order-phone').value; const address = document.getElementById('order-address').value;
-            const baseSum = shoppingCart.reduce((s, i) => s + i.totalPrice, 0);
-            let finalSum = baseSum;
-            if (appliedPromo) { if (appliedPromo.type === 'certificate') finalSum = Math.max(0, baseSum - appliedPromo.fiatValue); else finalSum = Math.round(baseSum * (1 - appliedPromo.discount / 100)); }
-            else if (repeatDiscountApplied && repeatDiscountPercent > 0) { finalSum = Math.round(baseSum * (1 - repeatDiscountPercent / 100)); }
+            // Той самий розрахунок, що бачив клієнт у кошику —
+            // жодних повторних формул, щоб суми не розійшлись.
+            const T = computeCartTotals();
+            const baseSum = T.base;
+            const finalSum = T.final;
             let newOrderId = '';
             try {
                 await db.runTransaction(async (transaction) => {
@@ -2280,6 +2767,19 @@ function rateLimit(key,ms){
                     if (clash.exists) throw new Error('order-number-clash');
 
                     let merchRefsAndData = [];
+                    // Збори читаємо тут, разом з рештою читань: Firestore
+                    // забороняє читати після першого запису в транзакції.
+                    const fundraiserRefs = {}, fundraiserBase = {}, fundraiserRaised = {};
+                    for (const ci of shoppingCart) {
+                        const m = globalMerchList.find(x => x.id === ci.merchId);
+                        const fid = m && m.fundraiserId;
+                        if (!fid || fundraiserRefs[fid]) continue;
+                        const fref = db.collection('fundraisers').doc(fid);
+                        const fdoc = await transaction.get(fref);
+                        if (!fdoc.exists) continue;
+                        fundraiserRefs[fid] = fref;
+                        fundraiserBase[fid] = Number((fdoc.data() || {}).raised) || 0;
+                    }
                     for (let cartItem of shoppingCart) {
                         let ref = db.collection('merch').doc(cartItem.merchId); let doc = await transaction.get(ref);
                         if (!doc.exists) throw new Error(currentLang === 'ua' ? `Товар "${cartItem.merchTitle}" більше не існує!` : `Item "${cartItem.merchTitle}" no longer exists!`);
@@ -2303,18 +2803,42 @@ function rateLimit(key,ms){
                         stockObj[sizeKey] = currentQty - obj.cartItem.quantity;
                         if (isVariant && variantIndex > -1) obj.data.variants[variantIndex].stock = stockObj; else obj.data.stock = stockObj;
                     }
-                    for (let obj of merchRefsAndData) { if (!obj.cartItem.isPreorder) transaction.update(obj.ref, { stock: obj.data.stock, variants: obj.data.variants || [] }); }
+                    // Списання залишку + лічильник партії за передзамовленнями.
+                    // Правила Firestore пропускають від покупця рівно ці поля:
+                    // stock, variants, batchCount — і жодного іншого.
+                    for (let obj of merchRefsAndData) {
+                        const patch = {};
+                        if (!obj.cartItem.isPreorder) {
+                            patch.stock = obj.data.stock;
+                            patch.variants = obj.data.variants || [];
+                        }
+                        if (Number(obj.data.batchGoal) > 0) {
+                            patch.batchCount = (Number(obj.data.batchCount) || 0) + (obj.cartItem.quantity || 1);
+                        }
+                        if (Object.keys(patch).length) transaction.update(obj.ref, patch);
+
+                        // Збір, до якого привʼязаний товар: сума росте лише вгору.
+                        const fid = obj.data.fundraiserId;
+                        if (fid && fundraiserRefs[fid]) {
+                            fundraiserRaised[fid] = (fundraiserRaised[fid] || 0) + (obj.cartItem.totalPrice || 0);
+                        }
+                    }
+                    Object.keys(fundraiserRaised).forEach(function (fid) {
+                        transaction.update(fundraiserRefs[fid], {
+                            raised: (fundraiserBase[fid] || 0) + fundraiserRaised[fid]
+                        });
+                    });
                     if (promoRef) transaction.update(promoRef, { active: false, usedAt: firebase.firestore.FieldValue.serverTimestamp() });
                     newOrderId = orderRef.id;
                     transaction.set(orderRef, {
                         name, phone, address,
                         items: shoppingCart.map(i => ({ ...i, image: '' })),
-                        totalPrice: finalSum, promoCode: appliedPromo ? appliedPromo.code : null, paymentMethod: method, paymentProof: orderReceiptBase64 || null, userId: currentAccountUser ? currentAccountUser.uid : null, status: 'new',
+                        totalPrice: finalSum, donation: T.donation || 0, promoCode: appliedPromo ? appliedPromo.code : null, paymentMethod: method, paymentProof: orderReceiptBase64 || null, userId: currentAccountUser ? currentAccountUser.uid : null, status: 'new',
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         time: new Date().toLocaleString('uk-UA')
                     });
                 });
-                shoppingCart = []; appliedPromo = null; repeatDiscountApplied = false; orderReceiptBase64 = ''; const receiptInput = document.getElementById('order-receipt-file'); if(receiptInput) receiptInput.value = ''; const receiptPrev = document.getElementById('order-receipt-preview'); if(receiptPrev) receiptPrev.style.display = 'none'; saveCart(); updateCartUI();
+                shoppingCart = []; appliedPromo = null; repeatDiscountApplied = false; donationEnabled = false; orderReceiptBase64 = ''; const receiptInput = document.getElementById('order-receipt-file'); if(receiptInput) receiptInput.value = ''; const receiptPrev = document.getElementById('order-receipt-preview'); if(receiptPrev) receiptPrev.style.display = 'none'; saveCart(); updateCartUI();
                 ['checkout-step-1', 'checkout-step-2', 'checkout-form', 'checkout-steps-indicator'].forEach(id => document.getElementById(id).style.display = 'none');
                 document.getElementById('order-success-number').innerText = newOrderId;
                 document.getElementById('order-success-screen').style.display = 'flex';
