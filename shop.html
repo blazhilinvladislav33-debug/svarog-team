@@ -2652,16 +2652,57 @@ function rateLimit(key,ms){
             renderDonationRow(T);
             document.getElementById('cart-total-section').style.display = 'flex'; document.getElementById('step1-nav-wrap').style.display = 'block'; 
         }
+        // Телефон покупця: спершу з форми замовлення, потім із профілю.
+        // Потрібен, щоб перевірити іменний промокод.
+        function buyerPhoneKey() {
+            const fromForm = (document.getElementById('order-phone') || {}).value || '';
+            const fromProfile = (currentProfile && currentProfile.phone) || '';
+            return normalizePhoneDigits(fromForm || fromProfile);
+        }
+
         async function applyPromoCode() {
             const input = document.getElementById('promo-code-input-field');
             const code = input.value.trim().toUpperCase();
+            const ua = currentLang === 'ua';
             if (!code) return;
             try {
                 const doc = await db.collection("promocodes").doc(code).get();
-                if (!doc.exists || doc.data().active !== true) { showToast(currentLang === 'ua' ? "Промокод недійсний" : "Invalid promo code"); return; }
+                if (!doc.exists || doc.data().active !== true) {
+                    showToast(ua ? "Промокод недійсний" : "Invalid promo code");
+                    return;
+                }
                 const data = doc.data();
+
+                // ── строк дії ──
+                if (data.expiresAt && Date.now() > Number(data.expiresAt)) {
+                    showToast(ua ? "Термін дії промокоду минув" : "This promo code has expired");
+                    return;
+                }
+
+                // ── ІМЕННИЙ КОД ──
+                // Виданий конкретній людині: працює лише з її телефоном.
+                // Так знижку «наступному покупцеві після першого замовлення»
+                // не можна переслати друзям або викласти в чат.
+                if (data.assignedPhone) {
+                    const mine = buyerPhoneKey();
+                    if (!mine) {
+                        showToast(ua
+                            ? "Спершу вкажіть номер телефону — цей код іменний"
+                            : "Enter your phone first — this code is personal");
+                        return;
+                    }
+                    if (normalizePhoneDigits(data.assignedPhone) !== mine) {
+                        showToast(ua
+                            ? "Цей код виданий іншому номеру телефону"
+                            : "This code was issued to a different phone number");
+                        return;
+                    }
+                }
+
                 appliedPromo = { code, type: data.isCertificate ? 'certificate' : 'promo', discount: data.discount || 0, fiatValue: data.fiatValue || 0 };
-                showToast(currentLang === 'ua' ? "Промокод застосовано!" : "Promo code applied!");
+                showToast(data.assignedPhone
+                    ? (ua ? "Вашу персональну знижку застосовано!" : "Your personal discount is applied!")
+                    : (ua ? "Промокод застосовано!" : "Promo code applied!"));
                 renderCartModalContent();
             } catch (err) { showToast(err.message); }
         }
